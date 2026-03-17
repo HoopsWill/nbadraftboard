@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HoopsWill — NBA Draft Board</title>
+<title>HoopsWill — NBA Draft Board v9</title>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -97,8 +97,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--gray-50);color:var(--navy
 
 .card-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;padding:0 10px 10px;border-top:1px solid var(--gray-100);margin-top:4px;padding-top:10px}
 .stat-cell{text-align:center;background:var(--gray-50);border-radius:6px;padding:5px 3px}
-.stat-val{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:800;color:var(--navy)}
-.stat-lbl{font-size:9px;color:var(--gray-400);text-transform:uppercase;letter-spacing:.3px;font-weight:600}
+.stat-val{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:800;color:inherit}
+.stat-lbl{font-size:9px;color:inherit;opacity:.7;text-transform:uppercase;letter-spacing:.3px;font-weight:600}
 
 .card-comp{padding:0 14px 12px;font-size:11px;color:var(--gray-500);border-top:1px solid var(--gray-100);margin-top:0;padding-top:8px}
 .card-comp strong{color:var(--blue);font-weight:600}
@@ -215,10 +215,10 @@ tr:hover td{background:var(--gray-50)}
 .modal-meta{font-size:12px;opacity:.65;margin-top:4px}
 .modal-body{padding:22px 26px}
 .modal-metrics-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(90px,1fr));gap:10px;margin-bottom:18px}
-.metric-box{background:var(--gray-50);border:1px solid var(--gray-100);border-radius:10px;padding:11px 14px;text-align:center}
-.metric-box .val{font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:900;color:var(--navy)}
+.metric-box{background:var(--gray-50);border:1px solid var(--gray-100);border-radius:10px;padding:11px 14px;text-align:center;transition:background .2s}
+.metric-box .val{font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:900;color:inherit}
 .metric-box .val.hi{color:var(--blue)}.metric-box .val.gold{color:var(--amber)}
-.metric-box .lbl{font-size:9px;color:var(--gray-400);text-transform:uppercase;letter-spacing:.5px;font-weight:600;margin-top:1px}
+.metric-box .lbl{font-size:9px;color:inherit;opacity:.65;text-transform:uppercase;letter-spacing:.5px;font-weight:600;margin-top:1px}
 .modal-section{margin-bottom:14px}
 .modal-sec-title{font-size:10px;font-weight:700;color:var(--gray-400);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:8px;display:flex;align-items:center;gap:6px}
 .notes-text{font-size:13px;color:var(--gray-700);line-height:1.65;background:var(--gray-50);padding:12px 14px;border-radius:8px;border:1px solid var(--gray-100)}
@@ -239,20 +239,20 @@ tr:hover td{background:var(--gray-50)}
 .chart-wrap{position:relative;height:340px}
 
 /* MOCKS */
-.mock-controls{display:flex;gap:10px;align-items:center;margin-bottom:18px;flex-wrap:wrap}
-.mock-table-wrap{overflow-x:auto;background:white;border:1.5px solid var(--gray-200);border-radius:12px;box-shadow:var(--shadow-sm)}
-.mock-table{width:max-content;min-width:100%;border-collapse:collapse;font-size:12px}
-.mock-table th{background:var(--navy);color:white;padding:10px 14px;text-align:center;font-size:11px;font-weight:700;letter-spacing:.5px;white-space:nowrap;border-right:1px solid rgba(255,255,255,.1);position:sticky;top:0;z-index:10}
+
+
+
+
 .mock-table th:first-child{text-align:center;width:48px;position:sticky;left:0;z-index:20;background:var(--navy-mid)}
-.mock-table td{padding:7px 10px;border-bottom:1px solid var(--gray-100);border-right:1px solid var(--gray-100);vertical-align:middle;text-align:center;min-width:160px}
+.mock-table td{padding:7px 10px;border-bottom:1px solid var(--gray-100);border-right:1px solid var(--gray-100);vertical-align:middle;text-align:center;min-width:0}
 .mock-table td:first-child{position:sticky;left:0;background:white;z-index:5;font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:800;color:var(--gray-300);border-right:2px solid var(--gray-200);text-align:center;width:48px}
-.mock-table td:first-child.lotto{color:var(--purple)}
+.mock-table td:first-child
 .mock-table tr:hover td{background:var(--gray-50)}
 .mock-table tr:hover td:first-child{background:var(--gray-50)}
-.mock-player-link{cursor:pointer;font-weight:600;color:var(--navy);transition:color .1s;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:150px}
+
 .mock-player-link:hover{color:var(--blue)}
-.mock-team-badge{font-size:10px;color:var(--gray-400);display:block;font-weight:500}
-.mock-empty{color:var(--gray-300);font-size:11px}
+
+
 
 /* TREND MODAL */
 .trend-modal{max-width:700px}
@@ -365,6 +365,204 @@ tr:hover td{background:var(--gray-50)}
 .gs-section-header{padding:6px 20px;font-size:10px;font-weight:700;color:#94A3B8;text-transform:uppercase;letter-spacing:.8px;background:#FAFBFC;border-bottom:1px solid #F1F5F9}
 .gs-highlight{background:#FEF9C3;border-radius:2px}
 .gs-no-results{text-align:center;padding:40px 20px;color:#94A3B8;font-size:14px}
+
+
+/* ── BIG BOARD INLINE VIEW ───────────────────────────────────── */
+.bb-wrap{display:flex;justify-content:center;padding:0 0 24px}
+.bb-board{width:100%;background:white;border-radius:12px;overflow:hidden;box-shadow:0 2px 24px rgba(10,22,40,.10)}
+.bb-screenshot-bar{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+.bb-sub-btn{background:var(--gray-50);border:1.5px solid var(--gray-200);color:var(--gray-500);border-radius:7px;padding:5px 13px;font-size:12px;font-weight:700;font-family:'Barlow Condensed',sans-serif;letter-spacing:.5px;cursor:pointer;transition:all .15s;white-space:nowrap}
+.bb-sub-btn.active,.bb-sub-btn:hover{background:rgba(212,168,48,.1);border-color:var(--amber);color:var(--amber)}
+.bb-header{background:linear-gradient(145deg,#0A1628 0%,#0f2040 60%,#0A1628 100%);padding:22px 26px 16px;position:relative;overflow:hidden}
+.bb-header::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent 0,transparent 80px,rgba(212,168,48,.04) 80px,rgba(212,168,48,.04) 81px)}
+.bb-header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,var(--amber),#F0C94A,var(--amber),transparent)}
+.bb-header-row{display:flex;align-items:center;gap:12px;position:relative;z-index:1}
+.bb-logo-box{width:42px;height:42px;border-radius:8px;background:rgba(212,168,48,.12);border:1.5px solid rgba(212,168,48,.3);display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:900;color:var(--amber);letter-spacing:1px;flex-shrink:0}
+.bb-htitles .bb-brand{font-size:10px;color:var(--amber);letter-spacing:2px;opacity:.8;margin-bottom:2px;font-family:'Barlow Condensed',sans-serif;font-weight:700;text-transform:uppercase}
+.bb-htitles .bb-title{font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:900;color:white;letter-spacing:.5px;line-height:1}
+.bb-meta{margin-top:10px;position:relative;z-index:1;display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.bb-pill{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:4px;padding:2px 9px;font-size:10px;font-weight:600;color:rgba(255,255,255,.5);letter-spacing:.3px}
+.bb-pill.gold{background:rgba(212,168,48,.15);border-color:rgba(212,168,48,.3);color:var(--amber)}
+.bb-col-hdr{background:var(--navy);display:flex;align-items:center;padding-right:10px;width:100%}
+.bb-ch{font-size:10px;font-weight:700;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:.8px;padding:9px 0;text-align:center}
+.bb-ch.left{text-align:left;padding-left:6px}
+/* Column widths — shared between header and rows */
+.bb-cr{width:42px;flex-shrink:0;text-align:center}
+.bb-cav{width:40px;flex-shrink:0}
+.bb-cid{flex:2.4;min-width:140px}
+.bb-ctag{flex:1.8;min-width:110px}
+.bb-cmet{flex:1.1;min-width:74px;text-align:center}
+.bb-cts{flex:0.85;min-width:56px;text-align:center}
+.bb-cpa{flex:0.95;min-width:62px;text-align:center}
+.bb-csb{flex:0.85;min-width:56px;text-align:center}
+.bb-cco{flex:1.3;min-width:80px}
+/* Tier band */
+.bb-tier-band{display:flex;align-items:center;height:32px;padding:0 14px;gap:10px;overflow:hidden}
+.bb-tier-label{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:900;color:white;letter-spacing:1.5px;text-transform:uppercase;white-space:nowrap}
+.bb-tier-sub{font-size:10px;color:rgba(255,255,255,.45);font-weight:600;letter-spacing:.3px;white-space:nowrap}
+.bb-tier-picks{margin-left:auto;font-family:'Barlow Condensed',sans-serif;font-size:10px;color:rgba(255,255,255,.38);letter-spacing:.4px;flex-shrink:0}
+/* Player row — FIXED HEIGHT, no flex-grow on children */
+.bb-row{display:flex;align-items:center;height:52px;padding-right:10px;border-bottom:1px solid var(--gray-100);transition:background .1s;overflow:hidden}
+.bb-row:hover{background:#F0F4FF}
+.bb-row:last-child{border-bottom:none}
+.bb-row.alt{background:var(--gray-50)}
+.bb-row.alt:hover{background:#E8EEFA}
+.bb-row.bbt1{border-left:3px solid #D97706}.bb-row.bbt1 .bb-rk{opacity:.5;color:#92400E}
+.bb-row.bbt2{border-left:3px solid #7C3AED}.bb-row.bbt2 .bb-rk{opacity:.4;color:#4C1D95}
+.bb-rk{font-family:'Barlow Condensed',sans-serif;font-size:22px;color:var(--navy);opacity:.18;line-height:1;user-select:none;flex-shrink:0}
+.bb-av{flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.bb-id{min-width:0;padding:0 7px 0 5px;display:flex;flex-direction:column;justify-content:center;overflow:hidden}
+.bb-name{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:800;color:var(--navy);line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bb-school-line{display:flex;align-items:center;gap:3px;margin-top:1px;overflow:hidden}
+.bb-school{font-size:10px;color:var(--gray-400);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bb-cls-dot{font-size:9px;color:var(--gray-300);font-weight:500;flex-shrink:0}
+.bb-tags{flex-shrink:0;display:flex;flex-direction:column;gap:2px;justify-content:center;overflow:hidden}
+.bb-tag{display:inline-block;border-radius:3px;padding:1px 5px;font-size:9.5px;font-weight:700;letter-spacing:.15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:120px;line-height:1.4}
+.bb-tag-g{background:#EFF6FF;color:#1D4ED8}
+.bb-tag-w{background:#F5F3FF;color:#6D28D9}
+.bb-tag-b{background:#F0FDFA;color:#0D9488}
+.bb-tag-r{background:var(--gray-50);color:var(--gray-500);border:1px solid var(--gray-200);font-weight:600}
+.bb-tag-phys{background:#F0F9FF;color:#0369A1;border:1px solid #BAE6FD;font-weight:700;font-size:9px;letter-spacing:.1px}
+.bb-met-cell{flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.bb-met-val{font-family:'Barlow Condensed',sans-serif;font-size:21px;font-weight:900;line-height:1;border-radius:6px;padding:4px 8px;min-width:58px;text-align:center;white-space:nowrap}
+.bb-met-lbl{display:none}
+.bb-stat-cell{flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;border-radius:6px;margin:3px 2px}
+.bb-sv{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:800;color:var(--navy);line-height:1;white-space:nowrap}
+.bb-sl{font-size:8px;color:var(--gray-300);text-transform:uppercase;letter-spacing:.5px;margin-top:2px;font-weight:700;white-space:nowrap}
+.bb-sv.empty{color:var(--gray-200)}
+.bb-pht{font-size:10px;font-weight:700}
+.bb-pwt{font-size:9px}
+.bb-comp-cell{flex-shrink:0;padding-left:8px;display:flex;flex-direction:column;justify-content:center;overflow:hidden}
+.bb-comp-lbl{font-size:7.5px;color:var(--gray-300);text-transform:uppercase;letter-spacing:.4px;font-weight:600;white-space:nowrap}
+.bb-comp-val{font-size:10px;color:var(--gray-400);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bb-footer{background:var(--navy);padding:10px 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px}
+.bb-footer-brand{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:800;color:var(--amber);letter-spacing:.5px}
+.bb-footer-note{font-size:10px;color:rgba(255,255,255,.22);font-weight:500}
+/* Twitter sub-mode: narrower board */
+#board2026Content .bb-board.bb-tw .bb-cco{display:none}
+#board2026Content .bb-board.bb-tw .bb-cid{flex:2}
+#board2026Content .bb-board.bb-tw .bb-ctag{flex:1.4;min-width:90px}
+#board2026Content .bb-board.bb-tw .bb-cmet{flex:0.9;min-width:60px}
+#board2026Content .bb-board.bb-tw .bb-met-val{font-size:17px;min-width:44px;padding:3px 5px}
+#board2026Content .bb-board.bb-tw .bb-cts,
+#board2026Content .bb-board.bb-tw .bb-cpa,
+#board2026Content .bb-board.bb-tw .bb-csb{flex:0.7;min-width:44px}
+#board2026Content .bb-board.bb-tw .bb-sv{font-size:12px}
+#board2026Content .bb-board.bb-tw .bb-row{height:46px}
+
+/* ── MOCK DRAFT REDESIGN ─────────────────────────────────────── */
+.mock-controls{display:flex;gap:10px;align-items:center;margin-bottom:18px;flex-wrap:wrap}
+.mock-table-wrap{overflow-x:auto;background:white;border:1.5px solid var(--gray-200);border-radius:12px;box-shadow:var(--shadow-sm)}
+.mock-table{width:max-content;min-width:100%;border-collapse:collapse;font-size:12px}
+.mock-table thead tr{background:var(--navy)}
+.mock-table th{color:rgba(255,255,255,.7);padding:0;text-align:center;white-space:nowrap;border-right:1px solid rgba(255,255,255,.08);position:sticky;top:0;z-index:10;font-size:10px;font-weight:700;letter-spacing:.6px}
+.mock-table th.pick-th{width:52px;padding:10px 8px;background:var(--navy);position:sticky;left:0;z-index:20}
+
+.mock-th-date{font-size:11px;font-weight:800;color:white;letter-spacing:.3px}
+.mock-th-label{font-size:9px;font-weight:600;color:rgba(255,255,255,.4);letter-spacing:.5px;text-transform:uppercase}
+.mock-table tbody tr{border-bottom:1px solid var(--gray-100);transition:background .1s}
+.mock-table tbody tr:last-child{border-bottom:none}
+.mock-table tbody tr:hover{background:#F0F4FF}
+.mock-table tbody tr.alt{background:var(--gray-50)}
+.mock-table tbody tr.alt:hover{background:#E8EEFA}
+.mock-table td{padding:0;border-right:1px solid var(--gray-100);vertical-align:middle}
+.mock-table td.pick-td{position:sticky;left:0;z-index:5;background:white;width:52px;text-align:center}
+.mock-table tr.alt td.pick-td{background:var(--gray-50)}
+.mock-table tr:hover td.pick-td{background:#F0F4FF}
+.pick-num{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:900;line-height:1;color:var(--navy);opacity:.22;padding:0 10px}
+.pick-num.lotto{color:var(--purple);opacity:.6}
+
+.mock-team-logo{width:26px;height:26px;object-fit:contain;flex-shrink:0;border-radius:3px}
+.mock-team-logo-fb{width:26px;height:26px;flex-shrink:0;border-radius:3px;background:var(--gray-100);display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:800;color:var(--gray-400);font-family:'Barlow Condensed',sans-serif;letter-spacing:.3px}
+.mock-cell-info{min-width:0;flex:1}
+.mock-player-link{cursor:pointer;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:800;color:var(--navy);transition:color .15s;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.1}
+.mock-player-link:hover{color:var(--blue)}
+.mock-team-line{display:flex;align-items:center;gap:4px;margin-top:1px}
+.mock-team-code{font-size:10px;font-weight:700;color:var(--gray-400);letter-spacing:.4px;font-family:'Barlow Condensed',sans-serif}
+.mock-via{font-size:9px;color:var(--gray-300);font-weight:500}
+.mock-empty{color:var(--gray-200);font-size:18px;display:flex;align-items:center;justify-content:center;height:100%;padding:12px}
+.mock-pick-trend{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:600;color:var(--gray-300)}
+
+.mock-cell{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 12px;min-width:0}
+.mock-pick-left{display:flex;align-items:center;gap:8px;min-width:0;flex:0 0 auto;max-width:180px}
+.mock-pick-stats{flex:1;min-width:0;display:flex;justify-content:flex-end}
+.mock-stats-row{display:flex;align-items:stretch;gap:3px;flex-wrap:nowrap}
+.mock-stat-box{display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:5px;padding:3px 6px;min-width:36px;background:var(--gray-100)}
+.mock-sval{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:900;line-height:1;color:inherit}
+.mock-slbl{font-size:7px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;opacity:.7;margin-top:1px;color:inherit;white-space:nowrap}
+.mock-stat-plain{background:var(--gray-100);color:var(--gray-500)}
+.mock-th-inner{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 14px;gap:2px;min-width:0}
+
+/* ── MOCK DRAFT CREATOR ─────────────────────────────────────────────────── */
+.mdc-wrap{display:flex;gap:0;height:calc(100vh - 160px);min-height:600px;border:1.5px solid var(--gray-200);border-radius:12px;overflow:hidden;box-shadow:0 2px 24px rgba(10,22,40,.1)}
+.mdc-board{flex:1;min-width:0;display:flex;flex-direction:column;background:var(--gray-50)}
+.mdc-board-header{background:var(--navy);padding:12px 16px;display:flex;align-items:center;gap:10px;flex-shrink:0;flex-wrap:wrap}
+.mdc-board-title{font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900;color:white;letter-spacing:.5px}
+.mdc-progress{flex:1;display:flex;align-items:center;gap:8px}
+.mdc-prog-bar{flex:1;height:6px;background:rgba(255,255,255,.15);border-radius:3px;overflow:hidden}
+.mdc-prog-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--amber),#F0C94A);transition:width .3s}
+.mdc-prog-text{font-size:11px;color:rgba(255,255,255,.5);font-weight:600;white-space:nowrap}
+.mdc-actions{display:flex;gap:6px}
+.mdc-act-btn{border:1.5px solid rgba(255,255,255,.2);background:rgba(255,255,255,.08);color:rgba(255,255,255,.8);border-radius:6px;padding:5px 12px;font-size:11px;font-weight:700;font-family:'Barlow Condensed',sans-serif;letter-spacing:.4px;cursor:pointer;transition:all .15s;white-space:nowrap}
+.mdc-act-btn:hover{background:rgba(255,255,255,.16);color:white}
+.mdc-act-btn.gold{background:var(--amber);color:var(--navy);border-color:var(--amber)}
+.mdc-act-btn.gold:hover{background:#F0C94A}
+.mdc-picks-scroll{flex:1;overflow-y:auto;padding:8px}
+.mdc-round-hdr{padding:6px 8px;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:900;letter-spacing:1.5px;text-transform:uppercase;color:var(--gray-400);border-bottom:1px solid var(--gray-200);margin:8px 0 4px;background:var(--gray-50)}
+.mdc-pick-row{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;border:1.5px solid transparent;background:white;margin-bottom:3px;cursor:pointer;transition:all .15s;min-height:52px}
+.mdc-pick-row:hover{border-color:var(--amber);background:#FFFBEB}
+.mdc-pick-row.active{border-color:var(--amber);background:#FFFBEB;box-shadow:0 0 0 3px rgba(212,168,48,.15)}
+.mdc-pick-row.filled{border-color:var(--gray-200);background:white;cursor:pointer}
+.mdc-pick-row.filled:hover{border-color:rgba(239,68,68,.35);background:#FFF5F5}
+.mdc-pick-num{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:900;color:var(--navy);opacity:.2;width:32px;text-align:center;flex-shrink:0;line-height:1}
+.mdc-pick-row.active .mdc-pick-num{opacity:.6;color:var(--amber)}
+.mdc-pick-num.lotto{color:var(--purple);opacity:.6}
+.mdc-team-logo{width:28px;height:28px;object-fit:contain;flex-shrink:0}
+.mdc-team-logo-fb{width:28px;height:28px;border-radius:4px;background:var(--gray-100);display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:800;color:var(--gray-400);font-family:'Barlow Condensed',sans-serif;flex-shrink:0}
+.mdc-team-info{display:flex;flex-direction:column;min-width:0;width:110px;flex-shrink:0}
+.mdc-team-name{font-size:11px;font-weight:700;color:var(--navy);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mdc-selection{flex:1;min-width:0}
+.mdc-empty-slot{font-size:12px;color:var(--gray-300);font-style:italic}
+.mdc-pick-row.active .mdc-empty-slot{color:var(--amber);font-weight:600;font-style:normal}
+.mdc-picked-name{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:800;color:var(--navy);line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mdc-picked-meta{font-size:10px;color:var(--gray-400);font-weight:500;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mdc-unpick-btn{width:20px;height:20px;border-radius:50%;background:rgba(239,68,68,.1);border:none;color:var(--red);font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;opacity:0;transition:opacity .15s}
+.mdc-pick-row:hover .mdc-unpick-btn{opacity:1}
+.mdc-pick-av{flex-shrink:0}
+
+/* Right panel — player pool */
+.mdc-pool{width:320px;flex-shrink:0;display:flex;flex-direction:column;border-left:1.5px solid var(--gray-200);background:white}
+.mdc-pool-header{background:var(--navy);padding:10px 14px;flex-shrink:0}
+.mdc-pool-title{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:900;color:white;letter-spacing:.5px;margin-bottom:8px}
+.mdc-pool-filters{display:flex;gap:6px;flex-wrap:wrap}
+.mdc-pool-search{flex:1;min-width:0;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.1);border-radius:5px;padding:4px 8px;font-size:11px;color:white;outline:none;font-family:'DM Sans',sans-serif}
+.mdc-pool-search::placeholder{color:rgba(255,255,255,.35)}
+.mdc-pos-filter{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:4px;color:rgba(255,255,255,.6);padding:3px 8px;font-size:10px;font-weight:700;font-family:'Barlow Condensed',sans-serif;cursor:pointer;transition:all .15s;white-space:nowrap}
+.mdc-pos-filter.active{background:rgba(212,168,48,.2);border-color:var(--amber);color:var(--amber)}
+.mdc-pool-list{flex:1;overflow-y:auto;padding:4px}
+.mdc-pool-item{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:7px;border:1.5px solid transparent;cursor:pointer;transition:all .12s;margin-bottom:2px}
+.mdc-pool-item:hover{background:#F0F9FF;border-color:#BAE6FD}
+.mdc-pool-item.selected{background:#FFFBEB;border-color:var(--amber)}
+.mdc-pool-item.drafted{opacity:.3;pointer-events:none}
+.mdc-pool-rank{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;color:var(--navy);opacity:.25;width:26px;text-align:right;flex-shrink:0}
+.mdc-pool-name{flex:1;min-width:0}
+.mdc-pool-pname{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:800;color:var(--navy);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mdc-pool-school{font-size:10px;color:var(--gray-400);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mdc-pool-met{border-radius:4px;padding:2px 6px;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:800;white-space:nowrap;flex-shrink:0}
+.mdc-select-btn{background:var(--amber);color:var(--navy);border:none;border-radius:5px;padding:4px 10px;font-size:11px;font-weight:800;font-family:'Barlow Condensed',sans-serif;cursor:pointer;flex-shrink:0;transition:all .12s;white-space:nowrap}
+.mdc-select-btn:hover{background:#F0C94A}
+.mdc-pool-empty{text-align:center;padding:40px 20px;color:var(--gray-300);font-size:13px}
+.mdc-save-toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--navy);color:white;padding:10px 22px;border-radius:8px;font-size:13px;font-weight:600;box-shadow:0 4px 24px rgba(0,0,0,.3);z-index:9999;opacity:0;transition:opacity .3s;pointer-events:none}
+.mdc-save-toast.show{opacity:1}
+@media print{
+  .mdc-actions,.mdc-pool-header .mdc-pool-filters,.mdc-select-btn,.mdc-unpick-btn,.mdc-active-indicator{display:none!important}
+  .mdc-wrap{height:auto!important;border:none!important;box-shadow:none!important}
+  .mdc-pool{display:none!important}
+  .mdc-board{width:100%!important}
+  .mdc-picks-scroll{overflow:visible!important;max-height:none!important}
+}
+.mdc-active-indicator{width:8px;height:8px;border-radius:50%;background:var(--amber);flex-shrink:0;animation:pulse 1.2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
 </style>
 </head>
 <body>
@@ -385,7 +583,7 @@ tr:hover td{background:var(--gray-50)}
       <div class="file-item" onclick="showUploadPanel();closeFileMenu()">&#8593;&nbsp; Refresh from Excel</div>
     </div>
   </div>
-  <div class="header-badge">2026 Live</div>
+  <div class="header-badge">v9 · 2026</div>
 </header>
 
 <nav class="nav-tabs" id="navTabs">
@@ -397,6 +595,7 @@ tr:hover td{background:var(--gray-50)}
   <div class="nav-tab" data-tab="future">🔭 2027 Watch</div>
   <div class="nav-tab" data-tab="resources">📚 Resources</div>
   <div class="nav-tab" data-tab="compare">⚖️ Compare</div>
+  <div class="nav-tab" data-tab="mockbuilder">🏗️ Mock Builder</div>
 </nav>
 
 <div id="uploadPanel" class="upload-panel">
@@ -442,6 +641,7 @@ tr:hover td{background:var(--gray-50)}
     <div class="view-toggle">
       <button class="view-btn active" id="viewCards" onclick="setView('cards')">⊞ Cards</button>
       <button class="view-btn" id="viewTable" onclick="setView('table')">☰ Table</button>
+      <button class="view-btn" id="viewBigboard" onclick="setView('bigboard')">🏆 Big Board</button>
     </div>
     <span class="count-badge" id="boardCount"></span>
   </div>
@@ -594,6 +794,45 @@ tr:hover td{background:var(--gray-50)}
   <div id="compareError" style="display:none;color:var(--red);font-size:13px;font-weight:600;margin-bottom:10px"></div>
   <div id="compareContent"></div>
 </section>
+
+<section class="tab-panel" id="tab-mockbuilder">
+  <div class="print-header"><div class="print-header-title">HoopsWill NBA Draft Board — Mock Draft Creator</div><div class="print-header-sub">2026 Draft Order (Tankathon) · hoopswill.com</div></div>
+  <div id="mdcWrap" class="mdc-wrap">
+    <!-- Left: pick board -->
+    <div class="mdc-board">
+      <div class="mdc-board-header">
+        <span class="mdc-board-title">🏆 Build Your Mock Draft</span>
+        <div class="mdc-progress">
+          <div class="mdc-prog-bar"><div class="mdc-prog-fill" id="mdcProgFill" style="width:0%"></div></div>
+          <span class="mdc-prog-text" id="mdcProgText">0 / 60 picks</span>
+        </div>
+        <div class="mdc-actions">
+          <button class="mdc-act-btn" onclick="mdcUndo()">↩ Undo</button>
+          <button class="mdc-act-btn" onclick="mdcReset()">✕ Reset</button>
+          <button class="mdc-act-btn gold" onclick="mdcSave()">💾 Save Snapshot</button>
+          <button class="mdc-act-btn" onclick="mdcScreenshot()">📷 Screenshot</button>
+        </div>
+      </div>
+      <div class="mdc-picks-scroll" id="mdcPicksScroll"></div>
+    </div>
+    <!-- Right: player pool -->
+    <div class="mdc-pool">
+      <div class="mdc-pool-header">
+        <div class="mdc-pool-title">Player Pool <span id="mdcPoolCount" style="font-weight:500;opacity:.5;font-size:12px"></span></div>
+        <div class="mdc-pool-filters">
+          <input class="mdc-pool-search" id="mdcSearch" type="text" placeholder="Search player…" oninput="mdcFilterPool(this.value)">
+          <button class="mdc-pos-filter active" onclick="mdcSetPos('ALL',this)">All</button>
+          <button class="mdc-pos-filter" onclick="mdcSetPos('Guard',this)">G</button>
+          <button class="mdc-pos-filter" onclick="mdcSetPos('Forward',this)">F</button>
+          <button class="mdc-pos-filter" onclick="mdcSetPos('Center',this)">C</button>
+        </div>
+      </div>
+      <div class="mdc-pool-list" id="mdcPoolList"></div>
+    </div>
+  </div>
+  <div class="mdc-save-toast" id="mdcToast"></div>
+</section>
+
 </main>
 
 <!-- PLAYER MODAL -->
@@ -813,6 +1052,14 @@ const ESPN_IDS = {
   'Keyonte George':4433755,'Dereck Lively II':4433756,'Nick Smith Jr.':4433757
 };
 
+const NBA_TEAM_IDS = {
+  'ATL':1,'BKN':17,'BOS':2,'CHA':30,'CHI':4,'CLE':5,'DAL':6,'DEN':7,
+  'DET':8,'GSW':9,'HOU':10,'IND':11,'LAC':12,'LAL':13,'MEM':29,
+  'MIA':14,'MIL':15,'MIN':16,'NOP':3,'NYK':18,'OKC':25,'ORL':19,
+  'PHI':20,'PHX':21,'POR':22,'SAC':23,'SAS':24,'TOR':28,'UTA':26,'WAS':27
+};
+
+
 function getPhotoUrl(playerName) {
   const base = splitName(playerName)[0];
   const id = ESPN_IDS[base];
@@ -858,8 +1105,9 @@ let sortCol = 'rank', sortDir = 1;
 
 function setView(v) {
   currentView = v;
-  document.getElementById('viewCards').classList.toggle('active', v === 'cards');
-  document.getElementById('viewTable').classList.toggle('active', v === 'table');
+  document.getElementById('viewCards').classList.toggle('active',    v === 'cards');
+  document.getElementById('viewTable').classList.toggle('active',    v === 'table');
+  document.getElementById('viewBigboard').classList.toggle('active', v === 'bigboard');
   renderBoard2026();
 }
 
@@ -879,7 +1127,9 @@ function renderBoard2026() {
   });
 
   document.getElementById('boardCount').textContent = players.length + ' prospects';
-  currentView === 'table' ? renderBoardTable(players) : renderBoardCards(players);
+  if (currentView === 'table')        renderBoardTable(players);
+  else if (currentView === 'bigboard') renderBoardBigboard(players);
+  else                                 renderBoardCards(players);
 }
 
 function renderBoardCards(players) {
@@ -1051,14 +1301,22 @@ function openPlayerModal(rank, year) {
   document.getElementById('modalMeta').textContent = [school, player.cls, player.torvik_role, player.position].filter(Boolean).join(' · ');
   document.getElementById('modalAvatar').innerHTML = avatarHtml(player.name, player.position, '72px', '12px');
 
+  // Pre-compute gradient styles for each stat
+  const mgMet = gradStyle(player.metric,  'metric');
+  const mgTs  = gradStyle(player.ts_pct,  'ts_pct');
+  const mgPa  = gradStyle(player.pa2_usg, 'pa2_usg');
+  const mgSb  = gradStyle(player.stl_bl,  'stl_bl');
+  const mgAto = gradStyle(player.ato,     'ato');
+  const mgFt  = gradStyle(player.ftar,    'ftar');
+  const mgTp  = gradStyle(player.tpar,    'tpar');
   let body = `<div class="modal-metrics-row">
-    <div class="metric-box"><div class="val ${elite?'gold':'hi'}">${player.metric ? Math.round(player.metric) : '—'}</div><div class="lbl">Model Metric</div></div>
-    <div class="metric-box"><div class="val">${pct(player.ts_pct)}</div><div class="lbl">TS%</div></div>
-    <div class="metric-box"><div class="val">${round1(player.pa2_usg)}</div><div class="lbl">P+A/USG</div></div>
-    <div class="metric-box"><div class="val">${player.stl_bl ? parseFloat(player.stl_bl).toFixed(2) : '—'}</div><div class="lbl">Stl+Bl/75</div></div>
-    <div class="metric-box"><div class="val">${player.ato ? parseFloat(player.ato).toFixed(2) : '—'}</div><div class="lbl">A/TO</div></div>
-    <div class="metric-box"><div class="val">${player.ftar ? parseFloat(player.ftar).toFixed(3) : '—'}</div><div class="lbl">FTAr</div></div>
-    <div class="metric-box"><div class="val">${player.tpar ? parseFloat(player.tpar).toFixed(3) : '—'}</div><div class="lbl">3PAr</div></div>
+    <div class="metric-box" style="${mgMet}"><div class="val">${player.metric ? Math.round(player.metric) : '—'}</div><div class="lbl">Model Metric</div></div>
+    <div class="metric-box" style="${mgTs}"><div class="val">${pct(player.ts_pct)}</div><div class="lbl">TS%</div></div>
+    <div class="metric-box" style="${mgPa}"><div class="val">${round1(player.pa2_usg)}</div><div class="lbl">P+A/USG</div></div>
+    <div class="metric-box" style="${mgSb}"><div class="val">${player.stl_bl ? parseFloat(player.stl_bl).toFixed(2) : '—'}</div><div class="lbl">Stl+Bl/75</div></div>
+    <div class="metric-box" style="${mgAto}"><div class="val">${player.ato ? parseFloat(player.ato).toFixed(2) : '—'}</div><div class="lbl">A/TO</div></div>
+    <div class="metric-box" style="${mgFt}"><div class="val">${player.ftar ? parseFloat(player.ftar).toFixed(3) : '—'}</div><div class="lbl">FTAr</div></div>
+    <div class="metric-box" style="${mgTp}"><div class="val">${player.tpar ? parseFloat(player.tpar).toFixed(3) : '—'}</div><div class="lbl">3PAr</div></div>
     <div class="metric-box"><div class="val">${player.bpm ? parseFloat(player.bpm).toFixed(1) : '—'}</div><div class="lbl">BPM</div></div>
   </div>`;
 
@@ -1271,69 +1529,127 @@ function getBoardRank(playerName, year) {
 let trendChart = null;
 
 function renderMocks() {
-  const yr = document.getElementById('mockYear').value;
+  const yr       = document.getElementById('mockYear').value;
   const yearData = DATA.mocks[yr] || {};
-  const snapshots = Object.keys(yearData); // in order
+  const snapshots= Object.keys(yearData);
 
   if (!snapshots.length) {
-    document.getElementById('mocksContent').innerHTML = '<div class="empty"><div class="empty-icon">📋</div><p>No mock draft data for this year yet</p></div>';
+    document.getElementById('mocksContent').innerHTML =
+      '<div class="empty"><div class="empty-icon">📋</div><p>No mock draft data for this year yet</p></div>';
     document.getElementById('mockInfo').textContent = '';
     return;
   }
+  document.getElementById('mockInfo').textContent = snapshots.length + ' snapshots';
 
-  document.getElementById('mockInfo').textContent = `${snapshots.length} snapshots`;
-
-  // Collect all picks across all snapshots
+  // All picks across all snapshots
   const allPicks = new Set();
   snapshots.forEach(s => yearData[s].forEach(p => allPicks.add(p.pick)));
-  const sortedPicks = [...allPicks].sort((a,b)=>a-b);
+  const sortedPicks = [...allPicks].sort((a,b) => a-b);
 
-  // Build player-to-picks map: normalizedName -> {snapIdx -> {pick, team}}
-  const playerMap = {};  // normName -> { displayName, snapData: {snapLabel: {pick, team}} }
-  snapshots.forEach(snap => {
-    yearData[snap].forEach(entry => {
-      const norm = normalizeName(entry.player);
-      if (!playerMap[norm]) playerMap[norm] = { displayName: entry.player, snaps: {} };
-      playerMap[norm].snaps[snap] = { pick: entry.pick, team: entry.team };
-    });
-  });
-
-  // Build table: pick -> snap -> entry
+  // pickTable[pick][snap] = entry | null
   const pickTable = {};
   sortedPicks.forEach(pick => {
     pickTable[pick] = {};
     snapshots.forEach(snap => {
-      const entry = yearData[snap].find(e => e.pick === pick);
-      pickTable[pick][snap] = entry || null;
+      pickTable[pick][snap] = yearData[snap].find(e => e.pick === pick) || null;
     });
   });
 
-  let html = `<div class="mock-table-wrap"><table class="mock-table"><thead><tr>
-    <th style="position:sticky;left:0;z-index:20;background:var(--navy-mid)">Pick</th>`;
-  snapshots.forEach(s => { html += `<th>${s}</th>`; });
-  html += '</tr></thead><tbody>';
+  // ── Table ────────────────────────────────────────────────────────
+  let h = '<div class="mock-table-wrap"><table class="mock-table"><thead><tr>'
+    + '<th class="pick-th">PICK</th>';
 
-  sortedPicks.forEach(pick => {
+  snapshots.forEach(s => {
+    h += '<th><div class="mock-th-inner">'
+      + '<span class="mock-th-date">' + s + '</span>'
+      + '<span class="mock-th-label">Snapshot</span>'
+      + '</div></th>';
+  });
+  h += '</tr></thead><tbody>';
+
+  sortedPicks.forEach((pick, ri) => {
     const isLotto = pick <= 14;
-    html += `<tr><td class="${isLotto?'lotto':''}">${pick}</td>`;
+    const altCls  = ri % 2 === 1 ? ' alt' : '';
+    h += '<tr class="' + altCls + '">';
+    h += '<td class="pick-td"><span class="pick-num' + (isLotto ? ' lotto' : '') + '">'
+      + (pick < 10 ? '0'+pick : pick) + '</span></td>';
+
     snapshots.forEach(snap => {
       const entry = pickTable[pick][snap];
       if (entry && entry.player) {
         const [name] = splitName(entry.player);
-        const norm = normalizeName(entry.player);
-        html += `<td>
-          <span class="mock-player-link" onclick="openTrendModal('${escJs(norm)}','${yr}','${escJs(entry.player)}')">${name}</span>
-          ${entry.team ? `<span class="mock-team-badge">${entry.team}</span>` : ''}
-        </td>`;
+        const norm   = normalizeName(entry.player);
+        const rawTeam= (entry.team || '').trim();
+        // Extract base 3-letter code + via note
+        const baseTeam = rawTeam.replace(/\s*\(.*\)/, '').trim().slice(0,3);
+        const via      = rawTeam.match(/\(([^)]+)\)/)?.[1] || '';
+        const logoId   = NBA_TEAM_IDS[baseTeam];
+        const logoHtml = logoId
+          ? '<img class="mock-team-logo" src="https://a.espncdn.com/i/teamlogos/nba/500/'
+              + logoId + '.png" onerror="this.style.display=\'none\'" alt="' + baseTeam + '">'
+          : (baseTeam
+              ? '<div class="mock-team-logo-fb">' + baseTeam + '</div>'
+              : '');
+
+        // Look up player stats from the matching board
+        const pStats = mockPlayerStats(entry.player, yr);
+        let statsHtml = '';
+        if (pStats) {
+          const mV = (pStats.metric && pStats.metric>0) ? Number(pStats.metric).toFixed(1) : null;
+          const tV = (pStats.ts_pct && pStats.ts_pct>0) ? (pStats.ts_pct*100).toFixed(1)+'%' : null;
+          const pV = (pStats.pa2_usg && pStats.pa2_usg>0) ? Math.round(pStats.pa2_usg) : null;
+          const sV = (pStats.stl_bl && pStats.stl_bl>0) ? parseFloat(pStats.stl_bl).toFixed(1) : null;
+          if (mV || tV || pV || sV) {
+            const metSty = mV ? bbMetStyle(parseFloat(mV)) : '';
+            var tsStyM = pStats.ts_pct  ? gradStyle(pStats.ts_pct, 'ts_pct')   : '';
+            var paStyM = pStats.pa2_usg ? gradStyle(pStats.pa2_usg,'pa2_usg')  : '';
+            var sbStyM = pStats.stl_bl  ? gradStyle(pStats.stl_bl, 'stl_bl')   : '';
+            statsHtml = '<div class="mock-stats-row">'
+              + (mV ? '<div class="mock-stat-box" style="'+metSty+'"><div class="mock-sval">'+mV+'</div><div class="mock-slbl">Metric</div></div>' : '')
+              + (tV ? '<div class="mock-stat-box" style="'+tsStyM+'"><div class="mock-sval">'+tV+'</div><div class="mock-slbl">TS%</div></div>' : '')
+              + (pV ? '<div class="mock-stat-box" style="'+paStyM+'"><div class="mock-sval">'+String(pV)+'</div><div class="mock-slbl">P+A/USG</div></div>' : '')
+              + (sV ? '<div class="mock-stat-box" style="'+sbStyM+'"><div class="mock-sval">'+sV+'</div><div class="mock-slbl">Stl+Bl</div></div>' : '')
+              + '</div>';
+          }
+        }
+
+        h += '<td><div class="mock-cell">'
+          + '<div class="mock-pick-left">'
+          + logoHtml
+          + '<div class="mock-cell-info">'
+            + '<span class="mock-player-link" onclick="openTrendModal(\''
+              + escJs(norm) + '\',\'' + yr + '\',\'' + escJs(entry.player) + '\')">'
+              + name + '</span>'
+            + (rawTeam ? '<div class="mock-team-line">'
+              + '<span class="mock-team-code">' + baseTeam + '</span>'
+              + (via ? '<span class="mock-via">via ' + via + '</span>' : '')
+              + '</div>' : '')
+          + '</div>'
+          + '</div>'
+          + (statsHtml ? '<div class="mock-pick-stats">' + statsHtml + '</div>' : '')
+        + '</div></td>';
       } else {
-        html += `<td><span class="mock-empty">—</span></td>`;
+        h += '<td><div class="mock-empty">—</div></td>';
       }
     });
-    html += '</tr>';
+    h += '</tr>';
   });
 
-  html += '</tbody></table></div>';
-  document.getElementById('mocksContent').innerHTML = html;
+  h += '</tbody></table></div>';
+  document.getElementById('mocksContent').innerHTML = h;
+}
+
+
+function mockPlayerStats(rawName, yr) {
+  // Look up a mock pick's stats from the matching board year
+  var base  = rawName.indexOf(' - ') > 0 ? rawName.slice(0, rawName.indexOf(' - ')) : rawName;
+  var bLow  = base.toLowerCase().replace(/[^a-z]/g,'');
+  var board = (yr === '2026') ? (DATA.board2026||[]) : ((DATA.historical&&DATA.historical[yr])||[]);
+  return board.find(function(p) {
+    var pBase = p.name.indexOf(' - ')>0 ? p.name.slice(0, p.name.indexOf(' - ')) : p.name;
+    var pLow  = pBase.toLowerCase().replace(/[^a-z]/g,'');
+    return pLow === bLow || (bLow.length >= 5 && pLow.startsWith(bLow.slice(0,8)));
+  }) || null;
 }
 
 function normalizeName(name) {
@@ -1641,6 +1957,7 @@ document.querySelectorAll('.nav-tab').forEach(tab => {
     if (tab.dataset.tab==='mocks') renderMocks();
     if (tab.dataset.tab==='resources') renderResources();
     if (tab.dataset.tab==='compare') { populateCompareSelect(); renderCompare(); }
+    if (tab.dataset.tab==='mockbuilder') mdcInit();
   });
 });
 
@@ -2318,6 +2635,519 @@ document.addEventListener('keydown', function(e) {
   if (e.key === 'Escape') closeGlobalSearch();
 });
 
+
+
+
+// ── BIG BOARD INLINE VIEW ───────────────────────────────────────
+
+var bbSubMode = 'full'; // 'full' | 'twitter'
+
+var BB_TIERS = [
+  { label:'Franchise',    sub:'Cornerstone Prospects', picks:'Picks 1–5',   from:1,  to:5,
+    grad:'linear-gradient(90deg,#92400E,#B45309,#D97706)' },
+  { label:'Lottery',      sub:'Top-14 Prospects',      picks:'Picks 6–14',  from:6,  to:14,
+    grad:'linear-gradient(90deg,#3B0764,#5B21B6,#7C3AED)' },
+  { label:'Late First',   sub:'First Round Targets',   picks:'Picks 15–30', from:15, to:30,
+    grad:'linear-gradient(90deg,#1E3A8A,#1D4ED8,#3B82F6)' },
+  { label:'Second Round', sub:'Value Prospects',       picks:'Picks 31–60', from:31, to:60,
+    grad:'linear-gradient(90deg,#134E4A,#0D9488,#14B8A6)' },
+];
+
+function bbMetStyle(val) {
+  if (!val || val <= 0) return 'background:#F1F5F9;color:#94A3B8';
+  var mn = 47, mx = 155;
+  var t  = Math.max(0, Math.min(1, (val - mn) / (mx - mn)));
+  return 'background:hsl('+Math.round(t*120)+',60%,'+Math.round(94-t*10)+'%);color:hsl('+Math.round(t*120)+',55%,'+Math.round(34-t*12)+'%)';
+}
+
+function bbTagCls(pos) {
+  var p = (pos||'').toLowerCase();
+  if (p.includes('guard')||p.includes('pg')||p.includes('sg')||p.includes('combo g')||p.includes('wing g')) return 'bb-tag-g';
+  if (p.includes('center')||p.includes('pf/c')||p==='c') return 'bb-tag-b';
+  return 'bb-tag-w';
+}
+
+function bbBuildRow(p, idx) {
+  var base   = p.name.indexOf(' - ')>0 ? p.name.slice(0,p.name.indexOf(' - ')) : p.name;
+  var school = p.name.indexOf(' - ')>0 ? p.name.slice(p.name.indexOf(' - ')+3) : '';
+  var ht = p.ht ? (Math.floor(p.ht/12)+"'"+(p.ht%12)+'"') : '—';
+  var wt = p.wt ? p.wt+'lb' : '—';
+
+  // Class abbreviation
+  var cls = (p.cls||'').trim();
+  if (cls==='Freshman'||cls==='Fresh') cls='Fr';
+  else if (cls==='Sophomore') cls='So';
+  else if (cls==='Junior') cls='Jr';
+  else if (cls==='Senior') cls='Sr';
+
+  var metSty = bbMetStyle(p.metric);
+  var metVal = (p.metric && p.metric>0) ? Number(p.metric).toFixed(1) : '—';
+  var tsVal  = (p.ts_pct  && p.ts_pct>0)  ? (p.ts_pct*100).toFixed(1)+'%' : '—';
+  var paVal  = (p.pa2_usg && p.pa2_usg>0) ? Math.round(p.pa2_usg)          : '—';
+  var sbVal  = (p.stl_bl  && p.stl_bl>0)  ? parseFloat(p.stl_bl).toFixed(2): '—';
+
+  var rankStr = p.rank<10 ? '0'+p.rank : ''+p.rank;
+  var tierCls = p.rank<=5 ? 'bbt1' : p.rank<=14 ? 'bbt2' : '';
+  var altCls  = idx%2===1 ? 'alt' : '';
+
+  var logoHtml = schoolLogoHtml(school,'13px','2px');
+  // avatarHtml returns a div — use a compact 30px version
+  var avHtml   = avatarHtml(p.name, p.position||'', '30px', '5px')
+                   .replace('class="avatar-fallback"', 'style="font-size:11px" class="avatar-fallback"');
+
+  // Per-class gradients for stat cells
+  var tsSty = gradStyle(p.ts_pct,  'ts_pct');
+  var paSty = gradStyle(p.pa2_usg, 'pa2_usg');
+  var sbSty = gradStyle(p.stl_bl,  'stl_bl');
+
+  return '<div class="bb-row '+tierCls+' '+altCls+'">'
+    +'<div class="bb-rk bb-cr">'+rankStr+'</div>'
+    +'<div class="bb-av bb-cav">'+avHtml+'</div>'
+    +'<div class="bb-id bb-cid">'
+      +'<div class="bb-name">'+base+'</div>'
+      +'<div class="bb-school-line">'
+        +(logoHtml||'')
+        +'<span class="bb-school">'+school+'</span>'
+        +(cls ? '<span class="bb-cls-dot">&thinsp;·&thinsp;'+cls+'</span>' : '')
+      +'</div>'
+    +'</div>'
+    +'<div class="bb-tags bb-ctag">'
+      +(p.position   ? '<span class="bb-tag '+bbTagCls(p.position)+'">'+p.position+'</span>' : '')
+      +(p.torvik_role? '<span class="bb-tag bb-tag-r">'+p.torvik_role+'</span>' : '')
+      +(ht!=='—' || wt!=='—' ? '<span class="bb-tag bb-tag-phys">'+ht+'&nbsp;·&nbsp;'+wt+'</span>' : '')
+    +'</div>'
+    +'<div class="bb-met-cell bb-cmet"><div class="bb-met-val" style="'+metSty+'">'+metVal+'</div></div>'
+    +'<div class="bb-stat-cell bb-cts" style="'+tsSty+'"><div class="bb-sv'+(tsVal==='—'?' empty':'')+'" style="color:inherit">'+tsVal+'</div><div class="bb-sl" style="color:inherit;opacity:.7">TS%</div></div>'
+    +'<div class="bb-stat-cell bb-cpa" style="'+paSty+'"><div class="bb-sv'+(paVal==='—'?' empty':'')+'" style="color:inherit">'+paVal+'</div><div class="bb-sl" style="color:inherit;opacity:.7">P+A/USG</div></div>'
+    +'<div class="bb-stat-cell bb-csb" style="'+sbSty+'"><div class="bb-sv'+(sbVal==='—'?' empty':'')+'" style="color:inherit">'+sbVal+'</div><div class="bb-sl" style="color:inherit;opacity:.7">Stl+Bl</div></div>'
+    +'<div class="bb-comp-cell bb-cco">'
+      +(p.comp ? '<span class="bb-comp-lbl">comp</span><span class="bb-comp-val">'+p.comp+'</span>' : '')
+    +'</div>'
+  +'</div>';
+}
+
+function renderBoardBigboard(players) {
+  var el = document.getElementById('board2026Content');
+  if (!el) return;
+
+  var limit   = bbSubMode==='twitter' ? 30 : 60;
+  var limited = players.slice(0, limit);
+  var now     = new Date();
+  var dateStr = now.toLocaleDateString('en-US',{month:'short',year:'numeric'});
+
+  // Controls bar
+  var out = '<div class="bb-screenshot-bar">'
+    +'<button class="bb-sub-btn'+(bbSubMode==='full'?' active':'')+'" onclick="setBBSubMode(\'full\')">📋 Full Board (60)</button>'
+    +'<button class="bb-sub-btn'+(bbSubMode==='twitter'?' active':'')+'" onclick="setBBSubMode(\'twitter\')">🐦 Twitter Card (30)</button>'
+    +'<button class="bb-sub-btn" style="margin-left:auto;background:var(--amber);color:white;border-color:var(--amber)" onclick="bbScreenshot()">📷 Screenshot PNG</button>'
+  +'</div>';
+
+  // Board wrapper
+  out += '<div class="bb-wrap"><div id="bbBoard" class="bb-board'+(bbSubMode==='twitter'?' bb-tw':'')+'">';
+
+  // Header
+  out += '<div class="bb-header">'
+    +'<div class="bb-header-row">'
+      +'<div class="bb-logo-box">HW</div>'
+      +'<div class="bb-htitles">'
+        +'<div class="bb-brand">HoopsWill Analytics</div>'
+        +'<div class="bb-title">2026 NBA Draft Big Board</div>'
+      +'</div>'
+    +'</div>'
+    +'<div class="bb-meta">'
+      +'<span class="bb-pill gold">v1.0 · '+dateStr+'</span>'
+      +(bbSubMode==='full' ? '<span class="bb-pill">Top 60 · Full Board</span>' : '<span class="bb-pill">Top 30 · Twitter Edition</span>')
+      +'<span class="bb-pill">HoopsWill Metric Model</span>'
+      +'<span class="bb-pill">Torvik Role Classification</span>'
+    +'</div>'
+  +'</div>';
+
+  // Column header
+  out += '<div class="bb-col-hdr">'
+    +'<div class="bb-ch bb-cr">#</div>'
+    +'<div class="bb-ch bb-cav"></div>'
+    +'<div class="bb-ch bb-cid left">Player</div>'
+    +'<div class="bb-ch bb-ctag left">Position / Role</div>'
+    +'<div class="bb-ch bb-cmet">Metric</div>'
+    +'<div class="bb-ch bb-cts">TS%</div>'
+    +'<div class="bb-ch bb-cpa">P+A/USG</div>'
+    +'<div class="bb-ch bb-csb">Stl+Bl</div>'
+    +'<div class="bb-ch bb-cco left">Comp</div>'
+  +'</div>';
+
+  // Tiers + rows
+  var rowIdx = 0;
+  BB_TIERS.forEach(function(t) {
+    if (t.from > limit) return;
+    out += '<div class="bb-tier-band" style="background:'+t.grad+'">'
+      +'<span class="bb-tier-label">'+t.label+'</span>'
+      +'<span class="bb-tier-sub">'+t.sub+'</span>'
+      +'<span class="bb-tier-picks">'+t.picks+'</span>'
+    +'</div>';
+    limited.filter(function(p){ return p.rank>=t.from && p.rank<=Math.min(t.to,limit); })
+           .forEach(function(p){ out += bbBuildRow(p, rowIdx++); });
+  });
+
+  // Footer
+  out += '<div class="bb-footer">'
+    +'<span class="bb-footer-brand">hoopswill.com</span>'
+    +'<span class="bb-footer-note">Metric graded on 2026 class · Stats per Torvik/Synergy · Independent evaluation</span>'
+  +'</div>';
+
+  out += '</div></div>'; // close bb-board + bb-wrap
+  el.innerHTML = out;
+}
+
+function setBBSubMode(mode) {
+  bbSubMode = mode;
+  renderBoard2026();
+}
+
+function bbScreenshot() {
+  var board = document.getElementById('bbBoard');
+  if (!board) return;
+  function doShot() {
+    html2canvas(board,{scale:2,useCORS:true,allowTaint:false,backgroundColor:'#ffffff',logging:false})
+      .then(function(canvas){
+        canvas.toBlob(function(blob){
+          var url=URL.createObjectURL(blob);
+          var a=document.createElement('a');
+          a.href=url;
+          a.download='HoopsWill_BigBoard_'+(bbSubMode==='twitter'?'Top30':'Top60')+'.png';
+          a.click();
+          URL.revokeObjectURL(url);
+        });
+      });
+  }
+  if (typeof html2canvas==='undefined') {
+    var s=document.createElement('script');
+    s.src='https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+    s.onload=doShot; document.head.appendChild(s);
+  } else { doShot(); }
+}
+
+
+const DRAFT_ORDER_2026 = [
+  {pick:1,  team:'IND', name:'Indiana Pacers',         via:null},
+  {pick:2,  team:'SAC', name:'Sacramento Kings',       via:null},
+  {pick:3,  team:'WAS', name:'Washington Wizards',     via:null},
+  {pick:4,  team:'BKN', name:'Brooklyn Nets',          via:null},
+  {pick:5,  team:'UTA', name:'Utah Jazz',              via:null},
+  {pick:6,  team:'ATL', name:'Atlanta Hawks',          via:'NOP'},
+  {pick:7,  team:'DAL', name:'Dallas Mavericks',       via:null},
+  {pick:8,  team:'MEM', name:'Memphis Grizzlies',      via:null},
+  {pick:9,  team:'CHI', name:'Chicago Bulls',          via:null},
+  {pick:10, team:'MIL', name:'Milwaukee Bucks',        via:null},
+  {pick:11, team:'POR', name:'Portland Trail Blazers', via:null},
+  {pick:12, team:'GSW', name:'Golden State Warriors',  via:null},
+  {pick:13, team:'CHA', name:'Charlotte Hornets',      via:null},
+  {pick:14, team:'OKC', name:'Oklahoma City Thunder',  via:'PHI'},
+  {pick:15, team:'OKC', name:'Oklahoma City Thunder',  via:'LAC'},
+  {pick:16, team:'SAS', name:'San Antonio Spurs',      via:'ATL'},
+  {pick:17, team:'TOR', name:'Toronto Raptors',        via:null},
+  {pick:18, team:'MIA', name:'Miami Heat',             via:null},
+  {pick:19, team:'MEM', name:'Memphis Grizzlies',      via:'ORL'},
+  {pick:20, team:'CHA', name:'Charlotte Hornets',      via:'PHX'},
+  {pick:21, team:'ATL', name:'Atlanta Hawks',          via:'CLE'},
+  {pick:22, team:'DET', name:'Detroit Pistons',        via:'MIN'},
+  {pick:23, team:'DEN', name:'Denver Nuggets',         via:null},
+  {pick:24, team:'PHI', name:'Philadelphia 76ers',     via:'HOU'},
+  {pick:25, team:'LAL', name:'LA Lakers',              via:null},
+  {pick:26, team:'NYK', name:'New York Knicks',        via:null},
+  {pick:27, team:'BOS', name:'Boston Celtics',         via:null},
+  {pick:28, team:'CLE', name:'Cleveland Cavaliers',    via:'SAS'},
+  {pick:29, team:'MIN', name:'Minnesota Timberwolves', via:'DET'},
+  {pick:30, team:'DAL', name:'Dallas Mavericks',       via:'OKC'},
+  {pick:31, team:'MEM', name:'Memphis Grizzlies',      via:'IND'},
+  {pick:32, team:'SAC', name:'Sacramento Kings',       via:null},
+  {pick:33, team:'NYK', name:'New York Knicks',        via:'WAS'},
+  {pick:34, team:'BKN', name:'Brooklyn Nets',          via:null},
+  {pick:35, team:'SAS', name:'San Antonio Spurs',      via:'UTA'},
+  {pick:36, team:'CHI', name:'Chicago Bulls',          via:'NOP'},
+  {pick:37, team:'OKC', name:'Oklahoma City Thunder',  via:'DAL'},
+  {pick:38, team:'LAC', name:'LA Clippers',            via:'MEM'},
+  {pick:39, team:'HOU', name:'Houston Rockets',        via:'CHI'},
+  {pick:40, team:'BOS', name:'Boston Celtics',         via:'MIL'},
+  {pick:41, team:'SAS', name:'San Antonio Spurs',      via:'POR'},
+  {pick:42, team:'MIA', name:'Miami Heat',             via:'GSW'},
+  {pick:43, team:'SAC', name:'Sacramento Kings',       via:'CHA'},
+  {pick:44, team:'BKN', name:'Brooklyn Nets',          via:'LAC'},
+  {pick:45, team:'DEN', name:'Denver Nuggets',         via:'ATL'},
+  {pick:46, team:'PHX', name:'Phoenix Suns',           via:'PHI'},
+  {pick:47, team:'TOR', name:'Toronto Raptors',        via:null},
+  {pick:48, team:'SAS', name:'San Antonio Spurs',      via:'MIA'},
+  {pick:49, team:'ORL', name:'Orlando Magic',          via:null},
+  {pick:50, team:'DAL', name:'Dallas Mavericks',       via:'PHX'},
+  {pick:51, team:'CHI', name:'Chicago Bulls',          via:'DEN'},
+  {pick:52, team:'WAS', name:'Washington Wizards',     via:'MIN'},
+  {pick:53, team:'LAC', name:'LA Clippers',            via:'CLE'},
+  {pick:54, team:'GSW', name:'Golden State Warriors',  via:'LAL'},
+  {pick:55, team:'HOU', name:'Houston Rockets',        via:null},
+  {pick:56, team:'NYK', name:'New York Knicks',        via:null},
+  {pick:57, team:'ATL', name:'Atlanta Hawks',          via:'BOS'},
+  {pick:58, team:'NOP', name:'New Orleans Pelicans',   via:'DET'},
+  {pick:59, team:'MIN', name:'Minnesota Timberwolves', via:'SAS'},
+  {pick:60, team:'WAS', name:'Washington Wizards',     via:'OKC'},
+];
+
+// ── Mock Draft Creator state ───────────────────────────────────────────────
+var mdcSelections  = {};   // pick# → player rank
+var mdcActivePick  = 1;    // currently highlighted pick slot
+var mdcPosFilter   = 'ALL';
+var mdcSearchTerm  = '';
+
+
+// ── MOCK DRAFT CREATOR ──────────────────────────────────────────────────────
+
+var mdcHistory = [];  // stack of {pick, rank} for undo
+
+function mdcInit() {
+  mdcRenderPicks();
+  mdcRenderPool();
+}
+
+function mdcTeamLogoHtml(teamCode, size) {
+  size = size || '28px';
+  var id = NBA_TEAM_IDS[teamCode];
+  if (id) {
+    return '<img class="mdc-team-logo" src="https://a.espncdn.com/i/teamlogos/nba/500/'
+      + id + '.png" onerror="this.parentNode.innerHTML=\'<div class=mdc-team-logo-fb>'
+      + teamCode + '</div>\'" alt="' + teamCode + '" style="width:' + size + ';height:' + size + '">';
+  }
+  return '<div class="mdc-team-logo-fb" style="width:'+size+';height:'+size+'">' + teamCode + '</div>';
+}
+
+function mdcRenderPicks() {
+  var el  = document.getElementById('mdcPicksScroll');
+  var pg  = document.getElementById('mdcProgFill');
+  var pt  = document.getElementById('mdcProgText');
+  if (!el) return;
+
+  var filled = Object.keys(mdcSelections).length;
+  if (pg) pg.style.width = Math.round(filled / 60 * 100) + '%';
+  if (pt) pt.textContent  = filled + ' / 60 picks';
+
+  var html = '';
+  var lastRound = 0;
+  DRAFT_ORDER_2026.forEach(function(slot) {
+    var round = slot.pick <= 30 ? 1 : 2;
+    if (round !== lastRound) {
+      html += '<div class="mdc-round-hdr">Round ' + round + '</div>';
+      lastRound = round;
+    }
+    var isActive = (slot.pick === mdcActivePick);
+    var pickData = mdcSelections[slot.pick];
+    var player   = pickData ? (DATA.board2026||[]).find(function(p){ return p.rank === pickData; }) : null;
+    var pickNum  = slot.pick < 10 ? '0'+slot.pick : ''+slot.pick;
+    var isLotto  = slot.pick <= 14;
+    var avHtml   = player ? avatarHtml(player.name, player.position||'', '26px', '4px')
+                              .replace('class="avatar-fallback"','class="avatar-fallback" style="font-size:10px"') : '';
+    var filledCls = player ? ' filled' : '';
+    var activeCls = isActive ? ' active' : '';
+
+    html += '<div class="mdc-pick-row' + filledCls + activeCls + '" id="mdcRow' + slot.pick + '" onclick="mdcPickRowClick(' + slot.pick + ')">';
+    html += '<span class="mdc-pick-num' + (isLotto?' lotto':'') + '">' + pickNum + '</span>';
+    html += mdcTeamLogoHtml(slot.team, '26px');
+    html += '<div class="mdc-team-info">';
+    html += '  <span class="mdc-team-name">' + slot.name.replace(/^(Indiana|Sacramento|Washington|Brooklyn|Utah|Dallas|Memphis|Chicago|Milwaukee|Portland|Golden State|Charlotte|Oklahoma City|San Antonio|Toronto|Miami|Denver|Philadelphia|LA Lakers|New York|Boston|Cleveland|Minnesota|Houston|Phoenix|Orlando|Detroit|Atlanta|New Orleans) /, '') + '</span>';
+    html += '</div>';
+    html += '<div class="mdc-selection">';
+    if (player) {
+      var pBase = player.name.indexOf(' - ')>0 ? player.name.slice(0,player.name.indexOf(' - ')) : player.name;
+      var pSchool= player.name.indexOf(' - ')>0 ? player.name.slice(player.name.indexOf(' - ')+3) : '';
+      var metSty = bbMetStyle(player.metric);
+      html += '<div class="mdc-pick-av">' + avHtml + '</div>';
+      html += '<div style="margin-left:8px;min-width:0;flex:1">';
+      html += '  <div class="mdc-picked-name">' + pBase + '</div>';
+      html += '  <div class="mdc-picked-meta">' + pSchool
+            + (player.position ? ' · ' + player.position : '')
+            + (player.torvik_role ? ' · ' + player.torvik_role : '') + '</div>';
+      html += '</div>';
+      if (player.metric > 0) {
+        html += '<div style="' + metSty + 'border-radius:4px;padding:2px 6px;margin-right:6px;font-family:Barlow Condensed,sans-serif;font-size:12px;font-weight:900;flex-shrink:0">' + Number(player.metric).toFixed(1) + '</div>';
+      }
+    } else {
+      html += '<span class="mdc-empty-slot">' + (isActive ? '← Select a player from the pool' : 'Empty') + '</span>';
+      if (isActive) html += '<span class="mdc-active-indicator" style="margin-right:8px"></span>';
+    }
+    html += '</div>';
+    if (player) html += '<button class="mdc-unpick-btn" onclick="event.stopPropagation();mdcUnpick(' + slot.pick + ')" title="Remove pick">✕</button>';
+    html += '</div>';
+  });
+  el.innerHTML = html;
+
+  // Scroll active row into view
+  var activeRow = document.getElementById('mdcRow' + mdcActivePick);
+  if (activeRow) activeRow.scrollIntoView({ behavior:'smooth', block:'nearest' });
+}
+
+function mdcRenderPool() {
+  var el = document.getElementById('mdcPoolList');
+  var ct = document.getElementById('mdcPoolCount');
+  if (!el) return;
+
+  var drafted = Object.values(mdcSelections);
+  var players = (DATA.board2026||[]).filter(function(p) {
+    if (mdcPosFilter !== 'ALL' && p.position !== mdcPosFilter) return false;
+    if (mdcSearchTerm) {
+      var base = p.name.indexOf(' - ')>0 ? p.name.slice(0,p.name.indexOf(' - ')) : p.name;
+      if (base.toLowerCase().indexOf(mdcSearchTerm) < 0) return false;
+    }
+    return true;
+  });
+
+  // Only show available (undrafted) players — hide drafted entirely
+  var available = players.filter(function(p){ return drafted.indexOf(p.rank) < 0; });
+  if (ct) ct.textContent = available.length + ' available';
+
+  if (!available.length) {
+    el.innerHTML = '<div class="mdc-pool-empty">All players drafted!</div>';
+    return;
+  }
+
+  var html = '';
+  available.forEach(function(p) {
+    var base   = p.name.indexOf(' - ')>0 ? p.name.slice(0,p.name.indexOf(' - ')) : p.name;
+    var school = p.name.indexOf(' - ')>0 ? p.name.slice(p.name.indexOf(' - ')+3) : '';
+    var metSty = bbMetStyle(p.metric);
+    var metVal = p.metric > 0 ? Number(p.metric).toFixed(1) : '—';
+    html += '<div class="mdc-pool-item" onclick="mdcPickPlayer(' + p.rank + ')">';
+    html += '<span class="mdc-pool-rank">' + p.rank + '</span>';
+    html += avatarHtml(p.name, p.position||'', '24px', '4px').replace('class="avatar-fallback"','class="avatar-fallback" style="font-size:9px"');
+    html += '<div class="mdc-pool-name">';
+    html += '  <div class="mdc-pool-pname">' + base + '</div>';
+    html += '  <div class="mdc-pool-school">' + school + (p.torvik_role ? ' · '+p.torvik_role : '') + '</div>';
+    html += '</div>';
+    if (p.metric > 0) {
+      html += '<div class="mdc-pool-met" style="' + metSty + '">' + metVal + '</div>';
+    }
+    html += '<button class="mdc-select-btn" onclick="event.stopPropagation();mdcPickPlayer(' + p.rank + ')">Pick</button>';
+    html += '</div>';
+  });
+  el.innerHTML = html;
+}
+
+function mdcPickRowClick(pickNum) {
+  if (mdcSelections[pickNum]) {
+    // Click filled slot → un-assign and return player to pool
+    delete mdcSelections[pickNum];
+    mdcActivePick = pickNum;
+    mdcRenderPicks();
+    mdcRenderPool();
+    return;
+  }
+  mdcActivePick = pickNum;
+  mdcRenderPicks();
+}
+
+function mdcPickPlayer(rank) {
+  // Assign player to active pick
+  if (mdcSelections[mdcActivePick]) return; // already filled
+  if (Object.values(mdcSelections).indexOf(rank) >= 0) {
+    mdcShowToast('Player already drafted!'); return;
+  }
+  // Save to history for undo
+  mdcHistory.push({ pick: mdcActivePick, rank: rank });
+  mdcSelections[mdcActivePick] = rank;
+  // Advance active pick to next empty slot
+  var next = mdcActivePick;
+  for (var i = 1; i <= 60; i++) {
+    var candidate = mdcActivePick + i;
+    if (candidate > 60) candidate -= 60;
+    if (!mdcSelections[candidate]) { next = candidate; break; }
+  }
+  mdcActivePick = next;
+  mdcRenderPicks();
+  mdcRenderPool();
+}
+
+function mdcUnpick(pickNum) {
+  if (!mdcSelections[pickNum]) return;
+  delete mdcSelections[pickNum];
+  mdcActivePick = pickNum;
+  mdcRenderPicks();
+  mdcRenderPool();
+}
+
+function mdcUndo() {
+  if (!mdcHistory.length) { mdcShowToast('Nothing to undo'); return; }
+  var last = mdcHistory.pop();
+  delete mdcSelections[last.pick];
+  mdcActivePick = last.pick;
+  mdcRenderPicks();
+  mdcRenderPool();
+}
+
+function mdcReset() {
+  if (!Object.keys(mdcSelections).length) return;
+  if (!confirm('Reset your entire mock draft?')) return;
+  mdcSelections = {};
+  mdcHistory    = [];
+  mdcActivePick = 1;
+  mdcRenderPicks();
+  mdcRenderPool();
+}
+
+function mdcSetPos(pos, btn) {
+  mdcPosFilter = pos;
+  document.querySelectorAll('.mdc-pos-filter').forEach(function(b){ b.classList.remove('active'); });
+  if (btn) btn.classList.add('active');
+  mdcRenderPool();
+}
+
+function mdcFilterPool(val) {
+  mdcSearchTerm = val.toLowerCase().trim();
+  mdcRenderPool();
+}
+
+function mdcSave() {
+  var filled = Object.keys(mdcSelections).length;
+  if (filled === 0) { mdcShowToast('Draft your picks first!'); return; }
+  var label = prompt('Name this snapshot:', 'My Mock Draft');
+  if (!label) return;
+  // Build snapshot in same format as existing mocks
+  var snapshot = DRAFT_ORDER_2026.map(function(slot) {
+    var rank = mdcSelections[slot.pick];
+    var player = rank ? (DATA.board2026||[]).find(function(p){ return p.rank === rank; }) : null;
+    return {
+      pick: slot.pick,
+      team: slot.team + (slot.via ? ' (' + slot.via + ')' : ''),
+      player: player ? player.name : ''
+    };
+  }).filter(function(e){ return e.player; });
+  if (!DATA.mocks['2026']) DATA.mocks['2026'] = {};
+  DATA.mocks['2026'][label] = snapshot;
+  mdcShowToast('✓ Saved as "' + label + '" — visible in Mock Drafts tab');
+}
+
+function mdcScreenshot() {
+  var el = document.getElementById('mdcWrap');
+  if (!el) return;
+  function doShot() {
+    html2canvas(el, { scale:2, useCORS:true, backgroundColor:'#F8FAFC', logging:false })
+      .then(function(canvas) {
+        canvas.toBlob(function(blob) {
+          var url = URL.createObjectURL(blob);
+          var a   = document.createElement('a');
+          a.href  = url; a.download = 'HoopsWill_MockDraft.png'; a.click();
+          URL.revokeObjectURL(url);
+        });
+      });
+  }
+  if (typeof html2canvas === 'undefined') {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+    s.onload = doShot; document.head.appendChild(s);
+  } else { doShot(); }
+}
+
+function mdcShowToast(msg) {
+  var t = document.getElementById('mdcToast');
+  if (!t) return;
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(function(){ t.classList.remove('show'); }, 2500);
+}
+
 document.addEventListener('DOMContentLoaded', function() {
   var dz = document.getElementById('uploadDropzone');
   if (!dz) return;
@@ -2350,6 +3180,8 @@ function printActiveTab() {
   else if (tabKey === 'history')    renderHistory();
   else if (tabKey === 'future')     renderFuture();
   else if (tabKey === 'resources')  renderResources();
+  else if (tabKey === 'board2026' && currentView==='bigboard') renderBoard2026();
+  else if (tabKey === 'mockbuilder') mdcInit();
 
   setTimeout(function() {
     var old = document.getElementById('dyn-print-style');
