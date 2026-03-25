@@ -749,6 +749,20 @@ tr:hover td{background:var(--gray-50)}
   padding:4px 10px;font-size:11px;font-weight:600;cursor:pointer;
   font-family:'Barlow Condensed',sans-serif;transition:all .15s}
 .tier-ed-reset:hover{background:rgba(255,255,255,.18);color:white}
+
+/* ── DRAFT SIMULATOR ─────────────────────────────────────────────────────── */
+#simPicksBoard{max-height:600px;overflow-y:auto}
+#simPoolList .sim-pool-row:hover{background:var(--gray-50)}
+
+/* ── SIMULATOR BUTTONS ───────────────────────────────────────────────────── */
+.sim-team-btn{padding:4px 9px;border-radius:5px;border:1.5px solid var(--gray-200);
+  background:white;color:var(--gray-600);font-size:11px;font-weight:700;cursor:pointer;
+  font-family:'Barlow Condensed',sans-serif;transition:all .12s}
+.sim-team-btn.on{background:var(--navy);color:white;border-color:var(--navy)}
+.sim-pos-btn{padding:3px 8px;border-radius:5px;border:1px solid rgba(255,255,255,.25);
+  background:rgba(255,255,255,.08);color:rgba(255,255,255,.7);font-size:11px;
+  font-weight:700;cursor:pointer;font-family:'Barlow Condensed',sans-serif;transition:all .12s}
+.sim-pos-btn.active{background:rgba(255,255,255,.25);color:white}
 </style>
 </head>
 <body>
@@ -782,7 +796,6 @@ tr:hover td{background:var(--gray-50)}
   <div class="nav-tab" data-tab="future">🔭 2027 Watch</div>
   <div class="nav-tab" data-tab="resources">📚 Resources</div>
   <div class="nav-tab" data-tab="compare">⚖️ Compare</div>
-  <div class="nav-tab" data-tab="mockbuilder">🏗️ Mock Builder</div>
   <div class="nav-tab" data-tab="scatter">📈 Scatter</div>
   <div class="nav-tab" data-tab="methodology">🔬 The Metric</div>
 </nav>
@@ -920,19 +933,150 @@ tr:hover td{background:var(--gray-50)}
 <!-- MOCKS -->
 <section class="tab-panel" id="tab-mocks">
   <div class="print-header"><div class="print-header-title">HoopsWill NBA Draft Board — Mock Drafts</div><div class="print-header-sub">Analytics Model · 2019–2027 · hoopswill.com</div></div>
-  <div class="mock-controls">
-    <label style="font-size:13px;font-weight:600;color:var(--gray-600)">Draft Class:</label>
-    <select class="filter-select" id="mockYear" onchange="renderMocks()">
-      <option value="2026">2026</option>
-      <option value="2025">2025</option>
-      <option value="2024">2024</option>
-      <option value="2023">2023</option>
-      <option value="2022">2022</option>
-    </select>
-    <span style="font-size:12px;color:var(--gray-400);font-style:italic">Click any player name to see their pick trend over time →</span>
-    <span class="count-badge" id="mockInfo"></span>
+
+  <!-- ── MODE TOGGLE ─────────────────────────────────────────────────────── -->
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px;flex-wrap:wrap">
+    <div class="view-toggle" id="mockModeToggle">
+      <button class="view-btn active" id="mockModeBuild"   onclick="setMockMode('build')">🏗️ Build Mock</button>
+      <button class="view-btn"        id="mockModeArchive" onclick="setMockMode('archive')">📅 Archive</button>
+      <button class="view-btn"        id="mockModeSim"     onclick="setMockMode('sim')">🎮 Draft Simulator</button>
+    </div>
   </div>
-  <div id="mocksContent"></div>
+
+  <!-- ── BUILD MOCK (Mock Builder) ───────────────────────────────────────── -->
+  <div id="mockPanelBuild">
+    <div class="print-header"><div class="print-header-title">HoopsWill NBA Draft Board — Mock Draft Creator</div><div class="print-header-sub">2026 Draft Order (Tankathon) · hoopswill.com</div></div>
+  <div id="mdcWrap" class="mdc-wrap">
+    <!-- Left: pick board -->
+    <div class="mdc-board">
+      <div class="mdc-board-header">
+        <span class="mdc-board-title">🏆 Build Your Mock Draft</span>
+        <div class="mdc-progress">
+          <div class="mdc-prog-bar"><div class="mdc-prog-fill" id="mdcProgFill" style="width:0%"></div></div>
+          <span class="mdc-prog-text" id="mdcProgText">0 / 60 picks</span>
+        </div>
+        <div class="mdc-actions">
+          <button class="mdc-act-btn" onclick="mdcUndo()">↩ Undo</button>
+          <button class="mdc-act-btn" onclick="mdcReset()">✕ Reset</button>
+          <button class="mdc-act-btn gold" onclick="mdcSave()">💾 Save Snapshot</button>
+          <button class="mdc-act-btn" onclick="mdcScreenshot()">📷 Screenshot</button>
+        </div>
+      </div>
+      <div class="mdc-picks-scroll" id="mdcPicksScroll"></div>
+    </div>
+    <!-- Right: player pool -->
+    <div class="mdc-pool">
+      <div class="mdc-pool-header">
+        <div class="mdc-pool-title">Player Pool <span id="mdcPoolCount" style="font-weight:500;opacity:.5;font-size:12px"></span></div>
+        <div class="mdc-pool-filters">
+          <input class="mdc-pool-search" id="mdcSearch" type="text" placeholder="Search player…" oninput="mdcFilterPool(this.value)">
+          <button class="mdc-pos-filter active" onclick="mdcSetPos('ALL',this)">All</button>
+          <button class="mdc-pos-filter" onclick="mdcSetPos('Guard',this)">G</button>
+          <button class="mdc-pos-filter" onclick="mdcSetPos('Forward',this)">F</button>
+          <button class="mdc-pos-filter" onclick="mdcSetPos('Center',this)">C</button>
+        </div>
+      </div>
+      <div class="mdc-pool-list" id="mdcPoolList"></div>
+    </div>
+  </div>
+  <div class="mdc-save-toast" id="mdcToast"></div>
+  </div>
+
+  <!-- ── ARCHIVE (Historical snapshots) ──────────────────────────────────── -->
+  <div id="mockPanelArchive" style="display:none">
+    <div class="mock-controls">
+      <label style="font-size:13px;font-weight:600;color:var(--gray-600)">Draft Class:</label>
+      <select class="filter-select" id="mockYear" onchange="renderMocks()">
+        <option value="2026">2026</option>
+        <option value="2025">2025</option>
+        <option value="2024">2024</option>
+        <option value="2023">2023</option>
+        <option value="2022">2022</option>
+      </select>
+      <span style="font-size:12px;color:var(--gray-400);font-style:italic">Click any player name to see their pick trend over time →</span>
+      <span class="count-badge" id="mockInfo"></span>
+    </div>
+    <div id="mocksContent"></div>
+  </div>
+
+  <!-- ── DRAFT DAY SIMULATOR ──────────────────────────────────────────────── -->
+  <div id="mockPanelSim" style="display:none">
+
+    <!-- SETUP SCREEN -->
+    <div id="simSetup">
+      <div style="background:linear-gradient(135deg,#0A1628,#1a2f52);border-radius:14px;padding:28px 32px;margin-bottom:20px">
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:900;color:white;margin-bottom:6px">🎮 Draft Day Simulator</div>
+        <div style="font-size:13px;color:rgba(255,255,255,.65);line-height:1.6">Pick for every team — or just the ones you want to own. Every selection is scored live against the HoopsWill Metric: value picks, fair value, and reaches all tracked in real time.</div>
+      </div>
+
+      <div style="display:flex;gap:20px;flex-wrap:wrap;margin-bottom:20px">
+        <!-- Rounds -->
+        <div>
+          <div style="font-size:11px;font-weight:700;color:var(--gray-500);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Rounds</div>
+          <select class="filter-select" id="simRoundsSelect">
+            <option value="1">Round 1 only (30 picks)</option>
+            <option value="2" selected>Full Draft (60 picks)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Team selector -->
+      <div style="margin-bottom:20px">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;flex-wrap:wrap">
+          <div style="font-size:11px;font-weight:700;color:var(--gray-500);text-transform:uppercase;letter-spacing:.5px">Your Teams <span style="color:var(--gray-300);font-weight:500;text-transform:none">(highlight picks for these teams — optional)</span></div>
+          <button onclick="simSelectAllTeams()" style="font-size:11px;padding:3px 10px;border-radius:5px;border:1px solid var(--gray-200);background:white;color:var(--gray-600);cursor:pointer">All</button>
+          <button onclick="simClearAllTeams()" style="font-size:11px;padding:3px 10px;border-radius:5px;border:1px solid var(--gray-200);background:white;color:var(--gray-600);cursor:pointer">None</button>
+        </div>
+        <div id="simTeamGrid" style="display:flex;flex-wrap:wrap;gap:6px"></div>
+      </div>
+
+      <button onclick="simStart()" style="background:var(--blue);color:white;border:none;border-radius:8px;padding:11px 28px;font-size:14px;font-weight:700;cursor:pointer">▶ Start Simulation</button>
+    </div>
+
+    <!-- LIVE BOARD -->
+    <div id="simBoard" style="display:none">
+      <!-- Status bar -->
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap">
+        <div id="simOnClock" style="background:var(--navy);color:white;border-radius:8px;padding:8px 16px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:800;min-width:180px"></div>
+        <div style="flex:1;background:var(--gray-100);border-radius:6px;height:8px;overflow:hidden;min-width:80px">
+          <div id="simProgBar" style="height:100%;background:var(--blue);border-radius:6px;width:0%;transition:width .25s"></div>
+        </div>
+        <span id="simProgText" style="font-size:12px;font-weight:700;color:var(--gray-400);white-space:nowrap"></span>
+        <div id="simScorecard" style="display:flex;gap:8px"></div>
+        <button onclick="simReset()" style="background:white;border:1.5px solid var(--gray-200);border-radius:7px;padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer;color:var(--gray-600)">✕ Reset</button>
+      </div>
+
+      <div style="display:flex;gap:14px;align-items:flex-start">
+        <!-- Pick board left -->
+        <div style="flex:1;min-width:0">
+          <div id="simPicksBoard" style="background:white;border:1.5px solid var(--gray-200);border-radius:12px;overflow:hidden;max-height:620px;overflow-y:auto"></div>
+        </div>
+        <!-- Player pool right -->
+        <div id="simPoolPanel" style="width:264px;flex-shrink:0">
+          <div style="background:var(--navy);border-radius:12px 12px 0 0;padding:10px 14px">
+            <div id="simPoolLabel" style="font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:800;color:white;margin-bottom:6px">Select Player</div>
+            <input id="simPoolSearch" type="text" placeholder="Search name..." oninput="simFilterPool(this.value)"
+              style="width:100%;padding:6px 10px;border-radius:6px;border:none;font-size:12px;background:rgba(255,255,255,.12);color:white;outline:none">
+            <div style="display:flex;gap:5px;margin-top:7px;flex-wrap:wrap" id="simPosFilter">
+              <button class="sim-pos-btn active" onclick="simSetPosFilter('',this)">All</button>
+              <button class="sim-pos-btn" onclick="simSetPosFilter('Guard',this)">G</button>
+              <button class="sim-pos-btn" onclick="simSetPosFilter('Forward',this)">F</button>
+              <button class="sim-pos-btn" onclick="simSetPosFilter('Center',this)">C</button>
+            </div>
+          </div>
+          <div id="simPoolList" style="background:white;border:1.5px solid var(--gray-200);border-top:none;border-radius:0 0 12px 12px;max-height:520px;overflow-y:auto"></div>
+        </div>
+      </div>
+
+      <!-- Results (shown after last pick) -->
+      <div id="simResults" style="display:none;margin-top:22px">
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:900;color:var(--navy);margin-bottom:14px">📋 Draft Complete — Your Team Grades</div>
+        <div id="simResultsContent"></div>
+        <button onclick="simReset()" style="margin-top:18px;background:var(--navy);color:white;border:none;border-radius:8px;padding:10px 24px;font-size:14px;font-weight:700;cursor:pointer">🔄 New Simulation</button>
+      </div>
+    </div>
+
+  </div>
 </section>
 
 <!-- HISTORY -->
@@ -1014,43 +1158,7 @@ tr:hover td{background:var(--gray-50)}
   <div id="compareContent"></div>
 </section>
 
-<section class="tab-panel" id="tab-mockbuilder">
-  <div class="print-header"><div class="print-header-title">HoopsWill NBA Draft Board — Mock Draft Creator</div><div class="print-header-sub">2026 Draft Order (Tankathon) · hoopswill.com</div></div>
-  <div id="mdcWrap" class="mdc-wrap">
-    <!-- Left: pick board -->
-    <div class="mdc-board">
-      <div class="mdc-board-header">
-        <span class="mdc-board-title">🏆 Build Your Mock Draft</span>
-        <div class="mdc-progress">
-          <div class="mdc-prog-bar"><div class="mdc-prog-fill" id="mdcProgFill" style="width:0%"></div></div>
-          <span class="mdc-prog-text" id="mdcProgText">0 / 60 picks</span>
-        </div>
-        <div class="mdc-actions">
-          <button class="mdc-act-btn" onclick="mdcUndo()">↩ Undo</button>
-          <button class="mdc-act-btn" onclick="mdcReset()">✕ Reset</button>
-          <button class="mdc-act-btn gold" onclick="mdcSave()">💾 Save Snapshot</button>
-          <button class="mdc-act-btn" onclick="mdcScreenshot()">📷 Screenshot</button>
-        </div>
-      </div>
-      <div class="mdc-picks-scroll" id="mdcPicksScroll"></div>
-    </div>
-    <!-- Right: player pool -->
-    <div class="mdc-pool">
-      <div class="mdc-pool-header">
-        <div class="mdc-pool-title">Player Pool <span id="mdcPoolCount" style="font-weight:500;opacity:.5;font-size:12px"></span></div>
-        <div class="mdc-pool-filters">
-          <input class="mdc-pool-search" id="mdcSearch" type="text" placeholder="Search player…" oninput="mdcFilterPool(this.value)">
-          <button class="mdc-pos-filter active" onclick="mdcSetPos('ALL',this)">All</button>
-          <button class="mdc-pos-filter" onclick="mdcSetPos('Guard',this)">G</button>
-          <button class="mdc-pos-filter" onclick="mdcSetPos('Forward',this)">F</button>
-          <button class="mdc-pos-filter" onclick="mdcSetPos('Center',this)">C</button>
-        </div>
-      </div>
-      <div class="mdc-pool-list" id="mdcPoolList"></div>
-    </div>
-  </div>
-  <div class="mdc-save-toast" id="mdcToast"></div>
-</section>
+
 
 
 
@@ -2675,7 +2783,7 @@ document.querySelectorAll('.nav-tab').forEach(tab => {
     if (tab.dataset.tab==='mocks') renderMocks();
     if (tab.dataset.tab==='resources') renderResources();
     if (tab.dataset.tab==='compare') { populateCompareSelect(); renderCompare(); }
-    if (tab.dataset.tab==='mockbuilder') mdcInit();
+    if (tab.dataset.tab==='mocks') { if(_currentMockMode==='build') mdcInit(); else if(_currentMockMode==='archive') renderMocks(); else if(_currentMockMode==='sim') simPopulateTeams(); }
     if (tab.dataset.tab==='methodology') mcInit();
     if (tab.dataset.tab==='scatter') scRender();
   });
@@ -5590,6 +5698,448 @@ function renderBoardFreeform(players) {
 
 
   el.innerHTML = out;
+}
+
+
+// ── MOCK MODE SWITCHER ────────────────────────────────────────────────────────
+var _currentMockMode = 'build';
+
+function setMockMode(mode) {
+  _currentMockMode = mode;
+  ['build','archive','sim'].forEach(function(m) {
+    var panel = document.getElementById('mockPanel' + m.charAt(0).toUpperCase() + m.slice(1));
+    var btn   = document.getElementById('mockMode'  + m.charAt(0).toUpperCase() + m.slice(1));
+    if (panel) panel.style.display = (m === mode) ? '' : 'none';
+    if (btn)   btn.classList.toggle('active', m === mode);
+  });
+  if (mode === 'build')   mdcInit();
+  if (mode === 'archive') renderMocks();
+  if (mode === 'sim')     simBuildTeamGrid();
+}
+
+// ── DRAFT DAY SIMULATOR (fully manual, live reach/value grading) ──────────────
+// State
+var simUserTeams   = {};   // team code → true if user "owns" this team
+var simSelections  = {};   // pick# → { rank, name, team, metric, pos, grade }
+var simCurrentPick = 1;
+var simMaxPicks    = 60;
+var simAvailable   = [];   // players not yet picked
+var simPosFilter   = '';
+var simPoolQuery   = '';
+var simTimer       = null;  // CPU pick delay handle
+
+// Grade thresholds: compare player's metric rank vs pick number
+// metricRank = position in metric-sorted available pool at time of pick
+function simGrade(metricRank, pickNum) {
+  var diff = pickNum - metricRank; // positive = drafted earlier than metric says (reach)
+  if (diff <= -8)  return {label:'VALUE',  color:'#059669', bg:'#D1FAE5'};
+  if (diff <= -3)  return {label:'+VALUE', color:'#2563EB', bg:'#DBEAFE'};
+  if (diff <=  3)  return {label:'FAIR',   color:'#64748B', bg:'#F1F5F9'};
+  if (diff <=  8)  return {label:'REACH',  color:'#D97706', bg:'#FEF3C7'};
+  return                  {label:'BIG ⬆', color:'#DC2626', bg:'#FEE2E2'};
+}
+
+function simBuildTeamGrid() {
+  var grid = document.getElementById('simTeamGrid');
+  if (!grid || grid.children.length) return;
+  var seen = {};
+  (DRAFT_ORDER_2026 || []).forEach(function(slot) {
+    if (seen[slot.team]) return;
+    seen[slot.team] = true;
+    var btn = document.createElement('button');
+    btn.className   = 'sim-team-btn';
+    btn.id          = 'simTeamBtn_' + slot.team;
+    btn.textContent = slot.team;
+    btn.title       = slot.name;
+    btn.onclick     = function() { simToggleTeam(slot.team); };
+    grid.appendChild(btn);
+  });
+}
+
+function simToggleTeam(code) {
+  simUserTeams[code] = !simUserTeams[code];
+  var btn = document.getElementById('simTeamBtn_' + code);
+  if (btn) btn.classList.toggle('on', !!simUserTeams[code]);
+}
+
+function simSelectAllTeams() {
+  (DRAFT_ORDER_2026 || []).forEach(function(s) { simUserTeams[s.team] = true; });
+  document.querySelectorAll('.sim-team-btn').forEach(function(b){ b.classList.add('on'); });
+}
+
+function simClearAllTeams() {
+  simUserTeams = {};
+  document.querySelectorAll('.sim-team-btn').forEach(function(b){ b.classList.remove('on'); });
+}
+
+function simStart() {
+  simMaxPicks = parseInt((document.getElementById('simRoundsSelect')||{}).value||2) * 30;
+
+  // Pool sorted by big board rank (primary display order)
+  // A separate metric-sorted copy is kept for grade calculations
+  var players = (DATA.board2026 || []).filter(function(p){ return p.rank && p.rank <= simMaxPicks + 30; });
+  players.sort(function(a,b){ return a.rank - b.rank; });
+  simAvailable   = players.slice();  // rank-sorted (display)
+  simSelections  = {};
+  simCurrentPick = 1;
+  simPosFilter   = '';
+  simPoolQuery   = '';
+  simTimer       = null;
+
+  document.getElementById('simSetup').style.display  = 'none';
+  document.getElementById('simBoard').style.display   = '';
+  document.getElementById('simResults').style.display = 'none';
+
+  simRenderBoard();
+  simRenderPool();
+  simAdvance();
+}
+
+// ── SIM ADVANCE: fires after every pick — CPU picks instantly if not user-owned
+var simTimer = null; // already declared above, this line is a no-op guard
+
+function simAdvance() {
+  if (simCurrentPick > simMaxPicks) {
+    simUpdateStatus();
+    return;
+  }
+  var slot = (DRAFT_ORDER_2026||[]).find(function(s){ return s.pick===simCurrentPick; });
+  if (!slot) { simCurrentPick++; simAdvance(); return; }
+
+  simUpdateStatus();
+
+  // User's turn — stop and wait for manual pick
+  if (simUserTeams[slot.team]) return;
+
+  // CPU's turn — fire after brief visual delay (80ms so board renders first)
+  clearTimeout(simTimer);
+  simTimer = setTimeout(function() {
+    simCpuPick(slot);
+    simCurrentPick++;
+    simAdvance();
+  }, 80);
+}
+
+// CPU pick: weighted blend of big board rank (60%), metric (30%), positional need (10%)
+function simCpuPick(slot) {
+  if (!simAvailable.length) return;
+  var need = SIM_NEEDS[slot.team] || 'F';
+
+  // Score each available player — lower = better
+  var scored = simAvailable.map(function(p, i) {
+    // Big board rank component (i = position in rank-sorted available array)
+    var rankScore = i / Math.max(simAvailable.length - 1, 1);
+    // Metric component (invert: higher metric = lower score)
+    var metSorted = simAvailable.slice().sort(function(a,b){
+      var am=a.metric||0,bm=b.metric||0;
+      if(am>0&&bm>0) return bm-am; if(am>0) return -1; if(bm>0) return 1; return a.rank-b.rank;
+    });
+    var metRank = metSorted.findIndex(function(q){ return q.rank===p.rank; });
+    var metScore = metRank / Math.max(simAvailable.length - 1, 1);
+    // Positional need: bonus for matching team's need
+    var posBonus = 0;
+    var needPositions = (POS_MATCH||{})[need] || [];
+    if (needPositions.indexOf(p.position||'') >= 0) posBonus = -0.1;
+    // Weighted total
+    return { rank: p.rank, score: rankScore*0.60 + metScore*0.30 + posBonus };
+  });
+
+  scored.sort(function(a,b){ return a.score - b.score; });
+  var chosen = (DATA.board2026||[]).find(function(p){ return p.rank===scored[0].rank; });
+  if (!chosen) chosen = simAvailable[0];
+
+  var metSorted2 = simAvailable.slice().sort(function(a,b){
+    var am=a.metric||0,bm=b.metric||0;
+    if(am>0&&bm>0) return bm-am; if(am>0) return -1; if(bm>0) return 1; return a.rank-b.rank;
+  });
+  var metIdx = metSorted2.findIndex(function(p){ return p.rank===chosen.rank; });
+  var grade  = simGrade(metIdx+1, simCurrentPick);
+
+  simSelections[simCurrentPick] = {
+    rank:chosen.rank, name:chosen.name, team:slot.team,
+    metric:chosen.metric||0, pos:chosen.position||'',
+    grade:grade, isOwned:false
+  };
+  simAvailable = simAvailable.filter(function(p){ return p.rank!==chosen.rank; });
+  simRenderBoard();
+}
+
+
+function simUpdateStatus() {
+  var slot = (DRAFT_ORDER_2026||[]).find(function(s){ return s.pick===simCurrentPick; });
+  var badge = document.getElementById('simOnClock');
+  var prog  = document.getElementById('simProgBar');
+  var txt   = document.getElementById('simProgText');
+  var lbl   = document.getElementById('simPoolLabel');
+
+  if (simCurrentPick > simMaxPicks) {
+    if (badge) { badge.textContent='✅ Draft Complete'; badge.style.background='#059669'; }
+    if (prog)  prog.style.width='100%';
+    if (txt)   txt.textContent=simMaxPicks+' / '+simMaxPicks;
+    simShowResults();
+    return;
+  }
+
+  if (slot) {
+    var isOwned = simUserTeams[slot.team];
+    var label   = (isOwned ? '⭐ ' : '') + slot.name + ' — Pick #' + slot.pick;
+    if (badge) { badge.textContent=label; badge.style.background=isOwned?'#D97706':'var(--navy)'; }
+    if (lbl)   lbl.textContent = 'Pick #'+slot.pick+' — '+slot.team;
+  }
+
+  var pct = Math.round((simCurrentPick-1)/simMaxPicks*100);
+  if (prog) prog.style.width=pct+'%';
+  if (txt)  txt.textContent=(simCurrentPick-1)+' / '+simMaxPicks;
+
+  simUpdateScorecard();
+}
+
+function simUpdateScorecard() {
+  var sc = document.getElementById('simScorecard');
+  if (!sc) return;
+  var owned = Object.keys(simUserTeams).filter(function(t){ return simUserTeams[t]; });
+  if (!owned.length) { sc.innerHTML=''; return; }
+
+  var counts = {VALUE:0,'FAIR':0,'REACH':0};
+  Object.values(simSelections).forEach(function(s){
+    if (!simUserTeams[s.team]) return;
+    if (s.grade) {
+      if (s.grade.label==='VALUE'||s.grade.label==='+VALUE') counts.VALUE++;
+      else if (s.grade.label==='REACH'||s.grade.label==='BIG ⬆') counts.REACH++;
+      else counts.FAIR++;
+    }
+  });
+  sc.innerHTML =
+    '<span style="font-size:11px;font-weight:700;color:#059669;background:#D1FAE5;border-radius:5px;padding:3px 8px">'+counts.VALUE+' Value</span>'+
+    '<span style="font-size:11px;font-weight:700;color:#64748B;background:#F1F5F9;border-radius:5px;padding:3px 8px">'+counts.FAIR+' Fair</span>'+
+    '<span style="font-size:11px;font-weight:700;color:#DC2626;background:#FEE2E2;border-radius:5px;padding:3px 8px">'+counts.REACH+' Reach</span>';
+}
+
+function simSetPosFilter(pos, btn) {
+  simPosFilter = pos;
+  document.querySelectorAll('.sim-pos-btn').forEach(function(b){ b.classList.remove('active'); });
+  if (btn) btn.classList.add('active');
+  simRenderPool();
+}
+
+function simFilterPool(q) {
+  simPoolQuery = q.toLowerCase().trim();
+  simRenderPool();
+}
+
+function simRenderPool() {
+  var list = document.getElementById('simPoolList');
+  if (!list) return;
+  var players = simAvailable.filter(function(p) {
+    if (simPosFilter && p.position !== simPosFilter) return false;
+    if (simPoolQuery) {
+      var base = (p.name||'').split(' - ')[0].toLowerCase();
+      if (base.indexOf(simPoolQuery) < 0) return false;
+    }
+    return true;
+  });
+  // Metric-sorted reference for grade previews (built once per render)
+  var _simMetSorted = simAvailable.slice().sort(function(a,b){
+    var am=a.metric||0, bm=b.metric||0;
+    if (am>0&&bm>0) return bm-am;
+    if (am>0) return -1; if (bm>0) return 1;
+    return a.rank-b.rank;
+  });
+  var h = '';
+  players.forEach(function(p, idx) {
+    var base   = p.name&&p.name.indexOf(' - ')>0 ? p.name.slice(0,p.name.indexOf(' - ')) : (p.name||'');
+    var school = p.name&&p.name.indexOf(' - ')>0 ? p.name.slice(p.name.indexOf(' - ')+3) : '';
+    var posCol = p.position==='Guard'?'#2563EB':p.position==='Center'?'#0D9488':'#7C3AED';
+    var met    = p.metric&&p.metric>0 ? Number(p.metric).toFixed(1) : '';
+    // Preview grade: find player's position in metric-sorted pool
+    var metRank = _simMetSorted.findIndex(function(q){ return q.rank===p.rank; }) + 1;
+    var pg = simGrade(metRank, simCurrentPick);
+    h += '<div onclick="simPick('+p.rank+')" style="display:flex;align-items:center;gap:7px;padding:7px 12px;border-bottom:1px solid var(--gray-100);cursor:pointer;transition:background .1s" onmouseover="this.style.background=\'#F8FAFC\'" onmouseout="this.style.background=\'white\'">'
+      + '<span style="font-family:Barlow Condensed,sans-serif;font-size:11px;font-weight:900;color:var(--gray-300);width:20px;flex-shrink:0">#'+p.rank+'</span>'
+      + '<span style="width:7px;height:7px;border-radius:50%;background:'+posCol+';flex-shrink:0"></span>'
+      + '<div style="flex:1;min-width:0">'
+      +   '<div style="font-family:Barlow Condensed,sans-serif;font-size:13px;font-weight:800;color:var(--navy);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+base+'</div>'
+      +   '<div style="font-size:9px;color:var(--gray-400)">'+school+'</div>'
+      + '</div>'
+      + (met ? '<span style="font-family:Barlow Condensed,sans-serif;font-size:12px;font-weight:900;color:var(--amber)">'+met+'</span>' : '')
+      + '<span style="font-size:9px;font-weight:700;color:'+pg.color+';background:'+pg.bg+';border-radius:4px;padding:1px 5px;white-space:nowrap">'+pg.label+'</span>'
+      + '</div>';
+  });
+  if (!h) h = '<div style="padding:20px;text-align:center;color:var(--gray-400);font-size:13px">No players match</div>';
+  list.innerHTML = h;
+}
+
+function simPick(rank) {
+  if (simCurrentPick > simMaxPicks) return;
+  var slot   = (DRAFT_ORDER_2026||[]).find(function(s){ return s.pick===simCurrentPick; });
+  if (!slot) return;
+  var player = (DATA.board2026||[]).find(function(p){ return p.rank===rank; });
+  if (!player) return;
+
+  // Compute grade: metricRank = player's position in metric-sorted available pool
+  var metSorted = simAvailable.slice().sort(function(a,b){
+    var am=a.metric||0, bm=b.metric||0;
+    if (am>0&&bm>0) return bm-am;
+    if (am>0) return -1; if (bm>0) return 1;
+    return a.rank-b.rank;
+  });
+  var metIdx = metSorted.findIndex(function(p){ return p.rank===rank; });
+  var grade  = simGrade(metIdx+1, simCurrentPick);
+
+  simSelections[simCurrentPick] = {
+    rank:rank, name:player.name, team:slot.team,
+    metric:player.metric||0, pos:player.position||'',
+    grade:grade, isOwned:!!simUserTeams[slot.team]
+  };
+  simAvailable = simAvailable.filter(function(p){ return p.rank!==rank; });
+  simCurrentPick++;
+  simPoolQuery = '';
+  var srch = document.getElementById('simPoolSearch');
+  if (srch) srch.value = '';
+
+  simRenderBoard();
+  simRenderPool();
+  simAdvance();
+}
+
+function simRenderBoard() {
+  var el = document.getElementById('simPicksBoard');
+  if (!el) return;
+  var slots = (DRAFT_ORDER_2026||[]).filter(function(s){ return s.pick<=simMaxPicks; });
+  var lastRound = 0;
+  var h = '';
+  slots.forEach(function(slot) {
+    var round = slot.pick<=30 ? 1 : 2;
+    if (round!==lastRound) {
+      h += '<div style="background:var(--gray-100);padding:5px 14px;font-family:Barlow Condensed,sans-serif;font-size:11px;font-weight:800;color:var(--gray-500);text-transform:uppercase;letter-spacing:.7px">Round '+round+'</div>';
+      lastRound=round;
+    }
+    var sel      = simSelections[slot.pick];
+    var isCur    = slot.pick===simCurrentPick;
+    var isOwned  = simUserTeams[slot.team];
+    var isLotto  = slot.pick<=14;
+    var pickCol  = isLotto?'#D97706':'#94A3B8';
+    var bgColor  = isCur ? (isOwned?'#FFFBEB':'#EFF6FF') : (isOwned&&sel?'#F0F9FF':'white');
+    var borderL  = isOwned ? '3px solid #D97706' : (isCur?'3px solid #2563EB':'3px solid transparent');
+    var pickNum  = slot.pick<10?'0'+slot.pick:''+slot.pick;
+    var logoHtml = (typeof mdcTeamLogoHtml==='function') ? mdcTeamLogoHtml(slot.team,'22px') : slot.team;
+
+    var playerCell = '';
+    if (sel) {
+      var base   = sel.name&&sel.name.indexOf(' - ')>0 ? sel.name.slice(0,sel.name.indexOf(' - ')) : (sel.name||'');
+      var posCol = sel.pos==='Guard'?'#2563EB':sel.pos==='Center'?'#0D9488':'#7C3AED';
+      var metTxt = sel.metric>0 ? '<span style="font-family:Barlow Condensed,sans-serif;font-size:11px;font-weight:900;color:var(--amber);margin-left:5px">'+Number(sel.metric).toFixed(1)+'</span>' : '';
+      var gradeBadge = sel.grade ? '<span style="font-size:9px;font-weight:700;color:'+sel.grade.color+';background:'+sel.grade.bg+';border-radius:4px;padding:1px 5px;margin-left:4px;white-space:nowrap">'+sel.grade.label+'</span>' : '';
+      playerCell = '<span style="width:7px;height:7px;border-radius:50%;background:'+posCol+';flex-shrink:0;margin-right:3px"></span>'
+        + '<span style="font-family:Barlow Condensed,sans-serif;font-size:13px;font-weight:800;color:var(--navy)">'+base+'</span>'
+        + metTxt + gradeBadge;
+    } else if (isCur) {
+      playerCell = '<span style="font-size:11px;color:var(--blue);font-style:italic">← pick now</span>';
+    } else {
+      playerCell = '<span style="font-size:11px;color:var(--gray-300)">—</span>';
+    }
+
+    h += '<div style="display:flex;align-items:center;gap:7px;padding:5px 12px;border-bottom:1px solid #F8FAFC;background:'+bgColor+';border-left:'+borderL+'">'
+      + '<span style="font-family:Barlow Condensed,sans-serif;font-size:12px;font-weight:900;color:'+pickCol+';width:22px;flex-shrink:0">'+pickNum+'</span>'
+      + '<span style="flex-shrink:0">'+logoHtml+'</span>'
+      + '<span style="font-size:10px;color:var(--gray-400);width:26px;flex-shrink:0">'+slot.team+'</span>'
+      + '<span style="flex:1;display:flex;align-items:center;min-width:0;flex-wrap:wrap;gap:2px">'+playerCell+'</span>'
+      + '</div>';
+  });
+  el.innerHTML = h;
+
+  // Scroll current pick row into view
+  var rows = el.getElementsByTagName('div');
+  for (var i=0;i<rows.length;i++) {
+    if (rows[i].style&&rows[i].style.borderLeft&&rows[i].style.borderLeft.indexOf('2563EB')>=0) {
+      rows[i].scrollIntoView({behavior:'smooth',block:'nearest'});
+      break;
+    }
+  }
+}
+
+function simShowResults() {
+  var res = document.getElementById('simResults');
+  var rc  = document.getElementById('simResultsContent');
+  if (!res||!rc) return;
+
+  var ownedTeams = Object.keys(simUserTeams).filter(function(t){ return simUserTeams[t]; });
+  var h = '';
+
+  if (!ownedTeams.length) {
+    // Show all picks in a compact table with grades
+    h = '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12px">'
+      + '<thead><tr style="background:var(--navy)">'
+      + ['Pick','Team','Player','Metric','Grade'].map(function(c){ return '<th style="padding:7px 10px;color:rgba(255,255,255,.7);font-family:Barlow Condensed,sans-serif;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;text-align:left">'+c+'</th>'; }).join('')
+      + '</tr></thead><tbody>';
+    Object.keys(simSelections).sort(function(a,b){return a-b;}).forEach(function(pk,i){
+      var s    = simSelections[pk];
+      var base = s.name&&s.name.indexOf(' - ')>0 ? s.name.slice(0,s.name.indexOf(' - ')) : (s.name||'');
+      var met  = s.metric>0 ? Number(s.metric).toFixed(1) : '—';
+      var g    = s.grade || {label:'—',color:'#94A3B8',bg:'#F1F5F9'};
+      var alt  = i%2?'background:#F8FAFC':'';
+      h += '<tr style="'+alt+'">'
+        + '<td style="padding:6px 10px;font-weight:700;color:var(--gray-500)">#'+pk+'</td>'
+        + '<td style="padding:6px 10px;font-weight:700">'+s.team+'</td>'
+        + '<td style="padding:6px 10px;font-family:Barlow Condensed,sans-serif;font-size:14px;font-weight:800;color:var(--navy)">'+base+'</td>'
+        + '<td style="padding:6px 10px;font-family:Barlow Condensed,sans-serif;font-weight:900;color:var(--amber)">'+met+'</td>'
+        + '<td style="padding:6px 10px"><span style="font-size:10px;font-weight:700;color:'+g.color+';background:'+g.bg+';border-radius:4px;padding:2px 7px">'+g.label+'</span></td>'
+        + '</tr>';
+    });
+    h += '</tbody></table></div>';
+  } else {
+    // One card per owned team
+    ownedTeams.forEach(function(team) {
+      var teamPicks = Object.keys(simSelections).filter(function(pk){ return simSelections[pk].team===team; }).sort(function(a,b){return a-b;});
+      if (!teamPicks.length) return;
+      var slot0 = (DRAFT_ORDER_2026||[]).find(function(s){ return s.team===team; });
+      var teamName = slot0 ? slot0.name : team;
+      h += '<div style="background:white;border:1.5px solid var(--gray-200);border-radius:12px;padding:16px 20px;margin-bottom:14px">'
+        + '<div style="font-family:Barlow Condensed,sans-serif;font-size:16px;font-weight:900;color:var(--navy);margin-bottom:10px;display:flex;align-items:center;gap:8px">'
+        + (typeof mdcTeamLogoHtml==='function'?mdcTeamLogoHtml(team,'20px'):'')
+        + '<span>'+teamName+'</span></div>'
+        + '<div style="display:flex;flex-wrap:wrap;gap:8px">';
+      teamPicks.forEach(function(pk) {
+        var s    = simSelections[pk];
+        var base = s.name&&s.name.indexOf(' - ')>0 ? s.name.slice(0,s.name.indexOf(' - ')) : (s.name||'');
+        var met  = s.metric>0 ? Number(s.metric).toFixed(1) : '—';
+        var g    = s.grade || {label:'—',color:'#94A3B8',bg:'#F1F5F9'};
+        var posCol=s.pos==='Guard'?'#2563EB':s.pos==='Center'?'#0D9488':'#7C3AED';
+        h += '<div style="background:var(--gray-50);border:1px solid var(--gray-200);border-radius:8px;padding:10px 14px;min-width:140px">'
+          + '<div style="font-size:10px;font-weight:700;color:var(--gray-400);margin-bottom:3px">PICK #'+pk+'</div>'
+          + '<div style="display:flex;align-items:center;gap:5px;margin-bottom:6px">'
+          + '<span style="width:7px;height:7px;border-radius:50%;background:'+posCol+'"></span>'
+          + '<span style="font-family:Barlow Condensed,sans-serif;font-size:15px;font-weight:900;color:var(--navy)">'+base+'</span></div>'
+          + '<div style="display:flex;justify-content:space-between;align-items:center">'
+          + '<span style="font-size:11px;color:var(--gray-500)">Metric: <strong style="color:var(--amber)">'+met+'</strong></span>'
+          + '<span style="font-size:10px;font-weight:700;color:'+g.color+';background:'+g.bg+';border-radius:4px;padding:2px 7px">'+g.label+'</span>'
+          + '</div></div>';
+      });
+      h += '</div></div>';
+    });
+  }
+
+  rc.innerHTML = h;
+  res.style.display = '';
+  setTimeout(function(){ res.scrollIntoView({behavior:'smooth',block:'start'}); }, 100);
+}
+
+function simReset() {
+  simSelections  = {};
+  simCurrentPick = 1;
+  simAvailable   = [];
+  simPosFilter   = '';
+  simPoolQuery   = '';
+  document.getElementById('simSetup').style.display  = '';
+  document.getElementById('simBoard').style.display   = 'none';
+  document.getElementById('simResults').style.display = 'none';
+  var pb = document.getElementById('simPicksBoard');
+  if (pb) pb.innerHTML = '';
+  var ob = document.getElementById('simOnClock');
+  if (ob) { ob.textContent=''; ob.style.background='var(--navy)'; }
+  clearTimeout(simTimer); simTimer = null;
+  var sc = document.getElementById('simScorecard');
+  if (sc) sc.innerHTML = '';
 }
 
 // Load html2canvas dynamically when tweet card opens
