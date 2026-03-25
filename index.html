@@ -8,6 +8,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
+
 :root {
   --navy:#0A1628;--navy-mid:#162340;--blue:#2563EB;--blue-light:#3B82F6;
   --amber:#C9971A;--amber-light:#E8BF52;--gold:#D4A830;--green:#10B981;--red:#EF4444;
@@ -75,7 +76,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--gray-50);color:var(--navy
 .player-card:hover{border-color:var(--blue-light);box-shadow:var(--shadow-md);transform:translateY(-2px)}
 
 .card-header{display:flex;align-items:center;gap:12px;padding:14px 14px 10px}
-.card-avatar{width:52px;height:52px;border-radius:10px;overflow:hidden;flex-shrink:0;position:relative}
+
 .card-avatar img{width:100%;height:100%;object-fit:cover;object-position:top center}
 .avatar-fallback{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:20px;color:white;letter-spacing:-0.5px}
 .card-identity{flex:1;min-width:0}
@@ -94,8 +95,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--gray-50);color:var(--navy
 .tag.role{background:#F0FDF4;color:#15803D}
 .tag.cls{background:#FFF7ED;color:#B45309}
 .tag.age{background:#FAF5FF;color:#7C3AED}
-.tag.ht{background:#F0F9FF;color:#0369A1;border-color:#BAE6FD}
-.tag.wt{background:#FFF7ED;color:#9A3412;border-color:#FED7AA}
 
 .card-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;padding:0 10px 10px;border-top:1px solid var(--gray-100);margin-top:4px;padding-top:10px}
 .stat-cell{text-align:center;background:var(--gray-50);border-radius:6px;padding:5px 3px}
@@ -104,8 +103,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--gray-50);color:var(--navy
 
 .card-comp{padding:0 14px 12px;font-size:11px;color:var(--gray-500);border-top:1px solid var(--gray-100);margin-top:0;padding-top:8px}
 .card-comp strong{color:var(--blue);font-weight:600}
-
-
 
 /* UPLOAD PANEL */
 .file-menu{position:relative}
@@ -127,7 +124,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--gray-50);color:var(--navy
 .upload-close:hover{color:var(--navy)}
 .upload-desc{font-size:13px;color:var(--gray-600);line-height:1.6;margin:0}
 .upload-dropzone{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;border:2px dashed var(--gray-300);border-radius:12px;padding:32px 20px;cursor:pointer;transition:border-color .15s,background .15s}
-.upload-dropzone:hover,.upload-dropzone.drag-over{border-color:var(--blue);background:rgba(37,99,235,.04)}
+.upload-dropzone:hover,.upload-dropzone
 .upload-icon{font-size:36px;opacity:.6}
 .upload-droptext{font-size:13px;color:var(--gray-500);text-align:center;line-height:1.5}
 .upload-link{color:var(--blue);font-weight:600}
@@ -242,9 +239,6 @@ tr:hover td{background:var(--gray-50)}
 
 /* MOCKS */
 
-
-
-
 .mock-table th:first-child{text-align:center;width:48px;position:sticky;left:0;z-index:20;background:var(--navy-mid)}
 .mock-table td{padding:7px 10px;border-bottom:1px solid var(--gray-100);border-right:1px solid var(--gray-100);vertical-align:middle;text-align:center;min-width:0}
 .mock-table td:first-child{position:sticky;left:0;background:white;z-index:5;font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:800;color:var(--gray-300);border-right:2px solid var(--gray-200);text-align:center;width:48px}
@@ -253,8 +247,6 @@ tr:hover td{background:var(--gray-50)}
 .mock-table tr:hover td:first-child{background:var(--gray-50)}
 
 .mock-player-link:hover{color:var(--blue)}
-
-
 
 /* TREND MODAL */
 .trend-modal{max-width:700px}
@@ -278,7 +270,7 @@ tr:hover td{background:var(--gray-50)}
 /* COMP EXPLORER */
 .comp-search-card{background:white;border:1.5px solid var(--gray-200);border-radius:12px;padding:20px;margin-bottom:18px}
 .comp-result{background:white;border:1.5px solid var(--gray-200);border-radius:12px;padding:22px}
-.comp-table{width:100%;border-collapse:collapse}
+
 .comp-table th{background:var(--gray-50);padding:8px 12px;font-size:10px;font-weight:700;color:var(--gray-500);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--gray-200);text-align:left}
 .comp-table td{padding:9px 12px;border-bottom:1px solid var(--gray-100);font-size:12px}
 .comp-table tr:last-child td{border-bottom:none}
@@ -293,6 +285,8 @@ tr:hover td{background:var(--gray-50)}
   .header-sub{display:none}
   .modal-overlay{padding:8px}
   .modal{max-height:92vh;overflow-y:auto}
+  .ff-wrap{min-height:500px}
+  .ff-xlab{font-size:9px}
 }
 
 /* ── PRINT / PDF EXPORT ───────────────────────────────────────── */
@@ -321,22 +315,22 @@ tr:hover td{background:var(--gray-50)}
   .player-card { break-inside:avoid; box-shadow:none !important; border:1px solid #ddd !important; }
   .tier-section { break-before:auto; }
 
-  /* Mock Builder */
-  .mdc-actions,.mdc-pool-header .mdc-pool-filters,.mdc-select-btn,.mdc-unpick-btn,.mdc-active-indicator{display:none!important}
-  .mdc-wrap{height:auto!important;border:none!important;box-shadow:none!important}
-  .mdc-pool{display:none!important}
-  .mdc-board{width:100%!important}
-  .mdc-picks-scroll{overflow:visible!important;max-height:none!important}
-
   /* Charts — let canvas render at current size */
   canvas { max-width:100% !important; }
 
   /* Page setup */
-  @page { size:A4 landscape; margin:12mm 14mm; }
+  @page { margin:14mm 12mm; size:A4 landscape; }
+
+  /* Typography */
   * { -webkit-print-color-adjust:exact !important; print-color-adjust:exact !important; }
 
-  /* Mock columns */
+  /* Mock columns — scrollable becomes wrapping */
   .mocks-grid { display:block !important; }
+  .mock-col { display:inline-block; width:18%; vertical-align:top; margin-right:1%; font-size:9px; }
+  /* Default page orientation */
+  @page { size: A4 landscape; margin: 12mm 14mm; }
+  /* Color accuracy */
+  * { -webkit-print-color-adjust:exact !important; print-color-adjust:exact !important; }
 }
 
 /* Print header (hidden on screen, shown on print) */
@@ -367,7 +361,6 @@ tr:hover td{background:var(--gray-50)}
 .gs-section-header{padding:6px 20px;font-size:10px;font-weight:700;color:#94A3B8;text-transform:uppercase;letter-spacing:.8px;background:#FAFBFC;border-bottom:1px solid #F1F5F9}
 .gs-highlight{background:#FEF9C3;border-radius:2px}
 .gs-no-results{text-align:center;padding:40px 20px;color:#94A3B8;font-size:14px}
-
 
 /* ── BIG BOARD INLINE VIEW ───────────────────────────────────── */
 .bb-wrap{display:flex;justify-content:center;padding:0 0 24px}
@@ -427,22 +420,19 @@ tr:hover td{background:var(--gray-50)}
 .bb-tag-w{background:#F5F3FF;color:#6D28D9}
 .bb-tag-b{background:#F0FDFA;color:#0D9488}
 .bb-tag-r{background:var(--gray-50);color:var(--gray-500);border:1px solid var(--gray-200);font-weight:600}
-.bb-tag-phys{background:#F0F9FF;color:#0369A1;border:1px solid #BAE6FD;font-weight:700;font-size:9px;letter-spacing:.1px}
+
 .bb-met-cell{flex-shrink:0;display:flex;align-items:center;justify-content:center}
 .bb-met-val{font-family:'Barlow Condensed',sans-serif;font-size:21px;font-weight:900;line-height:1;border-radius:6px;padding:4px 8px;min-width:58px;text-align:center;white-space:nowrap}
-.bb-met-lbl{display:none}
+
 .bb-stat-cell{flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;border-radius:6px;margin:3px 2px}
 .bb-sv{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:800;color:var(--navy);line-height:1;white-space:nowrap}
 .bb-sl{font-size:8px;color:var(--gray-300);text-transform:uppercase;letter-spacing:.5px;margin-top:2px;font-weight:700;white-space:nowrap}
 .bb-sv.empty{color:var(--gray-200)}
-.bb-pht{font-size:10px;font-weight:700}
-.bb-pwt{font-size:9px}
+
 .bb-ht-cell{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%}
 .bb-ht-val{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:800;color:var(--navy);line-height:1}
 .bb-wt-val{font-size:10px;color:var(--gray-400);font-weight:500;margin-top:1px}
-.bb-comp-cell{flex-shrink:0;padding-left:8px;display:flex;flex-direction:column;justify-content:center;overflow:hidden}
-.bb-comp-lbl{font-size:7.5px;color:var(--gray-300);text-transform:uppercase;letter-spacing:.4px;font-weight:600;white-space:nowrap}
-.bb-comp-val{font-size:10px;color:var(--gray-400);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
 .bb-footer{background:var(--navy);padding:10px 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px}
 .bb-footer-brand{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:800;color:var(--amber);letter-spacing:.5px}
 .bb-footer-note{font-size:10px;color:rgba(255,255,255,.22);font-weight:500}
@@ -566,6 +556,13 @@ tr:hover td{background:var(--gray-50)}
 .mdc-pool-empty{text-align:center;padding:40px 20px;color:var(--gray-300);font-size:13px}
 .mdc-save-toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--navy);color:white;padding:10px 22px;border-radius:8px;font-size:13px;font-weight:600;box-shadow:0 4px 24px rgba(0,0,0,.3);z-index:9999;opacity:0;transition:opacity .3s;pointer-events:none}
 .mdc-save-toast.show{opacity:1}
+@media print{
+  .mdc-actions,.mdc-pool-header .mdc-pool-filters,.mdc-select-btn,.mdc-unpick-btn,.mdc-active-indicator{display:none!important}
+  .mdc-wrap{height:auto!important;border:none!important;box-shadow:none!important}
+  .mdc-pool{display:none!important}
+  .mdc-board{width:100%!important}
+  .mdc-picks-scroll{overflow:visible!important;max-height:none!important}
+}
 .mdc-active-indicator{width:8px;height:8px;border-radius:50%;background:var(--amber);flex-shrink:0;animation:pulse 1.2s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
 
@@ -584,7 +581,7 @@ tr:hover td{background:var(--gray-50)}
 .mc-step-link:hover{text-decoration:underline}
 .mc-upload-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px}
 .mc-upload-box{background:white;border:2px dashed var(--gray-300);border-radius:12px;padding:24px;text-align:center;transition:all .2s;cursor:pointer;position:relative}
-.mc-upload-box:hover,.mc-upload-box.drag-over{border-color:var(--amber);background:#FFFBEB}
+.mc-upload-box:hover,.mc-upload-box
 .mc-upload-box.loaded{border-color:var(--green);border-style:solid;background:#F0FDF4}
 .mc-upload-icon{font-size:28px;margin-bottom:8px}
 .mc-upload-label{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:800;color:var(--navy);margin-bottom:4px}
@@ -638,177 +635,35 @@ tr:hover td{background:var(--gray-50)}
 .mc-avg-item{display:flex;gap:5px}
 .mc-avg-label{font-weight:700;color:var(--gray-500)}
 
-/* ── SCATTER ──────────────────────────────────────────────────────────────── */
+/* ── SCATTER PLOT TAB ────────────────────────────────────────────────────── */
 .sc-wrap{max-width:1200px;margin:0 auto}
-.sc-controls{background:white;border:1.5px solid var(--gray-200);border-radius:12px;
-  padding:16px 20px;margin-bottom:16px;display:flex;gap:12px;align-items:flex-end;
-  flex-wrap:wrap;box-shadow:0 1px 8px rgba(10,22,40,.06)}
-.sc-ctrl-group{display:flex;flex-direction:column;gap:4px}
-.sc-ctrl-label{font-size:10px;font-weight:700;color:var(--gray-400);
-  text-transform:uppercase;letter-spacing:.7px}
-.sc-select{background:var(--gray-50);border:1.5px solid var(--gray-200);border-radius:7px;
-  padding:7px 10px;font-size:12px;font-weight:600;color:var(--navy);
-  font-family:'DM Sans',sans-serif;cursor:pointer;outline:none;min-width:145px}
+.sc-controls{background:white;border:1.5px solid var(--gray-200);border-radius:12px;padding:18px 22px;margin-bottom:18px;display:flex;gap:14px;align-items:flex-end;flex-wrap:wrap;box-shadow:0 1px 8px rgba(10,22,40,.06)}
+.sc-ctrl-group{display:flex;flex-direction:column;gap:5px;min-width:0}
+.sc-ctrl-label{font-size:10px;font-weight:700;color:var(--gray-400);text-transform:uppercase;letter-spacing:.7px}
+.sc-select{background:var(--gray-50);border:1.5px solid var(--gray-200);border-radius:7px;padding:7px 10px;font-size:12px;font-weight:600;color:var(--navy);font-family:'DM Sans',sans-serif;cursor:pointer;outline:none;min-width:150px;transition:border-color .15s}
 .sc-select:focus,.sc-select:hover{border-color:var(--amber)}
-.sc-trend-btn{background:var(--gray-50);border:1.5px solid var(--gray-200);
-  border-radius:7px;padding:7px 16px;font-size:12px;font-weight:700;
-  font-family:'Barlow Condensed',sans-serif;letter-spacing:.4px;cursor:pointer;
-  color:var(--gray-500);transition:all .15s}
-.sc-trend-btn.on{background:var(--blue);border-color:var(--blue);color:white}
-.sc-plot-wrap{background:white;border:1.5px solid var(--gray-200);border-radius:12px;
-  padding:20px;box-shadow:0 2px 16px rgba(10,22,40,.07)}
-.sc-plot-header{display:flex;align-items:center;justify-content:space-between;
-  margin-bottom:14px;gap:10px;flex-wrap:wrap}
-.sc-plot-title{font-family:'Barlow Condensed',sans-serif;font-size:20px;
-  font-weight:900;color:var(--navy)}
-.sc-plot-meta{font-size:11px;color:var(--gray-400)}
-.sc-canvas-wrap{position:relative;height:500px;width:100%}
-.sc-stat-bar{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;
-  padding-top:12px;border-top:1px solid var(--gray-100)}
-.sc-stat-chip{background:var(--gray-50);border:1px solid var(--gray-100);
-  border-radius:5px;padding:3px 10px;font-size:10px;font-weight:600;color:var(--gray-500)}
+.sc-toggle-group{display:flex;gap:6px;flex-wrap:wrap}
+.sc-tog{background:var(--gray-50);border:1.5px solid var(--gray-200);border-radius:6px;padding:5px 12px;font-size:11px;font-weight:700;font-family:'Barlow Condensed',sans-serif;letter-spacing:.4px;cursor:pointer;transition:all .15s;white-space:nowrap;color:var(--gray-500)}
+.sc-tog.active{background:rgba(212,168,48,.12);border-color:var(--amber);color:var(--amber)}
+.sc-plot-wrap{background:white;border:1.5px solid var(--gray-200);border-radius:12px;padding:20px;box-shadow:0 2px 16px rgba(10,22,40,.07);position:relative}
+.sc-plot-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px}
+.sc-plot-title{font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900;color:var(--navy);letter-spacing:.3px}
+.sc-plot-meta{font-size:11px;color:var(--gray-400);font-weight:500}
+.sc-canvas-wrap{position:relative;height:520px}
+.sc-legend{display:flex;gap:14px;flex-wrap:wrap;padding:12px 0 0;border-top:1px solid var(--gray-100);margin-top:14px}
+.sc-leg-item{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:600;color:var(--gray-500)}
+.sc-leg-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.sc-stat-bar{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;padding:10px 0 0;border-top:1px solid var(--gray-100)}
+.sc-stat-chip{background:var(--gray-50);border:1px solid var(--gray-100);border-radius:5px;padding:3px 10px;font-size:10px;font-weight:600;color:var(--gray-500)}
 .sc-stat-chip b{color:var(--navy)}
+.sc-empty{text-align:center;padding:80px 20px;color:var(--gray-300)}
+.sc-trend-toggle{background:rgba(37,99,235,.08);border:1px solid rgba(37,99,235,.2);color:var(--blue);border-radius:5px;padding:4px 12px;font-size:11px;font-weight:700;font-family:'Barlow Condensed',sans-serif;cursor:pointer;transition:all .15s}
+.sc-trend-toggle.on{background:var(--blue);color:white;border-color:var(--blue)}
 
-
-/* ── TIER CUTOFF CUSTOMIZER ─────────────────────────────────────────────── */
-.tier-editor-wrap{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-left:auto}
-.tier-editor{display:none;align-items:center;gap:10px;padding:7px 12px;
-  background:rgba(255,255,255,.07);border-radius:7px;flex-wrap:wrap;
-  border:1px solid rgba(255,255,255,.12)}
-.tier-editor.visible{display:flex}
-.tier-ed-label{font-size:9px;font-weight:700;color:rgba(255,255,255,.4);
-  text-transform:uppercase;letter-spacing:.6px;white-space:nowrap}
-.tier-ed-group{display:flex;align-items:center;gap:5px}
-.tier-ed-name{font-size:10px;font-weight:700;white-space:nowrap}
-.tier-ed-sep{width:1px;height:18px;background:rgba(255,255,255,.12)}
-.tier-ed-input{width:44px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);
-  border-radius:4px;padding:2px 5px;font-size:12px;font-weight:800;color:white;
-  text-align:center;outline:none;font-family:'Barlow Condensed',sans-serif}
-.tier-ed-input:focus{border-color:var(--amber);background:rgba(255,255,255,.15)}
-.tier-ed-reset{background:none;border:1px solid rgba(255,255,255,.18);border-radius:5px;
-  color:rgba(255,255,255,.45);font-size:10px;font-weight:700;padding:2px 8px;
-  cursor:pointer;font-family:'Barlow Condensed',sans-serif;transition:all .15s}
-.tier-ed-reset:hover{color:white;border-color:rgba(255,255,255,.4)}
-.tier-customize-btn{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);
-  border-radius:6px;padding:4px 10px;font-size:10px;font-weight:700;
-  color:rgba(255,255,255,.6);cursor:pointer;font-family:'Barlow Condensed',sans-serif;
-  letter-spacing:.3px;transition:all .15s;white-space:nowrap}
-.tier-customize-btn:hover,.tier-customize-btn.on{color:var(--amber);
-  border-color:rgba(212,168,48,.4);background:rgba(212,168,48,.08)}
-/* ── URL SHARE ───────────────────────────────────────────────────────────── */
-.share-btn{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);
-  border-radius:6px;padding:5px 11px;font-size:11px;font-weight:700;
-  color:rgba(255,255,255,.65);cursor:pointer;font-family:'Barlow Condensed',sans-serif;
-  letter-spacing:.3px;transition:all .15s}
-.share-btn:hover{color:white;border-color:rgba(255,255,255,.35);
-  background:rgba(255,255,255,.12)}
-.url-copy-toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
-  background:var(--navy);color:white;padding:9px 20px;border-radius:8px;
-  font-size:13px;font-weight:600;box-shadow:0 4px 20px rgba(0,0,0,.3);
-  z-index:9999;opacity:0;transition:opacity .3s;pointer-events:none;
-  border:1px solid rgba(255,255,255,.1);white-space:nowrap}
-.url-copy-toast.show{opacity:1}
-
-/* ── COMP EXPLORER (revamped) ────────────────────────────────────────────── */
-.comp-section-title{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:800;
-  color:var(--navy);text-transform:uppercase;letter-spacing:.8px;margin:20px 0 10px;
-  padding-bottom:6px;border-bottom:2px solid var(--gray-100);display:flex;
-  align-items:center;gap:8px}
-.comp-confidence{display:inline-flex;align-items:center;gap:4px;font-family:'Barlow Condensed',sans-serif;
-  font-size:11px;font-weight:700;padding:2px 8px;border-radius:10px;
-  background:var(--gray-100);color:var(--gray-500)}
-.comp-confidence.high{background:#DCFCE7;color:#16A34A}
-.comp-confidence.med{background:#FEF3C7;color:#D97706}
-.comp-confidence.low{background:#FEE2E2;color:#DC2626}
-.comp-rows-wrap{display:flex;flex-direction:column;gap:8px}
-.comp-row{display:flex;align-items:center;background:white;border:1.5px solid var(--gray-200);
-  border-radius:10px;padding:10px 14px;gap:10px;transition:all .15s;cursor:default}
-.comp-row:hover{border-color:var(--blue);box-shadow:0 2px 12px rgba(37,99,235,.1)}
-.comp-row.cross-pos{border-style:dashed;opacity:.85}
-.comp-row-rank{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:900;
-  color:var(--navy);opacity:.2;width:28px;text-align:right;flex-shrink:0}
-.comp-row-av{flex-shrink:0}
-.comp-row-info{flex:1;min-width:0}
-.comp-row-name{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:800;
-  color:var(--navy);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.comp-row-meta{font-size:10px;color:var(--gray-400);font-weight:500;margin-top:1px}
-.comp-score-wrap{display:flex;flex-direction:column;align-items:center;flex-shrink:0;min-width:54px}
-.comp-score{font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:900;line-height:1}
-.comp-score-lbl{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;
-  color:var(--gray-300);margin-top:1px}
-.comp-stat-bars{display:flex;gap:4px;flex-wrap:wrap;flex:2;min-width:0}
-.comp-stat-pill{display:flex;flex-direction:column;align-items:center;border-radius:5px;
-  padding:3px 7px;min-width:40px;background:var(--gray-50)}
-.comp-stat-val{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:800;
-  color:inherit;line-height:1}
-.comp-stat-key{font-size:7px;text-transform:uppercase;letter-spacing:.4px;
-  color:inherit;opacity:.65;margin-top:1px;white-space:nowrap}
-.comp-draft-badge{flex-shrink:0;text-align:center}
-.comp-divider{display:flex;align-items:center;gap:10px;color:var(--gray-300);
-  font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;
-  margin:12px 0 8px}
-.comp-divider::before,.comp-divider::after{content:'';flex:1;height:1px;background:var(--gray-200)}
-.comp-var-bar{height:4px;border-radius:2px;background:var(--gray-100);margin-top:3px;
-  position:relative;overflow:hidden;width:100%}
-.comp-var-fill{height:100%;border-radius:2px;background:var(--green);
-  transition:width .4s ease}
-.comp-var-fill.med{background:var(--amber)}
-.comp-var-fill.hi{background:var(--red)}
-.comp-player-header{display:flex;align-items:center;gap:16px;padding:16px;
-  background:linear-gradient(135deg,var(--navy) 0%,#1e3a6e 100%);
-  border-radius:12px;margin-bottom:4px;color:white}
-.comp-header-name{font-family:'Barlow Condensed',sans-serif;font-size:28px;
-  font-weight:900;color:white;line-height:1}
-.comp-header-sub{font-size:12px;color:rgba(255,255,255,.55);margin-top:3px}
-.comp-fields-used{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:16px}
-.comp-field-badge{background:var(--gray-50);border:1px solid var(--gray-200);
-  border-radius:4px;padding:2px 8px;font-size:10px;font-weight:700;color:var(--gray-600)}
-.comp-field-badge.used{background:#EFF6FF;border-color:#BFDBFE;color:var(--blue)}
-.comp-field-badge.missing{background:#FEF9C3;border-color:#FDE68A;color:#92400E}
-
-/* ── COMP EXPLORER v3 — table layout ────────────────────────────────────────── */
-.comp-tbl-wrap{overflow-x:auto;border-radius:10px;border:1.5px solid var(--gray-200);
-  box-shadow:0 2px 12px rgba(10,22,40,.06);background:white}
-.comp-tbl{width:100%;border-collapse:collapse;min-width:900px}
-.comp-tbl th{position:sticky;top:0;z-index:2;background:var(--navy);color:rgba(255,255,255,.7);
-  font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;
-  text-transform:uppercase;letter-spacing:.7px;padding:7px 10px;white-space:nowrap;
-  border-right:1px solid rgba(255,255,255,.07)}
-.comp-tbl th:first-child{text-align:left;min-width:180px;position:sticky;left:0;z-index:3;
-  background:var(--navy)}
-.comp-tbl th.stat-col{text-align:center;min-width:72px}
-.comp-tbl tr.prospect-row td{background:#F0F7FF;border-bottom:2px solid var(--blue)}
-.comp-tbl tr.comp-row-tr:hover td{background:#F8FAFC}
-.comp-tbl tr.comp-row-tr td{border-bottom:1px solid var(--gray-100)}
-.comp-tbl td{padding:8px 10px;vertical-align:middle}
-.comp-tbl td:first-child{position:sticky;left:0;z-index:1;
-  background:white;border-right:1px solid var(--gray-100)}
-.comp-tbl tr.prospect-row td:first-child{background:#F0F7FF}
-.comp-tbl tr.comp-row-tr:hover td:first-child{background:#F8FAFC}
-.ctd-stat{display:flex;flex-direction:column;align-items:center;gap:1px}
-.ctd-val{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:800;
-  color:var(--navy);line-height:1}
-.ctd-delta{font-size:10px;font-weight:700;line-height:1;margin-top:2px}
-.ctd-delta.pos{color:#16A34A}
-.ctd-delta.neg{color:#DC2626}
-.ctd-delta.neu{color:#94A3B8}
-.ctd-missing{color:var(--gray-300);font-size:11px;text-align:center}
-.comp-sim-badge{display:inline-flex;flex-direction:column;align-items:center;
-  border-radius:6px;padding:3px 8px;line-height:1.2}
-.comp-sim-val{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:900}
-.comp-sim-lbl{font-size:7px;text-transform:uppercase;letter-spacing:.4px;opacity:.65}
-.comp-name-cell{display:flex;align-items:center;gap:8px}
-.comp-name-main{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:800;
-  color:var(--navy);line-height:1}
-.comp-name-sub{font-size:10px;color:var(--gray-400);margin-top:1px}
-.prospect-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;
-  color:var(--blue);background:#DBEAFE;border-radius:3px;padding:1px 5px;display:inline-block}
-
-/* ── FREEFORM VIEW ────────────────────────────────────────────────────────── */
+/* ── NEW FEATURE CSS (added post-v9) ─────────────────────────────────── */
 .ff-wrap{position:relative;width:100%;background:white;border:1.5px solid var(--gray-200);
   border-radius:12px;overflow:hidden;box-shadow:0 2px 16px rgba(10,22,40,.07)}
-.ff-yaxis{position:absolute;left:0;top:44px;bottom:48px;width:52px;
-  pointer-events:none;z-index:2}
+.ff-yaxis{position:absolute;left:0;top:44px;bottom:48px;width:52px;pointer-events:none;z-index:2}
 .ff-ylab{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;
   color:var(--gray-400);text-align:right;padding-right:8px;width:100%;display:block}
 .ff-xaxis{position:absolute;bottom:0;left:52px;right:0;height:48px;
@@ -816,22 +671,16 @@ tr:hover td{background:var(--gray-50)}
   padding:0 24px;border-top:1px solid var(--gray-100);pointer-events:none}
 .ff-xlab{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;
   color:var(--gray-400);text-align:center;display:flex;flex-direction:column;gap:2px}
-.ff-xlab span{font-size:9px;font-weight:600;color:var(--gray-300)}
 .ff-plot{position:absolute;left:52px;right:0;top:44px;bottom:48px;overflow:hidden}
-.ff-tier-line{position:absolute;left:0;right:0;border-top:1px dashed;
-  pointer-events:none;z-index:1}
+.ff-tier-line{position:absolute;left:0;right:0;border-top:1px dashed;pointer-events:none;z-index:1}
 .ff-tier-label{position:absolute;right:8px;font-family:'Barlow Condensed',sans-serif;
   font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;
   pointer-events:none;z-index:1;opacity:.6;transform:translateY(-50%)}
-.ff-player{position:absolute;transform:translate(-50%,-50%);cursor:pointer;
-  z-index:3;transition:transform .12s,box-shadow .12s}
-.ff-player:hover{transform:translate(-50%,-50%) scale(1.08);z-index:10;
-  box-shadow:0 3px 10px rgba(0,0,0,.18)}
+.ff-player{position:absolute;transform:translate(-50%,-50%);cursor:pointer;z-index:3;transition:transform .12s,box-shadow .12s}
 .ff-tooltip{position:fixed;z-index:9999;pointer-events:none;opacity:0;
   background:#0A1628;color:white;border-radius:8px;padding:9px 13px;
-  font-family:'DM Sans',sans-serif;font-size:12px;line-height:1.5;
-  box-shadow:0 8px 24px rgba(0,0,0,.4);max-width:220px;transition:opacity .1s;
-  border:1px solid rgba(255,255,255,.1);white-space:nowrap}
+  font-size:12px;line-height:1.5;box-shadow:0 8px 24px rgba(0,0,0,.4);
+  max-width:220px;transition:opacity .1s;border:1px solid rgba(255,255,255,.1);white-space:nowrap}
 .ff-legend{position:absolute;top:8px;left:60px;display:flex;gap:12px;
   align-items:center;z-index:2;pointer-events:none}
 .ff-leg-item{display:flex;align-items:center;gap:5px;font-size:10px;
@@ -839,9 +688,67 @@ tr:hover td{background:var(--gray-50)}
 .ff-leg-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
 .ff-header{padding:12px 16px 0;display:flex;align-items:center;
   justify-content:space-between;flex-wrap:wrap;gap:8px}
-.ff-title{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:800;
-  color:var(--navy)}
+.ff-title{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:800;color:var(--navy)}
 .ff-subtitle{font-size:10px;color:var(--gray-400);font-weight:500}
+.ff-wrap{min-height:500px}
+.ff-xlab{font-size:9px}
+.comp-tbl-wrap{overflow-x:auto;border-radius:10px;border:1.5px solid var(--gray-200);
+  box-shadow:0 2px 12px rgba(10,22,40,.06);background:white;-webkit-overflow-scrolling:touch}
+.comp-tbl{width:100%;border-collapse:collapse;min-width:900px}
+.comp-tbl{min-width:760px}
+.comp-sim-badge{display:inline-flex;flex-direction:column;align-items:center;border-radius:6px;padding:3px 8px;line-height:1.2}
+.comp-sim-val{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:900}
+.comp-sim-lbl{font-size:7px;text-transform:uppercase;letter-spacing:.4px;opacity:.65}
+.comp-name-cell{display:flex;align-items:center;gap:8px}
+.comp-name-main{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:800;color:var(--navy);line-height:1}
+.comp-name-sub{font-size:10px;color:var(--gray-400);margin-top:1px}
+.comp-player-header{display:flex;align-items:center;gap:16px;padding:16px;
+  background:linear-gradient(135deg,var(--navy) 0%,#1e3a6e 100%);border-radius:12px;margin-bottom:4px;color:white}
+.comp-player-header{flex-wrap:wrap}
+.comp-player-header{padding:12px}
+.comp-header-name{font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:900;color:white;line-height:1}
+.comp-header-sub{font-size:12px;color:rgba(255,255,255,.55);margin-top:3px}
+.comp-header-name{font-size:22px}
+.comp-field-badge{background:var(--gray-50);border:1px solid var(--gray-200);border-radius:4px;
+  padding:2px 8px;font-size:10px;font-weight:700;color:var(--gray-600)}
+.comp-section-title{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:800;
+  color:var(--navy);text-transform:uppercase;letter-spacing:.8px;margin:20px 0 10px;
+  padding-bottom:6px;border-bottom:2px solid var(--gray-100);display:flex;align-items:center;gap:8px}
+.comp-confidence{display:inline-flex;align-items:center;gap:4px;font-family:'Barlow Condensed',sans-serif;
+  font-size:11px;font-weight:700;padding:2px 8px;border-radius:10px;background:var(--gray-100);color:var(--gray-500)}
+.ctd-stat{display:flex;flex-direction:column;align-items:center;gap:1px}
+.ctd-val{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:800;color:var(--navy);line-height:1}
+.ctd-delta{font-size:10px;font-weight:700;line-height:1;margin-top:2px}
+.ctd-missing{color:var(--gray-300);font-size:11px;text-align:center}
+.prospect-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;
+  color:var(--blue);background:#DBEAFE;border-radius:3px;padding:1px 5px;display:inline-block}
+.tag.ht{background:#F0F9FF;color:#0369A1;border-color:#BAE6FD}
+.tag.wt{background:#FFF7ED;color:#9A3412;border-color:#FED7AA}
+
+/* ── TIER EDITOR ─────────────────────────────────────────────────────────── */
+.tier-customize-btn{background:rgba(10,22,40,.07);color:var(--gray-600);
+  border:1.5px solid var(--gray-200);border-radius:7px;padding:6px 12px;
+  font-size:11px;font-weight:700;font-family:'Barlow Condensed',sans-serif;
+  letter-spacing:.5px;cursor:pointer;white-space:nowrap;transition:all .15s}
+.tier-customize-btn.on{background:var(--navy);color:white;border-color:var(--navy)}
+.tier-editor{display:none}
+.tier-editor.visible{display:block}
+.tier-ed-label{font-family:'Barlow Condensed',sans-serif;font-size:11px;
+  font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+.tier-ed-group{display:flex;align-items:center;gap:6px}
+.tier-ed-name{font-family:'Barlow Condensed',sans-serif;font-size:12px;
+  font-weight:700;white-space:nowrap}
+.tier-ed-input{width:48px;padding:3px 6px;border-radius:5px;
+  border:1.5px solid rgba(255,255,255,.2);background:rgba(255,255,255,.08);
+  color:white;font-size:13px;font-weight:700;text-align:center;
+  font-family:'Barlow Condensed',sans-serif;outline:none}
+.tier-ed-input:focus{border-color:rgba(255,255,255,.5)}
+.tier-ed-sep{width:1px;height:20px;background:rgba(255,255,255,.15)}
+.tier-ed-reset{background:rgba(255,255,255,.1);color:rgba(255,255,255,.6);
+  border:1px solid rgba(255,255,255,.2);border-radius:5px;
+  padding:4px 10px;font-size:11px;font-weight:600;cursor:pointer;
+  font-family:'Barlow Condensed',sans-serif;transition:all .15s}
+.tier-ed-reset:hover{background:rgba(255,255,255,.18);color:white}
 </style>
 </head>
 <body>
@@ -863,7 +770,7 @@ tr:hover td{background:var(--gray-50)}
       <div class="file-item" onclick="showUploadPanel();closeFileMenu()">&#8593;&nbsp; Refresh from Excel</div>
     </div>
   </div>
-  <div class="header-badge">v9 · 2026</div>
+  <div class="header-badge">v10 · 2026</div>
 </header>
 
 <nav class="nav-tabs" id="navTabs">
@@ -876,8 +783,8 @@ tr:hover td{background:var(--gray-50)}
   <div class="nav-tab" data-tab="resources">📚 Resources</div>
   <div class="nav-tab" data-tab="compare">⚖️ Compare</div>
   <div class="nav-tab" data-tab="mockbuilder">🏗️ Mock Builder</div>
-  <div class="nav-tab" data-tab="metriccalc">🧮 Metric Calc</div>
   <div class="nav-tab" data-tab="scatter">📈 Scatter</div>
+  <div class="nav-tab" data-tab="methodology">🔬 The Metric</div>
 </nav>
 
 <div id="uploadPanel" class="upload-panel">
@@ -1145,53 +1052,14 @@ tr:hover td{background:var(--gray-50)}
   <div class="mdc-save-toast" id="mdcToast"></div>
 </section>
 
-<section class="tab-panel" id="tab-metriccalc">
-  <div class="mc-wrap">
-    <div class="mc-hero">
-      <div style="display:flex;align-items:flex-start;gap:20px;flex-wrap:wrap">
-        <div style="flex:1;min-width:0">
-          <div class="mc-hero-title">🧮 HoopsWill Metric — 2026 Board</div>
-          <div class="mc-hero-sub">All 182 prospects ranked by the HoopsWill Metric. Players with calculated metrics are fully colored. Pending players are grayed — add their stats in Excel then use <strong>File ▾ → Refresh from Excel</strong> to update everything instantly.</div>
-        </div>
-        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0">
-          <div id="mcCoverage" style="font-family:'Barlow Condensed',sans-serif;font-size:32px;font-weight:900;color:var(--amber)">—</div>
-          <div style="font-size:10px;color:rgba(255,255,255,.4);font-weight:600">players with metrics</div>
-        </div>
-      </div>
-    </div>
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:22px">
-      <div class="mc-step"><div class="mc-step-num">1</div><div class="mc-step-title">Add stats in Excel</div><div class="mc-step-body">In <strong>Draft_Project_2026.xlsx</strong>, fill in raw CBB Reference stats for any prospect. Your formulas calculate the Metric automatically.</div></div>
-      <div class="mc-step"><div class="mc-step-num">2</div><div class="mc-step-title">Refresh the dashboard</div><div class="mc-step-body">Click <strong>File ▾ → Refresh from Excel</strong> and upload your updated .xlsx. Every tab — including this one — updates instantly.</div></div>
-      <div class="mc-step"><div class="mc-step-num">3</div><div class="mc-step-title">Rankings update live</div><div class="mc-step-body">New metric scores appear here sorted highest to lowest. Pending players move up when their stats come in. Export anytime to CSV.</div></div>
-    </div>
-    <div class="mc-controls-row" style="margin-bottom:14px">
-      <input id="mcSearchInput" type="text" placeholder="Search player or school…"
-        style="background:white;border:1.5px solid var(--gray-200);color:var(--navy);width:220px;padding:7px 12px;font-size:12px;border-radius:7px;outline:none"
-        oninput="mcFilterResults(this.value)">
-      <div class="mc-mode-group">
-        <button class="mc-mode-btn active" onclick="mcSetFilter('all',this)">All 182</button>
-        <button class="mc-mode-btn" onclick="mcSetFilter('metric',this)">Has Metric</button>
-        <button class="mc-mode-btn" onclick="mcSetFilter('pending',this)">Pending</button>
-      </div>
-      <button class="mc-export-btn" onclick="mcExportCSV()" style="margin-left:auto">⬇ Export CSV</button>
-    </div>
-    <div class="mc-results-wrap">
-      <div class="mc-results-header" style="display:flex">
-        <span class="mc-results-title">2026 Board — Metric Rankings</span>
-        <span class="mc-results-meta" id="mcResultsMeta" style="margin-left:12px"></span>
-      </div>
-      <div id="mcResultsBody"><div class="mc-empty-state"><div class="mc-empty-icon">⏳</div><div class="mc-empty-text">Loading…</div></div></div>
-      <div class="mc-avgs-strip" id="mcAvgsStrip" style="display:none"></div>
-    </div>
-  </div>
-</section>
+
 
 <section class="tab-panel" id="tab-scatter">
   <div class="sc-wrap">
     <div class="sc-controls">
       <div class="sc-ctrl-group">
         <label class="sc-ctrl-label">X Axis</label>
-        <select class="sc-select" id="scXAxis" onchange="scRender()">
+        <select class="sc-select" id="scXAxis" onchange="scRenderDebounced()">
           <optgroup label="Physical">
             <option value="age" selected>Age</option>
             <option value="ht">Height (in)</option>
@@ -1215,7 +1083,7 @@ tr:hover td{background:var(--gray-50)}
       </div>
       <div class="sc-ctrl-group">
         <label class="sc-ctrl-label">Y Axis</label>
-        <select class="sc-select" id="scYAxis" onchange="scRender()">
+        <select class="sc-select" id="scYAxis" onchange="scRenderDebounced()">
           <optgroup label="Stats">
             <option value="ts_pct" selected>TS%</option>
             <option value="pa2_usg">P+A/USG</option>
@@ -1239,7 +1107,7 @@ tr:hover td{background:var(--gray-50)}
       </div>
       <div class="sc-ctrl-group">
         <label class="sc-ctrl-label">Draft Class</label>
-        <select class="sc-select" id="scYear" onchange="scRender()">
+        <select class="sc-select" id="scYear" onchange="scRenderDebounced()">
           <option value="2026" selected>2026</option>
           <option value="all">All (2019-2026)</option>
           <option value="2025">2025</option>
@@ -1253,7 +1121,7 @@ tr:hover td{background:var(--gray-50)}
       </div>
       <div class="sc-ctrl-group">
         <label class="sc-ctrl-label">Color By</label>
-        <select class="sc-select" id="scColorBy" onchange="scRender()">
+        <select class="sc-select" id="scColorBy" onchange="scRenderDebounced()">
           <option value="position">Position</option>
           <option value="year">Draft Class</option>
           <option value="tier">Tier</option>
@@ -1261,7 +1129,7 @@ tr:hover td{background:var(--gray-50)}
       </div>
       <div class="sc-ctrl-group">
         <label class="sc-ctrl-label">Position</label>
-        <select class="sc-select" id="scPosFilter" onchange="scRender()">
+        <select class="sc-select" id="scPosFilter" onchange="scRenderDebounced()">
           <option value="all">All</option>
           <option value="Guard">Guards</option>
           <option value="Forward">Forwards</option>
@@ -1499,11 +1367,16 @@ function schoolLogoUrl(school) {
   var norm = normalizeSchoolName(school);
   if (norm && SCHOOL_LOGOS[norm]) return espnUrl(SCHOOL_LOGOS[norm]);
   var sl = school.toLowerCase().replace(/[.']/g,'').trim();
-  var keys = Object.keys(SCHOOL_LOGOS);
-  for (var i=0;i<keys.length;i++) {
-    var kl = keys[i].toLowerCase().replace(/[.']/g,'').trim();
+  if (!schoolLogoUrl._cache) {
+    schoolLogoUrl._cache = Object.keys(SCHOOL_LOGOS).map(function(k) {
+      return {raw:k, norm:k.toLowerCase().replace(/[.']/g,'').trim()};
+    });
+  }
+  var cache = schoolLogoUrl._cache;
+  for (var i=0;i<cache.length;i++) {
+    var kl = cache[i].norm;
     if (kl===sl||sl.indexOf(kl)===0||kl.indexOf(sl)===0) {
-      return espnUrl(SCHOOL_LOGOS[keys[i]]);
+      return espnUrl(SCHOOL_LOGOS[cache[i].raw]);
     }
   }
   return null;
@@ -1768,6 +1641,7 @@ function renderBoard2026() {
   else                                 renderBoardCards(players);
 }
 
+// ── BOARD 2026 — CARDS VIEW ─────────────────────────────────────────────────
 function renderBoardCards(players) {
   const el = document.getElementById('board2026Content');
   if (!players.length) { el.innerHTML = '<div class="empty"><div class="empty-icon">🏀</div><p>No prospects match your filters</p></div>'; return; }
@@ -1845,6 +1719,7 @@ function renderBoardCards(players) {
   el.innerHTML = html;
 }
 
+// ── BOARD 2026 — TABLE VIEW ──────────────────────────────────────────────────
 function renderBoardTable(players) {
   let sorted = [...players].sort((a,b) => {
     let va = a[sortCol] ?? (sortDir===1 ? 9999 : -9999);
@@ -2086,6 +1961,7 @@ function populateCompSelect() {
     eligible.map(function(p){ return '<option value="' + p.rank + '">' + p.rank + '. ' + splitName(p.name)[0] + '</option>'; }).join('');
 }
 
+// ── COMP EXPLORER — STATISTICAL SIMILARITY MODEL ─────────────────────────────
 function showCompExplorer() {
   var rankVal = document.getElementById('compProspectSelect').value;
   if (!rankVal) return;
@@ -2156,7 +2032,7 @@ function showCompExplorer() {
 
   var scored = [];
   (DATA.yoy||[]).forEach(function(comp) {
-    var compNameBase = comp.name.indexOf(' - ')>0 ? comp.name.slice(0,comp.name.indexOf(' - ')) : comp.name;
+    var compNameBase = (comp.name||'').indexOf(' - ')>0 ? comp.name.slice(0,comp.name.indexOf(' - ')) : (comp.name||'');
     var htWt = COMP_HT_WT[compNameBase] || null;
     // Exclude comps with no ht/wt — positional comparisons are unreliable without them
     if (!htWt) return;
@@ -2368,6 +2244,7 @@ function getBoardRank(playerName, year) {
 
 let trendChart = null;
 
+// ── MOCK DRAFTS ───────────────────────────────────────────────────────────────
 function renderMocks() {
   const yr       = document.getElementById('mockYear').value;
   const yearData = DATA.mocks[yr] || {};
@@ -2799,7 +2676,7 @@ document.querySelectorAll('.nav-tab').forEach(tab => {
     if (tab.dataset.tab==='resources') renderResources();
     if (tab.dataset.tab==='compare') { populateCompareSelect(); renderCompare(); }
     if (tab.dataset.tab==='mockbuilder') mdcInit();
-    if (tab.dataset.tab==='metriccalc') mcInit();
+    if (tab.dataset.tab==='methodology') mcInit();
     if (tab.dataset.tab==='scatter') scRender();
   });
 });
@@ -3598,6 +3475,7 @@ function bbBuildRow(p, idx) {
   +'</div>';
 }
 
+// ── BOARD 2026 — BIG BOARD VIEW ──────────────────────────────────────────────
 function renderBoardBigboard(players) {
   var el = document.getElementById('board2026Content');
   if (!el) return;
@@ -4774,6 +4652,13 @@ function scShowTip(e, nearby, xM, yM) {
 }
 function scHideTip() { var tt = scGetTip(); tt.style.opacity = '0'; }
 
+// ── SCATTER PLOT ──────────────────────────────────────────────────────────────
+var _scRenderTimer = null;
+function scRenderDebounced() {
+  clearTimeout(_scRenderTimer);
+  _scRenderTimer = setTimeout(scRender, 150);
+}
+
 function scRender() {
   try {
     var _xe=document.getElementById('scXAxis'),_ye=document.getElementById('scYAxis');
@@ -5117,7 +5002,6 @@ function urlRestoreState() {
     board2026:renderBoard2026,analytics:renderAnalytics,
     history:renderHistory,future:renderFuture,mocks:renderMocks,
     resources:renderResources,scatter:scRender,
-    metriccalc:mcInit,mockbuilder:mdcInit,
     compare:function(){populateCompareSelect();renderCompare();}
   };
   if(renders[p.tab]) renders[p.tab]();
@@ -5550,6 +5434,7 @@ function ffXpos(p) {
   return posScore * 0.50 + htNorm * 100 * 0.35 + wtNorm * 100 * 0.15;
 }
 
+// ── BOARD 2026 — FREEFORM VIEW ───────────────────────────────────────────────
 function renderBoardFreeform(players) {
   var el = document.getElementById('board2026Content');
   if (!el) return;
@@ -5735,5 +5620,299 @@ function renderBoardFreeform(players) {
   </div>
 </div>
 <div class="url-copy-toast" id="urlCopyToast"></div>
+<section class="tab-panel" id="tab-methodology">
+  <div class="print-header"><div class="print-header-title">HoopsWill NBA Draft Board — The Metric</div><div class="print-header-sub">Methodology · hoopswill.com</div></div>
+
+  <!-- ── HERO ───────────────────────────────────────────────────────────── -->
+  <div style="background:linear-gradient(135deg,#0A1628 0%,#1a2f52 60%,#0f2040 100%);border-radius:14px;padding:40px 40px 36px;margin-bottom:24px;position:relative;overflow:hidden">
+    <div style="position:absolute;top:-40px;right:-40px;width:260px;height:260px;border-radius:50%;background:rgba(212,168,48,.06);pointer-events:none"></div>
+    <div style="position:absolute;bottom:-60px;left:30%;width:180px;height:180px;border-radius:50%;background:rgba(37,99,235,.07);pointer-events:none"></div>
+    <div style="position:relative;z-index:1">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:20px">
+        <div style="flex:1;min-width:260px">
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--amber-light,#E8BF52);margin-bottom:10px">HoopsWill Draft Model</div>
+          <h1 style="font-family:'Barlow Condensed',sans-serif;font-size:38px;font-weight:900;color:white;margin:0 0 14px;line-height:1.1">The HoopsWill Metric</h1>
+          <p style="font-size:15px;color:rgba(255,255,255,.7);line-height:1.7;margin:0;max-width:580px">A framework for identifying the players who will matter when it counts — built on the statistical signals that have proven to translate from college to the NBA, and especially to the playoff settings where rosters are defined.</p>
+        </div>
+        <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start">
+          <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:14px 20px;text-align:center;min-width:90px">
+            <div style="font-family:'Barlow Condensed',sans-serif;font-size:36px;font-weight:900;color:var(--amber-light,#E8BF52);line-height:1">6</div>
+            <div style="font-size:10px;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:.5px;margin-top:4px">Core inputs</div>
+          </div>
+          <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:14px 20px;text-align:center;min-width:90px">
+            <div style="font-family:'Barlow Condensed',sans-serif;font-size:36px;font-weight:900;color:var(--amber-light,#E8BF52);line-height:1">3</div>
+            <div style="font-size:10px;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:.5px;margin-top:4px">Scale factors</div>
+          </div>
+          <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:14px 20px;text-align:center;min-width:90px">
+            <div style="font-family:'Barlow Condensed',sans-serif;font-size:36px;font-weight:900;color:var(--amber-light,#E8BF52);line-height:1">8+</div>
+            <div style="font-size:10px;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:.5px;margin-top:4px">Classes 2019–27</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── INTRO ───────────────────────────────────────────────────────────── -->
+  <div style="max-width:1100px;margin:0 auto">
+    <div style="background:white;border:1.5px solid var(--gray-200);border-radius:12px;padding:24px 28px;margin-bottom:20px">
+      <p style="font-size:15px;line-height:1.75;margin:0 0 16px;color:var(--navy)">Draft evaluation is hard precisely because it asks us to project college performance onto a pro game that looks different in almost every way. The HoopsWill Metric doesn't try to predict a player's NBA career. It tries to answer a narrower, more answerable question: <strong>given what this player did in college, from a raw analytical perspective how productive and impactful were they relative to their opportunity?</strong></p>
+      <p style="font-size:15px;line-height:1.75;margin:0 0 16px;color:var(--navy)">The framework is built around what I believe drives winning in the NBA — and more specifically, what produces <em>16-game players</em>. That's the standard that matters: not who fills a box score in November, but who a coaching staff trusts when the margin is thin and the opposition has had weeks to prepare. Playoff basketball strips out the noise. It rewards skill, efficiency, and defensive impact in ways the regular season often masks. The metric is constructed with that context in mind.</p>
+      <p style="font-size:15px;line-height:1.75;margin:0;color:var(--navy)">What I wanted were stats that say something durable — that reflect how a player actually plays the game, not just what role their coach gave them. The six inputs below aren't just analytically meaningful. They're <strong>sticky</strong>. Players who score efficiently in college tend to score efficiently in the NBA. Players who take steals and blocks in college tend to do so in the pros. Players who create for others without turning it over tend to keep doing that at the next level. These aren't traits you coach in — they're expressions of how a player sees and plays the game.</p>
+    </div>
+
+    <!-- ── THE SIX INPUTS ─────────────────────────────────────────────────── -->
+    <div style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:var(--gray-400);margin-bottom:12px;padding-left:4px">The six inputs</div>
+
+    <div style="display:grid;gap:12px;margin-bottom:20px">
+
+      <div style="background:white;border:1.5px solid var(--gray-200);border-radius:12px;padding:20px 24px;border-left:4px solid #D97706">
+        <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:8px;flex-wrap:wrap">
+          <span style="font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900;color:var(--navy)">True Shooting %</span>
+          <span style="font-size:11px;font-weight:700;color:#D97706;background:#FEF3C7;border-radius:12px;padding:2px 9px">TS%</span>
+        </div>
+        <p style="font-size:14px;line-height:1.7;margin:0;color:var(--gray-700)">Scoring efficiency is the most portable skill in basketball. A player who scores efficiently in college — accounting for twos, threes, and free throws in a single number — is demonstrating shot quality and shot selection simultaneously. TS% cuts through volume to ask: when you shoot, how well do you do it? Elite scorers at the college level tend to remain elite scorers. That's not a coincidence — it reflects real skill in shot creation, touch, and decision-making that travels.</p>
+      </div>
+
+      <div style="background:white;border:1.5px solid var(--gray-200);border-radius:12px;padding:20px 24px;border-left:4px solid #2563EB">
+        <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:8px;flex-wrap:wrap">
+          <span style="font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900;color:var(--navy)">Points + Assists per Usage</span>
+          <span style="font-size:11px;font-weight:700;color:#2563EB;background:#EFF6FF;border-radius:12px;padding:2px 9px">P+A(2)/USG · pace-adjusted</span>
+        </div>
+        <p style="font-size:14px;line-height:1.7;margin:0;color:var(--gray-700)">This is the metric's most unusual input and probably its most important. It measures how much a player produces — points and assist-value, scaled for pace — relative to the possessions they consume. A player who scores 20 points but needs 25 possessions is less useful than one who scores 18 on 14. This stat rewards efficiency of impact rather than raw output, which is exactly what you want when evaluating players across wildly different roles and systems. It captures the dimension of basketball that matters most to winning teams: <em>what did you produce for every opportunity you were given?</em></p>
+      </div>
+
+      <div style="background:white;border:1.5px solid var(--gray-200);border-radius:12px;padding:20px 24px;border-left:4px solid #059669">
+        <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:8px;flex-wrap:wrap">
+          <span style="font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900;color:var(--navy)">Steals + Blocks</span>
+          <span style="font-size:11px;font-weight:700;color:#059669;background:#ECFDF5;border-radius:12px;padding:2px 9px">Stl+Bl · pace-adjusted</span>
+        </div>
+        <p style="font-size:14px;line-height:1.7;margin:0;color:var(--gray-700)">Defensive impact is notoriously hard to quantify at the college level — but steals and blocks represent the two most direct ways a defense can alter possessions, and they are among the stickiest stats in basketball. A steal doesn't just stop a possession — it creates one. It eliminates the opponent's shot while generating a transition opportunity on the other end. A block reduces the opponent's shots on goal, and the best shot-blockers don't just alter attempts — they do so in ways that keep the ball in bounds and trigger quick-strike scoring on the other end. Combined and pace-adjusted, Stl+Bl identifies players who actively take possessions rather than simply contest them. That skill translates because it reflects athleticism, anticipation, and positioning — traits that don't diminish when the competition improves.</p>
+      </div>
+
+      <div style="background:white;border:1.5px solid var(--gray-200);border-radius:12px;padding:20px 24px;border-left:4px solid #7C3AED">
+        <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:8px;flex-wrap:wrap">
+          <span style="font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900;color:var(--navy)">Assist-to-Turnover Ratio</span>
+          <span style="font-size:11px;font-weight:700;color:#7C3AED;background:#FAF5FF;border-radius:12px;padding:2px 9px">A/TO</span>
+        </div>
+        <p style="font-size:14px;line-height:1.7;margin:0;color:var(--gray-700)">Ball security and decision-making. A high A/TO ratio tells you the player creates for others without giving the ball away — a signal of processing speed, court vision, and composure under pressure. It's one of the few stats that translates cleanly from college to the pros because it reflects how a player thinks, not just what they can physically do. Teams that protect the ball in the playoffs win. This is the stat that tracks the players who understand that.</p>
+      </div>
+
+      <div style="background:white;border:1.5px solid var(--gray-200);border-radius:12px;padding:20px 24px;border-left:4px solid #DC2626">
+        <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:8px;flex-wrap:wrap">
+          <span style="font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900;color:var(--navy)">Free Throw Rate</span>
+          <span style="font-size:11px;font-weight:700;color:#DC2626;background:#FEF2F2;border-radius:12px;padding:2px 9px">FTAr</span>
+        </div>
+        <p style="font-size:14px;line-height:1.7;margin:0;color:var(--gray-700)">The ability to draw fouls — to get to the line relative to shot attempts — reflects aggression, athleticism, and the physical assertiveness that creates pressure on defenses. It also captures something repeatable: some players just get calls, and that's a skill. In playoff basketball specifically, getting to the free throw line is one of the most reliable paths to efficient scoring when half-court offense is harder to come by.</p>
+      </div>
+
+      <div style="background:white;border:1.5px solid var(--gray-200);border-radius:12px;padding:20px 24px;border-left:4px solid #0D9488">
+        <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:8px;flex-wrap:wrap">
+          <span style="font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900;color:var(--navy)">Three-Point Attempt Rate</span>
+          <span style="font-size:11px;font-weight:700;color:#0D9488;background:#F0FDFA;border-radius:12px;padding:2px 9px">3PAr</span>
+        </div>
+        <p style="font-size:14px;line-height:1.7;margin:0;color:var(--gray-700)">Modern NBA offenses are built around three-point spacing, and 3PAr signals more than shooting volume — it signals a player's inherent value-add to an offense as a floor spacer. Research has shown that players with high three-point attempt rates force defenses to push out further on perimeter coverage, which generates driving lanes, post opportunities, and open cuts for teammates even when the shot doesn't go in. A player willing to operate from range at volume makes everyone around them more dangerous. That underlying value — spacing-driven offense creation — is something this stat quantifies beyond raw shooting efficiency. TS% handles whether the shots go in; 3PAr handles whether the threat is real.</p>
+      </div>
+    </div>
+
+    <!-- ── SCALING FACTORS ─────────────────────────────────────────────────── -->
+    <div style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:var(--gray-400);margin-bottom:12px;padding-left:4px">The scaling factors</div>
+
+    <div style="background:white;border:1.5px solid var(--gray-200);border-radius:12px;padding:20px 28px;margin-bottom:20px">
+      <p style="font-size:14px;line-height:1.7;margin:0 0 16px;color:var(--gray-700)">The six stats above are the core. But raw stats from an 18-year-old freshman carry different weight than the same numbers from a 22-year-old senior. The metric applies three scaling adjustments:</p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px">
+
+        <div style="background:var(--gray-50);border-radius:10px;padding:16px 18px;border-top:3px solid #D97706">
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:800;color:var(--navy);margin-bottom:6px">Age</div>
+          <p style="font-size:13px;line-height:1.65;margin:0;color:var(--gray-700)">Younger players who post strong numbers get a premium — and not just because the projection is longer. More importantly, it signals <em>untapped upside</em>. A freshman dominating from day one suggests a development arc that has barely begun. Older breakout ages, by contrast, can reflect a player whose performance was driven partly by competing against younger opponents — production that may not translate as cleanly when the age gap disappears.</p>
+        </div>
+
+        <div style="background:var(--gray-50);border-radius:10px;padding:16px 18px;border-top:3px solid #2563EB">
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:800;color:var(--navy);margin-bottom:6px">Size</div>
+          <p style="font-size:13px;line-height:1.65;margin:0;color:var(--gray-700)">This is a recent addition to the model and one I expect to keep refining. The six core inputs are primarily skill-based — as they should be — but length and strength are always at a premium in the NBA, especially when playoff physicality demands it. A 6'8" guard running elite assist and steal numbers is rare in a way that matters. Size also affects how skills translate: a center with a high A/TO may be doing something more exceptional than a guard with the same number. I believe size deserves additional weighting in future iterations.</p>
+        </div>
+
+        <div style="background:var(--gray-50);border-radius:10px;padding:16px 18px;border-top:3px solid #7C3AED">
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:800;color:var(--navy);margin-bottom:6px">Position</div>
+          <p style="font-size:13px;line-height:1.65;margin:0;color:var(--gray-700)">A modest positional weighting reflects the reality that guards and forwards tend to produce higher raw metric inputs than traditional bigs — partly by design of the college game, partly by how possessions are structured. The adjustment is intentionally light. The goal isn't to correct for position so much as to ensure positional context is acknowledged.</p>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ── HISTORICAL BENCHMARKS ──────────────────────────────────────────── -->
+    <div style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:var(--gray-400);margin-bottom:12px;padding-left:4px">Historical benchmarks</div>
+
+    <div style="background:white;border:1.5px solid var(--gray-200);border-radius:12px;padding:20px 24px;margin-bottom:20px">
+      <p style="font-size:14px;line-height:1.7;margin:0 0 16px;color:var(--gray-700)">The metric is best read comparatively. Scores above 140 are genuinely rare — historically that tier has included some of the most impactful prospects in recent draft history, and the chart below shows how those scores align with where they were actually taken.</p>
+      <canvas id="methodologyChart" style="width:100%;height:280px;display:block"></canvas>
+      <div id="methChartLegend" style="display:flex;gap:16px;margin-top:12px;flex-wrap:wrap;font-size:11px;color:var(--gray-500)">
+        <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:50%;background:#D97706;display:inline-block"></span>Lottery pick (1–14)</span>
+        <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:50%;background:#2563EB;display:inline-block"></span>Late 1st round</span>
+        <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:50%;background:#94A3B8;display:inline-block"></span>2nd round</span>
+      </div>
+    </div>
+
+    <!-- ── LIVING MODEL ───────────────────────────────────────────────────── -->
+    <div style="background:linear-gradient(135deg,#0A1628,#1a2f52);border-radius:12px;padding:24px 28px;margin-bottom:8px">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:800;color:var(--amber-light,#E8BF52);margin-bottom:10px">This is a living model</div>
+      <p style="font-size:14px;line-height:1.75;margin:0 0 12px;color:rgba(255,255,255,.8)">Basketball changes. The three-point revolution reshaped what efficiency looks like. Positional distinctions have blurred. Metrics that made sense five years ago may need revisiting — and as the game evolves, so should the model that tries to measure it.</p>
+      <p style="font-size:14px;line-height:1.75;margin:0;color:rgba(255,255,255,.8)">The HoopsWill Metric is designed to be refined. The inputs may shift. The scaling weights may get adjusted. New variables may earn their way in. The size factor, for one, is already being reconsidered for more weight in future iterations. If a better way to measure something presents itself, the model should reflect that. The goal isn't to lock in a formula — it's to get closer to the truth about what makes a prospect.</p>
+    </div>
+
+  </div>
+
+  <script>
+  (function() {
+    function drawMethodologyChart() {
+      var canvas = document.getElementById('methodologyChart');
+      if (!canvas) return;
+      var ctx = canvas.getContext('2d');
+      var dpr = window.devicePixelRatio || 1;
+      var rect = canvas.getBoundingClientRect();
+      canvas.width  = rect.width  * dpr;
+      canvas.height = 280 * dpr;
+      ctx.scale(dpr, dpr);
+      var W = rect.width, H = 280;
+
+      var players = [{"name": "Reed Sheppard","year": 24,"metric": 197.2,"draft": 3,"hw": 4,"pos": "Guard"},{"name": "Chet Holmgren","year": 22,"metric": 180.1,"draft": 2,"hw": 2,"pos": "Center"},{"name": "Zion Williamson","year": 19,"metric": 172.3,"draft": 1,"hw": 1,"pos": "Forward"},{"name": "Cooper Flagg","year": 25,"metric": 167.5,"draft": 1,"hw": 1,"pos": "Forward"},{"name": "Tyrese Haliburton","year": 20,"metric": 167.4,"draft": 12,"hw": 8,"pos": "Guard"},{"name": "Franz Wagner","year": 21,"metric": 167.1,"draft": 8,"hw": 5,"pos": "Forward"},{"name": "Alperen Sengun","year": 21,"metric": 149.0,"draft": 16,"hw": 11,"pos": "Center"},{"name": "Cason Wallace","year": 23,"metric": 148.4,"draft": 10,"hw": 6,"pos": "Guard"},{"name": "Scottie Barnes","year": 21,"metric": 147.9,"draft": 4,"hw": 6,"pos": "Forward"},{"name": "Donovan Clingan","year": 24,"metric": 142.0,"draft": 7,"hw": 5,"pos": "Center"},{"name": "Davion Mitchell","year": 21,"metric": 141.4,"draft": 9,"hw": 13,"pos": "Guard"},{"name": "Evan Mobley","year": 21,"metric": 137.3,"draft": 3,"hw": 3,"pos": "Center"},{"name": "Jalen Suggs","year": 21,"metric": 136.7,"draft": 5,"hw": 2,"pos": "Guard"}];
+      var maxMetric = 210;
+      var minMetric = 120;
+      var barH = Math.floor((H - 60) / players.length) - 4;
+      var labelW = 130;
+      var rightPad = 70;
+      var plotW = W - labelW - rightPad;
+
+      ctx.clearRect(0, 0, W, H);
+
+      // Title
+      ctx.fillStyle = '#64748B';
+      ctx.font = '600 11px DM Sans, sans-serif';
+      ctx.textAlign = 'left';
+      ctx.fillText('HoopsWill Metric Score', labelW, 16);
+      ctx.textAlign = 'right';
+      ctx.fillText('Draft pick', W - 4, 16);
+
+      // Grid lines
+      var gridVals = [130, 140, 150, 160, 170, 180, 190, 200];
+      gridVals.forEach(function(v) {
+        var x = labelW + (v - minMetric) / (maxMetric - minMetric) * plotW;
+        ctx.beginPath();
+        ctx.strokeStyle = '#F1F5F9';
+        ctx.lineWidth = 1;
+        ctx.moveTo(x, 24);
+        ctx.lineTo(x, H - 28);
+        ctx.stroke();
+        ctx.fillStyle = '#CBD5E1';
+        ctx.font = '10px DM Sans, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(v, x, H - 14);
+      });
+
+      players.forEach(function(p, i) {
+        var y = 28 + i * (barH + 4);
+        var barW = Math.max(2, (p.metric - minMetric) / (maxMetric - minMetric) * plotW);
+        var color = p.draft <= 14 ? '#D97706' : p.draft <= 30 ? '#2563EB' : '#94A3B8';
+        var lightColor = p.draft <= 14 ? '#FEF3C7' : p.draft <= 30 ? '#EFF6FF' : '#F8FAFC';
+
+        // Bar
+        ctx.fillStyle = lightColor;
+        ctx.beginPath();
+        ctx.roundRect ? ctx.roundRect(labelW, y, barW, barH, 3) : null;
+        ctx.fill();
+
+        // Colored portion
+        ctx.fillStyle = color;
+        ctx.globalAlpha = 0.85;
+        ctx.beginPath();
+        if (ctx.roundRect) {
+          ctx.roundRect(labelW, y, barW, barH, 3);
+        } else {
+          ctx.rect(labelW, y, barW, barH);
+        }
+        ctx.fill();
+        ctx.globalAlpha = 1;
+
+        // Player name
+        ctx.fillStyle = '#0A1628';
+        ctx.font = '600 11.5px DM Sans, sans-serif';
+        ctx.textAlign = 'right';
+        var yr = "'" + String(p.year).padStart(2,'0');
+        ctx.fillText(p.name + ' ' + yr, labelW - 6, y + barH/2 + 4);
+
+        // Metric value inside bar
+        ctx.fillStyle = 'white';
+        ctx.font = '700 10.5px DM Sans, sans-serif';
+        ctx.textAlign = 'left';
+        ctx.fillText(p.metric.toFixed(1), labelW + barW - 34, y + barH/2 + 4);
+
+        // Draft pick
+        ctx.fillStyle = color;
+        ctx.font = '700 11px DM Sans, sans-serif';
+        ctx.textAlign = 'left';
+        ctx.fillText('#' + p.draft, labelW + plotW + 8, y + barH/2 + 4);
+      });
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', drawMethodologyChart);
+    } else {
+      setTimeout(drawMethodologyChart, 50);
+    }
+
+    // Redraw when tab becomes visible
+    var navTabs = document.querySelectorAll('.nav-tab');
+    navTabs.forEach(function(tab) {
+      tab.addEventListener('click', function() {
+        if (tab.dataset && tab.dataset.tab === 'methodology') {
+          setTimeout(drawMethodologyChart, 80);
+        }
+      });
+    });
+  })();
+  </script>
+
+
+
+  <!-- ── METRIC RANKINGS ──────────────────────────────────────────────────── -->
+  <div style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:var(--gray-400);margin:28px 0 12px;padding-left:4px">2026 Metric Rankings</div>
+  <div class="mc-wrap">
+    <div class="mc-hero">
+      <div style="display:flex;align-items:flex-start;gap:20px;flex-wrap:wrap">
+        <div style="flex:1;min-width:0">
+          <div class="mc-hero-title">🧮 HoopsWill Metric — 2026 Board</div>
+          <div class="mc-hero-sub">All 182 prospects ranked by the HoopsWill Metric. Players with calculated metrics are fully colored. Pending players are grayed — add their stats in Excel then use <strong>File ▾ → Refresh from Excel</strong> to update everything instantly.</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0">
+          <div id="mcCoverage" style="font-family:'Barlow Condensed',sans-serif;font-size:32px;font-weight:900;color:var(--amber)">—</div>
+          <div style="font-size:10px;color:rgba(255,255,255,.4);font-weight:600">players with metrics</div>
+        </div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:22px">
+      <div class="mc-step"><div class="mc-step-num">1</div><div class="mc-step-title">Add stats in Excel</div><div class="mc-step-body">In <strong>Draft_Project_2026.xlsx</strong>, fill in raw CBB Reference stats for any prospect. Your formulas calculate the Metric automatically.</div></div>
+      <div class="mc-step"><div class="mc-step-num">2</div><div class="mc-step-title">Refresh the dashboard</div><div class="mc-step-body">Click <strong>File ▾ → Refresh from Excel</strong> and upload your updated .xlsx. Every tab — including this one — updates instantly.</div></div>
+      <div class="mc-step"><div class="mc-step-num">3</div><div class="mc-step-title">Rankings update live</div><div class="mc-step-body">New metric scores appear here sorted highest to lowest. Pending players move up when their stats come in. Export anytime to CSV.</div></div>
+    </div>
+    <div class="mc-controls-row" style="margin-bottom:14px">
+      <input id="mcSearchInput" type="text" placeholder="Search player or school…"
+        style="background:white;border:1.5px solid var(--gray-200);color:var(--navy);width:220px;padding:7px 12px;font-size:12px;border-radius:7px;outline:none"
+        oninput="mcFilterResults(this.value)">
+      <div class="mc-mode-group">
+        <button class="mc-mode-btn active" onclick="mcSetFilter('all',this)">All 182</button>
+        <button class="mc-mode-btn" onclick="mcSetFilter('metric',this)">Has Metric</button>
+        <button class="mc-mode-btn" onclick="mcSetFilter('pending',this)">Pending</button>
+      </div>
+      <button class="mc-export-btn" onclick="mcExportCSV()" style="margin-left:auto">⬇ Export CSV</button>
+    </div>
+    <div class="mc-results-wrap">
+      <div class="mc-results-header" style="display:flex">
+        <span class="mc-results-title">2026 Board — Metric Rankings</span>
+        <span class="mc-results-meta" id="mcResultsMeta" style="margin-left:12px"></span>
+      </div>
+      <div id="mcResultsBody"><div class="mc-empty-state"><div class="mc-empty-icon">⏳</div><div class="mc-empty-text">Loading…</div></div></div>
+      <div class="mc-avgs-strip" id="mcAvgsStrip" style="display:none"></div>
+    </div>
+  </div>
+</section>
 </body>
 </html>
