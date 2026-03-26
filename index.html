@@ -279,15 +279,131 @@ tr:hover td{background:var(--gray-50)}
 .empty{text-align:center;padding:48px;color:var(--gray-400)}
 .empty-icon{font-size:42px;margin-bottom:10px}
 
-@media(max-width:640px){
-  .main{padding:12px}
-  .cards-grid{grid-template-columns:1fr}
-  .header-sub{display:none}
-  .modal-overlay{padding:8px}
-  .modal{max-height:92vh;overflow-y:auto}
-  .ff-wrap{min-height:500px}
-  .ff-xlab{font-size:9px}
+
+/* ── TABLET (≤900px) ─────────────────────────────────────────────────────── */
+@media(max-width:900px){
+  .main{padding:14px 16px}
+  .header{padding:0 16px}
+  .mdc-pool{width:260px}
+  .mdc-wrap{height:calc(100vh - 140px)}
+  .sc-canvas-wrap{height:420px}
+  .mc-hero{padding:20px 24px}
+  .methodology-hero-inner{flex-direction:column}
+  #simPoolPanel{width:220px}
 }
+
+/* ── MOBILE (≤640px) ─────────────────────────────────────────────────────── */
+.share-btn{background:rgba(255,255,255,.08);border:1.5px solid rgba(255,255,255,.15);color:rgba(255,255,255,.9);border-radius:8px;padding:6px 14px;font-size:12px;font-weight:700;font-family:'Barlow Condensed',sans-serif;letter-spacing:.5px;cursor:pointer;transition:all .15s;white-space:nowrap}
+@media(max-width:640px){
+  /* Header */
+  .header{padding:0 10px;gap:6px;height:56px}
+  .header-logo-img{width:32px;height:32px}
+  .header-title-rest{display:none}
+  .header-title{font-size:16px}
+  .header-sub{display:none}
+  .header-badge{display:none}
+  #lotteryCountdown{display:none!important}
+  #draftCountdown{display:none!important}
+  
+  
+  .file-menu-btn{padding:5px 9px;font-size:11px}
+
+  /* Nav */
+  .nav-tabs{top:56px;padding:0 6px}
+  .nav-tab{padding:9px 10px;font-size:11px}
+
+  /* Main */
+  .main{padding:10px 10px}
+
+  /* Controls bar */
+  .controls-bar{gap:6px}
+  .search-wrap{min-width:120px}
+  .filter-select{min-width:90px;font-size:12px;padding:6px 8px}
+  .view-toggle{width:100%}
+  .view-btn{flex:1;text-align:center;padding:4px 6px;font-size:11px}
+  .tier-customize-btn{font-size:10px;padding:5px 8px}
+  .tier-editor{min-width:calc(100vw - 20px);right:-10px}
+
+  /* Cards */
+  .cards-grid{grid-template-columns:1fr}
+  .card-header{padding:10px 12px 8px}
+  .card-stats{grid-template-columns:repeat(3,1fr)}
+  .card-tags{padding:6px 12px 8px;gap:4px}
+
+  /* Tables — horizontal scroll */
+  .table-wrap{-webkit-overflow-scrolling:touch}
+  .board-table{min-width:540px}
+  .bb-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .bb-board{min-width:500px}
+
+  /* Mock archive */
+  .mock-table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+
+  /* Mock Builder — pool becomes slide-up drawer */
+  .mdc-wrap{flex-direction:column;height:auto;min-height:0;border:none;box-shadow:none;border-radius:0}
+  .mdc-board{height:calc(100vh - 160px);min-height:400px}
+  .mdc-pool{
+    display:none;
+    position:fixed;bottom:0;left:0;right:0;
+    width:100%;height:65vh;
+    border-left:none;border-top:1.5px solid var(--gray-200);
+    border-radius:16px 16px 0 0;
+    box-shadow:0 -8px 40px rgba(10,22,40,.25);
+    z-index:800;
+    transform:translateY(100%);
+    transition:transform .28s cubic-bezier(.4,0,.2,1)
+  }
+  .mdc-pool.open{display:flex;transform:translateY(0)}
+  .mdc-pool-header{border-radius:16px 16px 0 0}
+  .mdc-picks-scroll{-webkit-overflow-scrolling:touch}
+  .mdc-board-header{flex-wrap:wrap;gap:6px}
+  .mdc-actions{flex-wrap:wrap;gap:4px}
+  .mdc-act-btn{padding:4px 9px;font-size:10px}
+
+  /* Scatter */
+  .sc-canvas-wrap{height:300px}
+  .sc-controls{gap:6px}
+  .sc-select{min-width:100px;font-size:12px}
+
+  /* Modal */
+  .modal-overlay{padding:0;align-items:flex-end}
+  .modal{border-radius:16px 16px 0 0;max-width:100%;max-height:88vh;margin:0;transform:translateY(40px)}
+  .modal-overlay.open .modal{transform:translateY(0)}
+  .modal-header{padding:14px 14px 10px}
+  .modal-body{padding:12px 14px 24px}
+
+  /* Comp explorer */
+  .comp-tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .comp-tbl{min-width:700px}
+
+  /* Methodology hero */
+  .mc-hero{padding:16px 16px}
+  .mc-hero .methodology-hero-inner{flex-direction:column;gap:12px}
+  .mc-hero-title{font-size:22px}
+  .mc-hero-sub{font-size:12px}
+
+  /* Freeform */
+  .ff-wrap{min-height:460px}
+  .ff-xlab{font-size:9px}
+  .ff-xlab span{font-size:8px}
+
+  /* Compare */
+  .compare-grid{grid-template-columns:1fr}
+
+  /* Upload panel */
+  .upload-panel{width:100%;left:0;right:0}
+
+  /* Simulator pool */
+  #simPoolPanel{
+    position:fixed;bottom:0;left:0;right:0;
+    width:100%!important;height:60vh;
+    border-left:none;border-top:1.5px solid var(--gray-200);
+    border-radius:16px 16px 0 0;
+    box-shadow:0 -8px 40px rgba(10,22,40,.25);
+    z-index:800
+  }
+}
+
 
 /* ── PRINT / PDF EXPORT ───────────────────────────────────────── */
 @media print {
@@ -349,7 +465,7 @@ tr:hover td{background:var(--gray-50)}
 }
 
 .global-search-btn{background:rgba(255,255,255,.08);border:1.5px solid rgba(255,255,255,.15);color:rgba(255,255,255,.9);border-radius:8px;padding:6px 14px;font-size:12px;font-weight:700;font-family:'Barlow Condensed',sans-serif;letter-spacing:.5px;cursor:pointer;transition:all .15s;white-space:nowrap}
-.global-search-btn:hover{background:rgba(212,168,48,.18);border-color:var(--gold);color:var(--gold)}
+.share-btn:hover{background:rgba(212,168,48,.18);border-color:rgba(212,168,48,.5);color:var(--amber-light,#E8BF52)}.global-search-btn:hover{background:rgba(212,168,48,.18);border-color:var(--gold);color:var(--gold)}
 .gs-result{display:flex;align-items:flex-start;gap:12px;padding:10px 20px;cursor:pointer;border-bottom:1px solid #F8FAFC;transition:background .1s}
 .gs-result:hover{background:#F8FAFC}
 .gs-result:last-child{border-bottom:none}
@@ -763,6 +879,51 @@ tr:hover td{background:var(--gray-50)}
   background:rgba(255,255,255,.08);color:rgba(255,255,255,.7);font-size:11px;
   font-weight:700;cursor:pointer;font-family:'Barlow Condensed',sans-serif;transition:all .12s}
 .sim-pos-btn.active{background:rgba(255,255,255,.25);color:white}
+
+/* ── MOCK MODE STRIP ─────────────────────────────────────────────────────── */
+.mock-mode-strip{
+  display:flex;gap:10px;flex-wrap:wrap
+}
+.mock-mode-btn{
+  display:flex;flex-direction:column;align-items:flex-start;
+  padding:12px 18px;border-radius:12px;cursor:pointer;
+  border:2px solid var(--gray-200);background:white;
+  transition:all .18s;text-align:left;min-width:160px;flex:1;
+  box-shadow:0 1px 4px rgba(10,22,40,.06)
+}
+.mock-mode-btn:hover{
+  border-color:var(--blue);box-shadow:0 3px 14px rgba(37,99,235,.12);
+  transform:translateY(-1px)
+}
+.mock-mode-btn.active{
+  border-color:var(--blue);background:linear-gradient(135deg,#EFF6FF 0%,#DBEAFE 100%);
+  box-shadow:0 4px 16px rgba(37,99,235,.16)
+}
+.mock-mode-icon{font-size:20px;margin-bottom:5px;line-height:1;display:block}
+.mock-mode-label{
+  font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;
+  color:var(--navy);line-height:1;display:block
+}
+.mock-mode-btn.active .mock-mode-label{color:var(--blue)}
+.mock-mode-sub{
+  font-size:11px;color:var(--gray-400);font-weight:500;margin-top:3px;
+  display:block;line-height:1.3;white-space:nowrap
+}
+.mock-mode-btn.active .mock-mode-sub{color:#3B82F6}
+@media(max-width:640px){
+  .mock-mode-btn{min-width:calc(50% - 5px);flex:none;padding:10px 14px}
+  .mock-mode-icon{font-size:17px;margin-bottom:3px}
+  .mock-mode-label{font-size:14px}
+  .mock-mode-sub{display:none}
+}
+
+/* ── PRIOR PICKS SIDEBAR ─────────────────────────────────────────────────── */
+.prior-picks-sidebar{
+  width:0;overflow:hidden;flex-shrink:0;
+  background:#0f1e38;
+  border-right:1px solid rgba(255,255,255,.08);
+  transition:width .25s cubic-bezier(.4,0,.2,1);
+}
 </style>
 </head>
 <body>
@@ -774,6 +935,14 @@ tr:hover td{background:var(--gray-50)}
       <div class="header-title"><span class="header-title-hoops">HoopsWill</span> <span class="header-title-rest">NBA Draft Board</span></div>
       <div class="header-sub">Analytics Model · 2019–2027</div>
     </div>
+  </div>
+  <div id="lotteryCountdown" style="display:flex;flex-direction:column;align-items:center;background:rgba(124,58,237,.1);border:1px solid rgba(124,58,237,.28);border-radius:8px;padding:4px 12px;cursor:default;flex-shrink:0" title="2026 NBA Draft Lottery — May 12, 2026">
+    <div id="lotLabel" style="font-size:8px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:rgba(167,139,250,.75);line-height:1;margin-bottom:2px">Lottery</div>
+    <div id="lotDisplay" style="font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900;color:#A78BFA;line-height:1;letter-spacing:.5px">—</div>
+  </div>
+  <div id="draftCountdown" style="display:flex;flex-direction:column;align-items:center;background:rgba(212,168,48,.12);border:1px solid rgba(212,168,48,.28);border-radius:8px;padding:4px 12px;cursor:default;flex-shrink:0" title="2026 NBA Draft — June 25, 2026">
+    <div id="cdLabel" style="font-size:8px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:rgba(212,168,48,.65);line-height:1;margin-bottom:2px">Draft Day</div>
+    <div id="cdDisplay" style="font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900;color:var(--amber-light,#E8BF52);line-height:1;letter-spacing:.5px">—</div>
   </div>
   <button class="share-btn" onclick="urlCopyLink()" title="Copy shareable link to this view">🔗 Share</button>
   <button class="global-search-btn" onclick="openGlobalSearch()" title="Search all prospects (⌘K)">&#128269; Search</button>
@@ -789,15 +958,15 @@ tr:hover td{background:var(--gray-50)}
 
 <nav class="nav-tabs" id="navTabs">
   <div class="nav-tab active" data-tab="board2026">🏀 2026 Draft Board</div>
-  <div class="nav-tab" data-tab="analytics">📊 Class Compare</div>
-  <div class="nav-tab" data-tab="comps">🔍 Comp Explorer</div>
+  <div class="nav-tab" data-tab="methodology">🔬 The Metric</div>
   <div class="nav-tab" data-tab="mocks">📋 Mock Drafts</div>
-  <div class="nav-tab" data-tab="history">📅 Past Boards</div>
-  <div class="nav-tab" data-tab="future">🔭 2027 Watch</div>
-  <div class="nav-tab" data-tab="resources">📚 Resources</div>
   <div class="nav-tab" data-tab="compare">⚖️ Compare</div>
   <div class="nav-tab" data-tab="scatter">📈 Scatter</div>
-  <div class="nav-tab" data-tab="methodology">🔬 The Metric</div>
+  <div class="nav-tab" data-tab="comps">🔍 Comp Explorer</div>
+  <div class="nav-tab" data-tab="future">🔭 2027 Watch</div>
+  <div class="nav-tab" data-tab="history">📅 Past Boards</div>
+  <div class="nav-tab" data-tab="analytics">📊 Class Compare</div>
+  <div class="nav-tab" data-tab="resources">📚 Resources</div>
 </nav>
 
 <div id="uploadPanel" class="upload-panel">
@@ -935,11 +1104,23 @@ tr:hover td{background:var(--gray-50)}
   <div class="print-header"><div class="print-header-title">HoopsWill NBA Draft Board — Mock Drafts</div><div class="print-header-sub">Analytics Model · 2019–2027 · hoopswill.com</div></div>
 
   <!-- ── MODE TOGGLE ─────────────────────────────────────────────────────── -->
-  <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px;flex-wrap:wrap">
-    <div class="view-toggle" id="mockModeToggle">
-      <button class="view-btn active" id="mockModeBuild"   onclick="setMockMode('build')">🏗️ Build Mock</button>
-      <button class="view-btn"        id="mockModeArchive" onclick="setMockMode('archive')">📅 Archive</button>
-      <button class="view-btn"        id="mockModeSim"     onclick="setMockMode('sim')">🎮 Draft Simulator</button>
+  <div style="margin-bottom:22px">
+    <div class="mock-mode-strip" id="mockModeToggle">
+      <button class="mock-mode-btn active" id="mockModeBuild" onclick="setMockMode('build')">
+        <span class="mock-mode-icon">🏗️</span>
+        <span class="mock-mode-label">Build Mock</span>
+        <span class="mock-mode-sub">Create your draft</span>
+      </button>
+      <button class="mock-mode-btn" id="mockModeSim" onclick="setMockMode('sim')">
+        <span class="mock-mode-icon">🎮</span>
+        <span class="mock-mode-label">Draft Simulator</span>
+        <span class="mock-mode-sub">CPU drafts for every team</span>
+      </button>
+      <button class="mock-mode-btn" id="mockModeArchive" onclick="setMockMode('archive')">
+        <span class="mock-mode-icon">📅</span>
+        <span class="mock-mode-label">Archive</span>
+        <span class="mock-mode-sub">Past mock snapshots</span>
+      </button>
     </div>
   </div>
 
@@ -965,9 +1146,11 @@ tr:hover td{background:var(--gray-50)}
       <div class="mdc-picks-scroll" id="mdcPicksScroll"></div>
     </div>
     <!-- Right: player pool -->
-    <div class="mdc-pool">
+    <div id="mdcPriorSidebar" class="prior-picks-sidebar" style="border-radius:0;align-self:stretch"></div>
+    <div class="mdc-pool" id="mdcWrapPool">
       <div class="mdc-pool-header">
-        <div class="mdc-pool-title">Player Pool <span id="mdcPoolCount" style="font-weight:500;opacity:.5;font-size:12px"></span></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px"><div class="mdc-pool-title">Player Pool <span id="mdcPoolCount" style="font-weight:500;opacity:.5;font-size:12px"></span></div><button onclick="mdcClosePoolDrawer()" style="display:none;background:rgba(255,255,255,.1);border:none;border-radius:50%;width:26px;height:26px;color:white;font-size:14px;cursor:pointer;align-items:center;justify-content:center;flex-shrink:0" id="mdcPoolCloseBtn">✕</button></div>
+        <div id="mdcTeamInfo"></div>
         <div class="mdc-pool-filters">
           <input class="mdc-pool-search" id="mdcSearch" type="text" placeholder="Search player…" oninput="mdcFilterPool(this.value)">
           <button class="mdc-pos-filter active" onclick="mdcSetPos('ALL',this)">All</button>
@@ -1030,7 +1213,15 @@ tr:hover td{background:var(--gray-50)}
         <div id="simTeamGrid" style="display:flex;flex-wrap:wrap;gap:6px"></div>
       </div>
 
-      <button onclick="simStart()" style="background:var(--blue);color:white;border:none;border-radius:8px;padding:11px 28px;font-size:14px;font-weight:700;cursor:pointer">▶ Start Simulation</button>
+      <div>
+          <div style="font-size:11px;font-weight:700;color:var(--gray-500);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">CPU Pick Speed</div>
+          <select class="filter-select" id="simSpeedSelect">
+            <option value="700">Slow</option>
+            <option value="350" selected>Normal</option>
+            <option value="100">Fast</option>
+          </select>
+        </div>
+        <button onclick="simStart()" style="background:var(--blue);color:white;border:none;border-radius:8px;padding:11px 28px;font-size:14px;font-weight:700;cursor:pointer;align-self:flex-end">▶ Start Draft</button>
     </div>
 
     <!-- LIVE BOARD -->
@@ -1038,6 +1229,7 @@ tr:hover td{background:var(--gray-50)}
       <!-- Status bar -->
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap">
         <div id="simOnClock" style="background:var(--navy);color:white;border-radius:8px;padding:8px 16px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:800;min-width:180px"></div>
+        <button id="simFollowBtn" onclick="simToggleFollow()" style="background:rgba(37,99,235,.12);color:var(--blue);border:1.5px solid rgba(37,99,235,.3);border-radius:7px;padding:5px 12px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Barlow Condensed',sans-serif;white-space:nowrap;flex-shrink:0">📍 Follow Picks</button>
         <div style="flex:1;background:var(--gray-100);border-radius:6px;height:8px;overflow:hidden;min-width:80px">
           <div id="simProgBar" style="height:100%;background:var(--blue);border-radius:6px;width:0%;transition:width .25s"></div>
         </div>
@@ -1047,13 +1239,17 @@ tr:hover td{background:var(--gray-50)}
       </div>
 
       <div style="display:flex;gap:14px;align-items:flex-start">
+        <!-- Prior picks sidebar -->
+        <div id="simPriorSidebar" class="prior-picks-sidebar" style="border-radius:10px;align-self:stretch"></div>
         <!-- Pick board left -->
         <div style="flex:1;min-width:0">
           <div id="simPicksBoard" style="background:white;border:1.5px solid var(--gray-200);border-radius:12px;overflow:hidden;max-height:620px;overflow-y:auto"></div>
         </div>
         <!-- Player pool right -->
         <div id="simPoolPanel" style="width:264px;flex-shrink:0">
-          <div style="background:var(--navy);border-radius:12px 12px 0 0;padding:10px 14px">
+          <div style="background:var(--navy);border-radius:12px 12px 0 0">
+            <div id="simTeamInfo"></div>
+            <div style="padding:8px 14px 10px">
             <div id="simPoolLabel" style="font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:800;color:white;margin-bottom:6px">Select Player</div>
             <input id="simPoolSearch" type="text" placeholder="Search name..." oninput="simFilterPool(this.value)"
               style="width:100%;padding:6px 10px;border-radius:6px;border:none;font-size:12px;background:rgba(255,255,255,.12);color:white;outline:none">
@@ -3847,6 +4043,36 @@ function mdcRenderPool() {
   var ct = document.getElementById('mdcPoolCount');
   if (!el) return;
 
+  // Update pool header (needs + BBRef) and prior picks sidebar
+  var teamInfoEl = document.getElementById('mdcTeamInfo');
+  if (mdcActivePick) {
+    var activeSlot = (DRAFT_ORDER_2026||[]).find(function(s){ return s.pick===mdcActivePick; });
+    if (activeSlot) {
+      // Pool header: needs + BBRef
+      if (teamInfoEl) teamInfoEl.innerHTML = teamNeedsHtml(activeSlot.team, []);
+      // Sidebar: prior picks by this team
+      var priorPicks = Object.keys(mdcSelections)
+        .filter(function(pk){ return pk!=mdcActivePick; })
+        .filter(function(pk){
+          var slot2=(DRAFT_ORDER_2026||[]).find(function(s){return s.pick===parseInt(pk);});
+          return slot2&&slot2.team===activeSlot.team;
+        })
+        .sort(function(a,b){return a-b;})
+        .map(function(pk){
+          var p=(DATA.board2026||[]).find(function(x){return x.rank===mdcSelections[parseInt(pk)];});
+          return {pick:parseInt(pk), name:p?p.name:('Pick #'+pk),
+            pos:p?p.position:'', rank:p?p.rank:0,
+            metric:p?p.metric:0, stats:p||null};
+        });
+      showPriorPicksSidebar('mdcPriorSidebar', activeSlot.team, priorPicks, mdcActivePick);
+    } else {
+      if (teamInfoEl) teamInfoEl.innerHTML = '';
+      hidePriorPicksSidebar('mdcPriorSidebar');
+    }
+  } else {
+    hidePriorPicksSidebar('mdcPriorSidebar');
+  }
+
   var drafted = Object.values(mdcSelections);
   var players = (DATA.board2026||[]).filter(function(p) {
     if (mdcPosFilter !== 'ALL' && p.position !== mdcPosFilter) return false;
@@ -3886,6 +4112,20 @@ function mdcRenderPool() {
     html += '</div>';
   });
   el.innerHTML = html;
+}
+
+function mdcOpenPoolDrawer() {
+  if (window.innerWidth > 640) return; // desktop: no drawer needed
+  var pool = document.getElementById('mdcWrapPool');
+  if (pool) { pool.classList.add('open'); pool.style.display='flex'; }
+}
+
+function mdcClosePoolDrawer() {
+  var pool = document.getElementById('mdcWrapPool');
+  if (pool) {
+    pool.classList.remove('open');
+    setTimeout(function(){ pool.style.display='none'; }, 280);
+  }
 }
 
 function mdcPickRowClick(pickNum) {
@@ -3928,6 +4168,7 @@ function mdcUnpick(pickNum) {
   mdcActivePick = pickNum;
   mdcRenderPicks();
   mdcRenderPool();
+  mdcOpenPoolDrawer();
 }
 
 function mdcUndo() {
@@ -5717,21 +5958,32 @@ function setMockMode(mode) {
   if (mode === 'sim')     simBuildTeamGrid();
 }
 
-// ── DRAFT DAY SIMULATOR (fully manual, live reach/value grading) ──────────────
+// ── DRAFT DAY SIMULATOR ──────────────────────────────────────────────────────
 // State
-var simUserTeams   = {};   // team code → true if user "owns" this team
-var simSelections  = {};   // pick# → { rank, name, team, metric, pos, grade }
+var simUserTeams   = {};    // team code → true if user owns this team
+var simSelections  = {};    // pick# → selection object
 var simCurrentPick = 1;
 var simMaxPicks    = 60;
-var simAvailable   = [];   // players not yet picked
+var simAvailable   = [];    // rank-sorted available players
 var simPosFilter   = '';
 var simPoolQuery   = '';
-var simTimer       = null;  // CPU pick delay handle
+var simInterval    = null;  // single interval driving CPU picks
+var simFollowPicks = true;  // whether board auto-scrolls to current pick
+var simRunning     = false;
+var simCpuSpeed    = 350;   // ms per CPU pick
 
-// Grade thresholds: compare player's metric rank vs pick number
-// metricRank = position in metric-sorted available pool at time of pick
+// Positional needs per team for hybrid CPU logic
+var SIM_NEEDS = {
+  IND:'G', SAC:'C', WAS:'G', BKN:'F', UTA:'F', ATL:'G', DAL:'C', MEM:'F',
+  CHI:'G', MIL:'C', POR:'G', GSW:'G', CHA:'F', OKC:'G', SAS:'F', TOR:'C',
+  MIA:'G', DEN:'F', PHI:'G', LAL:'C', NYK:'F', BOS:'G', CLE:'F', MIN:'C',
+  DET:'G', PHX:'F', LAC:'G', NOP:'C', ORL:'G', HOU:'F'
+};
+var POS_MATCH = { G:['Guard'], F:['Forward'], C:['Center'] };
+
+// ── GRADE: compare metric rank vs pick number ─────────────────────────────────
 function simGrade(metricRank, pickNum) {
-  var diff = pickNum - metricRank; // positive = drafted earlier than metric says (reach)
+  var diff = pickNum - metricRank;
   if (diff <= -8)  return {label:'VALUE',  color:'#059669', bg:'#D1FAE5'};
   if (diff <= -3)  return {label:'+VALUE', color:'#2563EB', bg:'#DBEAFE'};
   if (diff <=  3)  return {label:'FAIR',   color:'#64748B', bg:'#F1F5F9'};
@@ -5739,11 +5991,23 @@ function simGrade(metricRank, pickNum) {
   return                  {label:'BIG ⬆', color:'#DC2626', bg:'#FEE2E2'};
 }
 
+function simMetRank(rank) {
+  // Position of player (by rank) in metric-sorted available pool
+  var ms = simAvailable.slice().sort(function(a,b){
+    var am=a.metric||0, bm=b.metric||0;
+    if (am>0&&bm>0) return bm-am;
+    if (am>0) return -1; if (bm>0) return 1;
+    return a.rank-b.rank;
+  });
+  return ms.findIndex(function(p){ return p.rank===rank; })+1;
+}
+
+// ── TEAM GRID ─────────────────────────────────────────────────────────────────
 function simBuildTeamGrid() {
   var grid = document.getElementById('simTeamGrid');
   if (!grid || grid.children.length) return;
   var seen = {};
-  (DRAFT_ORDER_2026 || []).forEach(function(slot) {
+  (DRAFT_ORDER_2026||[]).forEach(function(slot) {
     if (seen[slot.team]) return;
     seen[slot.team] = true;
     var btn = document.createElement('button');
@@ -5751,7 +6015,7 @@ function simBuildTeamGrid() {
     btn.id          = 'simTeamBtn_' + slot.team;
     btn.textContent = slot.team;
     btn.title       = slot.name;
-    btn.onclick     = function() { simToggleTeam(slot.team); };
+    btn.onclick     = function(){ simToggleTeam(slot.team); };
     grid.appendChild(btn);
   });
 }
@@ -5761,158 +6025,273 @@ function simToggleTeam(code) {
   var btn = document.getElementById('simTeamBtn_' + code);
   if (btn) btn.classList.toggle('on', !!simUserTeams[code]);
 }
-
 function simSelectAllTeams() {
-  (DRAFT_ORDER_2026 || []).forEach(function(s) { simUserTeams[s.team] = true; });
+  (DRAFT_ORDER_2026||[]).forEach(function(s){ simUserTeams[s.team]=true; });
   document.querySelectorAll('.sim-team-btn').forEach(function(b){ b.classList.add('on'); });
 }
-
 function simClearAllTeams() {
-  simUserTeams = {};
+  simUserTeams={};
   document.querySelectorAll('.sim-team-btn').forEach(function(b){ b.classList.remove('on'); });
 }
 
-function simStart() {
-  simMaxPicks = parseInt((document.getElementById('simRoundsSelect')||{}).value||2) * 30;
+function simToggleFollow() {
+  simFollowPicks = !simFollowPicks;
+  var btn = document.getElementById('simFollowBtn');
+  if (!btn) return;
+  if (simFollowPicks) {
+    btn.textContent = '📍 Follow Picks';
+    btn.style.background = 'rgba(37,99,235,.12)';
+    btn.style.color      = 'var(--blue)';
+    btn.style.borderColor= 'rgba(37,99,235,.3)';
+  } else {
+    btn.textContent = '🔓 Free Scroll';
+    btn.style.background = 'rgba(100,116,139,.12)';
+    btn.style.color      = 'var(--gray-400)';
+    btn.style.borderColor= 'var(--gray-300)';
+  }
+}
 
-  // Pool sorted by big board rank (primary display order)
-  // A separate metric-sorted copy is kept for grade calculations
-  var players = (DATA.board2026 || []).filter(function(p){ return p.rank && p.rank <= simMaxPicks + 30; });
-  players.sort(function(a,b){ return a.rank - b.rank; });
-  simAvailable   = players.slice();  // rank-sorted (display)
+// ── START ─────────────────────────────────────────────────────────────────────
+function simStart() {
+  simStop(); // clear any running interval
+  simMaxPicks  = parseInt((document.getElementById('simRoundsSelect')||{}).value||2)*30;
+  simCpuSpeed  = parseInt((document.getElementById('simSpeedSelect') ||{}).value||350);
+
+  // Build pool sorted by big board rank
+  var players = (DATA.board2026||[]).filter(function(p){ return p.rank && p.rank <= simMaxPicks+30; });
+  players.sort(function(a,b){ return a.rank-b.rank; });
+  simAvailable   = players.slice();
   simSelections  = {};
   simCurrentPick = 1;
   simPosFilter   = '';
   simPoolQuery   = '';
-  simTimer       = null;
+  simRunning     = true;
+  simFollowPicks = true;
+  var fb = document.getElementById('simFollowBtn');
+  if (fb) { fb.textContent='📍 Follow Picks'; fb.style.background='rgba(37,99,235,.12)'; fb.style.color='var(--blue)'; fb.style.borderColor='rgba(37,99,235,.3)'; }
 
   document.getElementById('simSetup').style.display  = 'none';
   document.getElementById('simBoard').style.display   = '';
   document.getElementById('simResults').style.display = 'none';
+  document.getElementById('simPoolPanel').style.display = 'none';
+  hidePriorPicksSidebar('simPriorSidebar');
 
   simRenderBoard();
   simRenderPool();
-  simAdvance();
+  simProcessNext(); // begin
 }
 
-// ── SIM ADVANCE: fires after every pick — CPU picks instantly if not user-owned
-var simTimer = null; // already declared above, this line is a no-op guard
+// ── MAIN LOOP: called after every pick (user or CPU) ─────────────────────────
+function simProcessNext() {
+  simStop(); // clear previous interval
 
-function simAdvance() {
+  // Skip picks beyond max
+  while (simCurrentPick <= simMaxPicks && simSelections[simCurrentPick]) {
+    simCurrentPick++;
+  }
+
   if (simCurrentPick > simMaxPicks) {
     simUpdateStatus();
     return;
   }
+
   var slot = (DRAFT_ORDER_2026||[]).find(function(s){ return s.pick===simCurrentPick; });
-  if (!slot) { simCurrentPick++; simAdvance(); return; }
+  if (!slot) { simCurrentPick++; simProcessNext(); return; }
 
   simUpdateStatus();
 
-  // User's turn — stop and wait for manual pick
-  if (simUserTeams[slot.team]) return;
+  if (simUserTeams[slot.team]) {
+    // USER's pick — show pool and wait
+    simShowPool();
+    return;
+  }
 
-  // CPU's turn — fire after brief visual delay (80ms so board renders first)
-  clearTimeout(simTimer);
-  simTimer = setTimeout(function() {
-    simCpuPick(slot);
+  // CPU picks — run at interval until we hit a user pick or the end
+  simInterval = setInterval(function() {
+    // Re-check: might have changed
+    var s2 = (DRAFT_ORDER_2026||[]).find(function(s){ return s.pick===simCurrentPick; });
+    if (!s2 || simCurrentPick > simMaxPicks) {
+      simStop();
+      simUpdateStatus();
+      return;
+    }
+    if (simUserTeams[s2.team]) {
+      // Hit a user pick — pause CPU
+      simStop();
+      simUpdateStatus();
+      simShowPool();
+      return;
+    }
+    // Execute CPU pick
+    simDoCpuPick(s2);
     simCurrentPick++;
-    simAdvance();
-  }, 80);
+    simUpdateStatus();
+    simRenderPool();
+
+    if (simCurrentPick > simMaxPicks) {
+      simStop();
+      simUpdateStatus();
+    }
+  }, simCpuSpeed);
 }
 
-// CPU pick: weighted blend of big board rank (60%), metric (30%), positional need (10%)
-function simCpuPick(slot) {
-  if (!simAvailable.length) return;
-  var need = SIM_NEEDS[slot.team] || 'F';
+function simStop() {
+  if (simInterval) { clearInterval(simInterval); simInterval = null; }
+}
 
-  // Score each available player — lower = better
-  var scored = simAvailable.map(function(p, i) {
-    // Big board rank component (i = position in rank-sorted available array)
-    var rankScore = i / Math.max(simAvailable.length - 1, 1);
-    // Metric component (invert: higher metric = lower score)
-    var metSorted = simAvailable.slice().sort(function(a,b){
-      var am=a.metric||0,bm=b.metric||0;
-      if(am>0&&bm>0) return bm-am; if(am>0) return -1; if(bm>0) return 1; return a.rank-b.rank;
-    });
-    var metRank = metSorted.findIndex(function(q){ return q.rank===p.rank; });
-    var metScore = metRank / Math.max(simAvailable.length - 1, 1);
-    // Positional need: bonus for matching team's need
-    var posBonus = 0;
-    var needPositions = (POS_MATCH||{})[need] || [];
-    if (needPositions.indexOf(p.position||'') >= 0) posBonus = -0.1;
-    // Weighted total
-    return { rank: p.rank, score: rankScore*0.60 + metScore*0.30 + posBonus };
+// ── CPU PICK LOGIC ───────────────────────────────────────────────────────────
+function simDoCpuPick(slot) {
+  if (!simAvailable.length) return;
+  var need    = SIM_NEEDS[slot.team] || 'F';
+  var needPos = POS_MATCH[need] || [];
+  var pickNum = simCurrentPick;
+
+  // Tier of the current pick — CPU should stay within tier
+  function getTierFloor(n) {
+    if (n <= TIER_CUTS.franchise) return 0;
+    if (n <= TIER_CUTS.lottery)   return TIER_CUTS.franchise + 1;
+    if (n <= TIER_CUTS.lateFirst) return TIER_CUTS.lottery + 1;
+    if (n <= TIER_CUTS.second)    return TIER_CUTS.lateFirst + 1;
+    return TIER_CUTS.second + 1;
+  }
+  var tierFloor = getTierFloor(pickNum);
+
+  // Build metric-sorted pool (only players WITH a metric score)
+  var withMetric = simAvailable.filter(function(p){ return p.metric && p.metric > 0; });
+  withMetric.sort(function(a,b){ return b.metric - a.metric; });
+
+  // Hard eligible window: CPU can only pick from players within ±window of current pick.
+  // Window is tight early (top picks must go near their rank) and opens up later.
+  // Examples: pick #1 window=2 → only ranks 1-3 eligible
+  //           pick #7 window=4 → ranks 3-11 eligible
+  //           pick #20 window=7 → ranks 13-27 eligible
+  //           pick #40 window=12 → ranks 28-52 eligible
+  function pickWindow(n) {
+    if (n <= 5)  return 2;    // franchise tier: almost no variance
+    if (n <= 14) return 4;    // lottery: tight
+    if (n <= 30) return 7;    // late 1st: moderate
+    return 12;                // 2nd round: more variance
+  }
+  var window = pickWindow(pickNum);
+  var eligible = simAvailable.filter(function(p) {
+    return p.rank >= pickNum - window && p.rank <= pickNum + window;
+  });
+  // Fallback: if window yields no candidates, expand to same tier
+  if (!eligible.length) {
+    eligible = simAvailable.filter(function(p){ return p.rank <= pickNum + window * 2; });
+  }
+  if (!eligible.length) eligible = simAvailable.slice(0, 5); // absolute fallback
+
+  // Within the eligible window, score by: 80% rank, 15% metric, 5% positional need
+  var n = eligible.length;
+  var scored = eligible.map(function(p, i) {
+    var rankScore = i / Math.max(n - 1, 1);
+
+    var metScore = 0;
+    if (p.metric && p.metric > 0 && withMetric.length > 1) {
+      var mi = withMetric.findIndex(function(q){ return q.rank === p.rank; });
+      metScore = mi / Math.max(withMetric.length - 1, 1);
+    } else {
+      metScore = rankScore; // no metric → rank proxy, no penalty
+    }
+
+    var posBonus = needPos.indexOf(p.position || '') >= 0 ? -0.05 : 0;
+    return { rank: p.rank, score: rankScore*0.80 + metScore*0.15 + posBonus };
   });
 
   scored.sort(function(a,b){ return a.score - b.score; });
-  var chosen = (DATA.board2026||[]).find(function(p){ return p.rank===scored[0].rank; });
-  if (!chosen) chosen = simAvailable[0];
 
-  var metSorted2 = simAvailable.slice().sort(function(a,b){
+  var chosen = eligible.find(function(p){ return p.rank === scored[0].rank; }) || eligible[0];
+
+  // Compute grade using metric-sorted index
+  var ms2 = simAvailable.slice().sort(function(a,b){
     var am=a.metric||0,bm=b.metric||0;
-    if(am>0&&bm>0) return bm-am; if(am>0) return -1; if(bm>0) return 1; return a.rank-b.rank;
+    if(am>0&&bm>0) return bm-am;
+    if(am>0) return -1; if(bm>0) return 1; return a.rank-b.rank;
   });
-  var metIdx = metSorted2.findIndex(function(p){ return p.rank===chosen.rank; });
-  var grade  = simGrade(metIdx+1, simCurrentPick);
+  var mr    = ms2.findIndex(function(p){ return p.rank===chosen.rank; })+1;
+  var grade = simGrade(mr, simCurrentPick);
 
   simSelections[simCurrentPick] = {
     rank:chosen.rank, name:chosen.name, team:slot.team,
     metric:chosen.metric||0, pos:chosen.position||'',
-    grade:grade, isOwned:false
+    grade:grade, isOwned:false, cpu:true
   };
   simAvailable = simAvailable.filter(function(p){ return p.rank!==chosen.rank; });
   simRenderBoard();
 }
 
-
-function simUpdateStatus() {
+// ── USER PICK ─────────────────────────────────────────────────────────────────
+function simPick(rank) {
+  simStop();
   var slot = (DRAFT_ORDER_2026||[]).find(function(s){ return s.pick===simCurrentPick; });
-  var badge = document.getElementById('simOnClock');
-  var prog  = document.getElementById('simProgBar');
-  var txt   = document.getElementById('simProgText');
-  var lbl   = document.getElementById('simPoolLabel');
+  if (!slot) return;
+  var player = simAvailable.find(function(p){ return p.rank===rank; });
+  if (!player) return;
 
-  if (simCurrentPick > simMaxPicks) {
-    if (badge) { badge.textContent='✅ Draft Complete'; badge.style.background='#059669'; }
-    if (prog)  prog.style.width='100%';
-    if (txt)   txt.textContent=simMaxPicks+' / '+simMaxPicks;
-    simShowResults();
-    return;
-  }
+  var mr    = simMetRank(rank);
+  var grade = simGrade(mr, simCurrentPick);
 
-  if (slot) {
-    var isOwned = simUserTeams[slot.team];
-    var label   = (isOwned ? '⭐ ' : '') + slot.name + ' — Pick #' + slot.pick;
-    if (badge) { badge.textContent=label; badge.style.background=isOwned?'#D97706':'var(--navy)'; }
-    if (lbl)   lbl.textContent = 'Pick #'+slot.pick+' — '+slot.team;
-  }
+  simSelections[simCurrentPick] = {
+    rank:rank, name:player.name, team:slot.team,
+    metric:player.metric||0, pos:player.position||'',
+    grade:grade, isOwned:true, cpu:false
+  };
+  simAvailable = simAvailable.filter(function(p){ return p.rank!==rank; });
 
-  var pct = Math.round((simCurrentPick-1)/simMaxPicks*100);
-  if (prog) prog.style.width=pct+'%';
-  if (txt)  txt.textContent=(simCurrentPick-1)+' / '+simMaxPicks;
+  document.getElementById('simPoolPanel').style.display = 'none';
+  var srch = document.getElementById('simPoolSearch');
+  if (srch) srch.value='';
+  simPoolQuery='';
 
-  simUpdateScorecard();
+  simCurrentPick++;
+  simRenderBoard();
+  // Refresh sidebar to include the pick just made
+  (function() {
+    var prevPick = simCurrentPick - 1;
+    var prevSel  = simSelections[prevPick];
+    if (prevSel) {
+      var teamPrior = Object.keys(simSelections)
+        .filter(function(pk){ return simSelections[pk].team===prevSel.team; })
+        .sort(function(a,b){return a-b;})
+        .map(function(pk){
+          var s=simSelections[pk];
+          // Look up full player stats
+          var full=(DATA.board2026||[]).find(function(x){return x.rank===s.rank;});
+          return {pick:parseInt(pk), name:s.name, pos:s.pos, rank:s.rank,
+            metric:s.metric, stats:full||null};
+        });
+      showPriorPicksSidebar('simPriorSidebar', prevSel.team, teamPrior, prevPick);
+      // Keep sidebar visible briefly before next pick processing
+      setTimeout(function(){ simProcessNext(); }, 600);
+      return;
+    }
+  })();
+  simProcessNext();
 }
 
-function simUpdateScorecard() {
-  var sc = document.getElementById('simScorecard');
-  if (!sc) return;
-  var owned = Object.keys(simUserTeams).filter(function(t){ return simUserTeams[t]; });
-  if (!owned.length) { sc.innerHTML=''; return; }
-
-  var counts = {VALUE:0,'FAIR':0,'REACH':0};
-  Object.values(simSelections).forEach(function(s){
-    if (!simUserTeams[s.team]) return;
-    if (s.grade) {
-      if (s.grade.label==='VALUE'||s.grade.label==='+VALUE') counts.VALUE++;
-      else if (s.grade.label==='REACH'||s.grade.label==='BIG ⬆') counts.REACH++;
-      else counts.FAIR++;
-    }
-  });
-  sc.innerHTML =
-    '<span style="font-size:11px;font-weight:700;color:#059669;background:#D1FAE5;border-radius:5px;padding:3px 8px">'+counts.VALUE+' Value</span>'+
-    '<span style="font-size:11px;font-weight:700;color:#64748B;background:#F1F5F9;border-radius:5px;padding:3px 8px">'+counts.FAIR+' Fair</span>'+
-    '<span style="font-size:11px;font-weight:700;color:#DC2626;background:#FEE2E2;border-radius:5px;padding:3px 8px">'+counts.REACH+' Reach</span>';
+// ── POOL ──────────────────────────────────────────────────────────────────────
+function simShowPool() {
+  var panel = document.getElementById('simPoolPanel');
+  if (panel) panel.style.display='';
+  var slot = (DRAFT_ORDER_2026||[]).find(function(s){ return s.pick===simCurrentPick; });
+  if (slot) {
+    // Pool header: team needs + BBRef
+    var infoEl = document.getElementById('simTeamInfo');
+    if (infoEl) infoEl.innerHTML = teamNeedsHtml(slot.team, []);
+    // Sidebar: prior picks by this team
+    var prior = Object.keys(simSelections)
+      .filter(function(pk){ return simSelections[pk].team===slot.team; })
+      .sort(function(a,b){return a-b;})
+      .map(function(pk){
+        var s=simSelections[pk];
+        var full=(DATA.board2026||[]).find(function(x){return x.rank===s.rank;});
+        return {pick:parseInt(pk), name:s.name, pos:s.pos, rank:s.rank,
+          metric:s.metric, stats:full||null};
+      });
+    showPriorPicksSidebar('simPriorSidebar', slot.team, prior, simCurrentPick);
+  }
+  simRenderPool();
 }
 
 function simSetPosFilter(pos, btn) {
@@ -5930,216 +6309,503 @@ function simFilterPool(q) {
 function simRenderPool() {
   var list = document.getElementById('simPoolList');
   if (!list) return;
-  var players = simAvailable.filter(function(p) {
-    if (simPosFilter && p.position !== simPosFilter) return false;
+  // Build metric-sorted once for grade previews
+  var ms = simAvailable.slice().sort(function(a,b){
+    var am=a.metric||0,bm=b.metric||0;
+    if(am>0&&bm>0) return bm-am;
+    if(am>0) return -1; if(bm>0) return 1; return a.rank-b.rank;
+  });
+
+  var players = simAvailable.filter(function(p){
+    if (simPosFilter && p.position!==simPosFilter) return false;
     if (simPoolQuery) {
-      var base = (p.name||'').split(' - ')[0].toLowerCase();
-      if (base.indexOf(simPoolQuery) < 0) return false;
+      var base=(p.name||'').split(' - ')[0].toLowerCase();
+      if (base.indexOf(simPoolQuery)<0) return false;
     }
     return true;
   });
-  // Metric-sorted reference for grade previews (built once per render)
-  var _simMetSorted = simAvailable.slice().sort(function(a,b){
-    var am=a.metric||0, bm=b.metric||0;
-    if (am>0&&bm>0) return bm-am;
-    if (am>0) return -1; if (bm>0) return 1;
-    return a.rank-b.rank;
+
+  var h='';
+  players.forEach(function(p) {
+    var base  =p.name&&p.name.indexOf(' - ')>0?p.name.slice(0,p.name.indexOf(' - ')):(p.name||'');
+    var school=p.name&&p.name.indexOf(' - ')>0?p.name.slice(p.name.indexOf(' - ')+3):'';
+    var posCol=p.position==='Guard'?'#2563EB':p.position==='Center'?'#0D9488':'#7C3AED';
+    var met   =p.metric&&p.metric>0?Number(p.metric).toFixed(1):'';
+    var mr    =ms.findIndex(function(q){return q.rank===p.rank;})+1;
+    var pg    =simGrade(mr, simCurrentPick);
+    h+='<div onclick="simPick('+p.rank+')" style="display:flex;align-items:center;gap:7px;padding:7px 12px;border-bottom:1px solid var(--gray-100);cursor:pointer" onmouseover="this.style.background=\'#F8FAFC\'" onmouseout="this.style.background=\'white\'">'
+      +'<span style="font-family:Barlow Condensed,sans-serif;font-size:11px;font-weight:900;color:var(--gray-300);width:20px;flex-shrink:0">#'+p.rank+'</span>'
+      +'<span style="width:7px;height:7px;border-radius:50%;background:'+posCol+';flex-shrink:0"></span>'
+      +'<div style="flex:1;min-width:0">'
+      +  '<div style="font-family:Barlow Condensed,sans-serif;font-size:13px;font-weight:800;color:var(--navy);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+base+'</div>'
+      +  '<div style="font-size:9px;color:var(--gray-400)">'+school+'</div>'
+      +'</div>'
+      +(met?'<span style="font-family:Barlow Condensed,sans-serif;font-size:12px;font-weight:900;color:var(--amber)">'+met+'</span>':'')
+      +'<span style="font-size:9px;font-weight:700;color:'+pg.color+';background:'+pg.bg+';border-radius:4px;padding:1px 5px;white-space:nowrap">'+pg.label+'</span>'
+      +'</div>';
   });
-  var h = '';
-  players.forEach(function(p, idx) {
-    var base   = p.name&&p.name.indexOf(' - ')>0 ? p.name.slice(0,p.name.indexOf(' - ')) : (p.name||'');
-    var school = p.name&&p.name.indexOf(' - ')>0 ? p.name.slice(p.name.indexOf(' - ')+3) : '';
-    var posCol = p.position==='Guard'?'#2563EB':p.position==='Center'?'#0D9488':'#7C3AED';
-    var met    = p.metric&&p.metric>0 ? Number(p.metric).toFixed(1) : '';
-    // Preview grade: find player's position in metric-sorted pool
-    var metRank = _simMetSorted.findIndex(function(q){ return q.rank===p.rank; }) + 1;
-    var pg = simGrade(metRank, simCurrentPick);
-    h += '<div onclick="simPick('+p.rank+')" style="display:flex;align-items:center;gap:7px;padding:7px 12px;border-bottom:1px solid var(--gray-100);cursor:pointer;transition:background .1s" onmouseover="this.style.background=\'#F8FAFC\'" onmouseout="this.style.background=\'white\'">'
-      + '<span style="font-family:Barlow Condensed,sans-serif;font-size:11px;font-weight:900;color:var(--gray-300);width:20px;flex-shrink:0">#'+p.rank+'</span>'
-      + '<span style="width:7px;height:7px;border-radius:50%;background:'+posCol+';flex-shrink:0"></span>'
-      + '<div style="flex:1;min-width:0">'
-      +   '<div style="font-family:Barlow Condensed,sans-serif;font-size:13px;font-weight:800;color:var(--navy);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+base+'</div>'
-      +   '<div style="font-size:9px;color:var(--gray-400)">'+school+'</div>'
-      + '</div>'
-      + (met ? '<span style="font-family:Barlow Condensed,sans-serif;font-size:12px;font-weight:900;color:var(--amber)">'+met+'</span>' : '')
-      + '<span style="font-size:9px;font-weight:700;color:'+pg.color+';background:'+pg.bg+';border-radius:4px;padding:1px 5px;white-space:nowrap">'+pg.label+'</span>'
-      + '</div>';
-  });
-  if (!h) h = '<div style="padding:20px;text-align:center;color:var(--gray-400);font-size:13px">No players match</div>';
-  list.innerHTML = h;
+  if (!h) h='<div style="padding:20px;text-align:center;color:var(--gray-400);font-size:13px">No players match</div>';
+  list.innerHTML=h;
 }
 
-function simPick(rank) {
-  if (simCurrentPick > simMaxPicks) return;
-  var slot   = (DRAFT_ORDER_2026||[]).find(function(s){ return s.pick===simCurrentPick; });
-  if (!slot) return;
-  var player = (DATA.board2026||[]).find(function(p){ return p.rank===rank; });
-  if (!player) return;
-
-  // Compute grade: metricRank = player's position in metric-sorted available pool
-  var metSorted = simAvailable.slice().sort(function(a,b){
-    var am=a.metric||0, bm=b.metric||0;
-    if (am>0&&bm>0) return bm-am;
-    if (am>0) return -1; if (bm>0) return 1;
-    return a.rank-b.rank;
-  });
-  var metIdx = metSorted.findIndex(function(p){ return p.rank===rank; });
-  var grade  = simGrade(metIdx+1, simCurrentPick);
-
-  simSelections[simCurrentPick] = {
-    rank:rank, name:player.name, team:slot.team,
-    metric:player.metric||0, pos:player.position||'',
-    grade:grade, isOwned:!!simUserTeams[slot.team]
-  };
-  simAvailable = simAvailable.filter(function(p){ return p.rank!==rank; });
-  simCurrentPick++;
-  simPoolQuery = '';
-  var srch = document.getElementById('simPoolSearch');
-  if (srch) srch.value = '';
-
-  simRenderBoard();
-  simRenderPool();
-  simAdvance();
-}
-
+// ── BOARD RENDER ──────────────────────────────────────────────────────────────
 function simRenderBoard() {
   var el = document.getElementById('simPicksBoard');
   if (!el) return;
   var slots = (DRAFT_ORDER_2026||[]).filter(function(s){ return s.pick<=simMaxPicks; });
-  var lastRound = 0;
-  var h = '';
+  var lastRound=0, h='';
   slots.forEach(function(slot) {
-    var round = slot.pick<=30 ? 1 : 2;
+    var round=slot.pick<=30?1:2;
     if (round!==lastRound) {
-      h += '<div style="background:var(--gray-100);padding:5px 14px;font-family:Barlow Condensed,sans-serif;font-size:11px;font-weight:800;color:var(--gray-500);text-transform:uppercase;letter-spacing:.7px">Round '+round+'</div>';
+      h+='<div style="background:var(--gray-100);padding:5px 14px;font-family:Barlow Condensed,sans-serif;font-size:11px;font-weight:800;color:var(--gray-500);text-transform:uppercase;letter-spacing:.7px">Round '+round+'</div>';
       lastRound=round;
     }
-    var sel      = simSelections[slot.pick];
-    var isCur    = slot.pick===simCurrentPick;
-    var isOwned  = simUserTeams[slot.team];
-    var isLotto  = slot.pick<=14;
-    var pickCol  = isLotto?'#D97706':'#94A3B8';
-    var bgColor  = isCur ? (isOwned?'#FFFBEB':'#EFF6FF') : (isOwned&&sel?'#F0F9FF':'white');
-    var borderL  = isOwned ? '3px solid #D97706' : (isCur?'3px solid #2563EB':'3px solid transparent');
-    var pickNum  = slot.pick<10?'0'+slot.pick:''+slot.pick;
-    var logoHtml = (typeof mdcTeamLogoHtml==='function') ? mdcTeamLogoHtml(slot.team,'22px') : slot.team;
-
-    var playerCell = '';
+    var sel    =simSelections[slot.pick];
+    var isCur  =slot.pick===simCurrentPick;
+    var isOwned=simUserTeams[slot.team];
+    var isLotto=slot.pick<=14;
+    var pickCol=isLotto?'#D97706':'#94A3B8';
+    var bgColor=isCur?(isOwned?'#FFFBEB':'#EFF6FF'):(isOwned&&sel?'#F0F9FF':'white');
+    var borderL=isOwned?'3px solid #D97706':(isCur?'3px solid #2563EB':'3px solid transparent');
+    var pickNum=slot.pick<10?'0'+slot.pick:''+slot.pick;
+    var logoHtml=(typeof mdcTeamLogoHtml==='function')?mdcTeamLogoHtml(slot.team,'22px'):slot.team;
+    var playerCell='';
     if (sel) {
-      var base   = sel.name&&sel.name.indexOf(' - ')>0 ? sel.name.slice(0,sel.name.indexOf(' - ')) : (sel.name||'');
-      var posCol = sel.pos==='Guard'?'#2563EB':sel.pos==='Center'?'#0D9488':'#7C3AED';
-      var metTxt = sel.metric>0 ? '<span style="font-family:Barlow Condensed,sans-serif;font-size:11px;font-weight:900;color:var(--amber);margin-left:5px">'+Number(sel.metric).toFixed(1)+'</span>' : '';
-      var gradeBadge = sel.grade ? '<span style="font-size:9px;font-weight:700;color:'+sel.grade.color+';background:'+sel.grade.bg+';border-radius:4px;padding:1px 5px;margin-left:4px;white-space:nowrap">'+sel.grade.label+'</span>' : '';
-      playerCell = '<span style="width:7px;height:7px;border-radius:50%;background:'+posCol+';flex-shrink:0;margin-right:3px"></span>'
-        + '<span style="font-family:Barlow Condensed,sans-serif;font-size:13px;font-weight:800;color:var(--navy)">'+base+'</span>'
-        + metTxt + gradeBadge;
-    } else if (isCur) {
-      playerCell = '<span style="font-size:11px;color:var(--blue);font-style:italic">← pick now</span>';
+      var base=sel.name&&sel.name.indexOf(' - ')>0?sel.name.slice(0,sel.name.indexOf(' - ')):(sel.name||'');
+      var posCol=sel.pos==='Guard'?'#2563EB':sel.pos==='Center'?'#0D9488':'#7C3AED';
+      var metTxt=sel.metric>0?'<span style="font-family:Barlow Condensed,sans-serif;font-size:11px;font-weight:900;color:var(--amber);margin-left:5px">'+Number(sel.metric).toFixed(1)+'</span>':'';
+      var grBadge=sel.grade?'<span style="font-size:9px;font-weight:700;color:'+sel.grade.color+';background:'+sel.grade.bg+';border-radius:4px;padding:1px 5px;margin-left:4px;white-space:nowrap">'+sel.grade.label+'</span>':'';
+      var cpuTag=sel.cpu?'<span style="font-size:8px;color:var(--gray-300);margin-left:3px">cpu</span>':'';
+      playerCell='<span style="width:7px;height:7px;border-radius:50%;background:'+posCol+';flex-shrink:0;margin-right:3px"></span>'
+        +'<span style="font-family:Barlow Condensed,sans-serif;font-size:13px;font-weight:800;color:var(--navy)">'+base+'</span>'
+        +metTxt+grBadge+cpuTag;
+    } else if (isCur&&simRunning) {
+      var isUser=simUserTeams[slot.team];
+      playerCell='<span style="font-size:11px;color:'+(isUser?'var(--amber)':'var(--blue)')+';font-style:italic">'+(isUser?'← your pick':'⚙ CPU picking...')+'</span>';
     } else {
-      playerCell = '<span style="font-size:11px;color:var(--gray-300)">—</span>';
+      playerCell='<span style="font-size:11px;color:var(--gray-200)">—</span>';
     }
-
-    h += '<div style="display:flex;align-items:center;gap:7px;padding:5px 12px;border-bottom:1px solid #F8FAFC;background:'+bgColor+';border-left:'+borderL+'">'
-      + '<span style="font-family:Barlow Condensed,sans-serif;font-size:12px;font-weight:900;color:'+pickCol+';width:22px;flex-shrink:0">'+pickNum+'</span>'
-      + '<span style="flex-shrink:0">'+logoHtml+'</span>'
-      + '<span style="font-size:10px;color:var(--gray-400);width:26px;flex-shrink:0">'+slot.team+'</span>'
-      + '<span style="flex:1;display:flex;align-items:center;min-width:0;flex-wrap:wrap;gap:2px">'+playerCell+'</span>'
-      + '</div>';
+    h+='<div style="display:flex;align-items:center;gap:7px;padding:5px 12px;border-bottom:1px solid #F8FAFC;background:'+bgColor+';border-left:'+borderL+'">'
+      +'<span style="font-family:Barlow Condensed,sans-serif;font-size:12px;font-weight:900;color:'+pickCol+';width:22px;flex-shrink:0">'+pickNum+'</span>'
+      +'<span style="flex-shrink:0">'+logoHtml+'</span>'
+      +'<span style="font-size:10px;color:var(--gray-400);width:26px;flex-shrink:0">'+slot.team+'</span>'
+      +'<span style="flex:1;display:flex;align-items:center;min-width:0;flex-wrap:wrap;gap:2px">'+playerCell+'</span>'
+      +'</div>';
   });
-  el.innerHTML = h;
+  el.innerHTML=h;
+  // Scroll active row into view
+  if (simFollowPicks) {
+    var active=el.querySelector('[style*="3px solid #2563EB"],[style*="3px solid #D97706"]');
+    if (active) active.scrollIntoView({behavior:'smooth',block:'nearest'});
+  }
+}
 
-  // Scroll current pick row into view
-  var rows = el.getElementsByTagName('div');
-  for (var i=0;i<rows.length;i++) {
-    if (rows[i].style&&rows[i].style.borderLeft&&rows[i].style.borderLeft.indexOf('2563EB')>=0) {
-      rows[i].scrollIntoView({behavior:'smooth',block:'nearest'});
-      break;
+// ── STATUS BAR ────────────────────────────────────────────────────────────────
+function simUpdateStatus() {
+  var badge=document.getElementById('simOnClock');
+  var prog =document.getElementById('simProgBar');
+  var txt  =document.getElementById('simProgText');
+  var lbl  =document.getElementById('simPoolLabel');
+
+  if (simCurrentPick > simMaxPicks) {
+    if (badge){badge.textContent='✅ Draft Complete';badge.style.background='#059669';}
+    if (prog) prog.style.width='100%';
+    if (txt)  txt.textContent=simMaxPicks+' / '+simMaxPicks;
+    simRunning=false;
+    simShowResults();
+    return;
+  }
+
+  var slot=(DRAFT_ORDER_2026||[]).find(function(s){return s.pick===simCurrentPick;});
+  if (slot) {
+    var isUser=simUserTeams[slot.team];
+    if (badge){
+      badge.textContent=(isUser?'⭐ YOUR PICK — ':'')+slot.name+' — Pick #'+slot.pick;
+      badge.style.background=isUser?'#D97706':'var(--navy)';
+    }
+    if (lbl) lbl.textContent='Pick #'+slot.pick+' — '+slot.name;
+  }
+  var pct=Math.round((simCurrentPick-1)/simMaxPicks*100);
+  if (prog) prog.style.width=pct+'%';
+  if (txt)  txt.textContent=(simCurrentPick-1)+' / '+simMaxPicks;
+  simUpdateScorecard();
+}
+
+function simUpdateScorecard() {
+  var sc=document.getElementById('simScorecard');
+  if (!sc) return;
+  var counts={VALUE:0,FAIR:0,REACH:0};
+  Object.values(simSelections).forEach(function(s){
+    if (!simUserTeams[s.team]) return;
+    if (!s.grade) return;
+    var l=s.grade.label;
+    if (l==='VALUE'||l==='+VALUE') counts.VALUE++;
+    else if (l==='REACH'||l==='BIG ⬆') counts.REACH++;
+    else counts.FAIR++;
+  });
+  sc.innerHTML=Object.keys(simUserTeams).some(function(t){return simUserTeams[t];})?
+    '<span style="font-size:11px;font-weight:700;color:#059669;background:#D1FAE5;border-radius:5px;padding:3px 8px">'+counts.VALUE+' Value</span>'
+    +'<span style="font-size:11px;font-weight:700;color:#64748B;background:#F1F5F9;border-radius:5px;padding:3px 8px">'+counts.FAIR+' Fair</span>'
+    +'<span style="font-size:11px;font-weight:700;color:#DC2626;background:#FEE2E2;border-radius:5px;padding:3px 8px">'+counts.REACH+' Reach</span>':'';
+}
+
+// ── RESULTS ───────────────────────────────────────────────────────────────────
+function simShowResults() {
+  var res=document.getElementById('simResults');
+  var rc =document.getElementById('simResultsContent');
+  if (!res||!rc) return;
+  var ownedTeams=Object.keys(simUserTeams).filter(function(t){return simUserTeams[t];});
+  var h='';
+  if (!ownedTeams.length) {
+    // Full draft table
+    h='<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12px">'
+      +'<thead><tr style="background:var(--navy)">'
+      +['Pick','Team','Player','Metric','Grade'].map(function(c){return'<th style="padding:7px 10px;color:rgba(255,255,255,.7);font-family:Barlow Condensed,sans-serif;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;text-align:left">'+c+'</th>';}).join('')
+      +'</tr></thead><tbody>';
+    Object.keys(simSelections).sort(function(a,b){return a-b;}).forEach(function(pk,i){
+      var s=simSelections[pk];
+      var base=s.name&&s.name.indexOf(' - ')>0?s.name.slice(0,s.name.indexOf(' - ')):(s.name||'');
+      var met=s.metric>0?Number(s.metric).toFixed(1):'—';
+      var g=s.grade||{label:'—',color:'#94A3B8',bg:'#F1F5F9'};
+      h+='<tr style="'+(i%2?'background:#F8FAFC':'')+'">'
+        +'<td style="padding:6px 10px;font-weight:700;color:var(--gray-500)">#'+pk+'</td>'
+        +'<td style="padding:6px 10px;font-weight:700">'+s.team+'</td>'
+        +'<td style="padding:6px 10px;font-family:Barlow Condensed,sans-serif;font-size:14px;font-weight:800;color:var(--navy)">'+base+'</td>'
+        +'<td style="padding:6px 10px;font-family:Barlow Condensed,sans-serif;font-weight:900;color:var(--amber)">'+met+'</td>'
+        +'<td style="padding:6px 10px"><span style="font-size:10px;font-weight:700;color:'+g.color+';background:'+g.bg+';border-radius:4px;padding:2px 7px">'+g.label+'</span></td>'
+        +'</tr>';
+    });
+    h+='</tbody></table></div>';
+  } else {
+    ownedTeams.forEach(function(team){
+      var picks=Object.keys(simSelections).filter(function(pk){return simSelections[pk].team===team;}).sort(function(a,b){return a-b;});
+      if (!picks.length) return;
+      var sName=((DRAFT_ORDER_2026||[]).find(function(s){return s.team===team;})||{}).name||team;
+      h+='<div style="background:white;border:1.5px solid var(--gray-200);border-radius:12px;padding:16px 20px;margin-bottom:14px">'
+        +'<div style="font-family:Barlow Condensed,sans-serif;font-size:16px;font-weight:900;color:var(--navy);margin-bottom:10px;display:flex;align-items:center;gap:8px">'
+        +(typeof mdcTeamLogoHtml==='function'?mdcTeamLogoHtml(team,'20px'):'')
+        +'<span>'+sName+'</span></div>'
+        +'<div style="display:flex;flex-wrap:wrap;gap:8px">';
+      picks.forEach(function(pk){
+        var s=simSelections[pk];
+        var base=s.name&&s.name.indexOf(' - ')>0?s.name.slice(0,s.name.indexOf(' - ')):(s.name||'');
+        var met=s.metric>0?Number(s.metric).toFixed(1):'—';
+        var g=s.grade||{label:'—',color:'#94A3B8',bg:'#F1F5F9'};
+        var posCol=s.pos==='Guard'?'#2563EB':s.pos==='Center'?'#0D9488':'#7C3AED';
+        h+='<div style="background:var(--gray-50);border:1px solid var(--gray-200);border-radius:8px;padding:10px 14px;min-width:140px">'
+          +'<div style="font-size:10px;font-weight:700;color:var(--gray-400);margin-bottom:3px">PICK #'+pk+'</div>'
+          +'<div style="display:flex;align-items:center;gap:5px;margin-bottom:6px">'
+          +'<span style="width:7px;height:7px;border-radius:50%;background:'+posCol+'"></span>'
+          +'<span style="font-family:Barlow Condensed,sans-serif;font-size:15px;font-weight:900;color:var(--navy)">'+base+'</span></div>'
+          +'<div style="display:flex;justify-content:space-between;align-items:center">'
+          +'<span style="font-size:11px;color:var(--gray-500)">Metric: <strong style="color:var(--amber)">'+met+'</strong></span>'
+          +'<span style="font-size:10px;font-weight:700;color:'+g.color+';background:'+g.bg+';border-radius:4px;padding:2px 7px">'+g.label+'</span>'
+          +'</div></div>';
+      });
+      h+='</div></div>';
+    });
+  }
+  rc.innerHTML=h;
+  res.style.display='';
+  setTimeout(function(){res.scrollIntoView({behavior:'smooth',block:'start'});},100);
+}
+
+// ── RESET ─────────────────────────────────────────────────────────────────────
+function simReset() {
+  simStop();
+  simRunning=false;
+  simSelections={};
+  simCurrentPick=1;
+  simAvailable=[];
+  simPosFilter='';
+  simPoolQuery='';
+  document.getElementById('simSetup').style.display='';
+  document.getElementById('simBoard').style.display='none';
+  document.getElementById('simResults').style.display='none';
+  document.getElementById('simPoolPanel').style.display='none';
+  var pb=document.getElementById('simPicksBoard');
+  if (pb) pb.innerHTML='';
+  var ob=document.getElementById('simOnClock');
+  if (ob){ob.textContent='';ob.style.background='var(--navy)';}
+  var sc=document.getElementById('simScorecard');
+  if (sc) sc.innerHTML='';
+}
+
+
+// ── DRAFT DAY COUNTDOWN ───────────────────────────────────────────────────────
+(function() {
+  // 2026 NBA Draft Lottery: ~May 12, 2026 at 8:00 PM ET (est. — second Tue of May)
+  var LOTTERY_TIME = new Date('2026-05-12T20:00:00-04:00').getTime();
+  // 2026 NBA Draft: June 25, 2026 at 8:00 PM Eastern Time (UTC-4 in June)
+  var DRAFT_TIME = new Date('2026-06-25T20:00:00-04:00').getTime();
+
+  function padZ(n) { return n < 10 ? '0' + n : '' + n; }
+
+  function updateCountdown() {
+    var el  = document.getElementById('cdDisplay');
+    var lbl = document.getElementById('cdLabel');
+    var lot = document.getElementById('lotDisplay');
+    var lotLbl = document.getElementById('lotLabel');
+    if (!el) return;
+
+    // Lottery countdown
+    if (lot) {
+      var now2  = Date.now();
+      var diff2 = LOTTERY_TIME - now2;
+      if (diff2 <= 0) {
+        lot.textContent = '🎱 LIVE';
+        lot.style.color = '#4ADE80';
+        if (lotLbl) lotLbl.textContent = 'Lottery Night';
+        // Hide lottery pill once draft has also passed
+        var lotPill = document.getElementById('lotteryCountdown');
+        if (lotPill && DRAFT_TIME <= Date.now()) lotPill.style.display = 'none';
+      } else {
+        var days2  = Math.floor(diff2 / 86400000);
+        var hours2 = Math.floor((diff2 % 86400000) / 3600000);
+        var mins2  = Math.floor((diff2 % 3600000)  / 60000);
+        var secs2  = Math.floor((diff2 % 60000)    / 1000);
+        if (days2 > 99) {
+          lot.textContent = days2 + 'd ' + padZ(hours2) + 'h ' + padZ(mins2) + 'm';
+        } else if (days2 > 0) {
+          lot.textContent = days2 + 'd ' + padZ(hours2) + ':' + padZ(mins2) + ':' + padZ(secs2);
+        } else {
+          lot.textContent = padZ(hours2) + ':' + padZ(mins2) + ':' + padZ(secs2);
+          lot.style.color = '#F87171';
+          if (lotLbl) { lotLbl.textContent = 'LOTTERY TODAY'; lotLbl.style.color = '#F87171'; }
+        }
+      }
+    }
+
+    var now  = Date.now();
+    var diff = DRAFT_TIME - now;
+
+    if (diff <= 0) {
+      // Draft is live or over
+      el.textContent  = '🏀 LIVE';
+      el.style.color  = '#4ADE80';
+      if (lbl) lbl.textContent = 'Draft Night';
+      return;
+    }
+
+    var days  = Math.floor(diff / 86400000);
+    var hours = Math.floor((diff % 86400000) / 3600000);
+    var mins  = Math.floor((diff % 3600000)  / 60000);
+    var secs  = Math.floor((diff % 60000)    / 1000);
+
+    if (days > 99) {
+      // Show D·HH:MM format when far out
+      el.textContent = days + 'd ' + padZ(hours) + 'h ' + padZ(mins) + 'm';
+    } else if (days > 0) {
+      // Show D·HH:MM:SS
+      el.textContent = days + 'd ' + padZ(hours) + ':' + padZ(mins) + ':' + padZ(secs);
+    } else {
+      // Final 24 hours — HH:MM:SS only, red tint
+      el.textContent = padZ(hours) + ':' + padZ(mins) + ':' + padZ(secs);
+      el.style.color = '#F87171';
+      if (lbl) { lbl.textContent = 'DRAFT TODAY'; lbl.style.color = '#F87171'; }
     }
   }
-}
 
-function simShowResults() {
-  var res = document.getElementById('simResults');
-  var rc  = document.getElementById('simResultsContent');
-  if (!res||!rc) return;
+  // Run immediately, then tick every second
+  updateCountdown();
+  setInterval(updateCountdown, 1000);
+})();
 
-  var ownedTeams = Object.keys(simUserTeams).filter(function(t){ return simUserTeams[t]; });
-  var h = '';
 
-  if (!ownedTeams.length) {
-    // Show all picks in a compact table with grades
-    h = '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12px">'
-      + '<thead><tr style="background:var(--navy)">'
-      + ['Pick','Team','Player','Metric','Grade'].map(function(c){ return '<th style="padding:7px 10px;color:rgba(255,255,255,.7);font-family:Barlow Condensed,sans-serif;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;text-align:left">'+c+'</th>'; }).join('')
-      + '</tr></thead><tbody>';
-    Object.keys(simSelections).sort(function(a,b){return a-b;}).forEach(function(pk,i){
-      var s    = simSelections[pk];
-      var base = s.name&&s.name.indexOf(' - ')>0 ? s.name.slice(0,s.name.indexOf(' - ')) : (s.name||'');
-      var met  = s.metric>0 ? Number(s.metric).toFixed(1) : '—';
-      var g    = s.grade || {label:'—',color:'#94A3B8',bg:'#F1F5F9'};
-      var alt  = i%2?'background:#F8FAFC':'';
-      h += '<tr style="'+alt+'">'
-        + '<td style="padding:6px 10px;font-weight:700;color:var(--gray-500)">#'+pk+'</td>'
-        + '<td style="padding:6px 10px;font-weight:700">'+s.team+'</td>'
-        + '<td style="padding:6px 10px;font-family:Barlow Condensed,sans-serif;font-size:14px;font-weight:800;color:var(--navy)">'+base+'</td>'
-        + '<td style="padding:6px 10px;font-family:Barlow Condensed,sans-serif;font-weight:900;color:var(--amber)">'+met+'</td>'
-        + '<td style="padding:6px 10px"><span style="font-size:10px;font-weight:700;color:'+g.color+';background:'+g.bg+';border-radius:4px;padding:2px 7px">'+g.label+'</span></td>'
-        + '</tr>';
-    });
-    h += '</tbody></table></div>';
-  } else {
-    // One card per owned team
-    ownedTeams.forEach(function(team) {
-      var teamPicks = Object.keys(simSelections).filter(function(pk){ return simSelections[pk].team===team; }).sort(function(a,b){return a-b;});
-      if (!teamPicks.length) return;
-      var slot0 = (DRAFT_ORDER_2026||[]).find(function(s){ return s.team===team; });
-      var teamName = slot0 ? slot0.name : team;
-      h += '<div style="background:white;border:1.5px solid var(--gray-200);border-radius:12px;padding:16px 20px;margin-bottom:14px">'
-        + '<div style="font-family:Barlow Condensed,sans-serif;font-size:16px;font-weight:900;color:var(--navy);margin-bottom:10px;display:flex;align-items:center;gap:8px">'
-        + (typeof mdcTeamLogoHtml==='function'?mdcTeamLogoHtml(team,'20px'):'')
-        + '<span>'+teamName+'</span></div>'
-        + '<div style="display:flex;flex-wrap:wrap;gap:8px">';
-      teamPicks.forEach(function(pk) {
-        var s    = simSelections[pk];
-        var base = s.name&&s.name.indexOf(' - ')>0 ? s.name.slice(0,s.name.indexOf(' - ')) : (s.name||'');
-        var met  = s.metric>0 ? Number(s.metric).toFixed(1) : '—';
-        var g    = s.grade || {label:'—',color:'#94A3B8',bg:'#F1F5F9'};
-        var posCol=s.pos==='Guard'?'#2563EB':s.pos==='Center'?'#0D9488':'#7C3AED';
-        h += '<div style="background:var(--gray-50);border:1px solid var(--gray-200);border-radius:8px;padding:10px 14px;min-width:140px">'
-          + '<div style="font-size:10px;font-weight:700;color:var(--gray-400);margin-bottom:3px">PICK #'+pk+'</div>'
-          + '<div style="display:flex;align-items:center;gap:5px;margin-bottom:6px">'
-          + '<span style="width:7px;height:7px;border-radius:50%;background:'+posCol+'"></span>'
-          + '<span style="font-family:Barlow Condensed,sans-serif;font-size:15px;font-weight:900;color:var(--navy)">'+base+'</span></div>'
-          + '<div style="display:flex;justify-content:space-between;align-items:center">'
-          + '<span style="font-size:11px;color:var(--gray-500)">Metric: <strong style="color:var(--amber)">'+met+'</strong></span>'
-          + '<span style="font-size:10px;font-weight:700;color:'+g.color+';background:'+g.bg+';border-radius:4px;padding:2px 7px">'+g.label+'</span>'
-          + '</div></div>';
-      });
-      h += '</div></div>';
-    });
+// Show pool close button on mobile
+(function() {
+  function updatePoolCloseBtn() {
+    var btn = document.getElementById('mdcPoolCloseBtn');
+    if (!btn) return;
+    btn.style.display = window.innerWidth <= 640 ? 'flex' : 'none';
   }
+  window.addEventListener('resize', updatePoolCloseBtn);
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', updatePoolCloseBtn);
+  } else {
+    updatePoolCloseBtn();
+  }
+})();
 
-  rc.innerHTML = h;
-  res.style.display = '';
-  setTimeout(function(){ res.scrollIntoView({behavior:'smooth',block:'start'}); }, 100);
+// ── TEAM NEEDS + ROSTER LINKS ─────────────────────────────────────────────────
+var TEAM_NEEDS = {
+  ATL:{needs:['C','PG'],   note:'Rebuilding — need center and playmaker'},
+  BKN:{needs:['PG','C'],   note:'Full rebuild — need floor general and rim presence'},
+  BOS:{needs:['PG','F'],   note:'Contender — need depth at guard/wing'},
+  CHA:{needs:['PG','C'],   note:'Rebuilding — multiple needs across roster'},
+  CHI:{needs:['PG','C'],   note:'Transition — need playmaker and modern center'},
+  CLE:{needs:['SG','F'],   note:'Contender — need wing depth and shooting'},
+  DAL:{needs:['C','SG'],   note:'Rebuilding — need rim protection and shooting'},
+  DEN:{needs:['SG','F'],   note:'Contender — need wing shooter off bench'},
+  DET:{needs:['F','C'],    note:'Rebuilding — need frontcourt around Cunningham'},
+  GSW:{needs:['PG','C'],   note:'Transition — multiple needs across roster'},
+  HOU:{needs:['SG','F'],   note:'Rising contender — need shooting around Green/Sengun'},
+  IND:{needs:['C','SG'],   note:'Contender — need rim presence and shooting depth'},
+  LAC:{needs:['PG','F'],   note:'Rebuilding — need franchise wing and playmaker'},
+  LAL:{needs:['PG','C'],   note:'Retooling — need young foundation pieces'},
+  MEM:{needs:['SG','C'],   note:'Rebuilding — need shooting and rim protection'},
+  MIA:{needs:['PG','C'],   note:'Retooling — need young playmaker and center'},
+  MIL:{needs:['PG','F'],   note:'Rebuilding — need new core pieces'},
+  MIN:{needs:['SG','F'],   note:'Contender — need wing depth around KAT/Edwards'},
+  NOP:{needs:['PG','C'],   note:'Full rebuild — need franchise pieces everywhere'},
+  NYK:{needs:['PG','C'],   note:'Contender — need playmaker and rim protector'},
+  OKC:{needs:['C','SG'],   note:'Contender — need center to pair with SGA/Holmgren'},
+  ORL:{needs:['PG','F'],   note:'Rising — need more playmaking and wing shooting'},
+  PHI:{needs:['C','PG'],   note:'Rebuilding — need new core around young pieces'},
+  PHX:{needs:['PG','F'],   note:'Retooling — need athletic wings around Durant'},
+  POR:{needs:['PG','C'],   note:'Rebuilding — need backcourt and rim protection'},
+  SAC:{needs:['C','F'],    note:'Contender bubble — need frontcourt upgrades'},
+  SAS:{needs:['SG','F'],   note:'Building around Wembanyama — need shooting'},
+  TOR:{needs:['PG','F'],   note:'Full rebuild — multiple needs, young roster'},
+  UTA:{needs:['PG','F'],   note:'Full rebuild — accumulating picks and talent'},
+  WAS:{needs:['PG','F'],   note:'Full rebuild — need franchise pieces'}
+};
+
+var BBREF_CODES = {
+  ATL:'ATL',BKN:'BRK',BOS:'BOS',CHA:'CHO',CHI:'CHI',CLE:'CLE',
+  DAL:'DAL',DEN:'DEN',DET:'DET',GSW:'GSW',HOU:'HOU',IND:'IND',
+  LAC:'LAC',LAL:'LAL',MEM:'MEM',MIA:'MIA',MIL:'MIL',MIN:'MIN',
+  NOP:'NOP',NYK:'NYK',OKC:'OKC',ORL:'ORL',PHI:'PHI',PHX:'PHO',
+  POR:'POR',SAC:'SAC',SAS:'SAS',TOR:'TOR',UTA:'UTA',WAS:'WAS'
+};
+
+function teamRosterUrl(code) {
+  return 'https://www.basketball-reference.com/contracts/' + (BBREF_CODES[code]||code) + '.html';
 }
 
-function simReset() {
-  simSelections  = {};
-  simCurrentPick = 1;
-  simAvailable   = [];
-  simPosFilter   = '';
-  simPoolQuery   = '';
-  document.getElementById('simSetup').style.display  = '';
-  document.getElementById('simBoard').style.display   = 'none';
-  document.getElementById('simResults').style.display = 'none';
-  var pb = document.getElementById('simPicksBoard');
-  if (pb) pb.innerHTML = '';
-  var ob = document.getElementById('simOnClock');
-  if (ob) { ob.textContent=''; ob.style.background='var(--navy)'; }
-  clearTimeout(simTimer); simTimer = null;
-  var sc = document.getElementById('simScorecard');
-  if (sc) sc.innerHTML = '';
+function teamNeedsHtml(teamCode, picksAlready) {
+  // Pool header: team name, needs, BBRef link (no prior picks — those go in sidebar)
+  var info = TEAM_NEEDS[teamCode] || {needs:[], note:''};
+  var slot = (DRAFT_ORDER_2026||[]).find(function(s){ return s.pick && s.team===teamCode; });
+  var teamName = slot ? slot.name : teamCode;
+
+  var h = '<div style="padding:8px 12px 6px;border-bottom:1px solid rgba(255,255,255,.1)">';
+  h += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px">';
+  h += '<span style="font-family:Barlow Condensed,sans-serif;font-size:13px;font-weight:800;color:white">' + teamName + '</span>';
+  h += '<a href="' + teamRosterUrl(teamCode) + '" target="_blank" rel="noopener" '
+    + 'style="font-size:9px;font-weight:700;color:rgba(212,168,48,.8);text-decoration:none;'
+    + 'border:1px solid rgba(212,168,48,.3);border-radius:4px;padding:2px 6px;'
+    + 'font-family:Barlow Condensed,sans-serif;letter-spacing:.3px;white-space:nowrap">'
+    + '📋 Roster &amp; Cap ↗</a>';
+  h += '</div>';
+  if (info.needs.length) {
+    h += '<div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap">';
+    h += '<span style="font-size:9px;color:rgba(255,255,255,.45);font-weight:600;letter-spacing:.4px;text-transform:uppercase">Need:</span>';
+    info.needs.forEach(function(n) {
+      var col = n==='PG'||n==='SG'||n==='G'?'#60A5FA': n==='C'?'#34D399':'#C084FC';
+      h += '<span style="background:rgba(255,255,255,.1);border:1px solid '+col+';color:'+col
+        + ';font-family:Barlow Condensed,sans-serif;font-size:10px;font-weight:800;'
+        + 'border-radius:4px;padding:1px 6px">' + n + '</span>';
+    });
+    if (info.note) {
+      h += '<span style="font-size:9px;color:rgba(255,255,255,.3);margin-left:2px;flex-basis:100%">' + info.note + '</span>';
+    }
+    h += '</div>';
+  }
+  h += '</div>';
+  return h;
+}
+
+function teamPriorPicksSidebar(teamCode, picksAlready, pickNum) {
+  if (!picksAlready || !picksAlready.length) return '';
+  var slot = (DRAFT_ORDER_2026||[]).find(function(s){ return s.pick && s.team===teamCode; });
+  var teamName = slot ? slot.name : teamCode;
+
+  // Stat display config: label, key, format
+  var STAT_COLS = [
+    {k:'metric',  l:'Metric', fmt:function(v){return v>0?v.toFixed(1):'—';}},
+    {k:'ts_pct',  l:'TS%',    fmt:function(v){return v>0?(v*100).toFixed(1)+'%':'—';}},
+    {k:'stl_bl',  l:'Stl+Bl', fmt:function(v){return v>0?v.toFixed(2):'—';}},
+    {k:'ato',     l:'A/TO',   fmt:function(v){return v>0?v.toFixed(2):'—';}},
+    {k:'pa2_usg', l:'P+A/USG',fmt:function(v){return v>0?Math.round(v):'—';}},
+  ];
+
+  var h = '<div style="height:100%;display:flex;flex-direction:column">';
+  h += '<div style="background:var(--navy);padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.1);flex-shrink:0">';
+  h += '<div style="font-family:Barlow Condensed,sans-serif;font-size:11px;font-weight:900;color:var(--amber-light,#E8BF52);text-transform:uppercase;letter-spacing:.6px;margin-bottom:2px">Your Picks</div>';
+  h += '<div style="font-family:Barlow Condensed,sans-serif;font-size:13px;font-weight:900;color:white">' + teamName + '</div>';
+  h += '</div>';
+
+  h += '<div style="flex:1;overflow-y:auto;padding:8px 10px;background:#0f1e38">';
+  picksAlready.forEach(function(p) {
+    var base   = p.name&&p.name.indexOf(' - ')>0 ? p.name.slice(0,p.name.indexOf(' - ')) : (p.name||'');
+    var school = p.name&&p.name.indexOf(' - ')>0 ? p.name.slice(p.name.indexOf(' - ')+3) : '';
+    var posCol = p.pos==='Guard'?'#60A5FA':p.pos==='Center'?'#34D399':'#C084FC';
+    var isNew  = p.pick === (pickNum - 1); // just picked
+
+    h += '<div style="background:'+(isNew?'rgba(212,168,48,.08)':'rgba(255,255,255,.04)')+';'
+      + 'border:1px solid '+(isNew?'rgba(212,168,48,.3)':'rgba(255,255,255,.08)')+';'
+      + 'border-radius:8px;padding:9px 10px;margin-bottom:7px">';
+
+    // Pick badge + name
+    h += '<div style="display:flex;align-items:baseline;gap:6px;margin-bottom:4px">';
+    h += '<span style="font-family:Barlow Condensed,sans-serif;font-size:10px;font-weight:800;'
+      + 'color:rgba(212,168,48,.7);background:rgba(212,168,48,.12);border-radius:3px;'
+      + 'padding:1px 5px;flex-shrink:0">Pick #'+p.pick+'</span>';
+    if (isNew) h += '<span style="font-size:9px;color:var(--amber-light,#E8BF52);font-weight:700">✓ Just picked</span>';
+    h += '</div>';
+
+    h += '<div style="font-family:Barlow Condensed,sans-serif;font-size:14px;font-weight:900;color:white;line-height:1.1">' + base + '</div>';
+    if (school) h += '<div style="font-size:9px;color:rgba(255,255,255,.3);margin-top:1px">' + school + '</div>';
+
+    // Position badge
+    if (p.pos) {
+      h += '<div style="margin-top:4px">'
+        + '<span style="font-size:9px;font-weight:700;color:'+posCol
+        + ';background:rgba(255,255,255,.06);border:1px solid '+posCol
+        + ';border-radius:3px;padding:1px 5px">'+p.pos+'</span>'
+        + '</div>';
+    }
+
+    // Stats grid with color gradients
+    var st = p.stats;
+    if (st) {
+      h += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:3px;margin-top:7px">';
+      STAT_COLS.forEach(function(sc) {
+        var val = st[sc.k];
+        var disp = (val && val > 0) ? sc.fmt(val) : '—';
+        var gs   = (val && val > 0 && typeof gradStyle==='function') ? gradStyle(val, sc.k) : '';
+        // Convert desktop gradStyle (light bg) to dark-mode-friendly version for sidebar
+        // Use opacity overlay approach: keep color, darken background
+        var cellStyle = gs
+          ? gs.replace(/background:hsl\((\d+),(\d+)%,(\d+)%\)/,
+              function(_,h2,s2,l2){ return 'background:hsl('+h2+','+s2+'%,'+(parseInt(l2)*0.35)+'%)'; })
+            .replace(/color:hsl\((\d+),(\d+)%,(\d+)%\)/,
+              function(_,h2,s2,l2){ return 'color:hsl('+h2+','+Math.min(90,parseInt(s2)+20)+'%,'+(Math.min(90,parseInt(l2)+40))+'%)'; })
+          : 'background:rgba(255,255,255,.05);color:rgba(255,255,255,.35)';
+        h += '<div style="border-radius:4px;padding:3px 5px;'+cellStyle+'">'
+          + '<div style="font-family:Barlow Condensed,sans-serif;font-size:12px;font-weight:900;line-height:1">'
+          + disp + '</div>'
+          + '<div style="font-size:8px;font-weight:700;letter-spacing:.3px;opacity:.65;margin-top:1px">'
+          + sc.l + '</div>'
+          + '</div>';
+      });
+      h += '</div>';
+    }
+
+    h += '</div>';
+  });
+  h += '</div>';
+  h += '</div>';
+  return h;
+}
+
+function showPriorPicksSidebar(panelId, teamCode, picksAlready, pickNum) {
+  var panel = document.getElementById(panelId);
+  if (!panel) return;
+  if (!picksAlready || !picksAlready.length) {
+    panel.style.width='0'; panel.style.overflow='hidden'; panel.innerHTML='';
+    return;
+  }
+  panel.innerHTML = teamPriorPicksSidebar(teamCode, picksAlready, pickNum);
+  panel.style.width='160px';
+  panel.style.overflow='visible';
+}
+
+function hidePriorPicksSidebar(panelId) {
+  var panel = document.getElementById(panelId);
+  if (!panel) return;
+  panel.style.width='0'; panel.style.overflow='hidden'; panel.innerHTML='';
 }
 
 // Load html2canvas dynamically when tweet card opens
