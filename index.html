@@ -418,9 +418,16 @@ tr:hover td{background:var(--gray-50)}
   .mc-hero-sub{font-size:12px}
 
   /* Freeform */
-  .ff-wrap{min-height:460px}
-  .ff-xlab{font-size:9px}
-  .ff-xlab span{font-size:8px}
+  .ff-outer{border-radius:10px}
+  .ff-board-header{padding:14px 16px 12px;flex-wrap:wrap;gap:8px}
+  .ff-board-title{font-size:17px}
+  .ff-pos-legend{gap:10px}
+  .ff-col-hdr{font-size:9px;letter-spacing:1.5px}
+  .ff-col-sub{display:none}
+  .ff-card{width:78px;padding:4px 5px 4px 9px}
+  .ff-card-name{font-size:11px}
+  .ff-card-rank{font-size:8px}
+  .ff-card-pos{font-size:6.5px}
 
   /* Compare */
   .compare-grid{grid-template-columns:1fr}
@@ -839,37 +846,75 @@ tr:hover td{background:var(--gray-50)}
 .sc-trend-toggle.on{background:var(--blue);color:white;border-color:var(--blue)}
 
 /* ── NEW FEATURE CSS (added post-v9) ─────────────────────────────────── */
-.ff-wrap{position:relative;width:100%;background:white;border:1.5px solid var(--gray-200);
-  border-radius:12px;overflow:hidden;box-shadow:0 2px 16px rgba(10,22,40,.07)}
-.ff-yaxis{position:absolute;left:0;top:44px;bottom:48px;width:52px;pointer-events:none;z-index:2}
-.ff-ylab{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;
-  color:var(--gray-400);text-align:right;padding-right:8px;width:100%;display:block}
-.ff-xaxis{position:absolute;bottom:0;left:52px;right:0;height:48px;
-  display:flex;align-items:center;justify-content:space-between;
-  padding:0 24px;border-top:1px solid var(--gray-100);pointer-events:none}
-.ff-xlab{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;
-  color:var(--gray-400);text-align:center;display:flex;flex-direction:column;gap:2px}
-.ff-plot{position:absolute;left:52px;right:0;top:44px;bottom:48px;overflow:hidden}
-.ff-tier-line{position:absolute;left:0;right:0;border-top:1px dashed;pointer-events:none;z-index:1}
-.ff-tier-label{position:absolute;right:8px;font-family:'Barlow Condensed',sans-serif;
-  font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;
-  pointer-events:none;z-index:1;opacity:.6;transform:translateY(-50%)}
-.ff-player{position:absolute;transform:translate(-50%,-50%);cursor:pointer;z-index:3;transition:transform .12s,box-shadow .12s}
-.ff-tooltip{position:fixed;z-index:9999;pointer-events:none;opacity:0;
-  background:#0A1628;color:white;border-radius:8px;padding:9px 13px;
-  font-size:12px;line-height:1.5;box-shadow:0 8px 24px rgba(0,0,0,.4);
-  max-width:220px;transition:opacity .1s;border:1px solid rgba(255,255,255,.1);white-space:nowrap}
-.ff-legend{position:absolute;top:8px;left:60px;display:flex;gap:12px;
-  align-items:center;z-index:2;pointer-events:none}
-.ff-leg-item{display:flex;align-items:center;gap:5px;font-size:10px;
-  font-weight:700;color:var(--gray-500);font-family:'Barlow Condensed',sans-serif}
-.ff-leg-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
-.ff-header{padding:12px 16px 0;display:flex;align-items:center;
-  justify-content:space-between;flex-wrap:wrap;gap:8px}
-.ff-title{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:800;color:var(--navy)}
-.ff-subtitle{font-size:10px;color:var(--gray-400);font-weight:500}
-.ff-wrap{min-height:500px}
-.ff-xlab{font-size:9px}
+
+/* ── FREEFORM BOARD v2 ─────────────────────────────────────────────────── */
+/* ── FREEFORM BOARD v2 — refined layout ──────────────────────── */
+.ff2-shell{background:#040D1E;border-radius:16px;border:1px solid rgba(255,255,255,.07);overflow:hidden;box-shadow:0 8px 64px rgba(0,0,0,.65),0 0 0 1px rgba(255,255,255,.04)}
+.ff2-head{padding:18px 24px 14px;display:flex;align-items:flex-start;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,.06);background:linear-gradient(180deg,rgba(255,255,255,.028) 0%,transparent 100%)}
+.ff2-title{font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:900;letter-spacing:.5px;color:white;line-height:1}
+.ff2-meta{font-size:11px;color:rgba(255,255,255,.28);margin-top:4px;font-weight:500}
+.ff2-legend{display:flex;gap:18px;align-items:center;flex-shrink:0}
+.ff2-leg-item{display:flex;align-items:center;gap:5px;font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:rgba(255,255,255,.38)}
+.ff2-leg-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+/* Column header bar */
+.ff2-col-bar{display:grid;grid-template-columns:64px 1fr;border-bottom:1px solid rgba(255,255,255,.05);background:rgba(0,0,0,.38)}
+.ff2-col-bar-spacer{border-right:1px solid rgba(255,255,255,.06)}
+.ff2-col-bar-inner{display:grid;grid-template-columns:1fr 1fr 1fr}
+.ff2-col-hdr{padding:9px 0 8px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:3px;border-left:1px solid rgba(255,255,255,.05)}
+.ff2-col-hdr:first-child{border-left:none}
+.ff2-col-hdr-name{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:900;letter-spacing:2.2px;text-transform:uppercase}
+.ff2-col-hdr-sub{font-size:8px;color:rgba(255,255,255,.38);font-weight:500;letter-spacing:.3px}
+/* Body layout */
+.ff2-body{display:flex;position:relative;overflow:hidden}
+.ff2-rail{width:64px;flex-shrink:0;position:relative;background:rgba(0,0,0,.3);border-right:1px solid rgba(255,255,255,.055)}
+.ff2-rail-item{position:absolute;left:0;right:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;gap:4px;padding:4px 2px;overflow:hidden}
+.ff2-rail-bar{width:3px;border-radius:2px;flex-shrink:0;opacity:.7}
+.ff2-rail-label{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:800;letter-spacing:2px;text-transform:uppercase;writing-mode:vertical-lr;transform:rotate(180deg);opacity:.72}
+.ff2-rail-count{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:800;opacity:.5}
+.ff2-canvas{flex:1;position:relative;overflow:visible}
+/* Plot — finer, more subtle dot grid */
+.ff2-plot{position:relative;overflow:visible;background-image:radial-gradient(circle,rgba(255,255,255,.022) 1px,transparent 1px);background-size:32px 32px}
+.ff2-col-zone{position:absolute;top:0;bottom:0;pointer-events:none;z-index:0}
+.ff2-col-div{position:absolute;top:0;bottom:0;width:1px;background:rgba(255,255,255,.035);z-index:1;pointer-events:none}
+.ff2-tier-fill{position:absolute;left:0;right:0;pointer-events:none;z-index:1}
+.ff2-tier-line{position:absolute;left:0;right:0;height:1px;pointer-events:none;z-index:3;border:none;border-top-style:dashed;border-top-width:1px}
+.ff2-tier-lbl{position:absolute;left:0;right:0;display:flex;align-items:center;gap:5px;pointer-events:none;z-index:4;transform:translateY(-50%);padding:0 10px}
+.ff2-tier-lbl-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
+.ff2-tier-lbl-text{font-family:'Barlow Condensed',sans-serif;font-size:9.5px;font-weight:900;letter-spacing:1.5px;text-transform:uppercase;opacity:.72}
+.ff2-ymark{position:absolute;right:8px;font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:900;opacity:.65;transform:translateY(-50%);z-index:2;pointer-events:none}
+/* ── Player card — smaller, cleaner, more spacious ── */
+.ff2-card{position:absolute;transform:translate(-50%,-50%);width:110px;cursor:pointer;z-index:5;border-radius:8px;padding:6px 8px 6px 12px;border:1px solid rgba(255,255,255,.09);transition:width .2s cubic-bezier(.4,0,.2,1),box-shadow .2s ease,border-color .2s ease,background .2s ease;animation:ff2-pop .38s cubic-bezier(.34,1.56,.64,1) both}
+.ff2-card:not(.ff2-expanded):hover{transform:translate(-50%,-50%) scale(1.1) translateY(-2px);z-index:25;border-color:rgba(255,255,255,.22)}
+.ff2-card.ff2-expanded{width:224px;z-index:30;border-color:rgba(255,255,255,.22) !important}
+.ff2-card.ff2-franchise{border-color:rgba(245,158,11,.22)}
+.ff2-card-stripe{position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:8px 0 0 8px}
+.ff2-card-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:2px}
+.ff2-card-rank{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:900;line-height:1;letter-spacing:.2px}
+.ff2-card-tier-dot{width:4px;height:4px;border-radius:50%;opacity:.6;flex-shrink:0}
+.ff2-card-name{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:800;line-height:1.2;color:rgba(255,255,255,.94);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.ff2-card-role{font-size:7.5px;font-weight:600;letter-spacing:.25px;color:rgba(255,255,255,.5);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:'DM Sans',sans-serif}
+/* Metric bar */
+.ff2-card-mbar-wrap{margin-top:5px;height:2px;background:rgba(255,255,255,.06);border-radius:2px;overflow:hidden}
+.ff2-card-mbar{height:100%;border-radius:2px;opacity:.55;transition:opacity .2s}
+.ff2-card:hover .ff2-card-mbar{opacity:.9}
+/* Franchise glow */
+.ff2-card.ff2-franchise::before{content:'';position:absolute;inset:-1px;border-radius:9px;background:transparent;box-shadow:0 0 12px 2px rgba(245,158,11,.18);pointer-events:none;z-index:-1}
+@keyframes ff2-pop{from{opacity:0;transform:translate(-50%,-50%) scale(.76)}to{opacity:1;transform:translate(-50%,-50%) scale(1)}}
+/* ── Expanded hover panel ── */
+.ff2-exp-body{display:flex;align-items:flex-start;gap:9px;margin-top:7px;padding-top:7px;border-top:1px solid rgba(255,255,255,.08)}
+.ff2-exp-photo{width:48px;height:48px;border-radius:7px;overflow:hidden;flex-shrink:0;background:rgba(255,255,255,.05);position:relative}
+.ff2-exp-info{flex:1;min-width:0;overflow:hidden}
+.ff2-exp-fullname{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:900;color:rgba(255,255,255,.96);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.2}
+.ff2-exp-school{font-size:9.5px;color:rgba(255,255,255,.48);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ff2-exp-role{font-size:9px;font-weight:600;color:rgba(255,255,255,.32);margin-top:1px;white-space:nowrap}
+.ff2-exp-metric-row{display:flex;align-items:baseline;gap:4px;margin-top:5px}
+.ff2-exp-metric-val{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;line-height:1}
+.ff2-exp-metric-lbl{font-size:8px;font-weight:700;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:.6px}
+/* Unplaced footer */
+.ff2-unplaced{padding:11px 16px 13px;border-top:1px solid rgba(255,255,255,.05);display:flex;flex-wrap:wrap;gap:5px;align-items:center}
+.ff2-unplaced-label{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,.2);margin-right:4px}
+.ff2-unplaced-chip{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:5px;padding:2px 7px;color:rgba(255,255,255,.4);cursor:pointer;transition:all .12s}
+.ff2-unplaced-chip:hover{background:rgba(255,255,255,.1);color:rgba(255,255,255,.85)}
 .comp-tbl-wrap{overflow-x:auto;border-radius:10px;border:1.5px solid var(--gray-200);
   box-shadow:0 2px 12px rgba(10,22,40,.06);background:white;-webkit-overflow-scrolling:touch}
 .comp-tbl{width:100%;border-collapse:collapse;min-width:900px}
@@ -6814,46 +6859,71 @@ function _scRefreshLogos() {
 // Position anchors: Guard≈left, Forward≈center, Center≈right.
 // Height within position adds fine-grained horizontal spread.
 
-var FF_TIP_EL = null;
+// ── Freeform card expand-on-hover ────────────────────────────────────────────
+function ff2HoverCard(el) {
+  var rank   = parseInt(el.getAttribute('data-rank'), 10);
+  var posCol = el.getAttribute('data-poscol') || '#8B5CF6';
+  var board  = (typeof DATA !== 'undefined' && DATA.board2026) ? DATA.board2026 : [];
+  var p = null;
+  for (var i = 0; i < board.length; i++) { if (board[i].rank === rank) { p = board[i]; break; } }
+  if (!p) return;
 
-function ffGetTip() {
-  if (!FF_TIP_EL) {
-    FF_TIP_EL = document.createElement('div');
-    FF_TIP_EL.className = 'ff-tooltip';
-    document.body.appendChild(FF_TIP_EL);
-  }
-  return FF_TIP_EL;
+  var school   = p.name && p.name.indexOf(' - ') > 0 ? p.name.slice(p.name.indexOf(' - ') + 3) : '';
+  var fullName = p.name && p.name.indexOf(' - ') > 0 ? p.name.slice(0, p.name.indexOf(' - ')) : (p.name || '');
+  var metric   = p.metric && p.metric > 0 ? p.metric.toFixed(1) : null;
+  var cls      = p.cls  || '';
+  var ht       = p.ht   ? (Math.floor(p.ht / 12) + "\'" + (p.ht % 12) + '\"') : null;
+
+  // Photo via app avatarHtml system
+  var av = (typeof avatarHtml === 'function')
+    ? avatarHtml(p.name, p.position || '', '48px', '7px')
+    : '<div style="width:48px;height:48px;background:' + posCol + '22;border-radius:7px;display:flex;align-items:center;justify-content:center;font-family:\'Barlow Condensed\',sans-serif;font-weight:900;font-size:18px;color:white">'
+        + (fullName.split(' ').map(function(w){ return w[0] || ''; }).join('').slice(0, 2).toUpperCase())
+      + '</div>';
+
+  var schoolLine = [school, cls].filter(Boolean).join(' · ');
+  var metricHtml = metric
+    ? '<div class="ff2-exp-metric-row"><span class="ff2-exp-metric-val" style="color:' + posCol + '">' + metric + '</span><span class="ff2-exp-metric-lbl">Metric</span></div>'
+    : '';
+
+  var expHtml = '<div class="ff2-exp-body">'
+    + '<div class="ff2-exp-photo">' + av + '</div>'
+    + '<div class="ff2-exp-info">'
+      + '<div class="ff2-exp-fullname">' + fullName + '</div>'
+      + (schoolLine ? '<div class="ff2-exp-school">' + schoolLine + '</div>' : '')
+      + (p.torvik_role ? '<div class="ff2-exp-role">' + p.torvik_role + (ht ? ' · ' + ht : '') + '</div>' : '')
+      + metricHtml
+    + '</div>'
+    + '</div>';
+
+  // Remove any stale expanded content before injecting
+  var old = el.querySelector('.ff2-exp-body');
+  if (old) old.remove();
+
+  el.insertAdjacentHTML('beforeend', expHtml);
+  el.classList.add('ff2-expanded');
+
+  // Smart origin: expand toward screen center so card stays visible
+  var xPct = parseFloat(el.style.left) || 50;
+  var ox = xPct < 18 ? '18%' : xPct > 82 ? '82%' : '50%';
+  el.style.transformOrigin = ox + ' 50%';
+  el.style.transform = 'translate(-' + ox + ', -50%)';
+  el.style.boxShadow = '0 24px 64px rgba(0,0,0,.82), 0 0 0 1.5px rgba(255,255,255,.18), 0 0 32px ' + posCol + '28';
+  el.style.background = 'rgba(4,13,30,.97)';
 }
 
-function ffShowTip(e, p, school) {
-  var tt = ffGetTip();
-  var name = p.name ? (p.name.indexOf(' - ')>0 ? p.name.slice(0,p.name.indexOf(' - ')) : p.name) : '';
-  var ht = p.ht ? (Math.floor(p.ht/12)+"'"+(p.ht%12)+'"') : '—';
-  var h = '<div style="font-family:Barlow Condensed,sans-serif;font-size:15px;font-weight:900;margin-bottom:3px">'
-        + '#'+p.rank+' '+name+'</div>';
-  if (school) h += '<div style="font-size:10px;color:rgba(255,255,255,.45);margin-bottom:5px">'+school+'</div>';
-  h += '<div style="display:grid;grid-template-columns:auto auto;gap:2px 12px;font-size:11px">';
-  if (p.position) h += '<span style="color:rgba(255,255,255,.5)">Pos</span><span style="font-weight:700">'+p.position+'</span>';
-  if (p.torvik_role) h += '<span style="color:rgba(255,255,255,.5)">Role</span><span style="font-weight:700">'+p.torvik_role+'</span>';
-  h += '<span style="color:rgba(255,255,255,.5)">Height</span><span style="font-weight:700">'+ht+'</span>';
-  if (p.metric && p.metric > 0) h += '<span style="color:rgba(255,255,255,.5)">Metric</span><span style="font-weight:700;color:var(--amber)">'+p.metric.toFixed(1)+'</span>';
-  h += '</div>';
-  tt.innerHTML = h;
-  tt.style.opacity = '1';
-  var x = e.clientX + 14, y = e.clientY - 10;
-  if (x + 240 > window.innerWidth) x = e.clientX - 248;
-  if (y + 160 > window.innerHeight) y = e.clientY - 170;
-  tt.style.left = x + 'px'; tt.style.top = y + 'px';
+function ff2LeaveCard(el) {
+  var expBody = el.querySelector('.ff2-exp-body');
+  if (expBody) expBody.remove();
+  el.classList.remove('ff2-expanded');
+  el.style.transform      = '';
+  el.style.transformOrigin = '';
+  el.style.boxShadow      = '0 2px 12px rgba(0,0,0,.42),inset 0 1px 0 rgba(255,255,255,.05)';
+  el.style.background     = '';
 }
 
-function ffHideTip() {
-  var tt = ffGetTip(); tt.style.opacity = '0';
-}
-
-// Compute X position (0-100%) for a player
-// Composite: position anchor (55%) + height (45%)
-function ffXpos(p) {
-  // Role→position inference for players without explicit position
+// Canonical position category for a player (Guard / Forward / Center)
+function ffPosCategory(p) {
   var ROLE_POS = {
     'Pure PG':'Guard','Scoring PG':'Guard','Combo G':'Guard','Wing G':'Guard',
     'Wing F':'Forward','Stretch 4':'Forward','PF/C':'Center','C':'Center'
@@ -6861,21 +6931,47 @@ function ffXpos(p) {
   var pos = p.position;
   if (!pos && p.torvik_role) {
     var keys = Object.keys(ROLE_POS);
-    for (var i=0;i<keys.length;i++) {
-      if ((p.torvik_role||'').indexOf(keys[i])>=0) { pos=ROLE_POS[keys[i]]; break; }
+    for (var i = 0; i < keys.length; i++) {
+      if ((p.torvik_role || '').indexOf(keys[i]) >= 0) { pos = ROLE_POS[keys[i]]; break; }
     }
   }
-  var posScore = pos==='Guard' ? 22 : pos==='Center' ? 78 : pos==='Forward' ? 50 : null;
+  return pos || null;
+}
+
+// Compute X position (0-100%) for a player — ZONE-CONSTRAINED
+// Each position category stays within its visual column; height/weight
+// only determines fine-grained spread *within* that zone.
+//   Guard zone:   5–31%  (center 18)
+//   Forward zone: 35–61% (center 48)
+//   Center zone:  65–91% (center 78)
+function ffXpos(p) {
+  var pos = ffPosCategory(p);
+  if (!pos) return null;
+
   var ht = p.ht;
   var wt = p.wt;
-  if (!posScore && !ht) return null; // can't place
-  if (!posScore) posScore = 50;
-  if (!ht) return posScore;
-  // Composite: position (50%) + height (35%) + weight (15%)
-  // Weight spreads same-height players — heavier players shift right
-  var htNorm = Math.max(0, Math.min(1, (ht - 72) / (87 - 72)));
-  var wtNorm = wt ? Math.max(0, Math.min(1, (wt - 163) / (293 - 163))) : htNorm;
-  return posScore * 0.50 + htNorm * 100 * 0.35 + wtNorm * 100 * 0.15;
+
+  // Zone center and half-spread
+  var zC = pos === 'Guard' ? 18 : pos === 'Center' ? 78 : 48;
+  var zR = 13; // ±13% — max card never crosses zone boundary
+
+  if (!ht && !wt) return zC;
+
+  // Unified size score 0→small/quick  1→big/strong
+  // Calibrated across full draft range: 71"–88" height, 160–300 lbs
+  var htNorm  = ht ? Math.max(0, Math.min(1, (ht  - 71) / (88  - 71))) : 0.5;
+  var wtNorm  = wt ? Math.max(0, Math.min(1, (wt  - 160) / (300 - 160))) : htNorm;
+  var sizeScr = htNorm * 0.62 + wtNorm * 0.38;
+
+  return Math.max(zC - zR, Math.min(zC + zR, zC + (sizeScr - 0.5) * (zR * 2)));
+}
+
+// Zone bounds for collision clamping — each player stays inside their column
+function ffZoneBounds(p) {
+  var pos = ffPosCategory(p);
+  if (pos === 'Guard')   return { min: 5,  max: 33 };
+  if (pos === 'Center')  return { min: 63, max: 92 };
+  return                        { min: 33, max: 63 }; // Forward
 }
 
 // ── BOARD 2026 — FREEFORM VIEW ───────────────────────────────────────────────
@@ -6884,23 +6980,36 @@ function renderBoardFreeform(players) {
   if (!el) return;
 
   var TIER_COLORS = {
-    franchise: {color:'#D97706', label:'Franchise', gradient:'rgba(217,119,6,.08)'},
-    lottery:   {color:'#7C3AED', label:'Lottery',   gradient:'rgba(124,58,237,.06)'},
-    lateFirst: {color:'#2563EB', label:'Late First', gradient:'rgba(37,99,235,.05)'},
-    second:    {color:'#0D9488', label:'2nd Round',  gradient:'rgba(13,148,136,.04)'},
+    franchise: {color:'#F59E0B', bg:'rgba(245,158,11,.065)',  label:'Franchise'},
+    lottery:   {color:'#8B5CF6', bg:'rgba(139,92,246,.055)',  label:'Lottery'},
+    lateFirst: {color:'#3B82F6', bg:'rgba(59,130,246,.045)',  label:'Late 1st'},
+    second:    {color:'#10B981', bg:'rgba(16,185,129,.038)',  label:'2nd Rd'},
   };
-  var POS_COLORS = { Guard:'#2563EB', Forward:'#7C3AED', Center:'#0D9488', '':'#94A3B8' };
+  var POS_COLORS = {Guard:'#3B82F6', Forward:'#8B5CF6', Center:'#10B981', '':'#64748B'};
+  var PLOT_H = 1160;
 
-  // Filter to players that can be placed (need at least ht or position)
-  var top75     = players.filter(function(p) { return p.rank <= 75; });
-  var placeable = top75.filter(function(p) { return ffXpos(p) !== null; });
-  var unplaced  = top75.filter(function(p) { return ffXpos(p) === null; });
+  var ranked    = players.filter(function(p){ return p.rank <= 75; });
+  var placeable = ranked.filter(function(p){ return ffXpos(p) !== null; });
+  var unplaced  = ranked.filter(function(p){ return ffXpos(p) === null; });
+  var maxRank   = Math.max.apply(null, placeable.map(function(p){ return p.rank; }));
 
-  // Y range: rank 1 to max visible rank
-  var maxRank = Math.max.apply(null, placeable.map(function(p){ return p.rank; }));
-  var minRank = 1;
+  // Metric normalizer for mini-bar (top metric in class ≈ 200; normalize 0–1)
+  var allMetrics = placeable.map(function(p){ return p.metric || 0; });
+  var metricMax  = Math.max.apply(null, allMetrics) || 1;
 
-  // Tier cut values
+  function yPct(rank) {
+    var exp   = 0.60;
+    var rNorm = Math.pow(rank, exp) / Math.pow(maxRank, exp);
+    return (4.5 + rNorm * 91).toFixed(2);
+  }
+
+  function getTierKey(rank) {
+    if (rank <= TIER_CUTS.franchise) return 'franchise';
+    if (rank <= TIER_CUTS.lottery)   return 'lottery';
+    if (rank <= TIER_CUTS.lateFirst) return 'lateFirst';
+    return 'second';
+  }
+
   var cuts = [
     {rank: TIER_CUTS.franchise, key:'franchise'},
     {rank: TIER_CUTS.lottery,   key:'lottery'},
@@ -6908,133 +7017,213 @@ function renderBoardFreeform(players) {
     {rank: TIER_CUTS.second,    key:'second'},
   ];
 
-  // Player dot size
-  var DOT = 22;
-
-  var out = '<div class="ff-wrap" style="height:' + 820 + 'px">';
-
-  // Header
-  out += '<div class="ff-header">';
-  out += '<div><div class="ff-title">Freeform Board</div>';
-  out += '<div class="ff-subtitle">' + placeable.length + ' prospects placed';
-  if (unplaced.length) out += ' · ' + unplaced.length + ' omitted (no position or height data)';
-  out += '</div></div>';
-  out += '</div>';
-
-  // Y-axis rank labels — one at top (#1) + one at each tier cutoff
-  // These use yPct() so they align exactly with the tier lines
-  var rankLabels = [{rank:1}];
-  cuts.forEach(function(c){ if(c.rank<=maxRank) rankLabels.push({rank:c.rank,color:TIER_COLORS[c.key].color}); });
-  rankLabels.push({rank:maxRank});
-  out += '<div class="ff-yaxis">';
-  rankLabels.forEach(function(item) {
-    var top = yPct(item.rank);
-    var col = item.color || 'var(--gray-400)';
-    out += '<div class="ff-ylab" style="position:absolute;top:'+top+'%;transform:translateY(-50%);color:'+col+'">'+item.rank+'</div>';
-  });
-  out += '</div>';
-
-  // X-axis labels
-  out += '<div class="ff-xaxis">';
-  out += '<div class="ff-xlab">Guards<span>Smaller / Quicker</span></div>';
-  out += '<div class="ff-xlab">Forwards<span>Wing Players</span></div>';
-  out += '<div class="ff-xlab">Centers<span>Bigger / Stronger</span></div>';
-  out += '</div>';
-
-  // Plot area
-  out += '<div class="ff-plot" id="ffPlot">';
-  out += '<div style="position:absolute;top:8px;left:0;right:0;display:flex;justify-content:center;gap:18px;z-index:4;pointer-events:none">';
-  ['Guard','Forward','Center'].forEach(function(pos){
-    out += '<div class="ff-leg-item"><div class="ff-leg-dot" style="background:'+POS_COLORS[pos]+'"></div>'+pos+'</div>';
-  });
-  out += '</div>';
-
-  // Tier band shading + dashed lines
-  // Non-linear Y: power curve ~60% height for top 30, ~40% for 31-75
-  function yPct(rank) {
-    var exp   = 0.65;
-    var rNorm = Math.pow(rank, exp) / Math.pow(maxRank, exp);
-    return (4 + rNorm * 92).toFixed(2); // 4% padding top+bottom
-  }
-
-  var prevCut = 0;
-  cuts.forEach(function(cut, i) {
-    if (cut.rank > maxRank) return;
-    var tc = TIER_COLORS[cut.key];
-    // Shaded band from prevCut to this cut
-    var bandTop  = yPct(prevCut);
-    var bandBot  = yPct(cut.rank);
-    out += '<div style="position:absolute;left:0;right:0;top:' + bandTop + '%;height:' + (parseFloat(bandBot)-parseFloat(bandTop)).toFixed(2) + '%;background:' + tc.gradient + ';pointer-events:none"></div>';
-    // Dashed tier line at the cut
-    out += '<div class="ff-tier-line" style="top:' + bandBot + '%;border-color:' + tc.color + ';opacity:.35"></div>';
-    out += '<div class="ff-tier-label" style="top:' + bandBot + '%;color:' + tc.color + '">' + tc.label + '</div>';
-    prevCut = cut.rank;
-  });
-
-  // Collision avoidance — nudge overlapping dots horizontally
+  // ── Collision avoidance — zone-aware: cards can't cross position column bounds
   var placed = placeable.map(function(p) {
-    return { p:p, x:ffXpos(p), y:parseFloat(yPct(p.rank)) };
+    var zb = ffZoneBounds(p);
+    return { p:p, x:ffXpos(p), y:parseFloat(yPct(p.rank)), zMin:zb.min, zMax:zb.max };
   });
+  placed.sort(function(a,b){ return a.p.rank - b.p.rank; });
 
-  // Simple horizontal nudge: sort by x, then push apart if too close
-  placed.sort(function(a,b){ return a.x - b.x || a.y - b.y; });
-  // Convert % to approximate pixels for nudge calc (assume 800px plot width)
-  var PW = 800, PH = 500; // approximate, actual sizing handled by % in CSS
-  var DOT_PCT_X = DOT / PW * 100;
-  var DOT_PCT_Y = DOT / PH * 100;
-  for (var i=1; i<placed.length; i++) {
-    for (var j=0; j<i; j++) {
-      var dx = Math.abs(placed[i].x - placed[j].x);
-      var dy = Math.abs(placed[i].y - placed[j].y);
-      if (dx < DOT_PCT_X * 1.1 && dy < DOT_PCT_Y * 1.1) {
-        // Nudge i to the right slightly
-        placed[i].x += DOT_PCT_X * 0.6;
-        // Clamp to 2-98% range
-        placed[i].x = Math.max(2, Math.min(98, placed[i].x));
+  // Card 110px wide; reference canvas width ~920px for %-based spacing
+  var PW    = 920;
+  var MIN_X = (110 + 16) / PW * 100;  // ≈ 13.7% — includes breathing gap
+  var MIN_Y = (52  + 18) / PLOT_H * 100; // proportional to canvas height
+
+  for (var pass = 0; pass < 28; pass++) {
+    for (var i = 1; i < placed.length; i++) {
+      for (var j = 0; j < i; j++) {
+        var dx = Math.abs(placed[i].x - placed[j].x);
+        var dy = Math.abs(placed[i].y - placed[j].y);
+        if (dx < MIN_X && dy < MIN_Y) {
+          var dir  = placed[i].x >= placed[j].x ? 1 : -1;
+          var push = (MIN_X - dx) * 0.52;
+          placed[i].x += dir * push;
+          // Clamp to player's zone — prevents cross-column drift
+          placed[i].x = Math.max(placed[i].zMin, Math.min(placed[i].zMax, placed[i].x));
+        }
       }
     }
   }
 
-  // Player chips — rank + last name in a position-colored pill
-  placed.forEach(function(item) {
-    var p     = item.p;
-    var xPct  = item.x.toFixed(2);
-    var yPct2 = item.y.toFixed(2);
-    var pos   = p.position || '';
-    var color = POS_COLORS[pos] || '#94A3B8';
-    var school     = p.name && p.name.indexOf(' - ')>0 ? p.name.slice(p.name.indexOf(' - ')+3) : '';
-    var playerBase = p.name && p.name.indexOf(' - ')>0 ? p.name.slice(0,p.name.indexOf(' - ')) : (p.name||'');
-    var nameParts = playerBase.trim().split(' ');
-    // Strip trailing generational suffixes so e.g. 'Darius Acuff Jr.' -> 'Acuff'
-    var SUFFIXES = {jr:1,'jr.':1,sr:1,'sr.':1,ii:1,iii:1,iv:1};
-    var cleanParts = nameParts.slice();
-    while (cleanParts.length > 1 && SUFFIXES[cleanParts[cleanParts.length-1].toLowerCase()]) {
-      cleanParts.pop();
-    }
-    var lastName = cleanParts.length > 1 ? cleanParts[cleanParts.length-1] : playerBase;
-    if (lastName.length > 11) lastName = lastName.slice(0,10)+'.';
-    var bgTint = color+'18';
-    var pData  = JSON.stringify({rank:p.rank,name:p.name,position:p.position,
-                   torvik_role:p.torvik_role,ht:p.ht,metric:p.metric});
-    var sData  = JSON.stringify(school);
-    out += '<div class="ff-player" '
-      + 'style="left:'+xPct+'%;top:'+yPct2+'%;width:auto;height:auto;border-radius:5px;'
-      + 'background:'+bgTint+';border-left:3px solid '+color+';'
-      + 'padding:1px 6px 1px 4px;display:flex;align-items:center;gap:3px;white-space:nowrap;'
-      + 'box-shadow:0 1px 4px rgba(0,0,0,.10)" '
-      + 'onclick="openPlayerModal('+p.rank+')" '
-      + 'onmouseenter="ffShowTip(event,'+pData+','+sData+')" '
-      + 'onmouseleave="ffHideTip()">'
-      + '<span style="font-family:Barlow Condensed,sans-serif;font-size:8px;font-weight:900;color:'
-      +   color+';opacity:.8;flex-shrink:0;line-height:1.5">#'+p.rank+'</span>'
-      + '<span style="font-family:Barlow Condensed,sans-serif;font-size:11px;font-weight:800;'
-      +   'color:var(--navy);line-height:1.5">'+lastName+'</span>'
-      + '</div>';
+  // ── Build HTML ────────────────────────────────────────────────────────
+  var out = '<div class="ff2-shell">';
+
+  // Header
+  out += '<div class="ff2-head">';
+  out += '<div><div class="ff2-title">Freeform Board</div>';
+  out += '<div class="ff2-meta">' + placeable.length + ' prospects · size &amp; positional placement';
+  if (unplaced.length) out += ' · <span style="color:rgba(255,255,255,.2)">' + unplaced.length + ' omitted</span>';
+  out += '</div></div>';
+  out += '<div class="ff2-legend">';
+  ['Guard','Forward','Center'].forEach(function(pos) {
+    out += '<div class="ff2-leg-item"><div class="ff2-leg-dot" style="background:' + POS_COLORS[pos] + '"></div>' + pos + '</div>';
+  });
+  out += '</div></div>';
+
+  // Column header bar (aligns with rail + canvas)
+  out += '<div class="ff2-col-bar">';
+  out += '<div class="ff2-col-bar-spacer"></div>';
+  out += '<div class="ff2-col-bar-inner">';
+  var colDefs = [
+    {name:'Guards',   sub:'Quicker / Smaller', color:POS_COLORS.Guard},
+    {name:'Forwards', sub:'Wing Players',       color:POS_COLORS.Forward},
+    {name:'Centers',  sub:'Bigger / Stronger',  color:POS_COLORS.Center},
+  ];
+  colDefs.forEach(function(cd) {
+    out += '<div class="ff2-col-hdr"><div class="ff2-col-hdr-name" style="color:' + cd.color + '">' + cd.name + '</div>';
+    out += '<div class="ff2-col-hdr-sub">' + cd.sub + '</div></div>';
+  });
+  out += '</div></div>';
+
+  // Body
+  out += '<div class="ff2-body">';
+
+  // Left tier rail
+  out += '<div class="ff2-rail" style="height:' + PLOT_H + 'px">';
+  var prevCutRank = 0;
+  cuts.forEach(function(cut) {
+    if (cut.rank > maxRank) return;
+    var tc        = TIER_COLORS[cut.key];
+    var tierStart = prevCutRank === 0 ? 1 : prevCutRank;
+    var tierEnd   = cut.rank;
+    var topPx     = parseFloat(yPct(tierStart)) / 100 * PLOT_H;
+    var botPx     = parseFloat(yPct(Math.min(tierEnd, maxRank))) / 100 * PLOT_H;
+    var h         = Math.max(botPx - topPx, 28);
+    var cnt       = placeable.filter(function(p){ return p.rank > prevCutRank && p.rank <= tierEnd; }).length;
+    out += '<div class="ff2-rail-item" style="top:' + topPx.toFixed(1) + 'px;height:' + h.toFixed(1) + 'px">';
+    out += '<div class="ff2-rail-bar" style="background:' + tc.color + ';height:' + Math.min(Math.max(h*0.55,14),52) + 'px"></div>';
+    out += '<div class="ff2-rail-label" style="color:' + tc.color + '">' + tc.label + '</div>';
+    out += '<div class="ff2-rail-count" style="color:' + tc.color + '">' + cnt + '</div>';
+    out += '</div>';
+    prevCutRank = tierEnd;
+  });
+  out += '</div>'; // ff2-rail
+
+  // Canvas (plot)
+  out += '<div class="ff2-canvas">';
+  out += '<div class="ff2-plot" id="ff2Plot" style="height:' + PLOT_H + 'px">';
+
+  // Column zone tints + dividers
+  out += '<div class="ff2-col-zone" style="left:0;width:33.33%;background:rgba(59,130,246,.02)"></div>';
+  out += '<div class="ff2-col-zone" style="left:33.33%;width:33.34%;background:rgba(139,92,246,.017)"></div>';
+  out += '<div class="ff2-col-zone" style="left:66.67%;width:33.33%;background:rgba(16,185,129,.02)"></div>';
+  out += '<div class="ff2-col-div" style="left:33.33%"></div>';
+  out += '<div class="ff2-col-div" style="left:66.67%"></div>';
+
+  // Tier fills, lines, labels
+  var prevFillRank = 0;
+  cuts.forEach(function(cut) {
+    if (cut.rank > maxRank) return;
+    var tc       = TIER_COLORS[cut.key];
+    var bandTopPct = parseFloat(yPct(prevFillRank === 0 ? 1 : prevFillRank));
+    var bandBotPct = parseFloat(yPct(cut.rank));
+    var bandH      = (bandBotPct - bandTopPct).toFixed(2);
+    out += '<div class="ff2-tier-fill" style="top:' + bandTopPct + '%;height:' + bandH + '%;background:' + tc.bg + '"></div>';
+    out += '<div class="ff2-tier-line" style="top:' + bandBotPct + '%;border-top-color:' + tc.color + ';opacity:.45"></div>';
+    out += '<div class="ff2-tier-lbl" style="top:' + bandBotPct + '%">';
+    out += '<div class="ff2-tier-lbl-dot" style="background:' + tc.color + '"></div>';
+    out += '<span class="ff2-tier-lbl-text" style="color:' + tc.color + '">' + tc.label + '</span>';
+    out += '</div>';
+    prevFillRank = cut.rank;
   });
 
+  // Y rank marks
+  var yMarkRanks = [1];
+  cuts.forEach(function(c){ if (c.rank <= maxRank) yMarkRanks.push(c.rank); });
+  yMarkRanks.push(maxRank);
+  yMarkRanks.forEach(function(r) {
+    var col = TIER_COLORS[getTierKey(r)].color;
+    out += '<div class="ff2-ymark" style="top:' + yPct(r) + '%;color:' + col + '">#' + r + '</div>';
+  });
+
+  // ── Player cards ──────────────────────────────────────────────────────
+  placed.forEach(function(item, idx) {
+    var p       = item.p;
+    var xPct    = item.x.toFixed(2);
+    var yPct2   = item.y.toFixed(2);
+    var pos     = p.position || '';
+    var posCol  = POS_COLORS[pos] || POS_COLORS[''];
+    var tierKey = getTierKey(p.rank);
+    var tierCol = TIER_COLORS[tierKey].color;
+
+    // Card background: tier-tinted dark glass
+    var cardBg = p.rank <= TIER_CUTS.franchise  ? 'rgba(245,158,11,.08)'  :
+                 p.rank <= TIER_CUTS.lottery     ? 'rgba(139,92,246,.065)' :
+                 p.rank <= TIER_CUTS.lateFirst   ? 'rgba(59,130,246,.052)'  :
+                                                   'rgba(255,255,255,.036)';
+
+    // Name: last name, allow up to 11 chars before truncation
+    var school     = p.name && p.name.indexOf(' - ') > 0 ? p.name.slice(p.name.indexOf(' - ') + 3) : '';
+    var playerBase = p.name && p.name.indexOf(' - ') > 0 ? p.name.slice(0, p.name.indexOf(' - ')) : (p.name || '');
+    var nameParts  = playerBase.trim().split(' ');
+    var SUFFIXES   = {jr:1,'jr.':1,sr:1,'sr.':1,ii:1,iii:1,iv:1};
+    while (nameParts.length > 1 && SUFFIXES[nameParts[nameParts.length-1].toLowerCase()]) nameParts.pop();
+    var lastName    = nameParts.length > 1 ? nameParts[nameParts.length-1] : playerBase;
+    var displayName = lastName.length > 11 ? lastName.slice(0,10) + '.' : lastName;
+
+    var roleLabel = p.torvik_role || p.position || '';
+    var delay     = (idx * 14).toFixed(0) + 'ms';
+
+    // Metric bar width (% of card, capped 8-92%)
+    var metricPct = p.metric && p.metric > 0
+      ? Math.max(8, Math.min(92, (p.metric / metricMax) * 100)).toFixed(1)
+      : '0';
+
+    // Franchise class for top picks
+    var franchiseCls = p.rank <= TIER_CUTS.franchise ? ' ff2-franchise' : '';
+
+    out += '<div class="ff2-card' + franchiseCls + '" '
+         + 'data-rank="' + p.rank + '" '
+         + 'data-poscol="' + posCol + '" '
+         + 'style="left:' + xPct + '%;top:' + yPct2 + '%;background:' + cardBg + ';'
+         + 'box-shadow:0 2px 12px rgba(0,0,0,.42),inset 0 1px 0 rgba(255,255,255,.05);'
+         + 'animation-delay:' + delay + '" '
+         + 'onclick="openPlayerModal(' + p.rank + ')" '
+         + 'onmouseenter="ff2HoverCard(this)" '
+         + 'onmouseleave="ff2LeaveCard(this)">';
+
+    out += '<div class="ff2-card-stripe" style="background:' + posCol + '"></div>';
+    out += '<div class="ff2-card-top">';
+    out += '<span class="ff2-card-rank" style="color:' + tierCol + ';opacity:.75">#' + p.rank + '</span>';
+    out += '<span class="ff2-card-tier-dot" style="background:' + posCol + '"></span>';
+    out += '</div>';
+    out += '<div class="ff2-card-name">' + displayName + '</div>';
+    if (roleLabel) out += '<div class="ff2-card-role">' + roleLabel + '</div>';
+    // Metric bar — only shown if metric exists
+    if (p.metric && p.metric > 0) {
+      out += '<div class="ff2-card-mbar-wrap">';
+      out += '<div class="ff2-card-mbar" style="width:' + metricPct + '%;background:' + posCol + '"></div>';
+      out += '</div>';
+    }
+    out += '</div>';
+  });
+
+  out += '</div>'; // ff2-plot
+  out += '</div>'; // ff2-canvas
+  out += '</div>'; // ff2-body
+
+  // Unplaced footer
+  if (unplaced.length) {
+    out += '<div class="ff2-unplaced">';
+    out += '<span class="ff2-unplaced-label">No placement data</span>';
+    unplaced.forEach(function(p) {
+      var base  = p.name ? (p.name.indexOf(' - ') > 0 ? p.name.slice(0, p.name.indexOf(' - ')) : p.name) : '?';
+      var parts = base.trim().split(' ');
+      var SUF   = {jr:1,'jr.':1,sr:1,'sr.':1,ii:1,iii:1,iv:1};
+      while (parts.length > 1 && SUF[parts[parts.length-1].toLowerCase()]) parts.pop();
+      var chip = '#' + p.rank + ' ' + (parts.length > 1 ? parts[parts.length-1] : base);
+      out += '<span class="ff2-unplaced-chip" onclick="openPlayerModal(' + p.rank + ')">' + chip + '</span>';
+    });
+    out += '</div>';
+  }
+
+  out += '</div>'; // ff2-shell
 
   el.innerHTML = out;
 }
+
+// ── Card hover helpers ────────────────────────────────────────────────────────
+
 
 
 // ── MOCK MODE SWITCHER ────────────────────────────────────────────────────────
