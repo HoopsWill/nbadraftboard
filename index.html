@@ -348,9 +348,9 @@ tr:hover td{background:var(--gray-50)}
   
   .file-menu-btn{padding:5px 9px;font-size:11px}
 
-  /* Nav */
-  .nav-tabs{top:56px;padding:0 6px}
-  .nav-tab{padding:9px 10px;font-size:11px}
+  /* Nav: snap scrolling, active tab always visible */
+  .nav-tabs{top:56px;padding:0 6px;scroll-snap-type:x mandatory;scroll-behavior:smooth}
+  .nav-tab{scroll-snap-align:start;padding:10px 12px;font-size:11.5px;gap:4px}
 
   /* Main */
   .main{padding:10px 10px}
@@ -364,17 +364,45 @@ tr:hover td{background:var(--gray-50)}
   .tier-customize-btn{font-size:10px;padding:5px 8px}
   .tier-editor{min-width:calc(100vw - 20px);right:-10px}
 
-  /* Cards */
-  .cards-grid{grid-template-columns:1fr}
-  .card-header{padding:10px 12px 8px}
-  .card-stats{grid-template-columns:repeat(3,1fr)}
-  .card-tags{padding:6px 12px 8px;gap:4px}
+  /* Cards: 2-column grid — more density, less vertical scroll */
+  .cards-grid{grid-template-columns:1fr 1fr;gap:8px}
+  .card-header{padding:8px 10px 7px;gap:7px}
+  .card-identity{min-width:0}
+  .card-name{font-size:14px !important}
+  .card-school{font-size:9px}
+  .card-stats{grid-template-columns:repeat(3,1fr);gap:2px}
+  .stat-cell{padding:5px 3px}
+  .stat-val{font-size:13px}
+  .stat-lbl{font-size:7.5px}
+  .card-comp{display:none}
+  .player-card > button{display:none}
+  .card-tags{padding:5px 10px 6px;gap:3px}
+  .tag{font-size:9px;padding:2px 5px}
 
-  /* Tables — horizontal scroll */
+  /* Table: sticky rank + player columns.
+     position:sticky on <td>/<th> requires border-collapse:separate.
+     border-spacing:0 keeps the visual identical to collapse. */
   .table-wrap{-webkit-overflow-scrolling:touch}
-  .board-table{min-width:540px}
+  .board-table{min-width:580px;border-collapse:separate !important;border-spacing:0 !important}
+  .board-table tbody td{border-bottom:1px solid #f1f5f9}
+  .board-table th:nth-child(1),.board-table td:nth-child(1){
+    position:sticky;left:0;z-index:3;background:white}
+  .board-table th:nth-child(2),.board-table td:nth-child(2){
+    position:sticky;left:44px;z-index:2;background:white;
+    box-shadow:3px 0 6px rgba(10,22,40,.07)}
+  .board-table thead th:nth-child(1),.board-table thead th:nth-child(2){
+    background:var(--navy);z-index:4}
+
+  /* Big Board: tighter columns so less horizontal scroll needed */
   .bb-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
-  .bb-board{min-width:500px}
+  .bb-board{min-width:480px}
+  .bb-cts,.bb-csb,.bb-cato,.bb-cftar,.bb-ctpar{flex:0.58 !important;min-width:40px !important}
+  .bb-cpa{flex:0.64 !important;min-width:42px !important}
+  .bb-cmet{flex:0.82 !important;min-width:52px !important}
+  .bb-ctag{flex:1.0 !important;min-width:76px !important}
+  .bb-cid{flex:1.4 !important;min-width:90px !important}
+  .bb-screenshot-bar{flex-wrap:wrap;gap:6px}
+  .bb-range-group{flex-wrap:wrap;gap:4px}
 
   /* Mock archive */
   .mock-table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
@@ -400,10 +428,32 @@ tr:hover td{background:var(--gray-50)}
   .mdc-actions{flex-wrap:wrap;gap:4px}
   .mdc-act-btn{padding:4px 9px;font-size:10px}
 
-  /* Scatter */
+  /* Scatter: stack top-5 panel below chart so chart gets full width */
+  .sc-body{flex-direction:column}
+  .sc-top5-wrap{
+    width:100%;align-self:auto;max-height:none;order:2;
+    border-radius:0 0 10px 10px;border-top:1px solid var(--gray-100)
+  }
+  .sc-plot-wrap{order:1}
+  /* Horizontal scrolling compact top-5 list */
+  #scTop5{display:flex;flex-direction:row;overflow-x:auto;-webkit-overflow-scrolling:touch;padding:0;scrollbar-width:none}
+  #scTop5::-webkit-scrollbar{display:none}
+  .sc-top5-row{
+    flex-direction:column;align-items:center;justify-content:center;
+    min-width:68px;max-width:80px;padding:7px 6px;
+    border-bottom:none;border-right:1px solid var(--gray-100);gap:2px
+  }
+  .sc-top5-row:last-child{border-right:none}
+  .sc-top5-school{display:none}
+  .sc-top5-logo{display:none}
+  .sc-top5-info{display:flex;flex-direction:column;align-items:center;min-width:0}
+  .sc-top5-name{text-align:center;font-size:10px;line-height:1.2}
+  .sc-top5-val{font-size:11px}
+  /* Controls: 2-column grid */
+  .sc-controls{display:grid;grid-template-columns:1fr 1fr;gap:8px;align-items:end}
+  .sc-ctrl-group{min-width:0}
+  .sc-select{min-width:0;width:100%;font-size:12px}
   .sc-canvas-wrap{height:300px}
-  .sc-controls{gap:6px}
-  .sc-select{min-width:100px;font-size:12px}
 
   /* Modal */
   .modal-overlay{padding:0;align-items:flex-end}
@@ -897,7 +947,7 @@ tr:hover td{background:var(--gray-50)}
 .ff2-col-hdr-name{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:900;letter-spacing:2.2px;text-transform:uppercase}
 .ff2-col-hdr-sub{font-size:8px;color:rgba(255,255,255,.38);font-weight:500;letter-spacing:.3px}
 /* Body layout */
-.ff2-body{display:flex;position:relative;overflow:hidden}
+.ff2-body{display:flex;position:relative}
 .ff2-rail{width:64px;flex-shrink:0;position:relative;background:rgba(0,0,0,.3);border-right:1px solid rgba(255,255,255,.055)}
 .ff2-rail-item{position:absolute;left:0;right:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;gap:4px;padding:4px 2px;overflow:hidden}
 .ff2-rail-bar{width:3px;border-radius:2px;flex-shrink:0;opacity:.7}
@@ -944,9 +994,22 @@ tr:hover td{background:var(--gray-50)}
 /* ── Viewport + zoom layer ── */
 /* ff2-viewport: the visible window, clips overflow.
    ff2-zoom-layer: receives CSS transform for pinch-zoom and pan. */
-.ff2-viewport{position:relative;overflow:hidden;touch-action:none;-webkit-user-select:none;user-select:none}
+/* ff2-viewport: explicit height set inline by render() = plotH on desktop,
+   overridden by mobile media query to a screen-relative window. */
+.ff2-viewport{position:relative;overflow:hidden;touch-action:none;
+  -webkit-user-select:none;user-select:none;box-sizing:border-box}
 .ff2-viewport.ff2-panning{cursor:grabbing}
-.ff2-zoom-layer{transform-origin:0 0;will-change:transform}
+/* zoom-layer: transform-origin top-left, GPU composited.
+   Height inherits from ff2-body (which gets 1160px from rail height). */
+.ff2-zoom-layer{transform-origin:0 0;will-change:transform;min-height:inherit}
+/* Reset view button */
+.ff2-reset-btn{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);
+  border-radius:5px;padding:4px 11px;font-size:9px;font-weight:800;
+  font-family:'Barlow Condensed',sans-serif;letter-spacing:.8px;text-transform:uppercase;
+  color:rgba(255,255,255,.45);cursor:pointer;transition:all .15s;white-space:nowrap;
+  display:none}
+.ff2-reset-btn.visible{display:inline-block}
+.ff2-reset-btn:hover{background:rgba(255,255,255,.14);color:rgba(255,255,255,.9)}
 /* ── Density control bar ── */
 .ff2-density-bar{display:flex;align-items:center;gap:2px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:6px;padding:3px}
 .ff2-density-btn{background:transparent;border:none;color:rgba(255,255,255,.32);border-radius:4px;padding:3px 9px;font-size:9px;font-weight:800;font-family:'Barlow Condensed',sans-serif;letter-spacing:.8px;text-transform:uppercase;cursor:pointer;transition:all .15s;white-space:nowrap}
@@ -957,9 +1020,15 @@ tr:hover td{background:var(--gray-50)}
   .ff2-shell{--ff-card-w:76px;--ff-card-pad:4px 6px 4px 9px;--ff-card-name-fs:11px}
   .ff2-card-role{display:none}
   .ff2-card-mbar-wrap{display:none}
+  /* On mobile, disable CSS hover scale — touch has no hover state */
   .ff2-card:not(.ff2-expanded):hover{transform:translate(-50%,-50%)}
   .ff2-head{flex-wrap:wrap;gap:8px;padding:12px 14px 10px}
   .ff2-legend{flex-wrap:wrap;gap:8px}
+  /* Constrain viewport to screen height on mobile so user can see
+     the rest of the page above/below. Zoom/pan reveals the full board. */
+  .ff2-viewport{height:72vh !important;min-height:460px !important;max-height:740px}
+  /* Reset btn always visible on mobile since hover state isn't available */
+  .ff2-reset-btn{display:inline-block !important}
 }
 /* ── Expanded hover panel ── */
 .ff2-exp-body{display:flex;align-items:flex-start;gap:9px;margin-top:7px;padding-top:7px;border-top:1px solid rgba(255,255,255,.08)}
@@ -4604,6 +4673,8 @@ document.querySelectorAll('.nav-tab').forEach(tab => {
     document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
     document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
     tab.classList.add('active');
+    // Scroll active tab into view on mobile (no-op on desktop)
+    tab.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
     document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
     urlSetState({tab: tab.dataset.tab});
     if (tab.dataset.tab==='analytics') renderAnalytics();
@@ -7259,10 +7330,12 @@ function scRender() {
     try {
       var xScale = _scChart.scales.x;
       var yScale = _scChart.scales.y;
+      var isTouchEvent = (e.pointerType === 'touch') || (window.matchMedia && matchMedia('(pointer:coarse)').matches);
+      var touchBoost = isTouchEvent ? 14 : 0;
       var near   = _scAllPts.filter(function(pt) {
         var px  = xScale.getPixelForValue(pt.x);
         var py  = yScale.getPixelForValue(pt.y);
-        var r   = ScatterEngine.tierSize(pt._p.rank) / 2 + 2;
+        var r   = ScatterEngine.tierSize(pt._p.rank) / 2 + 2 + touchBoost;
         return Math.sqrt((px-mx)*(px-mx) + (py-my)*(py-my)) <= r;
       });
       scShowTip(e, near, xM, yM);
@@ -7281,10 +7354,12 @@ function scRender() {
       var yScale  = _scChart.scales.y;
       var clicked = null;
       var minDist = Infinity;
+      var isTap   = (e.pointerType === 'touch') || (window.matchMedia && matchMedia('(pointer:coarse)').matches);
+      var tapBoost = isTap ? 16 : 0;
       _scAllPts.forEach(function(pt) {
         var px   = xScale.getPixelForValue(pt.x);
         var py   = yScale.getPixelForValue(pt.y);
-        var r    = ScatterEngine.tierSize(pt._p.rank) / 2 + ScatterLogoCache.BUBBLE_PAD + 2;
+        var r    = ScatterEngine.tierSize(pt._p.rank) / 2 + ScatterLogoCache.BUBBLE_PAD + 2 + tapBoost;
         var dist = Math.sqrt((px - mx) * (px - mx) + (py - my) * (py - my));
         if (dist <= r && dist < minDist) { minDist = dist; clicked = pt; }
       });
@@ -8230,123 +8305,233 @@ function ffSetDensity(mode) {
 }
 
 // ── MODULE: FreeformInteraction ───────────────────────────────────────────────
-// Owns pinch-to-zoom and drag-to-pan for the freeform board on touch devices.
-// Architecture: wraps ff2-body in ff2-viewport (overflow:hidden) + ff2-zoom-layer
-// (receives CSS transform). Zero re-renders — only the transform changes.
+// Owns pinch-to-zoom and drag-to-pan for the freeform board.
+// Architecture: ff2-viewport (overflow:hidden, explicit height) →
+//               ff2-zoom-layer (CSS transform only, no re-renders)
 //
-// Zoom math (zoom centered on pinch midpoint):
-//   A point p in layer-space maps to viewport-space as: vx = p.x*s + tx
-//   When scale changes s→ns, to keep midpoint m fixed:
-//   new_tx = m.x - (m.x - tx) * (ns/s)
+// Zoom math — zoom centered on pinch midpoint m in viewport-space:
+//   Layer point (lx,ly) maps to viewport as: vx = lx*s + tx
+//   To keep m stationary when s→ns:  new_tx = m.x - (m.x - tx) * (ns/s)
+//
+// Gesture discrimination:
+//   TAP   — touchstart→touchend, cumulative movement < TAP_THRESHOLD px
+//   DRAG  — single touch, movement ≥ TAP_THRESHOLD
+//   PINCH — two simultaneous touches
 var FreeformInteraction = (function() {
   'use strict';
 
-  var _s   = 1,  _tx  = 0,  _ty  = 0;   // scale and translation state
-  var S_MIN = 0.45, S_MAX = 1.65;
+  var S_MIN = 0.40, S_MAX = 1.80;
+  var TAP_THRESHOLD = 8;      // px movement before a touch becomes a drag
+  var RESET_ANIM_MS = 260;    // animation duration for reset()
+  var EDGE_MARGIN   = 80;     // min px of board that must stay visible on screen
 
-  var _lastDist  = null;   // previous pinch distance (px)
-  var _lastMid   = null;   // previous pinch midpoint in viewport coords
-  var _dragging  = false;
-  var _dragStart = null;   // { tx, ty, x, y } snapshot when drag began
-  var _layer     = null;   // ff2-zoom-layer element reference
-  var _vp        = null;   // ff2-viewport element reference
+  // ── State ─────────────────────────────────────────────────────────────────
+  var _s   = 1, _tx = 0, _ty = 0;   // current transform state
+  var _layer = null, _vp = null;     // DOM references (set on init)
+  var _layerW = 0, _layerH = 0;     // natural (unscaled) layer dimensions
 
-  // ── Geometry helpers ──────────────────────────────────────────────────────
-  function _dist(t) {
-    var dx = t[1].clientX - t[0].clientX;
-    var dy = t[1].clientY - t[0].clientY;
+  // Single-finger drag state
+  var _dragActive = false;
+  var _dragStart  = null;    // { tx, ty, cx, cy } — snapshot when drag began
+  var _dragMoved  = false;   // true once movement exceeds TAP_THRESHOLD
+
+  // Pinch state
+  var _pinchActive = false;
+  var _lastDist    = 0;
+  var _lastMid     = null;
+
+  // ── Geometry ──────────────────────────────────────────────────────────────
+  function _touchDist(touches) {
+    var dx = touches[1].clientX - touches[0].clientX;
+    var dy = touches[1].clientY - touches[0].clientY;
     return Math.sqrt(dx * dx + dy * dy);
   }
 
-  // Returns midpoint in viewport-relative pixel coordinates
-  function _mid(t, vpEl) {
-    var r = vpEl.getBoundingClientRect();
+  // Returns touch midpoint in viewport-relative coordinates
+  function _touchMid(touches) {
+    var r = _vp.getBoundingClientRect();
     return {
-      x: (t[0].clientX + t[1].clientX) / 2 - r.left,
-      y: (t[0].clientY + t[1].clientY) / 2 - r.top,
+      x: (touches[0].clientX + touches[1].clientX) / 2 - r.left,
+      y: (touches[0].clientY + touches[1].clientY) / 2 - r.top,
     };
   }
 
+  // ── Boundary clamping ─────────────────────────────────────────────────────
+  // Prevents the board from being panned entirely off-screen.
+  // The scaled content is _layerW*_s × _layerH*_s pixels.
+  function _clamp() {
+    if (!_vp || !_layerW) return;
+    var vpW = _vp.offsetWidth;
+    var vpH = _vp.offsetHeight;
+    var cW  = _layerW * _s;   // scaled content width
+    var cH  = _layerH * _s;   // scaled content height
+    var em  = EDGE_MARGIN;
+
+    // X: allow scroll until only EDGE_MARGIN of content visible on each side
+    var minTx = -(cW - em);
+    var maxTx = vpW - em;
+    // Y: same logic
+    var minTy = -(cH - em);
+    var maxTy = em;
+
+    _tx = Math.max(minTx, Math.min(maxTx, _tx));
+    _ty = Math.max(minTy, Math.min(maxTy, _ty));
+  }
+
   // ── Apply transform ───────────────────────────────────────────────────────
-  // translate3d forces GPU compositing — no layout invalidation on each frame.
+  // translate3d forces GPU layer — no layout reads/writes on each frame.
   function _apply() {
     if (!_layer) return;
-    _layer.style.transform = 'translate3d(' + _tx.toFixed(1) + 'px,' + _ty.toFixed(1) + 'px,0) scale(' + _s.toFixed(4) + ')';
+    _layer.style.transform =
+      'translate3d(' + _tx.toFixed(1) + 'px,' + _ty.toFixed(1) + 'px,0) scale(' + _s.toFixed(4) + ')';
+  }
+
+  // Show/hide reset button based on whether we're at the home position
+  function _syncResetBtn() {
+    var btn = document.querySelector('.ff2-reset-btn');
+    if (!btn) return;
+    var away = (Math.abs(_tx) > 6 || Math.abs(_ty) > 6 || Math.abs(_s - 1) > 0.04);
+    btn.classList.toggle('visible', away);
   }
 
   // ── Touch handlers ────────────────────────────────────────────────────────
   function _onTouchStart(e) {
     if (e.touches.length === 2) {
-      // Pinch start — capture initial distance + midpoint
+      // ── Pinch start ───────────────────────────────────────────────────────
       e.preventDefault();
-      _lastDist = _dist(e.touches);
-      _lastMid  = _mid(e.touches, _vp);
-      _dragging  = false;
-      _dragStart = null;
+      _pinchActive = true;
+      _dragActive  = false;
+      _dragMoved   = false;
+      _lastDist = _touchDist(e.touches);
+      _lastMid  = _touchMid(e.touches);
     } else if (e.touches.length === 1) {
-      // Single-finger pan start
-      _dragging  = true;
-      _dragStart = { tx: _tx, ty: _ty, x: e.touches[0].clientX, y: e.touches[0].clientY };
-      _lastDist  = null;
+      // ── Single-touch start ────────────────────────────────────────────────
+      // Don't call preventDefault here — we need the tap to fire click events.
+      // Only preventDefault on actual movement (in touchmove).
+      _pinchActive = false;
+      _dragActive  = true;
+      _dragMoved   = false;
+      _dragStart   = {
+        tx: _tx, ty: _ty,
+        cx: e.touches[0].clientX, cy: e.touches[0].clientY,
+      };
+      _lastDist = 0;
     }
   }
 
   function _onTouchMove(e) {
-    if (e.touches.length === 2) {
-      // Pinch-to-zoom
+    if (e.touches.length === 2 && _pinchActive) {
+      // ── Pinch-to-zoom ────────────────────────────────────────────────────
       e.preventDefault();
-      var d  = _dist(e.touches);
-      var m  = _mid(e.touches, _vp);
-      if (_lastDist !== null && _lastDist > 0) {
-        var ns = Math.max(S_MIN, Math.min(S_MAX, _s * (d / _lastDist)));
-        // Keep midpoint m fixed in viewport space
-        _tx = m.x - (m.x - _tx) * (ns / _s);
-        _ty = m.y - (m.y - _ty) * (ns / _s);
-        _s  = ns;
+      var d  = _touchDist(e.touches);
+      var m  = _touchMid(e.touches);
+      if (_lastDist > 0) {
+        var ratio = d / _lastDist;
+        var ns    = Math.max(S_MIN, Math.min(S_MAX, _s * ratio));
+        // Keep pinch midpoint stationary in viewport space
+        if (_s !== 0) {
+          _tx = m.x - (m.x - _tx) * (ns / _s);
+          _ty = m.y - (m.y - _ty) * (ns / _s);
+        }
+        _s = ns;
       }
       _lastDist = d;
       _lastMid  = m;
+      _clamp();
       _apply();
-    } else if (_dragging && e.touches.length === 1 && _dragStart) {
-      // Drag-to-pan — only prevent default when actually panning
+      _syncResetBtn();
+    } else if (e.touches.length === 1 && _dragActive && _dragStart) {
+      // ── Drag-to-pan ───────────────────────────────────────────────────────
+      var dx = e.touches[0].clientX - _dragStart.cx;
+      var dy = e.touches[0].clientY - _dragStart.cy;
+
+      if (!_dragMoved) {
+        // Check if we've moved enough to commit to a drag (vs tap)
+        var dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < TAP_THRESHOLD) return; // still looks like a tap — don't pan yet
+        _dragMoved = true;
+      }
+
+      // Now it's definitely a drag — prevent default scrolling
       e.preventDefault();
-      _tx = _dragStart.tx + (e.touches[0].clientX - _dragStart.x);
-      _ty = _dragStart.ty + (e.touches[0].clientY - _dragStart.y);
+      _tx = _dragStart.tx + dx;
+      _ty = _dragStart.ty + dy;
+      _clamp();
       _apply();
+      _syncResetBtn();
     }
   }
 
   function _onTouchEnd(e) {
-    if (e.touches.length < 2) _lastDist = null;
-    if (e.touches.length === 0) { _dragging = false; _dragStart = null; }
+    if (e.touches.length === 0) {
+      // All fingers lifted
+      if (_pinchActive) {
+        _pinchActive = false;
+        _lastDist    = 0;
+      }
+      // If finger lifts and _dragMoved is false → it was a tap.
+      // The browser will fire the click event naturally — we do nothing.
+      _dragActive = false;
+      _dragMoved  = false;
+      _dragStart  = null;
+    } else if (e.touches.length === 1 && _pinchActive) {
+      // One finger lifted during pinch — transition to drag from current pos
+      _pinchActive = false;
+      _lastDist    = 0;
+      _dragActive  = true;
+      _dragMoved   = false; // fresh start — require movement threshold again
+      _dragStart   = {
+        tx: _tx, ty: _ty,
+        cx: e.touches[0].clientX, cy: e.touches[0].clientY,
+      };
+    }
   }
 
   // ── Public API ────────────────────────────────────────────────────────────
 
-  // init: called after each render with fresh DOM references.
-  // Old listeners are automatically GC'd with the old DOM elements.
+  // init: called by FreeformBoard.render() with fresh DOM refs after each render.
+  // Event listeners on the old vpEl are GC'd with the replaced DOM — no cleanup needed.
   function init(vpEl, layerEl) {
     _vp    = vpEl;
     _layer = layerEl;
     _s = 1; _tx = 0; _ty = 0;
-    _layer.style.transform = '';
+    _pinchActive = false;
+    _dragActive  = false;
+    _dragMoved   = false;
+    _dragStart   = null;
+
+    // Measure natural layer dimensions for boundary clamping.
+    // Use requestAnimationFrame so the DOM has been painted first.
+    requestAnimationFrame(function() {
+      if (_layer) {
+        _layerW = _layer.offsetWidth;
+        _layerH = _layer.offsetHeight;
+      }
+      _layer.style.transform = '';
+    });
 
     vpEl.addEventListener('touchstart', _onTouchStart, { passive: false });
     vpEl.addEventListener('touchmove',  _onTouchMove,  { passive: false });
     vpEl.addEventListener('touchend',   _onTouchEnd,   { passive: true  });
-
-    // Visual feedback: grabbing cursor while panning
-    vpEl.addEventListener('touchstart', function() { vpEl.classList.add('ff2-panning'); },   { passive: true });
-    vpEl.addEventListener('touchend',   function() { vpEl.classList.remove('ff2-panning'); }, { passive: true });
   }
 
-  // reset: called when density changes — snap back to natural scale + position.
+  // reset: animates back to home position. Called by density change + reset button.
   function reset() {
+    if (!_layer) return;
+    // Temporarily enable transition for smooth animation
+    _layer.style.transition = 'transform ' + RESET_ANIM_MS + 'ms cubic-bezier(.4,0,.2,1)';
     _s = 1; _tx = 0; _ty = 0;
     _apply();
+    _syncResetBtn();
+    setTimeout(function() {
+      if (_layer) _layer.style.transition = '';
+    }, RESET_ANIM_MS + 20);
   }
 
-  return { init: init, reset: reset };
+  // getScale: returns current user zoom level (density is separate)
+  function getScale() { return _s; }
+
+  return { init: init, reset: reset, getScale: getScale };
 })();
 
 // ── MODULE: Freeform Board ───────────────────────────────────────────────────
@@ -8391,7 +8576,8 @@ var FreeformBoard = (function() {
           ? ' · <span style="color:rgba(255,255,255,.2)">' + layout.unplaced.length + ' omitted</span>'
           : '')
       + '</div></div>'
-      + '<div style="display:flex;align-items:center;gap:12px;flex-shrink:0;flex-wrap:wrap">'
+      + '<div style="display:flex;align-items:center;gap:10px;flex-shrink:0;flex-wrap:wrap">'
+      + '<button class="ff2-reset-btn" onclick="FreeformInteraction.reset()" title="Reset view">&#8634; Reset</button>'
       + '<div class="ff2-density-bar">' + densityBtns + '</div>'
       + '<div class="ff2-legend">' + Comp.BoardLegend() + '</div>'
       + '</div>'
@@ -8403,7 +8589,9 @@ var FreeformBoard = (function() {
     // Body: ff2-viewport (overflow:hidden, touch target) →
     //        ff2-zoom-layer (receives CSS transform for pinch-zoom/pan) →
     //          ff2-body (rail + canvas, layout unchanged)
-    out += '<div class="ff2-viewport" id="ff2Viewport"><div class="ff2-zoom-layer" id="ff2ZoomLayer">';
+    // ff2-viewport needs explicit height: sets the visible window on desktop.
+    // On mobile the CSS media query overrides this to 72vh.
+    out += '<div class="ff2-viewport" id="ff2Viewport" style="height:' + plotH + 'px"><div class="ff2-zoom-layer" id="ff2ZoomLayer">';
     out += '<div class="ff2-body">';
     out += Comp.TierRail(TIER_CUTS, maxRank, layout.placed, plotH, toYPct);
     out += '<div class="ff2-canvas"><div class="ff2-plot" id="ff2Plot" style="height:' + plotH + 'px">';
