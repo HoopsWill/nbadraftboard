@@ -226,6 +226,33 @@ body{font-family:'DM Sans',sans-serif;background:var(--gray-50);color:var(--navy
 .card-comp{padding:7px 13px 11px;font-size:10.5px;color:var(--gray-500);border-top:1px solid rgba(10,22,40,.06);margin-top:auto}
 .card-comp strong{color:var(--blue);font-weight:600}
 
+/* ── Championship trophy badge ─────────────────────────────────────────── */
+/* Appears inline after the player name in both Cards and Big Board views.  */
+/* Kept minimal — just enough to align and size the emoji + optional year.  */
+.champ-badge{
+  display:inline-flex;align-items:center;gap:2px;
+  margin-left:5px;
+  font-size:12px;line-height:1;
+  vertical-align:middle;
+  cursor:default;
+  flex-shrink:0
+}
+/* Year label: small pill in team gold so it reads as a callout, not body text */
+.champ-badge-year{
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:9px;font-weight:800;
+  color:#92400E;
+  background:rgba(212,168,48,.18);
+  border:1px solid rgba(212,168,48,.35);
+  border-radius:3px;
+  padding:0 3px;
+  line-height:1.6;
+  letter-spacing:.2px
+}
+/* Big Board variant: smaller emoji, tighter margin to suit the dense row height */
+.bb-name .champ-badge{font-size:11px;margin-left:4px}
+.bb-name .champ-badge-year{font-size:8px}
+
 /* UPLOAD PANEL */
 .file-menu{position:relative}
 .file-menu-btn{background:rgba(212,168,48,.12);color:var(--amber-light,#E8BF52);border:1.5px solid rgba(212,168,48,.3);border-radius:7px;padding:6px 14px;font-size:12px;font-weight:700;font-family:'Barlow Condensed',sans-serif;letter-spacing:.5px;cursor:pointer;transition:background .15s,border-color .15s;white-space:nowrap}
@@ -325,7 +352,7 @@ tr:hover td{background:var(--gray-50)}
 .modal{background:white;border-radius:16px;width:100%;max-width:780px;box-shadow:var(--shadow-xl);transform:translateY(16px);transition:transform .2s;margin:auto}
 .modal-overlay.open .modal{transform:translateY(0)}
 .modal-header{background:var(--navy);color:white;padding:22px 26px;border-radius:16px 16px 0 0;position:relative;display:flex;gap:18px;align-items:center}
-.modal-close{position:absolute;top:14px;right:14px;background:rgba(255,255,255,.1);border:none;color:white;width:30px;height:30px;border-radius:6px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center}
+.modal-close{position:absolute;top:10px;right:10px;background:rgba(255,255,255,.1);border:none;color:white;width:44px;height:44px;min-width:44px;min-height:44px;border-radius:8px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;touch-action:manipulation}
 .modal-close:hover{background:rgba(255,255,255,.2)}
 .modal-avatar{width:72px;height:72px;border-radius:12px;overflow:hidden;flex-shrink:0;border:2px solid rgba(255,255,255,.15)}
 .modal-avatar img{width:100%;height:100%;object-fit:cover;object-position:top}
@@ -453,26 +480,60 @@ tr:hover td{background:var(--gray-50)}
 /* ── MOBILE (≤640px) ─────────────────────────────────────────────────────── */
 .share-btn{background:rgba(255,255,255,.08);border:1.5px solid rgba(255,255,255,.15);color:rgba(255,255,255,.9);border-radius:8px;padding:6px 14px;font-size:12px;font-weight:700;font-family:'Barlow Condensed',sans-serif;letter-spacing:.5px;cursor:pointer;transition:all .15s;white-space:nowrap}
 @media(max-width:640px){
-  /* Header */
-  .header{padding:0 10px;gap:4px;min-height:56px;height:auto;flex-wrap:wrap;padding-top:6px;padding-bottom:6px}
-  .header-logo-img{width:32px;height:32px}
-  .header-title-rest{display:none}
-  .header-title{font-size:16px}
+  /* ── MOBILE HEADER: single fixed-height row ──────────────────────────── */
+  /* Strategy: collapse to logo + title + search only. Hide everything else.
+     Nav sticks 52px below since header is now exactly 52px tall. */
+  .header{
+    padding:0 12px;
+    gap:8px;
+    height:52px;min-height:52px;
+    flex-wrap:nowrap; /* NEVER wrap — one row only */
+    overflow:hidden
+  }
+  .header-logo-img{width:30px;height:30px;flex-shrink:0}
+  .header-title-rest{display:none}   /* Hide "NBA Draft Board" */
+  .header-title{font-size:15px;white-space:nowrap}
   .header-sub{display:none}
   .header-badge{display:none}
-  #lotteryCountdown,#draftCountdown{padding:3px 8px;border-radius:6px}
-  #lotteryCountdown #lotDisplay,#draftCountdown #cdDisplay{font-size:14px}
-  #lotteryCountdown #lotLabel,#draftCountdown #cdLabel{font-size:7px}
-  
-  
-  .file-menu-btn{padding:5px 9px;font-size:11px}
 
-  /* Nav: snap scrolling, active tab always visible */
-  .nav-tabs{top:56px;padding:0 6px;scroll-snap-type:x mandatory;scroll-behavior:smooth}
-  .nav-tab{scroll-snap-align:start;padding:10px 12px;font-size:11.5px;gap:4px}
+  /* Hide both countdown widgets — free up horizontal space */
+  #lotteryCountdown,#draftCountdown{display:none}
 
-  /* Main */
+  /* File menu: icon-only on mobile */
+  .file-menu-btn{padding:5px 8px;font-size:11px}
+
+  /* Share btn: hide label, keep icon */
+  .share-btn{padding:6px 8px;font-size:13px}
+
+  /* Global search btn: grows to fill remaining space for discoverability */
+  .global-search-btn{
+    flex:1;
+    text-align:center;
+    padding:6px 10px;
+    font-size:12px;
+    background:rgba(212,168,48,.15);
+    border-color:rgba(212,168,48,.35);
+    color:var(--amber-light)
+  }
+
+  /* Nav: 52px below the header */
+  /* nav-tabs: sticky below 52px header; mask-image creates right-edge fade
+     to hint at hidden tabs — no ::after pseudo-element needed */
+  .nav-tabs{
+    top:52px;padding:0 8px;
+    scroll-snap-type:x mandatory;scroll-behavior:smooth;
+    position:sticky;
+    -webkit-mask-image:linear-gradient(to right,black calc(100% - 28px),transparent 100%);
+    mask-image:linear-gradient(to right,black calc(100% - 28px),transparent 100%)
+  }
+  .nav-tab{scroll-snap-align:start;padding:10px 14px;font-size:12px;gap:5px}
+
+  /* Main: account for 52px header + 42px nav = 94px combined sticky */
   .main{padding:10px 10px}
+  /* Ensure the sticky nav doesn't overlap content when layout shifts */
+  .tab-panel.active{padding-top:4px}
+  /* scroll-margin accounts for combined sticky header + nav (94px total) */
+  .tab-panel{scroll-margin-top:96px}
 
   /* Controls bar */
   .controls-bar{gap:6px}
@@ -481,7 +542,16 @@ tr:hover td{background:var(--gray-50)}
   .view-toggle{width:100%}
   .view-btn{flex:1;text-align:center;padding:4px 6px;font-size:11px}
   .tier-customize-btn{font-size:10px;padding:5px 8px}
-  .tier-editor{min-width:calc(100vw - 20px);right:-10px}
+  /* Tier editor: full-width popup on mobile with scrollable inner row */
+  .tier-editor{
+    min-width:calc(100vw - 20px) !important;
+    right:-10px;
+    max-height:80vh;
+    overflow-y:auto
+  }
+  /* Inner tier controls: allow vertical stacking so they aren't crushed */
+  .tier-editor > div{flex-wrap:wrap !important;gap:10px !important}
+  .tier-ed-group{flex:1 0 120px !important}
 
   /* Cards: 2-column grid on mobile — tighter but not cramped */
   .cards-grid{grid-template-columns:1fr 1fr;gap:9px}
@@ -496,7 +566,14 @@ tr:hover td{background:var(--gray-50)}
   .stat-cell{padding:5px 2px 4px}
   .stat-val{font-size:13px}
   .stat-bar{display:none} /* hide bars on small cards — not enough room */
-  .stat-lbl{font-size:7.5px}
+  .stat-lbl{font-size:9px}  /* minimum legible text */
+  .stat-bar{display:block !important;opacity:.45}  /* restore stat bars */
+  /* Card comp: show on mobile as a single-line truncated comp */
+  .card-comp{display:block !important;padding:5px 10px 8px;font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  /* Card school: minimum legible */
+  .card-school{font-size:10px !important}
+  /* Tag labels: minimum 10px */
+  .tag{font-size:10px !important}
   /* Hide comp and tweet btn on mobile — not enough real estate */
   .card-comp{display:none}
   .player-card > .pc-tweet-btn{display:none}
@@ -517,9 +594,13 @@ tr:hover td{background:var(--gray-50)}
   .board-table thead th:nth-child(1),.board-table thead th:nth-child(2){
     background:var(--navy);z-index:4}
 
-  /* Big Board: tighter columns so less horizontal scroll needed */
+  /* Big Board: tighter columns, stat legend always visible on mobile */
   .bb-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  #bbMobileLegend{display:flex !important}  /* Show on mobile */
+  .bb-ch[data-tip]::after{display:none}     /* Hide hover tooltips on mobile */
   .bb-board{min-width:480px}
+  /* Slightly taller rows on mobile for better tap targets */
+  .bb-row{height:52px !important}
   .bb-cts,.bb-csb,.bb-cato,.bb-cftar,.bb-ctpar{flex:0.58 !important;min-width:40px !important}
   .bb-cpa{flex:0.64 !important;min-width:42px !important}
   .bb-cmet{flex:0.82 !important;min-width:52px !important}
@@ -552,6 +633,29 @@ tr:hover td{background:var(--gray-50)}
   .mdc-actions{flex-wrap:wrap;gap:4px}
   .mdc-act-btn{padding:4px 9px;font-size:10px}
 
+  /* ── Mock Builder floating action button ─────────────────────────────── */
+  /* The "+ Draft Player" FAB: fixed bottom-right, only on mobile, opens pool drawer */
+  #mdcPoolFab{
+    display:flex;
+    position:fixed;bottom:20px;right:16px;
+    z-index:780;
+    align-items:center;gap:8px;
+    background:linear-gradient(135deg,var(--blue),#1a4fc4);
+    color:white;
+    border:none;
+    border-radius:28px;
+    padding:13px 20px;
+    font-family:'Barlow Condensed',sans-serif;
+    font-size:15px;font-weight:900;
+    letter-spacing:.4px;
+    box-shadow:0 8px 32px rgba(37,99,235,.55),0 2px 8px rgba(0,0,0,.3);
+    cursor:pointer;
+    touch-action:manipulation;
+    transition:transform .15s,box-shadow .15s
+  }
+  #mdcPoolFab:active{transform:scale(.96);box-shadow:0 4px 16px rgba(37,99,235,.4)}
+  #mdcPoolFab .fab-icon{font-size:18px;line-height:1}
+
   /* Scatter: stack top-5 panel below chart so chart gets full width */
   .sc-body{flex-direction:column}
   .sc-top5-wrap{
@@ -577,7 +681,20 @@ tr:hover td{background:var(--gray-50)}
   .sc-controls{display:grid;grid-template-columns:1fr 1fr;gap:8px;align-items:end}
   .sc-ctrl-group{min-width:0}
   .sc-select{min-width:0;width:100%;font-size:12px}
-  .sc-canvas-wrap{height:300px}
+  .sc-canvas-wrap{height:340px}  /* taller canvas for more plotting room */
+  /* Scatter warning banner for "All classes" on mobile */
+  #scMobileWarning{
+    display:none;
+    background:rgba(245,158,11,.12);
+    border:1px solid rgba(245,158,11,.3);
+    border-radius:8px;
+    padding:8px 12px;
+    font-size:12px;
+    color:#92400E;
+    font-weight:600;
+    margin-bottom:10px;
+    line-height:1.5
+  }
 
   /* Modal */
   .modal-overlay{padding:0;align-items:flex-end}
@@ -586,9 +703,42 @@ tr:hover td{background:var(--gray-50)}
   .modal-header{padding:14px 14px 10px}
   .modal-body{padding:12px 14px 24px}
 
-  /* Comp explorer */
+  /* Comp explorer: hide wide table on mobile, show card layout instead */
   .comp-tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  /* On mobile the wide table is still available via scroll (for power users)
+     but the cards layout is shown first and is the primary affordance */
+  /* Single rule: !important on display beats the desktop .comp-mobile-cards{display:none} */
+  .comp-mobile-cards{display:flex !important;flex-direction:column;gap:8px;padding-top:4px}
+  /* Comp table: hint text above the scrollable wide table on mobile */
+  .comp-tbl-wrap::before{
+    content:'Full comparison table — scroll →';
+    display:block;
+    font-size:10px;color:var(--gray-400);
+    padding:6px 4px 4px;font-weight:600;
+    letter-spacing:.3px
+  }
   .comp-tbl{min-width:700px}
+  .comp-mobile-card{
+    background:white;
+    border:1.5px solid var(--gray-200);
+    border-radius:10px;
+    padding:12px 14px;
+    display:flex;align-items:center;gap:12px;
+    cursor:pointer
+  }
+  .comp-mobile-card:active{background:var(--gray-50)}
+  .comp-mobile-sim{
+    font-family:'Barlow Condensed',sans-serif;
+    font-size:22px;font-weight:900;
+    min-width:48px;text-align:center;
+    line-height:1
+  }
+  .comp-mobile-sim-lbl{font-size:8px;text-transform:uppercase;letter-spacing:.4px;font-weight:600;display:block;margin-top:1px}
+  .comp-mobile-info{flex:1;min-width:0}
+  .comp-mobile-name{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:800;color:var(--navy);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .comp-mobile-meta{font-size:11px;color:var(--gray-500);margin-top:2px}
+  .comp-mobile-stats{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+  .comp-mobile-stat{font-size:10px;background:var(--gray-50);border-radius:4px;padding:2px 6px;color:var(--gray-700);font-family:'Barlow Condensed',sans-serif;font-weight:700}
 
   /* Methodology hero */
   .mc-hero{padding:16px 16px}
@@ -606,7 +756,7 @@ tr:hover td{background:var(--gray-50)}
   .ff-card{width:78px;padding:4px 5px 4px 9px}
   .ff-card-name{font-size:11px}
   .ff-card-rank{font-size:8px}
-  .ff-card-pos{font-size:6.5px}
+  .ff-card-pos{font-size:10px}
 
   /* Compare */
   .compare-grid{grid-template-columns:1fr}
@@ -630,6 +780,15 @@ tr:hover td{background:var(--gray-50)}
     max-height:calc(100vh - 220px);
     border-radius:8px;
   }
+
+  /* Unpick button: always visible on mobile (no hover on touch) */
+  .mdc-unpick-btn{
+    opacity:1 !important;
+    background:rgba(239,68,68,.15) !important;
+    color:#EF4444 !important;
+    border:1px solid rgba(239,68,68,.25) !important
+  }
+  .mdc-unpick-btn:active{background:rgba(239,68,68,.3) !important}
 
   /* Add bottom padding when pool panel is visible so board can scroll above it */
   #simPicksBoardWrap{padding-bottom:62vh}
@@ -697,6 +856,7 @@ tr:hover td{background:var(--gray-50)}
   * { -webkit-print-color-adjust:exact !important; print-color-adjust:exact !important; }
 
   .mdc-actions,.mdc-pool-header .mdc-pool-filters,.mdc-select-btn,.mdc-unpick-btn,.mdc-active-indicator{display:none!important}
+  .comp-mobile-cards{display:none!important}  /* never print card layout */
   .mdc-wrap{height:auto!important;border:none!important;box-shadow:none!important}
   .mdc-pool{display:none!important}
   .mdc-board{width:100%!important}
@@ -755,9 +915,39 @@ tr:hover td{background:var(--gray-50)}
 .bb-meta{margin-top:10px;position:relative;z-index:1;display:flex;align-items:center;gap:7px;flex-wrap:wrap}
 .bb-pill{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:4px;padding:2px 9px;font-size:10px;font-weight:600;color:rgba(255,255,255,.5);letter-spacing:.3px}
 .bb-pill.gold{background:rgba(212,168,48,.15);border-color:rgba(212,168,48,.3);color:var(--amber)}
-.bb-col-hdr{background:var(--navy);display:flex;align-items:center;padding-right:10px;width:100%}
+.bb-col-hdr{background:var(--navy);display:flex;align-items:center;padding-right:10px;width:100%;position:relative;z-index:10}
 .bb-ch{font-size:12px;font-weight:700;color:rgba(255,255,255,.82);text-transform:uppercase;letter-spacing:.8px;padding:9px 0;text-align:center}
 .bb-ch.left{text-align:left;padding-left:6px}
+/* Sortable column headers — cursor + hover highlight + active amber tint */
+.bb-ch.sortable{cursor:pointer;user-select:none;transition:background .12s,color .12s}
+.bb-ch.sortable:hover{color:#fff;background:rgba(255,255,255,.1)}
+/* Active sort column glows amber to match brand and rank-pip palette */
+.bb-ch.bb-sorted{color:var(--amber)!important;background:rgba(212,168,48,.1)}
+.bb-ch.bb-sorted:hover{background:rgba(212,168,48,.18)}
+/* Sort direction arrow — inline after label text */
+.bb-sort-icon{font-size:9px;margin-left:2px;display:inline-block;opacity:.55;transition:opacity .12s}
+.bb-ch.bb-sorted .bb-sort-icon{opacity:1}
+/* ── Tooltip via data-tip: appears BELOW the header row overlaying the data.
+   The col-hdr carries z-index:10 so it stacks above the row cells cleanly.
+   white-space:normal + fixed width prevent the text from running off-screen.
+   Tooltip is suppressed on touch devices — sort still works; info is in the label. */
+.bb-ch[data-tip]{position:relative;overflow:visible}
+.bb-ch[data-tip]::after{
+  content:attr(data-tip);
+  position:absolute;
+  top:calc(100% + 4px);left:50%;transform:translateX(-50%);
+  background:#0F2040;color:rgba(255,255,255,.92);
+  border:1px solid rgba(255,255,255,.12);
+  font-size:11px;font-weight:500;
+  letter-spacing:0;text-transform:none;
+  white-space:normal;width:210px;
+  padding:7px 10px;border-radius:7px;
+  pointer-events:none;opacity:0;
+  transition:opacity .15s;z-index:200;
+  box-shadow:0 6px 20px rgba(0,0,0,.5);
+  line-height:1.5
+}
+.bb-ch[data-tip]:hover::after{opacity:1}
 /* Column widths: content-aware sizing */
 .bb-cr{width:36px;flex-shrink:0;text-align:center}
 .bb-cav{width:32px;flex-shrink:0}
@@ -776,8 +966,8 @@ tr:hover td{background:var(--gray-50)}
 .bb-tier-label{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:900;color:white;letter-spacing:1.5px;text-transform:uppercase;white-space:nowrap}
 .bb-tier-sub{font-size:10px;color:rgba(255,255,255,.45);font-weight:600;letter-spacing:.3px;white-space:nowrap}
 .bb-tier-picks{margin-left:auto;font-family:'Barlow Condensed',sans-serif;font-size:10px;color:rgba(255,255,255,.38);letter-spacing:.4px;flex-shrink:0}
-/* Player row — tighter height, cleaner separator */
-.bb-row{display:flex;align-items:center;height:48px;padding-right:6px;border-bottom:1px solid rgba(203,213,225,.5);transition:background .1s;overflow:hidden}
+/* Player row — tighter height, cleaner separator, clickable for modal */
+.bb-row{display:flex;align-items:center;height:48px;padding-right:6px;border-bottom:1px solid rgba(203,213,225,.5);transition:background .1s;overflow:hidden;cursor:pointer}
 .bb-row:hover{background:#F0F4FF}
 .bb-row:last-child{border-bottom:none}
 .bb-row.alt{background:rgba(248,250,252,.7)}
@@ -804,6 +994,28 @@ tr:hover td{background:var(--gray-50)}
 .bb-stat-cell{flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;border-radius:5px;margin:2px 1px}
 .bb-sv{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:800;color:var(--navy);line-height:1;white-space:nowrap;font-variant-numeric:tabular-nums}
 .bb-sl{font-size:7.5px;color:var(--gray-300);text-transform:uppercase;letter-spacing:.5px;margin-top:2px;font-weight:700;white-space:nowrap}
+
+/* ── Mobile stat legend for Big Board ──────────────────────────────────── */
+/* Shows a scrollable row of stat abbreviation → full name chips below the
+   column header on touch devices (replaces hover-only data-tip tooltips) */
+.bb-mobile-legend{
+  display:none;  /* hidden on desktop — shown in mobile media query */
+  overflow-x:auto;
+  scrollbar-width:none;
+  padding:6px 10px 8px;
+  gap:8px;
+  background:rgba(255,255,255,.04);
+  border-top:1px solid rgba(255,255,255,.06);
+  flex-wrap:nowrap
+}
+.bb-mobile-legend::-webkit-scrollbar{display:none}
+.bb-mobile-legend-chip{
+  display:inline-flex;flex-direction:column;align-items:center;
+  background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);
+  border-radius:6px;padding:4px 8px;flex-shrink:0;cursor:default
+}
+.bb-mlc-abbr{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:900;color:var(--amber);letter-spacing:.5px;line-height:1}
+.bb-mlc-full{font-size:8.5px;color:rgba(255,255,255,.45);font-weight:500;white-space:nowrap;margin-top:2px;line-height:1}
 .bb-sv.empty{color:var(--gray-200)}
 
 .bb-ht-cell{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%}
@@ -1095,7 +1307,7 @@ tr:hover td{background:var(--gray-50)}
 .ff2-card.ff2-franchise{border-color:rgba(245,158,11,.22)}
 .ff2-card-stripe{position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:8px 0 0 8px}
 .ff2-card-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:2px}
-.ff2-card-rank{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:900;line-height:1;letter-spacing:.2px}
+.ff2-card-rank{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:900;line-height:1;letter-spacing:.2px}
 .ff2-card-tier-dot{width:4px;height:4px;border-radius:50%;opacity:.6;flex-shrink:0}
 .ff2-card-name{font-family:'Barlow Condensed',sans-serif;font-size:var(--ff-card-name-fs,13px);font-weight:800;line-height:1.2;color:rgba(255,255,255,.94);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
 .ff2-card-role{font-size:7.5px;font-weight:600;letter-spacing:.25px;color:rgba(255,255,255,.5);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:'DM Sans',sans-serif}
@@ -1146,6 +1358,39 @@ tr:hover td{background:var(--gray-50)}
   .ff2-card-mbar-wrap{display:none}
   /* On mobile, disable CSS hover scale — touch has no hover state */
   .ff2-card:not(.ff2-expanded):hover{transform:translate(-50%,-50%)}
+  /* Touch-tap expanded state — wider card with full detail panel */
+  /* ff2-tap-expanded set by JS on mobile tap (not hover) */
+  .ff2-card.ff2-tap-expanded{
+    width:224px !important;
+    z-index:30;
+    border-color:rgba(255,255,255,.22) !important;
+    box-shadow:0 24px 64px rgba(0,0,0,.82),0 0 0 1.5px rgba(255,255,255,.18) !important;
+    background:rgba(4,13,30,.97) !important
+  }
+  /* Touch hint: small "tap for details" label rendered inside cards
+     that haven't been tapped yet — fades out after first tap */
+  .ff2-tap-hint{
+    display:block;
+    font-size:7px;font-weight:600;
+    color:rgba(255,255,255,.28);
+    letter-spacing:.4px;
+    margin-top:3px;
+    text-align:right;
+    font-family:'DM Sans',sans-serif
+  }
+  /* Close button for expanded tap card */
+  .ff2-exp-close{
+    display:flex;
+    align-items:center;justify-content:center;
+    width:22px;height:22px;
+    background:rgba(255,255,255,.1);
+    border:none;border-radius:50%;
+    color:rgba(255,255,255,.7);
+    font-size:12px;cursor:pointer;
+    position:absolute;top:6px;right:6px;
+    flex-shrink:0
+  }
+  .ff2-exp-close:active{background:rgba(255,255,255,.25)}
   .ff2-head{flex-wrap:wrap;gap:8px;padding:12px 14px 10px}
   .ff2-legend{flex-wrap:wrap;gap:8px}
   /* Constrain viewport to screen height on mobile so user can see
@@ -1177,8 +1422,14 @@ tr:hover td{background:var(--gray-50)}
 .ff2-plot.ff2-dim-active .ff2-card{opacity:.12;transition:opacity .2s ease}
 .ff2-plot.ff2-dim-active .ff2-card.ff2-pos-highlight{opacity:1}
 .ff2-leg-item{cursor:pointer;transition:opacity .15s ease}
-.ff2-leg-item.ff2-leg-active{opacity:1}
+.ff2-leg-item.ff2-leg-active{
+  opacity:1;
+  outline:2px solid rgba(255,255,255,.35);
+  border-radius:6px;
+  background:rgba(255,255,255,.08)
+}
 .ff2-leg-item:hover{opacity:.85}
+.comp-mobile-cards{display:none} /* hidden on desktop; shown on mobile via MQ */
 .comp-tbl-wrap{overflow-x:auto;border-radius:10px;border:1.5px solid var(--gray-200);
   box-shadow:0 2px 12px rgba(10,22,40,.06);background:white;-webkit-overflow-scrolling:touch}
 .comp-tbl{width:100%;border-collapse:collapse;min-width:900px}
@@ -1655,6 +1906,11 @@ tr:hover td{background:var(--gray-50)}
     </div>
   </div>
   <div class="mdc-save-toast" id="mdcToast"></div>
+  <!-- Mobile FAB: opens the player pool drawer. Hidden on desktop via JS/CSS -->
+  <button id="mdcPoolFab" onclick="mdcOpenPoolDrawer()" style="display:none"
+    aria-label="Draft a player">
+    <span class="fab-icon">＋</span> Draft Player
+  </button>
   </div>
 
   <!-- ── ARCHIVE (Historical snapshots) ──────────────────────────────────── -->
@@ -1982,6 +2238,7 @@ tr:hover td{background:var(--gray-50)}
         <button class="sc-trend-btn" id="scTrendBtn" onclick="scToggleTrend()">Off</button>
       </div>
     </div>
+    <div id="scMobileWarning">⚠️ "All classes" shows 600+ players — individual dots may overlap on small screens. Pick a specific year for clearer results.</div>
     <div class="sc-body">
       <!-- ── Top 5 by Y-axis panel ── -->
       <div class="sc-top5-wrap">
@@ -3269,7 +3526,37 @@ function buildSchoolLogoHtml(school) {
     + '</div>';
 }
 
-// ── buildPlayerCard: pure rendering function — data in, HTML string out.
+// ── CHAMPIONSHIP BADGES ─────────────────────────────────────────────────────
+// Maps player name fragments → { year, title } for the trophy badge.
+// Shown in both Cards view and Big Board next to the player's name.
+// Key must match a unique substring of p.name (checked case-insensitively).
+// year: null means current season (no year label shown — just the trophy).
+var CHAMPIONSHIP_BADGES = {
+  // Michigan 2026 Big Ten Champions — no year label, current season
+  'Lendeborg':    { year: null,   title: 'Michigan Big Ten Champions' },
+  'Aday Mara':    { year: null,   title: 'Michigan Big Ten Champions' },
+  'Morez Johnson':{ year: null,   title: 'Michigan Big Ten Champions' },
+  // Florida 2025 NCAA Champions
+  'Haugh':        { year: '2025', title: 'Florida 2025 NCAA Champions' },
+  'Condon':       { year: '2025', title: 'Florida 2025 NCAA Champions' },
+  'Chinyelu':     { year: '2025', title: 'Florida 2025 NCAA Champions' },
+};
+
+// Returns the HTML string for the trophy badge (if any) for a given player name.
+// Empty string if player has no badge — safe to concatenate unconditionally.
+function getBadgeHtml(playerName) {
+  var name = playerName || '';
+  for (var key in CHAMPIONSHIP_BADGES) {
+    if (name.indexOf(key) !== -1) {
+      var badge = CHAMPIONSHIP_BADGES[key];
+      var yearSpan = badge.year
+        ? '<span class="champ-badge-year">' + badge.year + '</span>'
+        : '';
+      return '<span class="champ-badge" title="' + badge.title + '">🏆' + yearSpan + '</span>';
+    }
+  }
+  return '';
+}
 // Separating this from the loop makes the template readable and independently
 // testable. The function has NO side effects and touches NO globals.
 function buildPlayerCard(p, tierKey) {
@@ -3365,7 +3652,7 @@ function buildPlayerCard(p, tierKey) {
       /* Avatar: circular (50% radius) — modern vs the old 8px square */
       + avatarHtml(p.name, p.position || '', '50px', '50%')
       + '<div class="card-identity">'
-        + '<div class="card-name">' + name + '</div>'
+        + '<div class="card-name">' + name + getBadgeHtml(p.name) + '</div>'
         /* School row: crisp circular logo + school name */
         + '<div class="card-school">' + schoolRow + '</div>'
       + '</div>'
@@ -3692,6 +3979,19 @@ function pctileInArr(value, arr) {
 }
 
 
+// Open modal by player name — used by comp explorer mobile cards
+// Searches board2026 + historical yoy data for a name match.
+function openPlayerModalByName(name) {
+  var all = (DATA.board2026||[]).concat(DATA.yoy||[]);
+  var match = all.find(function(p) {
+    var base = (p.name||'').indexOf(' - ') > 0
+      ? p.name.slice(0, p.name.indexOf(' - '))
+      : (p.name||'');
+    return base.trim().toLowerCase() === name.trim().toLowerCase();
+  });
+  if (match && match.rank) openPlayerModal(match.rank);
+}
+
 function openPlayerModal(rank, year) {
   const yr = year || '2026';
   const player = yr==='2026' ? DATA.board2026.find(p=>p.rank===rank) : (DATA.historical[yr]||[]).find(p=>p.rank===rank);
@@ -4004,6 +4304,7 @@ function populateCompSelect() {
 
 // ── COMP EXPLORER — STATISTICAL SIMILARITY MODEL ─────────────────────────────
 function showCompExplorer() {
+  // Will add mobile card rendering after computing results
   var rankVal = document.getElementById('compProspectSelect').value;
   if (!rankVal) return;
   var rank   = parseInt(rankVal);
@@ -4245,6 +4546,64 @@ function showCompExplorer() {
   });
 
   h += '</tbody></table></div>';
+
+  // ── MOBILE CARD LIST ──────────────────────────────────────────────────────
+  // On mobile (≤640px) we render a vertically-stacked card list instead of
+  // the 900px-min-width table. Cards show similarity score, name, draft year,
+  // and the 3 most-diagnostic stats (metric, ts_pct, pa2_usg).
+  // The table and cards are toggled by CSS media query:
+  //   desktop → table visible, cards hidden
+  //   mobile  → table hidden, cards visible
+  h += '<div class="comp-mobile-cards">';
+  results.forEach(function(s) {
+    var c = s.comp;
+    var scoreColor = s.simScore<15?'#16A34A':s.simScore<30?'#D97706':'#DC2626';
+    var scoreBg    = s.simScore<15?'rgba(22,163,74,.12)':s.simScore<30?'rgba(217,119,6,.12)':'rgba(220,38,38,.12)';
+    var dn = c.draft_no;
+    var draftStr = dn==='UDFA' ? 'UDFA'
+                 : (dn ? '#'+dn+' pick' : '—');
+    var yearStr = c.year ? "'"+String(c.year).slice(2)+" "+draftStr : draftStr;
+
+    // Pick 3 key stats for the card (metric + top 2 available fields)
+    var cardStats = [];
+    ['metric','ts_pct','pa2_usg','stl_bl','ato'].forEach(function(k) {
+      if (cardStats.length >= 3) return;
+      var fd = s.fieldDetails[k];
+      if (fd) {
+        cardStats.push({
+          lbl: FIELD_LABELS[k],
+          val: fmtVal(k, fd.b),
+          delta: fd.diff !== 0 ? fmtDelta(k, fd.diff) : null,
+          pos: fd.diff >= 0
+        });
+      }
+    });
+
+    // onclick: name is substituted at render time; &#39; makes apostrophes HTML-safe
+    var safeCompName = escHtml(s.compBase).replace(/'/g, '&#39;');
+    h += '<div class="comp-mobile-card" onclick="openPlayerModalByName(\'' + safeCompName + '\')">';
+    // Similarity score badge
+    h += '<div style="text-align:center;flex-shrink:0;min-width:52px">';
+    h += '<div class="comp-mobile-sim" style="color:'+scoreColor+';background:'+scoreBg+';border-radius:8px;padding:4px 6px">'+s.simScore.toFixed(1)+'</div>';
+    h += '<div class="comp-mobile-sim-lbl" style="color:'+scoreColor+'">sim</div>';
+    h += '</div>';
+    // Player info
+    h += '<div class="comp-mobile-info">';
+    h += '<div class="comp-mobile-name">'+escHtml(s.compBase)+'</div>';
+    h += '<div class="comp-mobile-meta">'+escHtml(s.compSchool)+' · '+yearStr+'</div>';
+    if (cardStats.length) {
+      h += '<div class="comp-mobile-stats">';
+      cardStats.forEach(function(st) {
+        h += '<div class="comp-mobile-stat">'+st.lbl+': '+st.val;
+        if (st.delta) h += ' <span style="color:'+(st.pos?'#16A34A':'#DC2626')+'">('+st.delta+')</span>';
+        h += '</div>';
+      });
+      h += '</div>';
+    }
+    h += '</div>';
+    h += '</div>';
+  });
+  h += '</div>'; // .comp-mobile-cards
 
   document.getElementById('compExplorerResult').innerHTML = h;
 }
@@ -5644,6 +6003,12 @@ function bbFmt(val, key) {
 
 var bbSubMode = 'full'; // 'full' | 'twitter'
 
+// ── Sort state: col key + direction (1=asc, -1=desc).
+// Default is rank ascending (board order). Clicking a stat column switches to
+// descending first (higher = better for all stats). Clicking rank resets to asc.
+var bbSortCol = 'rank';
+var bbSortDir = 1;
+
 var BB_TIERS = []; // built by rebuildBBTiers() — called after TIER_CUTS is declared
 
 function bbMetStyle(val) {
@@ -5702,14 +6067,14 @@ function bbBuildRow(p, idx) {
   var ftarVal = bbFmt(p.ftar, 'ftar');
   var tparVal = bbFmt(p.tpar, 'tpar');
 
-  return '<div class="bb-row '+tierCls+' '+altCls+'">'
+  return '<div class="bb-row '+tierCls+' '+altCls+'" onclick="openPlayerModal('+p.rank+')" data-rank="'+p.rank+'">'
     // 1. Rank
     +'<div class="bb-rk bb-cr">'+rankStr+'</div>'
     // 2. Avatar
     +'<div class="bb-av bb-cav">'+avHtml+'</div>'
     // 3. Player + School
     +'<div class="bb-id bb-cid">'
-      +'<div class="bb-name">'+base+'</div>'
+      +'<div class="bb-name">'+base+getBadgeHtml(p.name)+'</div>'
       +'<div class="bb-school-line">'
         +(logoHtml||'')
         +'<span class="bb-school">'+school+'</span>'
@@ -5743,81 +6108,164 @@ function renderBoardBigboard(players) {
   var el = document.getElementById('board2026Content');
   if (!el) return;
 
-  var limit   = bbSubMode==='twitter' ? 30 : 60;
+  var limit   = bbSubMode === 'twitter' ? 30 : 60;
   var limited = players.slice(0, limit);
   var now     = new Date();
-  var dateStr = now.toLocaleDateString('en-US',{month:'short',year:'numeric'});
+  var dateStr = now.toLocaleDateString('en-US', {month:'short', year:'numeric'});
+
+  // ── Sort within tiers: sort the full limited array before rendering.
+  // Each tier section filters by rank range, so tier membership is preserved.
+  // When sorted by a stat, you see the top performers within each tier first.
+  // Nulls always sink regardless of direction.
+  if (bbSortCol !== 'rank') {
+    var sc = bbSortCol;
+    limited = limited.slice().sort(function(a, b) {
+      var av = a[sc], bv = b[sc];
+      if (av == null && bv == null) return 0;
+      if (av == null) return 1;   // nulls to bottom
+      if (bv == null) return -1;
+      // bbSortDir: -1=desc (1=asc). bbSortDir*(av-bv) gives asc; flip for desc.
+      return bbSortDir * (av - bv);
+    });
+  }
+
+  // ── Column definitions: key, CSS class, label, tooltip, sort key, left-align flag.
+  // Tooltip text is intentionally plain prose — not jargon — so any reader understands.
+  var COLS = [
+    { key:'rank',     cls:'bb-cr',    label:'#',
+      tip:'Board rank — lower is better',
+      sortable:true, left:false },
+    { key:null,       cls:'bb-cav',   label:'',         tip:null, sortable:false, left:false },
+    { key:'name',     cls:'bb-cid',   label:'Player',
+      tip:'Player name · click any row to open the full scouting profile',
+      sortable:false, left:true },
+    { key:'ht',       cls:'bb-cht',   label:'Ht / Wt',
+      tip:'Height (ft/in) and weight (lbs) — most recent combine or pre-draft measurement',
+      sortable:true, left:false },
+    { key:'position', cls:'bb-ctag',  label:'Pos / Role',
+      tip:'NBA positional projection + Torvik algorithmic role — the role label is model-derived from statistical profile, not a scout label',
+      sortable:false, left:true },
+    { key:'metric',   cls:'bb-cmet',  label:'Metric',
+      tip:'HoopsWill Draft Model — composite of weighted per-75 stats adjusted for age, SOS and class context. 100 = class average.',
+      sortable:true, left:false },
+    { key:'ts_pct',   cls:'bb-cts',   label:'TS%',
+      tip:'True Shooting % — accounts for 2-pointers, 3-pointers, and free throws in a single efficiency rate. Class-graded; green = above average.',
+      sortable:true, left:false },
+    { key:'pa2_usg',  cls:'bb-cpa',   label:'P+A/USG',
+      tip:'Points + 2× Assists per 100 possession usage (per 75). Captures scoring AND playmaking relative to how often a player uses possessions.',
+      sortable:true, left:false },
+    { key:'stl_bl',   cls:'bb-csb',   label:'Stl+Bl',
+      tip:'Steals + Blocks per 75 possessions — combined defensive disruption rate. Strong predictor of defensive impact at the next level.',
+      sortable:true, left:false },
+    { key:'ato',      cls:'bb-cato',  label:'A/TO',
+      tip:'Assist-to-Turnover ratio — quality of decision-making as a ball-handler. Higher = better ball security. Does not penalise low-volume players.',
+      sortable:true, left:false },
+    { key:'ftar',     cls:'bb-cftar', label:'FTAr',
+      tip:'Free Throw Attempt Rate — FTA ÷ FGA. Measures ability to draw fouls and attack the basket. Elite finishers and drivers show high rates.',
+      sortable:true, left:false },
+    { key:'tpar',     cls:'bb-ctpar', label:'3PAr',
+      tip:'3-Point Attempt Rate — 3PA ÷ FGA. Indicates perimeter orientation. Context-dependent: high for wing scorers, naturally low for post players.',
+      sortable:true, left:false },
+  ];
+
+  // Helper: build a single column header cell with sort state + tooltip
+  function colHdr(col) {
+    if (!col.sortable) {
+      // Non-sortable: still show tooltip if defined
+      var tipAttr = col.tip ? ' data-tip="' + col.tip + '"' : '';
+      return '<div class="bb-ch ' + col.cls + (col.left ? ' left' : '') + '"' + tipAttr + '>' + col.label + '</div>';
+    }
+    var isActive = (bbSortCol === col.key);
+    var arrow    = isActive ? (bbSortDir === -1 ? ' ↓' : ' ↑') : ' ↕';
+    var sortCls  = isActive ? ' bb-sorted' : '';
+    var tipAttr  = col.tip ? ' data-tip="' + col.tip + '"' : '';
+    // onclick calls bbSort; stopPropagation guards against any future parent listeners
+    return '<div class="bb-ch sortable' + sortCls + (col.left ? ' left' : '') + ' ' + col.cls + '"'
+      + ' onclick="event.stopPropagation();bbSort(\'' + col.key + '\')"'
+      + tipAttr + '>'
+      + col.label
+      + '<span class="bb-sort-icon">' + arrow + '</span>'
+      + '</div>';
+  }
 
   // Controls bar
   var out = '<div class="bb-screenshot-bar">'
-    +'<button class="bb-sub-btn'+(bbSubMode==='full'?' active':'')+'" onclick="setBBSubMode(\'full\')">📋 Full Board (60)</button>'
-    +'<button class="bb-sub-btn'+(bbSubMode==='twitter'?' active':'')+'" onclick="setBBSubMode(\'twitter\')">🐦 Twitter Card (30)</button>'
-    +'<div class="bb-range-group" style="margin-left:auto">'
-      +'<span class="bb-range-lbl">Export ranks</span>'
-      +'<input class="bb-range-input" id="bbRangeFrom" type="number" min="1" max="60" value="1" title="Start rank">'
-      +'<span class="bb-range-sep">&mdash;</span>'
-      +'<input class="bb-range-input" id="bbRangeTo" type="number" min="1" max="60" value="'+(bbSubMode==='twitter'?'30':'60')+'" title="End rank">'
-      +'<button class="bb-preset-btn" onclick="bbSetRange(1,30)">1&ndash;30</button>'
-      +'<button class="bb-preset-btn" onclick="bbSetRange(31,60)">31&ndash;60</button>'
-      +'<button class="bb-preset-btn" onclick="bbSetRange(1,60)">All</button>'
-      +'<button class="bb-sub-btn" style="background:var(--amber);color:white;border-color:var(--amber);padding:4px 12px;font-size:11px" onclick="bbScreenshot()">&#128247; PNG</button>'
-    +'</div>'
-  +'</div>';
+    + '<button class="bb-sub-btn' + (bbSubMode === 'full'    ? ' active' : '') + '" onclick="setBBSubMode(\'full\')">📋 Full Board (60)</button>'
+    + '<button class="bb-sub-btn' + (bbSubMode === 'twitter' ? ' active' : '') + '" onclick="setBBSubMode(\'twitter\')">🐦 Twitter Card (30)</button>'
+    + '<div class="bb-range-group" style="margin-left:auto">'
+      + '<span class="bb-range-lbl">Export ranks</span>'
+      + '<input class="bb-range-input" id="bbRangeFrom" type="number" min="1" max="60" value="1" title="Start rank">'
+      + '<span class="bb-range-sep">&mdash;</span>'
+      + '<input class="bb-range-input" id="bbRangeTo"   type="number" min="1" max="60" value="' + (bbSubMode === 'twitter' ? '30' : '60') + '" title="End rank">'
+      + '<button class="bb-preset-btn" onclick="bbSetRange(1,30)">1&ndash;30</button>'
+      + '<button class="bb-preset-btn" onclick="bbSetRange(31,60)">31&ndash;60</button>'
+      + '<button class="bb-preset-btn" onclick="bbSetRange(1,60)">All</button>'
+      + '<button class="bb-sub-btn" style="background:var(--amber);color:white;border-color:var(--amber);padding:4px 12px;font-size:11px" onclick="bbScreenshot()">&#128247; PNG</button>'
+    + '</div>'
+  + '</div>';
+
+  // Show active sort state as a pill beneath the controls (only when non-default)
+  if (bbSortCol !== 'rank') {
+    var activeCol = COLS.filter(function(c){ return c.key === bbSortCol; })[0];
+    var dirLabel  = bbSortDir === -1 ? 'high → low' : 'low → high';
+    out += '<div style="display:flex;align-items:center;gap:6px;margin:-4px 0 10px;font-size:11px;color:var(--gray-500)">'
+      + '<span style="background:rgba(212,168,48,.12);color:#B45309;border:1px solid rgba(212,168,48,.3);border-radius:20px;padding:2px 10px;font-weight:700;font-size:10px">'
+        + 'Sorted: ' + (activeCol ? activeCol.label : bbSortCol) + ' ' + dirLabel
+      + '</span>'
+      + '<button onclick="bbSort(\'rank\')" style="font-size:10px;color:var(--gray-400);background:none;border:none;cursor:pointer;padding:0;text-decoration:underline">reset to rank order</button>'
+    + '</div>';
+  }
 
   // Board wrapper
-  out += '<div class="bb-wrap"><div id="bbBoard" class="bb-board'+(bbSubMode==='twitter'?' bb-tw':'')+'">';
+  out += '<div class="bb-wrap"><div id="bbBoard" class="bb-board' + (bbSubMode === 'twitter' ? ' bb-tw' : '') + '">';
 
   // Header
   out += '<div class="bb-header">'
-    +'<div class="bb-header-row">'
-      +'<div class="bb-logo-box">HW</div>'
-      +'<div class="bb-htitles">'
-        +'<div class="bb-brand">HoopsWill Analytics</div>'
-        +'<div class="bb-title">2026 NBA Draft Big Board</div>'
-      +'</div>'
-    +'</div>'
-    +'<div class="bb-meta">'
-      +'<span class="bb-pill gold">v1.0 · '+dateStr+'</span>'
-      +(bbSubMode==='full' ? '<span class="bb-pill">Top 60 · Full Board</span>' : '<span class="bb-pill">Top 30 · Twitter Edition</span>')
-      +'<span class="bb-pill">HoopsWill Metric Model</span>'
-      +'<span class="bb-pill">Torvik Role Classification</span>'
-    +'</div>'
-  +'</div>';
+    + '<div class="bb-header-row">'
+      + '<div class="bb-logo-box">HW</div>'
+      + '<div class="bb-htitles">'
+        + '<div class="bb-brand">HoopsWill Analytics</div>'
+        + '<div class="bb-title">2026 NBA Draft Big Board</div>'
+      + '</div>'
+    + '</div>'
+    + '<div class="bb-meta">'
+      + '<span class="bb-pill gold">v1.0 · ' + dateStr + '</span>'
+      + (bbSubMode === 'full' ? '<span class="bb-pill">Top 60 · Full Board</span>' : '<span class="bb-pill">Top 30 · Twitter Edition</span>')
+      + '<span class="bb-pill">HoopsWill Metric Model</span>'
+      + '<span class="bb-pill">Torvik Role Classification</span>'
+    + '</div>'
+  + '</div>';
 
-  // Column header
-  out += '<div class="bb-col-hdr">'
-    +'<div class="bb-ch bb-cr">#</div>'
-    +'<div class="bb-ch bb-cav"></div>'
-    +'<div class="bb-ch bb-cid left">Player</div>'
-    +'<div class="bb-ch bb-cht">Ht / Wt</div>'
-    +'<div class="bb-ch bb-ctag left">Pos / Role</div>'
-    +'<div class="bb-ch bb-cmet">Metric</div>'
-    +'<div class="bb-ch bb-cts">TS%</div>'
-    +'<div class="bb-ch bb-cpa">P+A/USG</div>'
-    +'<div class="bb-ch bb-csb">Stl+Bl</div>'
-    +'<div class="bb-ch bb-cato">A/TO</div>'
-    +'<div class="bb-ch bb-cftar">FTAr</div>'
-    +'<div class="bb-ch bb-ctpar">3PAr</div>'
-  +'</div>';
+  // Column headers — built from COLS definition
+  out += '<div class="bb-col-hdr">';
+  for (var ci = 0; ci < COLS.length; ci++) {
+    out += colHdr(COLS[ci]);
+  }
+  out += '</div>'; // close bb-col-hdr
+
+  // Mobile stat legend: scrollable chip strip showing abbrev→full stat name.
+  // Replaces hover-only data-tip tooltips inaccessible on touch devices.
+  // Base CSS: display:none; mobile MQ: #bbMobileLegend { display:flex !important }
+  out += '<div class="bb-mobile-legend" id="bbMobileLegend">' + _bbMobileLegendChips() + '</div>';
 
   // Tiers + rows
   var rowIdx = 0;
   BB_TIERS.forEach(function(t) {
     if (t.from > limit) return;
-    out += '<div class="bb-tier-band" style="background:'+t.grad+'">'
-      +'<span class="bb-tier-label">'+t.label+'</span>'
-      +'<span class="bb-tier-sub">'+t.sub+'</span>'
-      +'<span class="bb-tier-picks">'+t.picks+'</span>'
-    +'</div>';
-    limited.filter(function(p){ return p.rank>=t.from && p.rank<=Math.min(t.to,limit); })
+    out += '<div class="bb-tier-band" style="background:' + t.grad + '">'
+      + '<span class="bb-tier-label">' + t.label + '</span>'
+      + '<span class="bb-tier-sub">'   + t.sub   + '</span>'
+      + '<span class="bb-tier-picks">' + t.picks + '</span>'
+    + '</div>';
+    limited.filter(function(p){ return p.rank >= t.from && p.rank <= Math.min(t.to, limit); })
            .forEach(function(p){ out += bbBuildRow(p, rowIdx++); });
   });
 
   // Footer
   out += '<div class="bb-footer">'
-    +'<span class="bb-footer-brand">hoopswill.com</span>'
-    +'<span class="bb-footer-note">Metric graded on 2026 class · Stats per Torvik/Synergy · Independent evaluation</span>'
-  +'</div>';
+    + '<span class="bb-footer-brand">hoopswill.com</span>'
+    + '<span class="bb-footer-note">Metric graded on 2026 class · Stats per Torvik/Synergy · Independent evaluation</span>'
+  + '</div>';
 
   out += '</div></div>'; // close bb-board + bb-wrap
   el.innerHTML = out;
@@ -5825,6 +6273,10 @@ function renderBoardBigboard(players) {
 
 function setBBSubMode(mode) {
   bbSubMode = mode;
+  // Reset sort to default rank order when switching modes — avoids confusing
+  // carry-over of a "sorted by TS%" state into the Twitter card export view
+  bbSortCol = 'rank';
+  bbSortDir = 1;
   renderBoard2026();
 }
 
@@ -5833,6 +6285,22 @@ function bbSetRange(from, to) {
   var t = document.getElementById('bbRangeTo');
   if (f) f.value = from;
   if (t) t.value = to;
+}
+
+// ── bbSort: called by column header clicks.
+// Same column → toggle direction. New column → default to desc for stats, asc for rank.
+// Nulls always sink to the bottom regardless of direction.
+// Sort is applied within each tier group (tier membership stays rank-based),
+// so you see "best TS% within Lottery", "best TS% within Late First", etc.
+function bbSort(col) {
+  if (bbSortCol === col) {
+    bbSortDir = -bbSortDir;
+  } else {
+    bbSortCol = col;
+    // Rank ascending makes sense as "board order"; all stats default desc (higher=better)
+    bbSortDir = (col === 'rank') ? 1 : -1;
+  }
+  renderBoard2026();
 }
 
 function bbScreenshot() {
@@ -5967,6 +6435,14 @@ var mdcSearchTerm  = '';
 var mdcHistory = [];  // stack of {pick, rank} for undo
 
 function mdcInit() {
+  // Show FAB only on mobile (touch devices)
+  var fab = document.getElementById('mdcPoolFab');
+  if (fab) {
+    fab.style.display = (window.innerWidth <= 640) ? 'flex' : 'none';
+  }
+  // Show close button in pool header on mobile
+  var closeBtn = document.getElementById('mdcPoolCloseBtn');
+  if (closeBtn) closeBtn.style.display = (window.innerWidth <= 640) ? 'flex' : 'none';
   mdcRenderPicks();
   mdcRenderPool();
 }
@@ -7402,6 +7878,13 @@ function scHideTip() { var tt = scGetTip(); tt.style.opacity = '0'; }
 // ── Debounced render ──────────────────────────────────────────────────────────
 var _scRenderTimer = null;
 function scRenderDebounced() {
+  // Show mobile warning when "All classes" selected on small screen
+  var warn = document.getElementById('scMobileWarning');
+  if (warn) {
+    var isMobile = window.innerWidth <= 640;
+    var isAll = document.getElementById('scYear') && document.getElementById('scYear').value === 'all';
+    warn.style.display = (isMobile && isAll) ? 'block' : 'none';
+  }
   clearTimeout(_scRenderTimer);
   _scRenderTimer = setTimeout(scRender, 150);
 }
@@ -8389,7 +8872,7 @@ var FreeformComponents = (function() {
       + 'background:' + cardBg + ';'
       + 'box-shadow:0 2px 12px rgba(0,0,0,.42),inset 0 1px 0 rgba(255,255,255,.05);'
       + 'animation-delay:' + delay + '"'
-      + ' onclick="openPlayerModal(' + p.rank + ')"'
+      + ' onclick="FreeformBoard.cardTap(this,' + p.rank + ')"'
       + ' onmouseenter="FreeformBoard.hoverCard(this)"'
       + ' onmouseleave="FreeformBoard.leaveCard(this)">'
       + '<div class="ff2-card-stripe" style="background:' + posColor + '"></div>'
@@ -8769,6 +9252,29 @@ var FreeformInteraction = (function() {
   return { init: init, reset: reset, getScale: getScale };
 })();
 
+// ── BB Mobile Stat Legend Chips helper ──────────────────────────────────────
+// Generates the horizontal scrollable chip strip for Big Board on mobile.
+// Each chip shows the abbreviated stat name + full descriptive label.
+function _bbMobileLegendChips() {
+  var STATS = [
+    { abbr:'MET',  full:'HW Metric' },
+    { abbr:'TS%',  full:'True Shoot %' },
+    { abbr:'PA/U', full:'Pts+Ast / USG' },
+    { abbr:'S+B',  full:'Stl+Blk /75' },
+    { abbr:'A/TO', full:'Assist / TO' },
+    { abbr:'FTAr', full:'FT Attempt Rate' },
+    { abbr:'3PAr', full:'3pt Attempt Rate' },
+    { abbr:'HT',   full:'Height / Weight' },
+    { abbr:'TIER', full:'Role / Tier' },
+  ];
+  return STATS.map(function(s) {
+    return '<div class="bb-mobile-legend-chip">'
+      + '<span class="bb-mlc-abbr">' + s.abbr + '</span>'
+      + '<span class="bb-mlc-full">' + s.full + '</span>'
+      + '</div>';
+  }).join('');
+}
+
 // ── MODULE: Freeform Board ───────────────────────────────────────────────────
 // Orchestrator: wires layout engine, state store, and components together.
 // Owns the render pipeline and exposes the public interaction API.
@@ -8885,6 +9391,18 @@ var FreeformBoard = (function() {
     var layerEl = document.getElementById('ff2ZoomLayer');
     if (vpEl && layerEl) FreeformInteraction.init(vpEl, layerEl);
 
+    // Tap-dismiss: tapping empty board space collapses any open tap-expanded card.
+    // Placed here (inside FreeformBoard IIFE) so _collapseTapCard is in closure scope.
+    if (vpEl) {
+      vpEl.addEventListener('click', function(e) {
+        if (!e.target.closest('.ff2-card')) {
+          document.querySelectorAll('.ff2-tap-expanded').forEach(function(c) {
+            _collapseTapCard(c);
+          });
+        }
+      }, false);
+    }
+
     // Apply density class to freshly-rendered shell (density persists across renders).
     ffSetDensity(_ffDensity);
   }
@@ -8959,11 +9477,99 @@ var FreeformBoard = (function() {
     });
   }
 
+  // ── Tap handler: mobile tap-to-expand + desktop pass-through ────────────
+  // On touch devices: first tap expands card (shows stat detail),
+  // second tap opens full player modal, tap elsewhere collapses.
+  // On desktop: tap goes straight to player modal (hover handles detail).
+  function cardTap(el, rank) {
+    var isTouchDevice = (window.matchMedia && window.matchMedia('(pointer:coarse)').matches)
+      || ('ontouchstart' in window);
+
+    if (!isTouchDevice) {
+      // Desktop: open modal directly (hover has already shown detail)
+      openPlayerModal(rank);
+      return;
+    }
+
+    // Touch: toggle expanded state first, modal on second tap
+    var alreadyExpanded = el.classList.contains('ff2-tap-expanded');
+
+    // Collapse any other currently-expanded tap card
+    document.querySelectorAll('.ff2-tap-expanded').forEach(function(other) {
+      if (other !== el) {
+        _collapseTapCard(other);
+      }
+    });
+
+    if (alreadyExpanded) {
+      // Second tap → open modal and collapse
+      _collapseTapCard(el);
+      openPlayerModal(rank);
+    } else {
+      // First tap → expand card to show detail panel
+      _expandTapCard(el);
+    }
+  }
+
+  function _expandTapCard(el) {
+    var rank   = parseInt(el.getAttribute('data-rank'), 10);
+    var posCol = el.getAttribute('data-poscol') || '#8B5CF6';
+    var p      = FreeformState.getPlayer(rank);
+    if (!p) return;
+
+    // Remove any stale exp-body
+    var old = el.querySelector('.ff2-exp-body');
+    if (old) old.remove();
+
+    // Build expanded content (reuse existing HoverCardContent)
+    var content = Comp.HoverCardContent(p, posCol);
+
+    // Inject a close button before the content
+    var closeBtn = '<button class="ff2-exp-close" '
+      + 'onclick="event.stopPropagation();FreeformBoard.collapseTapCard(this.parentElement)">'
+      + '✕</button>';
+
+    el.insertAdjacentHTML('beforeend', closeBtn + content);
+    el.classList.add('ff2-expanded', 'ff2-tap-expanded');
+
+    // Smart expand origin
+    var xPct = parseFloat(el.style.left) || 50;
+    var ox   = xPct < 18 ? '18%' : xPct > 82 ? '82%' : '50%';
+    el.style.transformOrigin = ox + ' 50%';
+    el.style.transform       = 'translate(-' + ox + ', -50%)';
+    el.style.boxShadow       = '0 24px 64px rgba(0,0,0,.82),0 0 0 1.5px rgba(255,255,255,.18),0 0 32px ' + posCol + '28';
+    el.style.background      = 'rgba(4,13,30,.97)';
+    el.style.zIndex          = '30';
+
+    // Dim peers
+    var pos = el.getAttribute('data-pos') || '';
+    if (pos && !FreeformState.hasFilter()) _applyDim(pos);
+  }
+
+  function _collapseTapCard(el) {
+    var expBody = el.querySelector('.ff2-exp-body');
+    if (expBody) expBody.remove();
+    var closeBtn = el.querySelector('.ff2-exp-close');
+    if (closeBtn) closeBtn.remove();
+    el.classList.remove('ff2-expanded', 'ff2-tap-expanded');
+    el.style.transform       = '';
+    el.style.transformOrigin = '';
+    el.style.boxShadow       = '';
+    el.style.background      = '';
+    el.style.zIndex          = '';
+    if (!FreeformState.hasFilter()) _clearDim();
+  }
+
+  // Public alias for close button onclick
+  function collapseTapCard(el) { _collapseTapCard(el); }
+
   return {
-    render:          render,
-    hoverCard:       hoverCard,
-    leaveCard:       leaveCard,
-    togglePosFilter: togglePosFilter,
+    render:           render,
+    hoverCard:        hoverCard,
+    leaveCard:        leaveCard,
+    togglePosFilter:  togglePosFilter,
+    cardTap:          cardTap,
+    collapseTapCard:  collapseTapCard,
   };
 
 })();
