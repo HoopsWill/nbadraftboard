@@ -4232,6 +4232,10 @@ const STAT_RANGES = {};
   });
 })();
 
+// NOTE: buildRankCtxMap() is NOT called here — DataService is not yet initialized
+// at this point in script execution. The initial build is triggered from the
+// Bootstrap IIFE at the bottom of the file, after all modules are initialized.
+
 function gradStyle(value, statKey) {
   if(value === null || value === undefined || value === 0 || value === '') return '';
   var range = STAT_RANGES[statKey];
@@ -5130,7 +5134,7 @@ var DataService = (function() {
     _cache = {};  // invalidate all cached boards — new data, fresh normalization
     // Also clear module-level caches that depend on the same underlying data
     if (typeof schoolLogoUrl === 'function') schoolLogoUrl._cache = null;
-    if (typeof _statRankCache !== 'undefined') _statRankCache = {};
+    // _statRankCache is rebuilt via rebuildStatRanges() at the end of this function.
     if (parsed.board2026)  DATA.board2026  = parsed.board2026;
     if (parsed.board2027)  DATA.board2027  = parsed.board2027;
     if (parsed.historical) DATA.historical = parsed.historical;
@@ -5164,7 +5168,9 @@ var DataService = (function() {
   // re-normalizes from the current raw DATA arrays.
   function invalidateCache() {
     _cache = {};
-    if (typeof _statRankCache !== 'undefined') _statRankCache = {};
+    // _statRankCache (alias for _rankCtxMap) is reset inside buildRankCtxMap(),
+    // which is called via rebuildStatRanges() below. Do not reset it here —
+    // resetting _statRankCache would break the alias pointer to _rankCtxMap.
     if (typeof schoolLogoUrl === 'function' && schoolLogoUrl._cache) {
       schoolLogoUrl._cache = null;
     }
@@ -5795,33 +5801,123 @@ function parseSwl(notesStr) {
   return { strengths: strengths, neutral: neutral, weaknesses: weaknesses };
 }
 
-// Per-modal stat rank arrays — cached per stat+position key, cleared by rebuildStatRanges()
-var _statRankCache = {};
+// ── Precomputed rank-context map ─────────────────────────────────────────────
+//
+// _rankCtxMap[playerRank][statKey] = "4th overall · 2nd among Guards"
+//
+// Built once by buildRankCtxMap() at data load and on every data change.
+// Modal lookup is O(1): two property accesses, no scanning.
+//
+// Replaces _statRankCache which cached per-stat value arrays but still ran
+// two O(n) filter() passes on EVERY modal open to compute each rank number.
+// Previous cost: 11 stats × O(2n) filters = O(22n) per open (n=100 → 2,200 ops).
+// New cost: O(1) per stat × 11 stats = 11 property lookups per open.
+var _statRankCache = {};   // retained as alias so invalidateCache() calls still compile
+var _rankCtxMap    = {};   // { [playerRank]: { [statKey]: string } }
 
-// Compute "Nth overall · Nth among Positions" for a stat value (higher = better)
-function statRankCtx(statKey, value, position) {
-  if (value === null || value === undefined || value === '' || value === 0) return '';
-  var cacheKey = statKey + ':' + (position || '');
-  if (!_statRankCache[cacheKey]) {
-    // Build once per stat+position combination; reused across all 10 modal stat boxes
-    var board = DataService.getBoard('2026');
-    var allVals = board.map(function(p) { return p[statKey]; })
-                       .filter(function(v) { return v !== null && v !== undefined && v !== 0 && v !== ''; });
-    var posVals = position
-      ? board.filter(function(p) { return p.position === position; })
-             .map(function(p) { return p[statKey]; })
-             .filter(function(v) { return v !== null && v !== undefined && v !== 0 && v !== ''; })
-      : [];
-    _statRankCache[cacheKey] = { all: allVals, pos: posVals };
+// ── buildRankCtxMap ───────────────────────────────────────────────────────────
+// Precomputes rank-context strings for every player × stat in a single pass.
+//
+// Per stat key k (10 total):
+//   1. Collect all non-null values and sort descending            O(n log n)
+//   2. Do the same per position group (Guard / Forward / Center)  O(n log n)
+//   3. For each player: binary walk to find their rank            O(n)
+//      (sorted array means we stop at the first value ≤ theirs)
+//
+// Total: O(n × k × log n) once at startup.
+// n=100, k=10, log₂100≈7  →  ~7,000 comparisons total, run once.
+// Compare: old approach ran ~2,200 comparisons on EVERY modal open.
+// After the 4th modal open the new approach has paid for itself.
+function buildRankCtxMap() {
+  // Guard: DataService may not be initialized if called too early in page load.
+  // The Bootstrap IIFE triggers the first real build after all modules are ready.
+  if (typeof DataService === 'undefined' || typeof DataService.getBoard !== 'function') return;
+
+  _rankCtxMap   = {};
+  _statRankCache = _rankCtxMap;   // keep alias in sync
+
+  var board = DataService.getBoard('2026');
+  if (!board || !board.length) return;
+
+  // ── 1. Discover all position labels present in the board ──────────────────
+  var positions = [];
+  board.forEach(function(p) {
+    if (p.position && positions.indexOf(p.position) < 0) positions.push(p.position);
+  });
+
+  // ── 2. Pre-sort values for each stat (all players + per-position) ─────────
+  // Sorting once here means every player's rank lookup below is a cheap walk
+  // through a short sorted array rather than a full board filter.
+  var statMeta = {};   // { [statKey]: { allDesc: number[], byPos: { pos: number[] } } }
+
+  STAT_KEYS.forEach(function(k) {
+    function validVals(arr) {
+      return arr
+        .map(function(p) { return p[k]; })
+        .filter(function(v) { return v !== null && v !== undefined && v !== 0 && v !== ''; })
+        .sort(function(a, b) { return b - a; });   // descending: rank 1 = index 0
+    }
+
+    var byPos = {};
+    positions.forEach(function(pos) {
+      byPos[pos] = validVals(board.filter(function(p) { return p.position === pos; }));
+    });
+
+    statMeta[k] = { allDesc: validVals(board), byPos: byPos };
+  });
+
+  // ── 3. Rank helper ────────────────────────────────────────────────────────
+  // Returns the 1-based rank of value v within a pre-sorted descending array.
+  // "Rank 1" = highest value.  Ties share the same rank (same as original behavior:
+  // both players who score identically are "3rd overall").
+  //
+  // Early-exit loop: because the array is sorted descending, once we reach a
+  // value ≤ v we know no later element can be > v — safe to break.
+  function rankInDesc(sortedDesc, v) {
+    var higher = 0;
+    for (var i = 0; i < sortedDesc.length; i++) {
+      if (sortedDesc[i] > v) higher++;
+      else break;
+    }
+    return higher + 1;
   }
-  var cached = _statRankCache[cacheKey];
-  if (!cached.all.length) return '';
-  var overallRank = cached.all.filter(function(v) { return v > value; }).length + 1;
-  var posRank = cached.pos.length ? (cached.pos.filter(function(v) { return v > value; }).length + 1) : null;
-  var posLabel = position ? position + 's' : '';
-  var ctx = toOrdinal(overallRank) + ' overall';
-  if (posRank !== null && posLabel) ctx += ' · ' + toOrdinal(posRank) + ' among ' + posLabel;
-  return ctx;
+
+  // ── 4. Build the map for every player × stat combination ──────────────────
+  board.forEach(function(p) {
+    var entry = {};
+    STAT_KEYS.forEach(function(k) {
+      var v = p[k];
+      if (v === null || v === undefined || v === 0 || v === '') {
+        entry[k] = '';
+        return;
+      }
+      var meta = statMeta[k];
+      if (!meta || !meta.allDesc.length) { entry[k] = ''; return; }
+
+      var overallRank = rankInDesc(meta.allDesc, v);
+      var posRank     = null;
+      var posArr      = p.position ? meta.byPos[p.position] : null;
+      if (posArr && posArr.length) posRank = rankInDesc(posArr, v);
+
+      var ctx = toOrdinal(overallRank) + ' overall';
+      if (posRank !== null && p.position) {
+        ctx += ' · ' + toOrdinal(posRank) + ' among ' + p.position + 's';
+      }
+      entry[k] = ctx;
+    });
+    _rankCtxMap[p.rank] = entry;
+  });
+}
+
+// ── statRankCtx — O(1) map read (replaces O(n) scan) ─────────────────────────
+// Arguments changed: (playerRank, statKey) replaces (statKey, value, position).
+// The value and position are no longer needed — the map already has the answer
+// pre-keyed by playerRank. Signature change is safe: only one call site (rcDiv
+// inside openPlayerModal), updated below.
+function statRankCtx(playerRank, statKey) {
+  var entry = _rankCtxMap[playerRank];
+  if (!entry) return '';              // map not built yet or rank not found
+  return entry[statKey] || '';        // '' if stat missing or player has no value
 }
 
 // measPct: height/weight percentile within position group — not yet implemented.
@@ -5895,7 +5991,10 @@ function openPlayerModal(rank, year) {
   const pos = player.position || '';
 
   // Rank context helper (pre-bound to this player's position)
-  function rc(key, val) { return statRankCtx(key, val, pos); }
+  // rc(key) — O(1) lookup: reads pre-built _rankCtxMap[player.rank][key].
+  // The `val` parameter is retained in the signature so all rcDiv(key, val)
+  // call sites below compile without changes. It is intentionally unused here.
+  function rc(key, val) { return statRankCtx(player.rank, key); }  // eslint-disable-line no-unused-vars
   function rcDiv(key, val) {
     var s = rc(key, val);
     return s ? '<div class="rank-ctx">' + escHtml(s) + '</div>' : '';
@@ -7777,8 +7876,9 @@ function rebuildStatRanges() {
       .filter(function(v){ return v !== null && v !== undefined && v !== 0 && v !== ''; });
     if (vals.length) STAT_RANGES[k] = { mn: Math.min.apply(null, vals), mx: Math.max.apply(null, vals) };
   });
-  // Invalidate memoized stat-rank arrays — data changed, stale rankings must be recalculated
-  if (typeof _statRankCache !== 'undefined') _statRankCache = {};
+  // Rebuild the precomputed rank-context map — data changed, all player ranks
+  // must be recalculated. buildRankCtxMap() replaces the old _statRankCache flush.
+  if (typeof buildRankCtxMap === 'function') buildRankCtxMap();
 }
 
 
@@ -13402,6 +13502,12 @@ var IntelService = (function() {
     wireFilters();
   }
 
+  // ── Initial rank-context map build ────────────────────────────────────────
+  // Must run AFTER DataService is initialized (this Bootstrap IIFE runs last).
+  // Precomputes _rankCtxMap[playerRank][statKey] = "4th overall · 2nd among Guards"
+  // so the first modal open is O(1) with no scanning.
+  if (typeof buildRankCtxMap === 'function') buildRankCtxMap();
+
 })();
 
 </script>
@@ -14419,13 +14525,8 @@ window.hwRollForward = (function() {
     var badge = document.getElementById('watchBadge');
     if (badge) badge.textContent = '2028 Watch';
 
-    // 7. Flush DataService cache — DATA.board2026 was mutated directly above.
-    //    Without this, DataService.getBoard('2026') returns the stale pre-roll-forward
-    //    board from _cache, causing openPlayerModal to fetch wrong/null players.
-    //    applyUpdate({}) with no-op payload flushes _cache and rebuilds STAT_RANGES.
-    if (typeof DataService !== 'undefined') DataService.applyUpdate({});
-
-    // 8. Re-render board
+    // Re-render board (step numbering preserved; step 7 was removed —
+    // DataService.invalidateCache() in step 2a above is the sole cache flush).
     if (window.renderBoard2026) renderBoard2026();
     if (window.hwIntel && hwIntel.refreshBadges) hwIntel.refreshBadges();
   }
@@ -14465,9 +14566,6 @@ window.hwRollForward = (function() {
 
     var badge = document.getElementById('watchBadge');
     if (badge) badge.textContent = 'Preliminary';
-
-    // Flush DataService cache after DATA.board2026 mutation (same reason as _applyRollForward).
-    if (typeof DataService !== 'undefined') DataService.applyUpdate({});
 
     if (window.renderBoard2026) renderBoard2026();
     if (window.hwIntel && hwIntel.refreshBadges) hwIntel.refreshBadges();
