@@ -4346,9 +4346,11 @@ function normalizeSchoolName(school) {
 }
 
 function crossGradStyle(value, key, year) {
-  // Compute gradient relative to the player's own draft class
+  // Compute gradient relative to the player's own draft class.
+  // Always read through DataService so we get the normalized, cache-current board
+  // regardless of year-advance state.
   if (value === null || value === undefined || value === 0 || value === '') return '';
-  var board = (year === '2026') ? (DATA.board2026||[]) : ((DATA.historical&&DATA.historical[year])||[]);
+  var board = DataService.getBoard(year || '2026');
   var vals  = board.map(function(p){ return p[key]; }).filter(function(v){ return v !== null && v !== undefined && v !== 0 && v !== ''; });
   if (!vals.length) return gradStyle(value, key); // fallback to global
   var mn = Math.min.apply(null,vals), mx = Math.max.apply(null,vals);
@@ -4993,7 +4995,8 @@ function rankPipHtml(rank) {
 
 // ── BOARD STATE ───────────────────────────────────────────
 let currentView = 'cards';
-let sortCol = 'rank', sortDir = 1;
+// sortCol/sortDir removed — sort state lives in AppState.board.sortCol/sortDir
+// (previously module-level globals; now dispatched via SET_BOARD_SORT)
 
 function setView(v) {
   currentView = v;
@@ -5155,11 +5158,24 @@ var DataService = (function() {
     return i > 0 ? raw.slice(i + 3).trim() : '';
   }
 
+  // ── invalidateCache: flush all derived caches when DATA is mutated
+  // outside of applyUpdate() (roll-forward, roll-back).
+  // Does NOT modify DATA — only clears caches so next getBoard() call
+  // re-normalizes from the current raw DATA arrays.
+  function invalidateCache() {
+    _cache = {};
+    if (typeof _statRankCache !== 'undefined') _statRankCache = {};
+    if (typeof schoolLogoUrl === 'function' && schoolLogoUrl._cache) {
+      schoolLogoUrl._cache = null;
+    }
+    if (typeof rebuildStatRanges === 'function') rebuildStatRanges();
+  }
+
   return {
     normalize: normalize, getBoard: getBoard, getHistorical: getHistorical,
     getAllPlayers: getAllPlayers, getYoY: getYoY, getMocks: getMocks,
     getResources: getResources, findByName: findByName, findByRank: findByRank,
-    applyUpdate: applyUpdate,
+    applyUpdate: applyUpdate, invalidateCache: invalidateCache,
   };
 })();
 
@@ -5554,12 +5570,18 @@ function renderBoardCards(players) {
 
 // ── BOARD 2026 — TABLE VIEW ──────────────────────────────────────────────────
 function renderBoardTable(players) {
+  // Read sort state from AppState — never from module-level globals.
+  // AppState.board.sortCol/sortDir are the single source of truth; updated
+  // exclusively by sortBoardTable() via SET_BOARD_SORT dispatch.
+  var _boardState = AppState.get().board;
+  var _sortCol    = _boardState.sortCol || 'rank';
+  var _sortDir    = _boardState.sortDir || 1;
   let sorted = [...players].sort((a,b) => {
-    let va = a[sortCol] ?? (sortDir===1 ? 9999 : -9999);
-    let vb = b[sortCol] ?? (sortDir===1 ? 9999 : -9999);
+    let va = a[_sortCol] ?? (_sortDir===1 ? 9999 : -9999);
+    let vb = b[_sortCol] ?? (_sortDir===1 ? 9999 : -9999);
     if (typeof va==='string') va=va.toLowerCase();
     if (typeof vb==='string') vb=vb.toLowerCase();
-    return va<vb ? -sortDir : va>vb ? sortDir : 0;
+    return va<vb ? -_sortDir : va>vb ? _sortDir : 0;
   });
 
   const cols = [
@@ -5572,8 +5594,10 @@ function renderBoardTable(players) {
   let html = `<div class="table-wrap"><table class="board-table"><thead><tr>`;
   for (const c of cols) {
     if (!c.k) { html += '<th style="width:30px;padding:0"></th>'; continue; }
-    const s = sortCol===c.k;
-    html += `<th class="${s?'sorted':''}" onclick="sortBoardTable('${c.k}')">${c.l} <span style="opacity:.5">${s?(sortDir===1?'↑':'↓'):'↕'}</span></th>`;
+    const _bs = AppState.get().board;
+    const s = _bs.sortCol===c.k;
+    const _sd = _bs.sortDir || 1;
+    html += `<th class="${s?'sorted':''}" onclick="sortBoardTable('${c.k}')">${c.l} <span style="opacity:.5">${s?(_sd===1?'↑':'↓'):'↕'}</span></th>`;
   }
   html += '</tr></thead><tbody>';
 
@@ -5630,9 +5654,11 @@ function renderBoardTable(players) {
 }
 
 function sortBoardTable(col) {
-  if (sortCol===col) sortDir*=-1; else { sortCol=col; sortDir=1; }
-  // Use the same filtered dataset renderBoard2026 uses — never raw DATA
-  var filtered = LayoutEngine.applyFilters(DataService.getBoard('2026'), AppState.get().board);
+  // Route sort state through AppState — single source of truth.
+  // SET_BOARD_SORT toggles direction on same column, resets to 1 on new column.
+  AppState.dispatch({ type: 'SET_BOARD_SORT', payload: col });
+  var state    = AppState.get();
+  var filtered = LayoutEngine.applyFilters(DataService.getBoard('2026'), state.board);
   renderBoardTable(filtered);
 }
 
@@ -6173,7 +6199,7 @@ function renderAnalytics() {
 // ── COMP EXPLORER ─────────────────────────────────────────
 function populateCompSelect() {
   var sel = document.getElementById('compProspectSelect');
-  var eligible = (DATA.board2026||[]).filter(function(p){
+  var eligible = DataService.getBoard('2026').filter(function(p){
     return p.ts_pct && p.ts_pct > 0 && p.pa2_usg && p.pa2_usg > 0
         && p.stl_bl && p.stl_bl > 0 && p.ato && p.ato > 0;
   });
@@ -6187,7 +6213,7 @@ function showCompExplorer() {
   var rankVal = document.getElementById('compProspectSelect').value;
   if (!rankVal) return;
   var rank   = parseInt(rankVal);
-  var player = (DATA.board2026||[]).find(function(p){ return p.rank===rank; });
+  var player = DataService.findByRank(rank, '2026');
   if (!player) return;
 
   var topN = parseInt((document.getElementById('compTopN')||{value:'20'}).value)||20;
@@ -6535,11 +6561,13 @@ function addCardToCompare(rank) {
 // ── Add a yoy comp directly to the Compare tab's compareList ─────────────────
 // Called from the "+ Compare" button in the Comp Explorer results table.
 function addCompToCompare(playerBaseName, year) {
-  var yr    = String(year);
-  var board = yr === '2026' ? (DATA.board2026||[]) : ((DATA.historical&&DATA.historical[yr])||[]);
+  var yr     = String(year);
+  // DataService.getBoard(yr) returns normalized objects where p.name is already
+  // the base name (DataService._name strips the ' - School' suffix).
+  // Search case-insensitively to match the original behaviour.
+  var board  = DataService.getBoard(yr);
   var player = board.find(function(p) {
-    var base = p.name.indexOf(' - ') > 0 ? p.name.slice(0,p.name.indexOf(' - ')) : p.name;
-    return base.toLowerCase() === playerBaseName.toLowerCase();
+    return (p.name || '').toLowerCase() === playerBaseName.toLowerCase();
   });
   if (!player) return;
   if (compareList.length >= COMPARE_MAX) {
@@ -6713,10 +6741,11 @@ function mockPlayerStats(rawName, yr) {
   // Look up a mock pick's stats from the matching board year
   var base  = rawName.indexOf(' - ') > 0 ? rawName.slice(0, rawName.indexOf(' - ')) : rawName;
   var bLow  = base.toLowerCase().replace(/[^a-z]/g,'');
-  var board = (yr === '2026') ? (DATA.board2026||[]) : ((DATA.historical&&DATA.historical[yr])||[]);
+  // Use DataService for normalized data consistent with the rest of the board.
+  // p.name in normalized objects is already the base name (school suffix stripped).
+  var board = DataService.getBoard(yr || '2026');
   return board.find(function(p) {
-    var pBase = p.name.indexOf(' - ')>0 ? p.name.slice(0, p.name.indexOf(' - ')) : p.name;
-    var pLow  = pBase.toLowerCase().replace(/[^a-z]/g,'');
+    var pLow = (p.name || '').toLowerCase().replace(/[^a-z]/g,'');
     return pLow === bLow || (bLow.length >= 5 && pLow.startsWith(bLow.slice(0,8)));
   }) || null;
 }
@@ -7908,13 +7937,13 @@ function runGlobalSearch(query) {
            comp.indexOf(q) !== -1 || cls.indexOf(q) !== -1;
   }
 
-  // 2026 board
-  (DATA.board2026 || []).forEach(function(p) {
+  // 2026 board — read through DataService for normalized, roll-forward-safe data
+  DataService.getBoard('2026').forEach(function(p) {
     if (playerMatches(p, '2026')) results.push(Object.assign({}, p, { _year:'2026', _source:'2026 Draft Board' }));
   });
 
   // 2027 watch
-  (DATA.board2027 || []).forEach(function(p) {
+  DataService.getBoard('2027').forEach(function(p) {
     if (playerMatches(p, '2027')) results.push(Object.assign({}, p, { _year:'2027', _source:'2027 Watch' }));
   });
 
@@ -9103,7 +9132,7 @@ function populateCompareSelect() {
   if (!sel) return;
   var yrSel = document.getElementById('compareYear');
   var yr    = yrSel ? yrSel.value : '2026';
-  var board = yr === '2026' ? (DATA.board2026 || []) : (DATA.historical && DATA.historical[yr] ? DATA.historical[yr] : []);
+  var board = DataService.getBoard(yr);
   sel.innerHTML = '<option value="">Select a prospect\u2026</option>';
   board.forEach(function(p) {
     var opt = document.createElement('option');
@@ -9130,8 +9159,7 @@ function addToCompare() {
     showCompareError('Player already in comparison.');
     return;
   }
-  var board  = yr === '2026' ? (DATA.board2026 || []) : ((DATA.historical && DATA.historical[yr]) || []);
-  var player = board.find(function(p){ return p.rank === rank; });
+  var player = DataService.findByRank(rank, yr);
   if (!player) return;
   // Clone the player object and tag it with the year so renderCompare can use it
   var tagged = Object.assign({}, player, { _year: yr });
@@ -9326,7 +9354,7 @@ function renderCompare() {
           // True rank-based percentile within the player's own draft class.
           // Rank-based (not min-max) so cross-year comparisons are stable:
           // "75th percentile" means the same thing regardless of class era.
-          var board = yr === '2026' ? (DATA.board2026||[]) : ((DATA.historical&&DATA.historical[yr])||[]);
+          var board = DataService.getBoard(yr);
           var vals  = board.map(function(x){ return x[rk.k]; }).filter(function(v){ return v != null && v !== 0; });
           if (!vals.length || p[rk.k] == null || p[rk.k] === 0) return 0;
           var sorted = vals.slice().sort(function(a,b){ return a-b; });
@@ -9376,7 +9404,7 @@ function renderCompare() {
 
 // ── TWEET CARD GENERATOR ───────────────────────────────────────────────────
 function openTweetCard(rank) {
-  var p = (DATA.board2026 || []).find(function(pl){ return pl.rank === rank; });
+  var p = DataService.findByRank(rank, '2026');
   if (!p) return;
   renderTweetCardModal(p);
 }
@@ -14123,6 +14151,10 @@ window.hoopswill = (function() {
     // 2. Promote board2027 → board2026
     DATA.board2026 = DATA.board2027 || [];
 
+    // 2a. Flush DataService cache — DATA.board2026 changed, stale cache
+    // would cause openPlayerModal to find wrong players or return null.
+    if (typeof DataService !== 'undefined') DataService.invalidateCache();
+
     // 3. Update UI labels
     _updateLabels('2027');
 
@@ -14166,6 +14198,11 @@ window.hoopswill = (function() {
       DATA.board2026 = DATA.historical['2026'];
       delete DATA.historical['2026'];
     }
+
+    // Flush DataService cache — DATA.board2026 has been restored to original
+    // 2026 data. Stale cache from the advanced state must be discarded so
+    // findByRank() and openPlayerModal() see the correct players.
+    if (typeof DataService !== 'undefined') DataService.invalidateCache();
 
     _updateLabels('2026');
     try { localStorage.removeItem(ADVANCE_KEY); } catch(e) {}
@@ -14355,6 +14392,10 @@ window.hwRollForward = (function() {
       });
     }
 
+    // 2a. Flush DataService cache — DATA.board2026 has changed, stale normalized
+    // objects would cause findByRank() to return wrong players or null in modals.
+    if (typeof DataService !== 'undefined') DataService.invalidateCache();
+
     // 3. Update UI labels
     _updateLabels('2027', '2028');
 
@@ -14378,7 +14419,13 @@ window.hwRollForward = (function() {
     var badge = document.getElementById('watchBadge');
     if (badge) badge.textContent = '2028 Watch';
 
-    // 7. Re-render board
+    // 7. Flush DataService cache — DATA.board2026 was mutated directly above.
+    //    Without this, DataService.getBoard('2026') returns the stale pre-roll-forward
+    //    board from _cache, causing openPlayerModal to fetch wrong/null players.
+    //    applyUpdate({}) with no-op payload flushes _cache and rebuilds STAT_RANGES.
+    if (typeof DataService !== 'undefined') DataService.applyUpdate({});
+
+    // 8. Re-render board
     if (window.renderBoard2026) renderBoard2026();
     if (window.hwIntel && hwIntel.refreshBadges) hwIntel.refreshBadges();
   }
@@ -14393,6 +14440,10 @@ window.hwRollForward = (function() {
     }
     // Restore board2027
     if (DATA._orig2027) DATA.board2027 = DATA._orig2027;
+
+    // Flush DataService cache — DATA.board2026 has been restored, stale
+    // normalized objects must be discarded so modals read the correct players.
+    if (typeof DataService !== 'undefined') DataService.invalidateCache();
 
     _updateLabels('2026', '2027');
 
@@ -14414,6 +14465,9 @@ window.hwRollForward = (function() {
 
     var badge = document.getElementById('watchBadge');
     if (badge) badge.textContent = 'Preliminary';
+
+    // Flush DataService cache after DATA.board2026 mutation (same reason as _applyRollForward).
+    if (typeof DataService !== 'undefined') DataService.applyUpdate({});
 
     if (window.renderBoard2026) renderBoard2026();
     if (window.hwIntel && hwIntel.refreshBadges) hwIntel.refreshBadges();
