@@ -4351,10 +4351,13 @@ function normalizeSchoolName(school) {
 
 function crossGradStyle(value, key, year) {
   // Compute gradient relative to the player's own draft class.
-  // Always read through DataService so we get the normalized, cache-current board
-  // regardless of year-advance state.
+  // Uses raw DATA directly — normalization is not needed for min/max gradient
+  // computation, and this avoids any DataService dependency in a utility fn.
   if (value === null || value === undefined || value === 0 || value === '') return '';
-  var board = DataService.getBoard(year || '2026');
+  var _yr = year || '2026';
+  var board = (_yr === '2026') ? (DATA.board2026 || [])
+            : (_yr === '2027') ? (DATA.board2027 || [])
+            : (DATA.historical && DATA.historical[_yr]) ? DATA.historical[_yr] : [];
   var vals  = board.map(function(p){ return p[key]; }).filter(function(v){ return v !== null && v !== undefined && v !== 0 && v !== ''; });
   if (!vals.length) return gradStyle(value, key); // fallback to global
   var mn = Math.min.apply(null,vals), mx = Math.max.apply(null,vals);
@@ -5329,6 +5332,7 @@ var LayoutEngine = (function() {
 // ── BOARD 2026 ────────────────────────────────────────────
 function renderBoard2026() {
   // Data flows through DataService; filter state from AppState (not DOM)
+  if (typeof DataService === 'undefined') return;
   var state   = AppState.get();
   var players = LayoutEngine.applyFilters(DataService.getBoard('2026'), state.board);
 
@@ -6298,6 +6302,9 @@ function renderAnalytics() {
 // ── COMP EXPLORER ─────────────────────────────────────────
 function populateCompSelect() {
   var sel = document.getElementById('compProspectSelect');
+  if (!sel) return;
+  // Guard: DataService may not yet be initialized on very first call
+  if (typeof DataService === 'undefined' || typeof DataService.getBoard !== 'function') return;
   var eligible = DataService.getBoard('2026').filter(function(p){
     return p.ts_pct && p.ts_pct > 0 && p.pa2_usg && p.pa2_usg > 0
         && p.stl_bl && p.stl_bl > 0 && p.ato && p.ato > 0;
@@ -9231,7 +9238,9 @@ function populateCompareSelect() {
   var sel = document.getElementById('compareSelect');
   if (!sel) return;
   var yrSel = document.getElementById('compareYear');
-  var yr    = yrSel ? yrSel.value : '2026';
+  var yr    = (yrSel && yrSel.value) ? yrSel.value : '2026';
+  // Guard: DataService may not yet be initialized on very first call
+  if (typeof DataService === 'undefined' || typeof DataService.getBoard !== 'function') return;
   var board = DataService.getBoard(yr);
   sel.innerHTML = '<option value="">Select a prospect\u2026</option>';
   board.forEach(function(p) {
@@ -13926,14 +13935,18 @@ window.hwIntel = (function() {
 
   function _buildPData(playerName, school) {
     // DataService.findByName replaces direct DATA.board2026.find()
-    var found = DataService.findByName(playerName);
-    if (found) return found;
+    // Guard: DataService may be undefined in separate script block contexts.
+    if (typeof DataService !== 'undefined' && DataService.findByName) {
+      var found = DataService.findByName(playerName);
+      if (found) return found;
+    }
     return { name: playerName, school: school || '' };
   }
 
   // ── Public: refresh board badges ─────────────────────────────────────────
   function refreshBadges() {
     document.querySelectorAll('.intel-badge').forEach(function(b){ b.remove(); });
+    if (typeof DataService === 'undefined') return;
     document.querySelectorAll('.player-card[data-rank]').forEach(function(card) {
       var rank = parseInt(card.getAttribute('data-rank'),10);
       var player = DataService.findByRank(rank); // O(n) but only on badge refresh
