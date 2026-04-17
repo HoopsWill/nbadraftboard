@@ -670,15 +670,18 @@ tr:hover td{background:var(--gray-50)}
   /* Once user has scrolled, JS adds .scrolled class to hide the hint */
   .table-wrap.scrolled::before{display:none}
   .table-wrap.scrolled::after{display:none}
-  .board-table{min-width:580px;border-collapse:separate !important;border-spacing:0 !important}
+  /* min-width removed — sticky columns provide context without forcing horizontal scroll */
+  .board-table{border-collapse:separate !important;border-spacing:0 !important}
   .board-table tbody td{border-bottom:1px solid #f1f5f9}
-  /* Sticky rank column: inherit row bg so striped rows don't show white seam */
+  /* Sticky rank column */
   .board-table th:nth-child(1),.board-table td:nth-child(1){
-    position:sticky;left:0;z-index:3;background:inherit}
-  /* Sticky player column: same bg inheritance + separator shadow */
+    position:sticky;left:0;z-index:3;background:inherit;}
+  /* Rank + compare header cells need explicit dark bg */
+  .board-table thead th:nth-child(1),.board-table thead th:nth-child(2){
+    background:var(--navy) !important;z-index:5;}
+  /* Sticky compare button column */
   .board-table th:nth-child(2),.board-table td:nth-child(2){
-    position:sticky;left:44px;z-index:2;background:inherit;
-    box-shadow:3px 0 6px rgba(10,22,40,.07)}
+    position:sticky;left:32px;z-index:2;background:inherit;}
   /* Header rows need explicit bg — they have no striping logic */
   .board-table thead th:nth-child(1),.board-table thead th:nth-child(2){
     background:var(--navy) !important;z-index:4}
@@ -712,8 +715,11 @@ tr:hover td{background:var(--gray-50)}
     touch-action:manipulation
   }
   .bb-ch.left{justify-content:flex-start !important;padding-left:8px !important}
-  .bb-col-hdr{min-height:44px}
-  .bb-board{min-width:440px}
+  .bb-col-hdr{min-height:40px;padding-right:2px !important}
+  /* BB-MOB: board width determined by visible columns (no fixed min-width) */
+  .bb-board{min-width:0 !important}
+  /* Hide columns that do not fit a phone screen */
+  .bb-cht,.bb-ctag,.bb-cftar,.bb-ctpar,.bb-compare-col{display:none !important}
 
   /* BB-03: Header — compact but still premium on mobile */
   .bb-header{padding:12px 14px 8px}
@@ -727,7 +733,8 @@ tr:hover td{background:var(--gray-50)}
   .bb-row{height:48px !important}
 
   /* BB-04: Stat values — up 1px for legibility; labels slightly brighter */
-  .bb-sv{font-size:13px !important;font-weight:800 !important}
+  .bb-sv{font-size:12px !important;font-weight:800 !important;letter-spacing:-.2px}
+  .bb-sl{font-size:7px !important;letter-spacing:.2px}
   .bb-sl{
     font-size:7.5px !important;
     letter-spacing:.3px !important;
@@ -739,21 +746,26 @@ tr:hover td{background:var(--gray-50)}
   .bb-met-cell{padding:0 1px}
 
   /* BB-04: Name + school — tighter but never truncated badly */
-  .bb-name{font-size:13px !important;letter-spacing:-.1px}
+  .bb-name{font-size:13px !important;letter-spacing:-.1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .bb-school{font-size:9px;color:var(--gray-400)}
   .bb-rk{font-size:15px !important;width:30px !important}
   .bb-av{width:28px !important}
 
   /* BB-04: Column flex ratios — give name more room, compress stat cols */
-  .bb-cts,.bb-csb,.bb-cato,.bb-cftar,.bb-ctpar{flex:0.50 !important;min-width:36px !important}
-  .bb-cpa{flex:0.56 !important;min-width:38px !important}
-  .bb-cmet{flex:0.76 !important;min-width:46px !important}
-  .bb-ctag{flex:0.90 !important;min-width:68px !important}
-  .bb-cid{flex:1.55 !important;min-width:90px !important}
-  .bb-cht{flex:0.52 !important;min-width:38px !important}
+  /* Visible columns on mobile: rank | avatar | name | metric | TS% | P+A | Stl+Bl | A/TO */
+  /* Ht/Wt, Pos/Role, FTAr, 3PAr, compare are hidden (see above)             */
+  /* Target total ≈ 300px so zero horizontal scroll on 320px+ screens         */
+  .bb-cr{width:24px !important;flex-shrink:0 !important}
+  .bb-cav{width:22px !important;flex-shrink:0 !important}
+  .bb-cid{flex:1.8 !important;min-width:80px !important;max-width:none !important}
+  .bb-cmet{flex:0 0 44px !important;min-width:44px !important;max-width:44px !important}
+  .bb-cts{flex:1 !important;min-width:30px !important}
+  .bb-cpa{flex:1 !important;min-width:30px !important}
+  .bb-csb{flex:1 !important;min-width:28px !important}
+  .bb-cato{flex:1 !important;min-width:28px !important}
 
   /* BB-04: Stat cells — tighter margin, preserve color coding */
-  .bb-stat-cell{margin:1px 0 !important;border-radius:4px !important;padding:0 2px}
+  .bb-stat-cell{margin:1px 0 !important;border-radius:3px !important;padding:0 1px !important}
 
   /* BB-04: Tags — single max-width; truncate cleanly */
   .bb-tags{max-width:68px !important;overflow:hidden}
@@ -1158,71 +1170,86 @@ tr:hover td{background:var(--gray-50)}
 
 /* ── Mobile table: constrain player column + hide low-priority cols ────── */
 @media(max-width:640px){
-  /* Player cell: cap width, clip overflow, prevent layout blowout */
-  .board-table th:nth-child(2),
-  .board-table td:nth-child(2){
-    max-width:130px;
-    min-width:100px;
-  }
-  /* Name + school: truncate to single line with ellipsis */
-  .td-name-wrap .name{
-    white-space:nowrap;
-    overflow:hidden;
-    text-overflow:ellipsis;
-    max-width:100px;
-    display:block;
-  }
-  .td-name-wrap .school{
-    white-space:nowrap;
-    overflow:hidden;
-    text-overflow:ellipsis;
-    max-width:100px;
-  }
-  /* Shrink avatar slightly on mobile */
-  .td-mini-avatar,.td-mini-fb{
-    width:26px !important;
-    height:26px !important;
-    flex-shrink:0;
-  }
-  /* Hide low-priority columns — keep: Rank(1) Player(2) Metric(4) TS%(8) Class(14) */
-  .board-table th:nth-child(3), .board-table td:nth-child(3),
-  .board-table th:nth-child(5), .board-table td:nth-child(5),
-  .board-table th:nth-child(6), .board-table td:nth-child(6),
-  .board-table th:nth-child(7), .board-table td:nth-child(7),
-  .board-table th:nth-child(9), .board-table td:nth-child(9),
-  .board-table th:nth-child(10),.board-table td:nth-child(10),
-  .board-table th:nth-child(11),.board-table td:nth-child(11),
-  .board-table th:nth-child(12),.board-table td:nth-child(12),
-  .board-table th:nth-child(13),.board-table td:nth-child(13){
+  /* ── TABLE VIEW: Mobile column layout ────────────────────────────────────
+   Column map (renderBoardTable):
+     1=Rank  2=Compare  3=Player  4=Role   5=Metric  6=Ht   7=Wt   8=Age
+     9=TS%  10=P+A/USG 11=Stl+Bl 12=A/TO  13=FTAr  14=3PAr 15=Class
+   Keep: 1(Rank) 2(Compare) 3(Player) 5(Metric) 9(TS%) 10(P+A)
+   Hide: 4 6 7 8 11 12 13 14 15
+   Total minimum width: 36+26+flex+46+40+40 = ~188px fixed → fits 320px+
+   ─────────────────────────────────────────────────────────────────────── */
+  .board-table th:nth-child(4),  .board-table td:nth-child(4),
+  .board-table th:nth-child(6),  .board-table td:nth-child(6),
+  .board-table th:nth-child(7),  .board-table td:nth-child(7),
+  .board-table th:nth-child(8),  .board-table td:nth-child(8),
+  .board-table th:nth-child(11), .board-table td:nth-child(11),
+  .board-table th:nth-child(12), .board-table td:nth-child(12),
+  .board-table th:nth-child(13), .board-table td:nth-child(13),
+  .board-table th:nth-child(14), .board-table td:nth-child(14),
+  .board-table th:nth-child(15), .board-table td:nth-child(15){
     display:none;
   }
-  /* Rank column: slightly tighter */
+  /* Rank — tight fixed width */
   .board-table th:nth-child(1),
   .board-table td:nth-child(1){
-    width:36px;
-    min-width:36px;
-    padding-left:8px;
-    padding-right:4px;
+    width:32px; min-width:32px;
+    padding-left:6px; padding-right:4px;
     font-size:12px;
   }
-  /* Metric column: compact but readable */
-  .board-table td:nth-child(4){
-    font-size:14px !important;
+  /* Compare button — compact */
+  .board-table th:nth-child(2),
+  .board-table td:nth-child(2){
+    width:26px; min-width:26px; max-width:26px;
+    padding:0 2px;
   }
-  /* TS% column: compact */
-  .board-table td:nth-child(8){
+  /* Player name — sticky, flex fills remaining width */
+  .board-table th:nth-child(3),
+  .board-table td:nth-child(3){
+    position:sticky;
+    left:58px;  /* rank(32) + compare(26) = 58px */
+    z-index:2;
+    background:inherit;
+    box-shadow:3px 0 6px rgba(10,22,40,.07);
+    min-width:90px;
+    max-width:160px;
+  }
+  .board-table thead th:nth-child(3){ background:var(--navy) !important; z-index:4; }
+  /* Name + school: single line, no overflow */
+  .td-name-wrap .name{
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    max-width:120px; display:block; font-size:12px;
+  }
+  .td-name-wrap .school{
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    max-width:120px; font-size:9px;
+  }
+  /* Metric — compact colored cell */
+  .board-table th:nth-child(5),
+  .board-table td:nth-child(5){
+    font-size:13px !important;
+    padding:4px 5px;
+    min-width:44px; max-width:52px;
+    text-align:center;
+  }
+  /* TS% — compact */
+  .board-table th:nth-child(9),
+  .board-table td:nth-child(9){
     font-size:11px !important;
-    padding-left:6px;
-    padding-right:6px;
+    padding:4px 5px;
+    min-width:36px; max-width:44px;
+    text-align:center;
   }
-  /* Class column: abbreviate display */
-  .board-table td:nth-child(14){
-    font-size:10px;
-    color:var(--gray-500);
-    max-width:60px;
-    overflow:hidden;
-    text-overflow:ellipsis;
-    white-space:nowrap;
+  /* P+A — compact */
+  .board-table th:nth-child(10),
+  .board-table td:nth-child(10){
+    font-size:11px !important;
+    padding:4px 5px;
+    min-width:36px; max-width:44px;
+    text-align:center;
+  }
+  /* Avatar: slightly smaller on mobile */
+  .td-mini-avatar,.td-mini-fb{
+    width:24px !important; height:24px !important; flex-shrink:0;
   }
 }
 
@@ -2937,470 +2964,270 @@ body {
 }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
 
-/* ─────────────────────────────────────────────────────────────────────────
-   COMPARE VIEW — cleaner, less redundant
-   ─────────────────────────────────────────────────────────────────────────*/
-.compare-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 10px;
-  margin-bottom: 20px;
+/* ═══════════════════════════════════════════════════════════════════
+   COMPARE TAB v4 — Side-by-side hero: cards left / radar right
+   ─────────────────────────────────────────────────────────────────
+   Desktop layout:
+     [cards col 380px] | [radar flex:1, fills remaining width]
+     [stats table — full width]
+   Mobile ≤760px: stacks vertically
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ── Controls ── */
+.compare-add-btn {
+  background:#B8860F;color:white;border:none;border-radius:6px;
+  padding:6px 14px;font-size:12px;font-weight:700;
+  font-family:'Barlow Condensed',sans-serif;letter-spacing:.5px;
+  cursor:pointer;transition:background .12s,transform .1s;
 }
-.compare-card {
-  background: white;
-  border: 1.5px solid var(--border-med);
-  border-radius: var(--r-md);
-  overflow: hidden;
-  position: relative;
-  box-shadow: 0 1px 3px rgba(15,23,42,.04);
-  transition: box-shadow .15s;
+.compare-add-btn:hover{background:#96700C;}
+.compare-add-btn:active{transform:scale(.97);}
+.compare-clear-btn{
+  background:none;color:var(--gray-400);border:1.5px solid var(--gray-200);
+  border-radius:6px;padding:5px 12px;font-size:12px;font-weight:600;
+  cursor:pointer;transition:all .12s;margin-left:auto;
 }
-.compare-card:hover { box-shadow: 0 4px 12px rgba(15,23,42,.08); }
-.compare-card-header {
-  padding: 12px 12px 8px;
+.compare-clear-btn:hover{color:#DC2626;border-color:rgba(220,38,38,.4);}
+
+/* ── Hero: cards left, radar right ──────────────────────────────── */
+.compare-hero {
   display: flex;
-  align-items: center;
-  gap: 8px;
+  gap: 14px;
+  align-items: flex-start;
+  margin-bottom: 14px;
 }
-.compare-card-rank {
-  width: 32px;
-  height: 32px;
-  border-radius: 6px;
+
+/* ── Cards column ────────────────────────────────────────────────── */
+.compare-cards-col {
+  width: 380px;
+  flex-shrink: 0;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-family: 'Barlow Condensed', sans-serif;
-  font-weight: 900;
-  color: white;
-  flex-shrink: 0;
+  gap: 8px;
 }
-.compare-card-rank .rn { font-size: 16px; line-height: 1; }
+
+/* ── Player card — expanded ──────────────────────────────────────── */
+.compare-card {
+  background: white;
+  border: 1.5px solid var(--gray-200);
+  border-radius: 10px;
+  overflow: hidden;
+  position: relative;
+  transition: box-shadow .12s;
+}
+.compare-card:hover { box-shadow: 0 4px 16px rgba(15,23,42,.1); }
+.compare-card-accent { height: 3px; width: 100%; display: block; }
+
+.compare-card-header {
+  padding: 10px 12px 0;
+  display: flex; align-items: center; gap: 10px;
+}
+.compare-card-remove {
+  position: absolute; top: 8px; right: 8px;
+  background: none; border: 1px solid transparent;
+  border-radius: 50%; width: 20px; height: 20px;
+  cursor: pointer; font-size: 11px;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--gray-300); transition: all .12s; opacity: 0;
+}
+.compare-card:hover .compare-card-remove { opacity: 1; }
+.compare-card-remove:hover {
+  background: rgba(220,38,38,.1); color: #DC2626;
+  border-color: rgba(220,38,38,.2);
+}
+.compare-card-rank {
+  width: 36px; height: 36px; border-radius: 7px;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  font-family: 'Barlow Condensed', sans-serif; font-weight: 900;
+  color: white; flex-shrink: 0;
+}
+.compare-card-rank .rn { font-size: 18px; line-height: 1; }
 .compare-card-rank .rl { font-size: 7px; opacity: .65; text-transform: uppercase; }
+.compare-card-info { min-width: 0; flex: 1; }
 .compare-card-info .cn {
   font-family: 'Barlow Condensed', sans-serif;
-  font-size: 14px;
-  font-weight: 800;
-  color: var(--text-primary);
-  line-height: 1.1;
+  font-size: 17px; font-weight: 800; color: var(--navy);
+  line-height: 1.15;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 .compare-card-info .cs {
-  font-size: 10px;
-  color: var(--text-muted);
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  margin-top: 2px;
+  font-size: 10px; color: var(--gray-400);
+  display: flex; align-items: center; gap: 4px; margin-top: 2px;
 }
 .compare-metric-row {
-  padding: 7px 12px;
-  background: var(--surface-inset);
-  border-top: 1px solid var(--border-light);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  padding: 7px 12px 8px;
+  display: flex; align-items: center; justify-content: space-between;
+  margin-top: 8px; background: var(--gray-50); border-top: 1px solid var(--gray-100);
 }
 .compare-metric-val {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 22px;
-  font-weight: 900;
+  font-family: 'Barlow Condensed', sans-serif; font-size: 22px; font-weight: 900;
 }
 .compare-metric-lbl {
-  font-size: 8px;
-  opacity: .55;
-  text-transform: uppercase;
-  letter-spacing: .5px;
-  font-weight: 700;
+  font-size: 9px; color: var(--gray-400); text-transform: uppercase; letter-spacing: .4px;
 }
-.compare-stat-grid {
+
+/* ── Inline stat mini-grid ───────────────────────────────────────── */
+.ccard-stats {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-columns: repeat(5, 1fr);
   gap: 1px;
-  background: var(--border-light);
-  border-top: 1px solid var(--border-light);
+  background: var(--gray-100);
+  border-top: 1px solid var(--gray-100);
 }
-.compare-stat-cell {
-  background: white;
-  padding: 7px 8px;
+.ccs-cell {
+  background: white; padding: 6px 3px; text-align: center;
+}
+.ccs-val {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 13px; font-weight: 800; display: block; line-height: 1.1;
+}
+.ccs-lbl {
+  font-size: 8px; color: rgba(0,0,0,.35);
+  text-transform: uppercase; letter-spacing: .3px;
+  display: block; margin-top: 1px;
+}
+/* Leader stat cell gets a star below the label */
+.ccs-cell.ccs-lead .ccs-val { color: #15803D; }
+.ccs-cell.ccs-lead::after {
+  content: '★'; font-size: 7px; color: #15803D;
+  display: block; margin-top: 0px; opacity: .65;
   text-align: center;
 }
-.compare-stat-val {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 15px;
-  font-weight: 800;
-  color: var(--text-primary);
-  line-height: 1;
-}
-.compare-stat-lbl {
-  font-size: 8px;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: .4px;
-  margin-top: 2px;
-}
 
-/* Side-by-side table */
-.compare-table-wrap {
-  background: white;
-  border: 1px solid var(--border-light);
-  border-radius: var(--r-md);
-  overflow: hidden;
-  margin-bottom: 20px;
-  box-shadow: 0 1px 3px rgba(15,23,42,.04);
-}
-.compare-table-title {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 13px;
-  font-weight: 800;
-  color: var(--text-primary);
-  padding: 11px 16px;
-  border-bottom: 1px solid var(--border-light);
-  background: #F8FAFC;
-  letter-spacing: .3px;
-}
-.compare-table table { width: 100%; border-collapse: collapse; }
-.compare-table th {
-  background: #F8FAFC;
-  padding: 8px 14px;
-  font-size: 10px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: .7px;
-  color: var(--text-muted);
-  border-bottom: 1px solid var(--border-light);
-  text-align: right;
-}
-.compare-table th:first-child { text-align: left; }
-.compare-table td {
-  padding: 8px 14px;
-  font-size: 13px;
-  border-bottom: 1px solid rgba(15,23,42,.04);
-  text-align: right;
-  font-variant-numeric: tabular-nums;
-}
-.compare-table td:first-child {
-  font-weight: 700;
-  color: var(--text-secondary);
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: .5px;
-  text-align: left;
-}
-.compare-table tr:last-child td { border-bottom: none; }
-.compare-table tr:nth-child(even) td { background: #FAFBFC; }
-.compare-best {
-  background: rgba(201,151,26,.1) !important;
-  color: #92400E;
-  font-weight: 800;
-  border-radius: 4px;
-}
+/* Card hover ring (cross-section sync) */
+.compare-card.crd-hover { box-shadow: 0 0 0 2px var(--blue); }
 
-/* Radar — hide by default since it duplicates table */
-/* User can still see it via toggle */
+/* ── Radar — right column, large ─────────────────────────────────── */
 .compare-radar-wrap {
-  background: white;
-  border: 1px solid var(--border-light);
-  border-radius: var(--r-md);
-  padding: 16px 20px;
-  margin-bottom: 20px;
-  box-shadow: 0 1px 3px rgba(15,23,42,.04);
+  flex: 1; min-width: 0;
+  background: white; border: 1.5px solid var(--gray-200); border-radius: 10px;
+  padding: 16px 18px 14px;
+  display: flex; flex-direction: column;
+}
+.compare-radar-top {
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 8px; margin-bottom: 12px; flex-shrink: 0;
 }
 .compare-radar-title {
   font-family: 'Barlow Condensed', sans-serif;
-  font-size: 13px;
-  font-weight: 800;
-  color: var(--text-primary);
-  margin-bottom: 12px;
-  letter-spacing: .3px;
+  font-size: 13px; font-weight: 800; color: var(--navy); letter-spacing: .2px;
+}
+.compare-radar-legend { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+/* Canvas fills remaining vertical space of radar panel */
+.compare-radar-canvas-wrap { flex: 1; min-height: 360px; position: relative; }
+#compareRadar {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 360px;
 }
 
-/* Compare add controls — cleaner */
-.compare-add-btn {
-  height: 32px;
-  border-radius: 6px;
-  background: var(--accent);
-  color: white;
-  font-size: 12px;
-  font-weight: 700;
-  border: none;
-  cursor: pointer;
-  padding: 0 14px;
-  transition: background .12s, transform .1s;
-  letter-spacing: .02em;
+/* ── Stats table ─────────────────────────────────────────────────── */
+.compare-panel { display: flex; flex-direction: column; gap: 12px; }
+.compare-table-wrap {
+  background: white; border: 1.5px solid var(--gray-200); border-radius: 10px; overflow: hidden;
 }
-.compare-add-btn:hover { background: #B8860F; }
-.compare-add-btn:active { transform: scale(.97); }
-.compare-clear-btn {
-  height: 32px;
-  border-radius: 6px;
-  background: var(--surface-inset);
-  color: var(--text-muted);
-  font-size: 12px;
-  font-weight: 600;
-  border: 1px solid var(--border-light);
-  cursor: pointer;
-  padding: 0 12px;
-  transition: all .12s;
+.compare-table-title {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 13px; font-weight: 800; color: var(--navy);
+  padding: 9px 12px; border-bottom: 1px solid var(--gray-100); letter-spacing: .2px;
+  display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap;
 }
-.compare-clear-btn:hover {
-  background: rgba(220,38,38,.06);
-  color: #DC2626;
-  border-color: rgba(220,38,38,.2);
+.compare-table { overflow-x: auto; }
+.compare-table table {
+  width: 100%; border-collapse: collapse;
+  /* table-layout: auto (default) — lets width:1% on stat col shrink to content minimum */
 }
+.compare-table thead th {
+  background: var(--gray-50); padding: 5px 10px;
+  font-size: 10px; font-weight: 700; color: var(--gray-500);
+  text-transform: uppercase; letter-spacing: .4px;
+  border-bottom: 1px solid var(--gray-100); white-space: nowrap;
+  position: sticky; top: 0; z-index: 2;
+}
+.compare-table thead th:first-child {
+  width: 1%; white-space: nowrap; text-align: left;
+  min-width: 90px;
+  position: sticky; left: 0; z-index: 3;
+  padding-right: 18px; /* breathing room between label and values */
+}
+.compare-table th.cth {
+  text-align: center; border-top: 3px solid transparent;
+  min-width: 120px; max-width: 280px;
+}
+.compare-table td {
+  padding: 4px 10px; font-size: 12px;
+  border-bottom: 1px solid var(--gray-100);
+  text-align: center; vertical-align: middle;
+}
+.compare-table tr:last-child td { border-bottom: none; }
+.compare-table tr:nth-child(even) td { background: #FAFBFC; }
+.compare-table tr:hover td { background: #EFF6FF; transition: background .1s; }
+.compare-table td:first-child {
+  font-weight: 700; color: var(--navy);
+  font-family: 'Barlow Condensed', sans-serif; font-size: 13px;
+  text-align: left; position: sticky; left: 0; z-index: 1;
+  background: white; border-right: 1px solid var(--gray-100);
+  width: 1%; white-space: nowrap; padding-right: 18px;
+}
+.compare-table tr:nth-child(even) td:first-child { background: #FAFBFC; }
+.compare-table tr:hover td:first-child { background: #EFF6FF; }
+.compare-table tr.ctr-section td {
+  background: #F4F6F9!important; font-size: 9px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .8px; color: var(--gray-400);
+  padding: 3px 10px; border-bottom: 1px solid var(--gray-200);
+}
+.compare-table tr.ctr-section td:first-child { background: #F4F6F9!important; }
+.compare-table tr.ctr-depth { display: none; }
+.compare-table.depth-open tr.ctr-depth { display: table-row; }
+.ctr-section.ctr-toggle { cursor: pointer; user-select: none; }
+.ctr-section.ctr-toggle td:first-child::after { content: ' ▸'; font-size: 8px; opacity: .5; }
+.compare-table.depth-open .ctr-section.ctr-toggle td:first-child::after { content: ' ▾'; }
+.ctd-val {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 15px; font-weight: 800; color: var(--navy); display: block; line-height: 1;
+}
+.ctd-delta { font-size: 9px; font-weight: 700; display: block; margin-top: 1px; letter-spacing: .15px; }
+.ctd-delta.pos { color: #16A34A; } .ctd-delta.neg { color: #DC2626; }
+.compare-best .ctd-val { color: #15803D; }
+.compare-table tr.ctr-maxgap td { background: #FFFBEB!important; }
+.compare-table tr.ctr-maxgap td:first-child { background: #FFFBEB!important; color: #92400E; }
+.compare-table tr.ctr-maxgap td:first-child::before { content: '↕ '; font-size: 9px; opacity: .7; }
+.compare-quick-row { background: var(--navy)!important; }
+.compare-quick-row td { background: var(--navy)!important; padding: 5px 10px!important; border-bottom: 2px solid rgba(255,255,255,.1)!important; }
+.compare-quick-row td:first-child { background: var(--navy)!important; color: rgba(255,255,255,.5)!important; font-size: 9px!important; font-weight: 700!important; letter-spacing: .6px; }
+.cqr-score { font-family: 'Barlow Condensed', sans-serif; font-size: 18px; font-weight: 900; color: white; display: block; line-height: 1; }
+.cqr-wins { font-size: 9px; font-weight: 600; color: rgba(255,255,255,.45); display: block; margin-top: 1px; }
+.cqr-score.cqr-lead { color: #F0C94A; }
+.compare-table tr.compare-gap-row td { padding: 0 10px 3px; border-bottom: none; }
+.compare-table tr.compare-gap-row td:first-child { border-right: 1px solid var(--gray-100); background: white!important; }
+.cgap-track { height: 2px; background: var(--gray-100); border-radius: 1px; overflow: hidden; }
+.cgap-fill { height: 100%; border-radius: 1px; opacity: .55; }
+
+/* ── Empty ────────────────────────────────────────────────────────── */
 .compare-empty {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 48px 20px;
-  color: var(--text-muted);
-  gap: 8px;
+  background: white; border: 1px dashed var(--gray-200); border-radius: 10px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 52px 20px; gap: 8px;
 }
-.compare-empty-icon { font-size: 32px; opacity: .4; }
-.compare-empty-text {
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--text-secondary);
-}
+.compare-empty-icon { font-size: 28px; opacity: .2; }
+.compare-empty-text { font-size: 14px; font-weight: 600; color: var(--gray-500); }
 
-/* ─────────────────────────────────────────────────────────────────────────
-   COUNT BADGE, VIEW TOGGLE
-   ─────────────────────────────────────────────────────────────────────────*/
-.count-badge {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--text-muted);
-  background: var(--surface-inset);
-  border-radius: 20px;
-  padding: 3px 10px;
-  border: 1px solid var(--border-light);
-  transition: all .2s;
+/* ── Responsive ──────────────────────────────────────────────────── */
+@media (max-width: 760px) {
+  .compare-hero { flex-direction: column; }
+  .compare-cards-col { width: 100%; flex-direction: row; flex-wrap: wrap; gap: 7px; }
+  .compare-card { min-width: 0; flex: 1 1 calc(50% - 4px); }
+  .compare-radar-wrap { width: 100%; }
+  #compareRadar { min-height: 280px; }
 }
-@keyframes hw-count-pulse {
-  0%   { transform: scale(1); }
-  50%  { transform: scale(1.07); }
-  100% { transform: scale(1); }
-}
-.count-badge.updated { animation: hw-count-pulse .3s ease-out; }
-
-/* ─────────────────────────────────────────────────────────────────────────
-   SMOOTH VIEW TRANSITIONS
-   ─────────────────────────────────────────────────────────────────────────*/
-#board2026Content {
-  animation: hw-view-in .18s ease-out;
-}
-@keyframes hw-view-in {
-  from { opacity: .6; transform: translateY(6px); }
-  to   { opacity: 1;  transform: none; }
+@media (max-width: 480px) {
+  .compare-cards-col { flex-direction: column; }
+  .compare-card { flex: none; width: 100%; }
+  #compareRadar { min-height: 240px; }
 }
 
-/* Modal entry */
-.modal-overlay.open .modal {
-  animation: hw-modal-in .18s cubic-bezier(.22,1,.36,1);
-}
-@keyframes hw-modal-in {
-  from { opacity: 0; transform: translateY(20px) scale(.98); }
-  to   { opacity: 1; transform: none; }
-}
-
-/* ─────────────────────────────────────────────────────────────────────────
-   POLISHED EMPTY STATES
-   ─────────────────────────────────────────────────────────────────────────*/
-.empty {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 60px 20px;
-  gap: 10px;
-}
-.empty-icon { font-size: 32px; opacity: .25; }
-.empty p {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--text-muted);
-}
-
-/* ─────────────────────────────────────────────────────────────────────────
-   MISC — chip/badge cleanup
-   ─────────────────────────────────────────────────────────────────────────*/
-.comp-chip {
-  background: var(--surface-inset);
-  border: 1px solid var(--border-light);
-  border-radius: 5px;
-  padding: 4px 10px;
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--text-secondary);
-}
-
-/* Notes text */
-.notes-text {
-  font-size: 13px;
-  color: var(--text-secondary);
-  line-height: 1.65;
-  background: var(--surface-inset);
-  border-radius: 8px;
-  padding: 10px 12px;
-}
-
-/* Role badge in scouting report */
-.role-badge {
-  background: rgba(37,99,235,.08);
-  color: #1D4ED8;
-  font-size: 9px;
-  font-weight: 700;
-  padding: 2px 7px;
-  border-radius: 4px;
-  letter-spacing: .3px;
-}
-
-/* ─────────────────────────────────────────────────────────────────────────
-   SCROLLBAR — webkit custom
-   ─────────────────────────────────────────────────────────────────────────*/
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(15,23,42,.15); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(15,23,42,.25); }
-
-/* ─────────────────────────────────────────────────────────────────────────
-   SELECTION / FOCUS quality
-   ─────────────────────────────────────────────────────────────────────────*/
-::selection { background: rgba(201,151,26,.15); color: var(--text-primary); }
-*:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-  border-radius: 3px;
-}
-
-
-/* ══════════════════════════════════════════════════════════════════════════
-   PHASE 3 — MICRO-INTERACTIONS, POLISH, SUBTLE WOW
-   ══════════════════════════════════════════════════════════════════════════ */
-
-/* BB row: compare button reveals on hover */
-.bb-compare-dot { opacity: 0; transition: opacity .15s, background .12s, color .12s !important; }
-.bb-row:hover .bb-compare-dot { opacity: 1; }
-.bb-compare-dot:hover {
-  background: rgba(37,99,235,.12) !important;
-  color: #1D4ED8 !important;
-  border-color: rgba(37,99,235,.25) !important;
-}
-
-/* Table: compare button column */
-.hw-table-compare-btn {
-  width: 22px; height: 22px;
-  border-radius: 5px;
-  border: 1px solid transparent;
-  background: transparent;
-  color: rgba(15,23,42,.2);
-  cursor: pointer;
-  font-size: 11px; font-weight: 700;
-  display: flex; align-items: center; justify-content: center;
-  transition: all .12s;
-  opacity: 0;
-}
-.board-table tbody tr:hover .hw-table-compare-btn { opacity: 1; }
-.hw-table-compare-btn:hover {
-  background: rgba(37,99,235,.1);
-  color: #1D4ED8;
-  border-color: rgba(37,99,235,.2);
-}
-
-/* Stat cell hover */
-.stat-cell:hover { filter: brightness(.97); }
-
-/* Modal tab bar */
-.modal-tab-bar {
-  background: var(--surface-inset);
-  border-radius: 8px; padding: 3px;
-  border: 1px solid var(--border-light); gap: 2px;
-}
-.modal-tab { border-radius: 6px; padding: 7px 14px; font-size: 12px; font-weight: 600; transition: background .12s, color .12s; color: var(--text-muted); border: none; background: transparent; }
-.modal-tab.active { background: white; color: var(--text-primary); box-shadow: 0 1px 3px rgba(15,23,42,.08); }
-.modal-tab:hover:not(.active) { color: var(--text-secondary); }
-
-/* Compare card remove */
-.compare-card-remove {
-  width: 20px; height: 20px; border-radius: 4px;
-  background: transparent; border: 1px solid transparent;
-  color: var(--text-muted); font-size: 11px; cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  opacity: 0; transition: all .12s;
-}
-.compare-card:hover .compare-card-remove { opacity: 1; }
-.compare-card-remove:hover { background: rgba(220,38,38,.1); color: #DC2626; border-color: rgba(220,38,38,.2); }
-
-/* Meas items: value pops on hover */
-.meas-item { transition: border-color .12s, box-shadow .12s; cursor: default; }
-.meas-item:hover { border-color: var(--border-med); box-shadow: 0 2px 6px rgba(15,23,42,.06); }
-
-/* Comp chip hover */
-.comp-chip { transition: background .12s, border-color .12s; }
-.comp-chip:hover { background: white; border-color: var(--border-med); }
-
-/* BB controls */
-.bb-screenshot-bar {
-  background: white; border: 1px solid var(--border-light);
-  border-radius: var(--r-md); padding: 8px 12px; margin-bottom: 12px;
-  box-shadow: 0 1px 3px rgba(15,23,42,.04);
-  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
-}
-.bb-sub-btn { height: 28px; font-size: 11px; border-radius: 6px; padding: 0 10px; }
-.bb-sub-btn, .bb-sub-btn:not(.active) {
-  background: var(--surface-inset) !important;
-  border: 1px solid var(--border-light) !important;
-  color: var(--text-muted) !important;
-}
-.bb-sub-btn.active, .bb-sub-btn:hover {
-  background: var(--accent-dim) !important;
-  border-color: rgba(201,151,26,.3) !important;
-  color: var(--accent) !important;
-}
-.bb-preset-btn { background: var(--surface-inset) !important; border-color: var(--border-light) !important; color: var(--text-muted) !important; border-radius: 5px !important; height: 26px; }
-.bb-preset-btn:hover { background: var(--accent-dim) !important; border-color: rgba(201,151,26,.25) !important; color: var(--accent) !important; }
-
-/* Tier bands: override bright JS gradients */
-.bb-tier-band { background: rgba(15,23,42,.025) !important; border-top: 1px solid var(--border-light); }
-.bb-tier-label { opacity: .55 !important; color: var(--text-secondary) !important; font-size: 9px !important; }
-.bb-tier-sub { display: none !important; }
-.bb-tier-picks { font-size: 9px !important; color: var(--text-muted) !important; }
-
-/* Comp search card */
-.comp-search-card { background: white !important; border: 1px solid var(--border-light) !important; border-radius: var(--r-md) !important; box-shadow: 0 1px 3px rgba(15,23,42,.04) !important; }
-.comp-player-header { background: linear-gradient(135deg, #0D1B2E, #162340) !important; border-radius: var(--r-md) !important; margin-bottom: 16px !important; }
-
-/* Compare empty */
-.compare-empty { background: white; border: 1px dashed var(--border-med); border-radius: var(--r-md); padding: 52px 20px; }
-.compare-empty-icon { font-size: 28px; opacity: .2; margin-bottom: 4px; }
-.compare-empty-text { font-size: 14px; font-weight: 600; color: var(--text-secondary); }
-
-/* Scatter controls */
-.sc-select { border-radius: 7px !important; border: 1.5px solid var(--border-med) !important; font-size: 12px !important; background: white !important; transition: border-color .15s !important; }
-.sc-select:focus { border-color: var(--accent) !important; outline: none !important; }
-
-/* Freeform board */
-.ff2-title { font-size: 17px; font-weight: 800; color: var(--text-primary); }
-.ff2-meta { font-size: 11px; color: var(--text-muted); }
-
-/* Controls bar: consistent height */
-.controls-bar { display: flex; align-items: center; flex-wrap: wrap; min-height: 48px; }
-
-/* Mobile */
-@media (max-width: 640px) {
-  .main { padding: 12px; }
-  .controls-bar { padding: 8px 10px; }
-  .cards-grid { grid-template-columns: 1fr; gap: 8px; }
-  .compare-grid { grid-template-columns: 1fr; }
-  .modal-body { padding: 14px 16px; }
-}
-
-/* Rank context labels in metric boxes */
-.rank-ctx { font-size: 9px; color: inherit; opacity: .5; margin-top: 3px; letter-spacing: .2px; font-weight: 500; line-height: 1.3; }
-
-/* Score badge for comps */
-.comp-sim-val { font-family: 'Barlow Condensed', sans-serif; font-size: 16px; font-weight: 900; }
-.comp-sim-badge { border-radius: 6px; padding: 3px 7px; display: inline-flex; flex-direction: column; align-items: center; line-height: 1.2; }
 
 /* Add-to-compare button global: shared style */
 .hw-add-compare {
@@ -3878,11 +3705,12 @@ body {
 <!-- COMPARE -->
 <section class="tab-panel" id="tab-compare">
   <div class="print-header"><div class="print-header-title">HoopsWill NBA Draft Board — Player Compare</div><div class="print-header-sub">Analytics Model · 2019–2027 · hoopswill.com</div></div>
-  <div class="controls-bar" style="margin-bottom:18px;flex-wrap:wrap;gap:10px">
+  <div class="controls-bar" style="margin-bottom:12px;flex-wrap:wrap;gap:8px">
     <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
       <span style="font-size:12px;font-weight:700;color:var(--gray-500);text-transform:uppercase;letter-spacing:.5px">Draft Class</span>
       <select id="compareYear" class="filter-select" onchange="populateCompareSelect()">
-        <option value="2026">2026</option>
+        <option value="2026">2026 ★</option>
+        <option value="2027">2027 Watch</option>
         <option value="2025">2025</option>
         <option value="2024">2024</option>
         <option value="2023">2023</option>
@@ -9319,211 +9147,340 @@ function renderCompare() {
   if (!el) return;
 
   if (!compareList.length) {
-    el.innerHTML = '<div class="compare-empty"><div class="compare-empty-icon">\u2696\uFE0F</div>'
-      + '<div class="compare-empty-text">Select up to 4 prospects to compare side-by-side</div>'
-      + '<div style="font-size:12px;color:var(--gray-400)">Choose a draft class, then pick a player and click + Add</div></div>';
+    el.innerHTML = '<div class="compare-empty">'
+      + '<div class="compare-empty-icon">\u2696\uFE0F</div>'
+      + '<div class="compare-empty-text">Select 2\u20134 prospects to compare</div>'
+      + '<div style="font-size:12px;color:var(--gray-400)">Choose a draft class and player, then click\u00a0+\u00a0Add</div>'
+      + '</div>';
     return;
   }
 
-  var STAT_DEFS = [
-    { k:'metric',  l:'Metric',    fmt: function(v){ return v ? Number(v).toFixed(2) : '\u2014'; }, higherBetter: true },
-    { k:'ts_pct',  l:'TS%',       fmt: function(v){ return v ? (v*100).toFixed(1)+'%' : '\u2014'; }, higherBetter: true },
-    { k:'pa2_usg', l:'P+A/USG',   fmt: function(v){ return v ? Math.round(v) : '\u2014'; }, higherBetter: true },
-    { k:'stl_bl',  l:'Stl+Bl/75', fmt: function(v){ return v ? parseFloat(v).toFixed(2) : '\u2014'; }, higherBetter: true },
-    { k:'ato',     l:'A/TO',      fmt: function(v){ return v ? parseFloat(v).toFixed(2) : '\u2014'; }, higherBetter: true },
-    { k:'ftar',    l:'FTAr',      fmt: function(v){ return v ? parseFloat(v).toFixed(3) : '\u2014'; }, higherBetter: false },
-    { k:'tpar',    l:'3PAr',      fmt: function(v){ return v ? parseFloat(v).toFixed(3) : '\u2014'; }, higherBetter: false },
-    { k:'obpm',    l:'OBPM',      fmt: function(v){ return (v !== null && v !== undefined) ? Number(v).toFixed(1) : '\u2014'; }, higherBetter: true },
-    { k:'dbpm',    l:'DBPM',      fmt: function(v){ return (v !== null && v !== undefined) ? Number(v).toFixed(1) : '\u2014'; }, higherBetter: true },
-    { k:'bpm',     l:'BPM',       fmt: function(v){ return (v !== null && v !== undefined) ? Number(v).toFixed(1) : '\u2014'; }, higherBetter: true },
+  // ── Stat definitions — same order used in radar, table, and card mini-grid ──
+  var RADAR_KEYS = [
+    { k:'metric',  l:'Metric'  }, { k:'ts_pct',  l:'TS%'     },
+    { k:'pa2_usg', l:'P+A/USG' }, { k:'stl_bl',  l:'Stl+Bl'  },
+    { k:'ato',     l:'A/TO'    }, { k:'ftar',     l:'FTAr'    },
+    { k:'tpar',    l:'3PAr'    },
   ];
+
+  // Stats shown in the expanded card mini-grid (5 most diagnostic, not metric — it's already shown)
+  var CARD_STATS = [
+    { k:'ts_pct',  l:'TS%',      fmt: function(v){ return v    ? (v*100).toFixed(1)+'%'    :'\u2014'; }, hb:true  },
+    { k:'pa2_usg', l:'P+A/USG',  fmt: function(v){ return v    ? Math.round(v)+''          :'\u2014'; }, hb:true  },
+    { k:'stl_bl',  l:'Stl+Bl',   fmt: function(v){ return v    ? parseFloat(v).toFixed(2)  :'\u2014'; }, hb:true  },
+    { k:'ato',     l:'A/TO',     fmt: function(v){ return v    ? parseFloat(v).toFixed(2)  :'\u2014'; }, hb:true  },
+    { k:'bpm',     l:'BPM',      fmt: function(v){ return v!=null ? Number(v).toFixed(1)   :'\u2014'; }, hb:true  },
+  ];
+
+  var SECTIONS = [
+    { label:'Performance', depth:false, stats:[
+      { k:'metric',  l:'Metric',    fmt:function(v){ return v    ? Number(v).toFixed(1)      :'\u2014'; }, hb:true  },
+      { k:'ts_pct',  l:'TS%',       fmt:function(v){ return v    ? (v*100).toFixed(1)+'%'    :'\u2014'; }, hb:true  },
+      { k:'pa2_usg', l:'P+A/USG',   fmt:function(v){ return v    ? Math.round(v)+''          :'\u2014'; }, hb:true  },
+      { k:'stl_bl',  l:'Stl+Bl/75', fmt:function(v){ return v    ? parseFloat(v).toFixed(2)  :'\u2014'; }, hb:true  },
+      { k:'ato',     l:'A/TO',      fmt:function(v){ return v    ? parseFloat(v).toFixed(2)  :'\u2014'; }, hb:true  },
+    ]},
+    { label:'Shot Profile', depth:false, stats:[
+      { k:'ftar', l:'FTAr', fmt:function(v){ return v ? parseFloat(v).toFixed(3):'\u2014'; }, hb:false },
+      { k:'tpar', l:'3PAr', fmt:function(v){ return v ? parseFloat(v).toFixed(3):'\u2014'; }, hb:false },
+    ]},
+    { label:'Advanced', depth:false, stats:[
+      { k:'obpm', l:'OBPM', fmt:function(v){ return v!=null ? Number(v).toFixed(1):'\u2014'; }, hb:true },
+      { k:'dbpm', l:'DBPM', fmt:function(v){ return v!=null ? Number(v).toFixed(1):'\u2014'; }, hb:true },
+      { k:'bpm',  l:'BPM',  fmt:function(v){ return v!=null ? Number(v).toFixed(1):'\u2014'; }, hb:true },
+    ]},
+    { label:'Physical\u00a0& Profile', depth:true, stats:[
+      { k:'ht',          l:'Height',   fmt:function(v){ return v ? Math.floor(v/12)+"'"+(v%12)+'"':'\u2014'; }, hb:null },
+      { k:'wt',          l:'Weight',   fmt:function(v){ return v ? v+'lb':'\u2014'; },                          hb:null },
+      { k:'age',         l:'Age',      fmt:function(v){ return v ? parseFloat(v).toFixed(1)+'y':'\u2014'; },    hb:null },
+      { k:'position',    l:'Position', fmt:function(v){ return v||'\u2014'; },                                  hb:null },
+      { k:'torvik_role', l:'Role',     fmt:function(v){ return v||'\u2014'; },                                  hb:null },
+      { k:'cls',         l:'Class',    fmt:function(v){ return v||'\u2014'; },                                  hb:null },
+    ]},
+  ];
+
+  // ── Delta helper ──────────────────────────────────────────────────
+  function delta(def, val, best) {
+    if (def.hb===null||val==null||best==null||val===best) return null;
+    var diff = val - best;
+    var txt;
+    if      (def.k==='ts_pct')  txt=(diff>=0?'+':'')+((diff)*100).toFixed(1)+'%';
+    else if (def.k==='pa2_usg') txt=(diff>=0?'+':'')+Math.round(diff);
+    else                        txt=(diff>=0?'+':'')+diff.toFixed(2);
+    return { text:txt, cls:(def.hb ? diff>=0 : diff<=0)?'pos':'neg' };
+  }
+
+  // ── Win counts + biggest-gap stat ─────────────────────────────────
+  var wins = compareList.map(function(){ return 0; });
+  var gapScores = {};
+  SECTIONS.forEach(function(sec) {
+    sec.stats.forEach(function(def) {
+      if (def.hb===null) return;
+      var vals = compareList.map(function(p){ var v=p[def.k]; return typeof v==='number'?v:null; });
+      var numV = vals.filter(function(v){ return v!==null; });
+      if (numV.length<2) return;
+      var best = def.hb?Math.max.apply(null,numV):Math.min.apply(null,numV);
+      vals.forEach(function(v,ci){ if(v===best) wins[ci]++; });
+      var mn=Math.min.apply(null,numV), mx=Math.max.apply(null,numV);
+      if (mx>0) gapScores[def.k]=(mx-mn)/mx;
+    });
+  });
+  var maxWins = Math.max.apply(null,wins);
+  var totalStats = SECTIONS.reduce(function(s,sec){ return s+sec.stats.filter(function(d){return d.hb!==null;}).length; },0);
+  var biggestGapKey='', biggestGapVal=0;
+  Object.keys(gapScores).forEach(function(k){ if(gapScores[k]>biggestGapVal){biggestGapVal=gapScores[k];biggestGapKey=k;} });
+
+  // Pre-compute best values for card mini-grid leader highlighting
+  var cardBests = {};
+  CARD_STATS.forEach(function(cs) {
+    var numV = compareList.map(function(p){ var v=p[cs.k]; return typeof v==='number'?v:null; }).filter(function(v){return v!==null;});
+    if (numV.length>1) cardBests[cs.k] = Math.max.apply(null,numV);
+  });
 
   var out = '';
 
-  // ── Player cards ────────────────────────────────────────────────────────
-  out += '<div class="compare-grid">';
+  // ╔════════════════════════════════════════════════════════╗
+  // ║  HERO: [cards column LEFT] + [radar RIGHT]             ║
+  // ╚════════════════════════════════════════════════════════╝
+  out += '<div class="compare-hero">';
+
+  // ── Cards column ─────────────────────────────────────────────────
+  out += '<div class="compare-cards-col">';
   compareList.forEach(function(p, ci) {
     var yr     = p._year || '2026';
-    var base   = p.name.indexOf(' - ') > 0 ? p.name.slice(0, p.name.indexOf(' - ')) : p.name;
-    var school = p.name.indexOf(' - ') > 0 ? p.name.slice(p.name.indexOf(' - ') + 3) : '';
+    var base   = p.name;
+    var school = p.school || '';
     var color  = COMPARE_COLORS[ci];
     var tier   = getTier(p.rank);
-    var tierColor = tier.key === 'lottery' ? 'var(--purple)' : tier.key === 'late1' ? 'var(--blue)' : tier.key === 'second' ? 'var(--cyan)' : 'var(--teal)';
-    if (p.rank <= 3) tierColor = 'linear-gradient(135deg,#B45309,#F59E0B)';
-    var logoHtml = schoolLogoHtml(school, '16px', '2px');
-    var gm = crossGradStyle(p.metric, 'metric', yr);
+    var tierBg = tier.key==='franchise' ? 'linear-gradient(135deg,#B45309,#F59E0B)'
+               : tier.key==='lottery'   ? 'var(--purple)'
+               : tier.key==='late1'     ? 'var(--blue)'
+               : tier.key==='second'    ? 'var(--cyan)'
+               : 'var(--teal)';
+    var gm    = crossGradStyle(p.metric,'metric',yr);
+    var logo  = schoolLogoHtml(school, '14px', '3px');
+    var isLdr = wins[ci]===maxWins && compareList.length>1;
 
-    out += '<div class="compare-card" style="border-color:' + color + '40">';
-    out += '<button class="compare-card-remove" onclick="removeFromCompare(' + p.rank + ',\'' + yr + '\')" title="Remove">\u2715</button>';
+    out += '<div class="compare-card" data-ci="'+ci+'">';
+    out += '<div class="compare-card-accent" style="background:'+color+'"></div>';
+    out += '<button class="compare-card-remove" onclick="removeFromCompare('+p.rank+',\''+yr+'\')" title="Remove">\u2715</button>';
+
+    // Header: rank badge + avatar + name/school
     out += '<div class="compare-card-header">';
-    out += '<div class="compare-card-rank" style="background:' + tierColor + '">'
-         + '<div class="rn">' + p.rank + '</div><div class="rl">rank</div></div>';
-    out += avatarHtml(p.name, p.position||'', '48px', '8px');
+    out += '<div class="compare-card-rank" style="background:'+tierBg+'">'
+         + '<div class="rn">'+p.rank+'</div><div class="rl">rank</div></div>';
+    out += avatarHtml(p.name, p.position||'', '38px', '6px');
     out += '<div class="compare-card-info">'
-         + '<div class="cn">' + base + '</div>'
-         + '<div class="cs">' + (logoHtml || '') + '<span>' + (school || '\u2014') + '</span>'
-         + '<span style="margin-left:5px;background:rgba(37,99,235,.12);color:var(--blue);font-size:9px;font-weight:700;padding:1px 5px;border-radius:3px;flex-shrink:0">' + yr + '</span>'
+         + '<div class="cn">'+base+'</div>'
+         + '<div class="cs">'+(logo||'')
+         + '<span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:110px">'+(school||'\u2014')+'</span>'
+         + '<span style="flex-shrink:0;background:rgba(37,99,235,.1);color:var(--blue);font-size:8px;font-weight:700;padding:1px 5px;border-radius:3px">'+yr+'</span>'
+         + '</div></div>';
+    out += '</div>'; // card-header
+
+    // Metric / tier / win-count
+    out += '<div class="compare-metric-row" style="'+gm+'">'
+         + '<div>'
+         + '<div class="compare-metric-val" style="color:inherit">'+(p.metric?Number(p.metric).toFixed(1):'\u2014')+'</div>'
+         + '<div class="compare-metric-lbl" style="color:inherit;opacity:.65">Metric</div>'
          + '</div>'
-         + '</div>';
-    out += '</div>';
-
-    // Metric row
-    out += '<div class="compare-metric-row" style="' + gm + '">'
-         + '<div><div class="compare-metric-val" style="color:inherit">' + (p.metric ? Number(p.metric).toFixed(2) : '\u2014') + '</div>'
-         + '<div class="compare-metric-lbl" style="color:inherit;opacity:.7">Metric</div></div>'
-         + '<div style="text-align:right"><div style="font-size:11px;color:inherit;opacity:.8;font-weight:600">' + tier.label + '</div>'
-         + '<div style="font-size:10px;color:inherit;opacity:.6">' + (p.torvik_role || '') + '</div></div>'
+         + '<div style="text-align:right">'
+         + '<div style="font-size:11px;font-weight:700;color:inherit;opacity:.85">'+tier.label+'</div>'
+         + '<div style="font-size:9px;color:inherit;opacity:'+(isLdr?'.9':'.5')+';font-weight:'+(isLdr?'800':'600')+'">'
+         + (isLdr?'\u2605 ':'')+wins[ci]+'/'+totalStats+' leads'
+         + '</div></div>'
          + '</div>';
 
-    // Stats 2x3 grid
-    out += '<div class="compare-stat-grid">';
-    [['ts_pct','TS%'],['pa2_usg','P+A/USG'],['stl_bl','Stl+Bl'],['ato','A/TO'],['ftar','FTAr'],['tpar','3PAr'],['obpm','OBPM'],['dbpm','DBPM'],['bpm','BPM']].forEach(function(pair) {
-      var k = pair[0], label = pair[1];
-      var gs = crossGradStyle(p[k], k, yr);
-      var fmtDef = STAT_DEFS.find(function(d){ return d.k === k; });
-      var val = fmtDef ? fmtDef.fmt(p[k]) : (p[k] || '\u2014');
-      out += '<div class="compare-stat-cell" style="' + gs + '">'
-           + '<div class="compare-stat-val" style="color:inherit">' + val + '</div>'
-           + '<div class="compare-stat-lbl" style="color:inherit;opacity:.7">' + label + '</div>'
-           + '</div>';
+    // ── 5-stat mini-grid ─────────────────────────────────────────
+    out += '<div class="ccard-stats">';
+    CARD_STATS.forEach(function(cs) {
+      var v = p[cs.k];
+      var isBest = (typeof v==='number' && compareList.length>1 && v===cardBests[cs.k]);
+      var gs = (v!=null && v!==0) ? crossGradStyle(v, cs.k, yr) : '';
+      out += '<div class="ccs-cell'+(isBest?' ccs-lead':'')+'" style="'+gs+'">';
+      out += '<span class="ccs-val" style="'+(gs?'color:inherit':'')+'">'+cs.fmt(v)+'</span>';
+      out += '<span class="ccs-lbl" style="'+(gs?'color:inherit;opacity:.55':'')+'">'+cs.l+'</span>';
+      out += '</div>';
     });
-    out += '</div>';
-    out += '</div>';
-  });
-  out += '</div>';
+    out += '</div>'; // ccard-stats
 
-  // ── Radar chart ─────────────────────────────────────────────────────────
+    out += '</div>'; // compare-card
+  });
+  out += '</div>'; // compare-cards-col
+
+  // ── Radar — right column ──────────────────────────────────────────
   if (compareList.length >= 2) {
     out += '<div class="compare-radar-wrap">';
-    out += '<div class="compare-radar-title">Stat Radar <span style="font-size:11px;font-weight:500;color:var(--gray-400)">(percentile vs own draft class)</span></div>';
-    out += '<div style="display:flex;justify-content:center;gap:16px;flex-wrap:wrap;margin-bottom:10px">';
-    compareList.forEach(function(p, ci) {
-      var base = p.name.indexOf(' - ') > 0 ? p.name.slice(0, p.name.indexOf(' - ')) : p.name;
-      var yr   = p._year || '2026';
-      out += '<span style="display:flex;align-items:center;gap:5px;font-size:12px;font-weight:600;color:var(--gray-700)">'
-           + '<span style="width:12px;height:12px;border-radius:50%;background:' + COMPARE_COLORS[ci] + ';flex-shrink:0"></span>'
-           + base + ' <span style="font-size:10px;color:var(--gray-400);font-weight:500">\''+yr.slice(2)+'</span></span>';
+    out += '<div class="compare-radar-top">';
+    out += '<div class="compare-radar-title">Percentile Radar'
+         + '<span style="font-size:9px;font-weight:500;color:var(--gray-400);margin-left:5px">vs own draft class</span>'
+         + '</div>';
+    out += '<div class="compare-radar-legend">';
+    compareList.forEach(function(p,ci){
+      var isLdr = wins[ci]===maxWins && compareList.length>1;
+      out += '<div style="display:flex;align-items:center;gap:5px;font-size:11px;font-weight:'+(isLdr?'800':'600')+';color:var(--navy)">'
+           + '<span style="width:10px;height:10px;border-radius:50%;background:'+COMPARE_COLORS[ci]+';flex-shrink:0"></span>'
+           + p.name
+           + (isLdr?'<span style="font-size:8px;color:#B8860F;margin-left:2px">\u2605</span>':'')
+           + '<span style="font-size:9px;color:var(--gray-400);font-weight:500;margin-left:4px">\''+(p._year||'2026').slice(2)+'</span>'
+           + '</div>';
     });
-    out += '</div>';
-    out += '<canvas id="compareRadar" style="max-height:340px"></canvas>';
-    out += '</div>';
+    out += '</div></div>'; // legend + radar-top
+    out += '<div class="compare-radar-canvas-wrap"><canvas id="compareRadar"></canvas></div>';
+    out += '</div>'; // radar-wrap
+  } else if (compareList.length === 1) {
+    // Single player — show a placeholder prompt instead of empty space
+    out += '<div class="compare-radar-wrap" style="align-items:center;justify-content:center">';
+    out += '<div style="text-align:center;padding:40px 20px;color:var(--gray-300)">';
+    out += '<div style="font-size:32px;opacity:.3;margin-bottom:10px">\u25ca</div>';
+    out += '<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:14px;font-weight:700">Add a 2nd player</div>';
+    out += '<div style="font-size:11px;margin-top:4px">to see the radar comparison</div>';
+    out += '</div></div>';
   }
 
-  // ── Side-by-side table ───────────────────────────────────────────────────
-  out += '<div class="compare-table-wrap">';
-  out += '<div class="compare-table-title">Side-by-Side Stats</div>';
+  out += '</div>'; // compare-hero
+
+  // ╔════════════════════════════════════════════════════════╗
+  // ║  STATS TABLE — full width below hero                   ║
+  // ╚════════════════════════════════════════════════════════╝
+  out += '<div class="compare-panel"><div class="compare-table-wrap">';
+  out += '<div class="compare-table-title">'
+       + 'Stat Comparison'
+       + '<span style="font-size:10px;font-weight:500;color:var(--gray-400)">\u2605\u00a0leader\u2003\u00b1\u00a0delta</span>'
+       + '<button onclick="var t=this.closest(\'.compare-table-wrap\').querySelector(\'.compare-table\');t.classList.toggle(\'depth-open\');this.textContent=t.classList.contains(\'depth-open\')?\'\u2212 Depth\':\'+ Depth\';" '
+       + 'style="margin-left:auto;font-size:10px;font-weight:700;font-family:\'Barlow Condensed\',sans-serif;background:none;border:1.5px solid var(--gray-200);border-radius:5px;padding:2px 9px;cursor:pointer;color:var(--gray-500);transition:all .12s" '
+       + 'onmouseover="this.style.borderColor=\'var(--blue)\';this.style.color=\'var(--blue)\'" '
+       + 'onmouseout="this.style.borderColor=\'var(--gray-200)\';this.style.color=\'var(--gray-500)\'">+ Depth</button>'
+       + '</div>';
+
   out += '<div class="compare-table"><table><thead><tr><th>Stat</th>';
-  compareList.forEach(function(p, ci) {
-    var base = p.name.indexOf(' - ') > 0 ? p.name.slice(0, p.name.indexOf(' - ')) : p.name;
-    var yr   = p._year || '2026';
-    out += '<th style="color:' + COMPARE_COLORS[ci] + '">' + base
-         + '<br><span style="font-size:9px;font-weight:600;opacity:.8;color:' + COMPARE_COLORS[ci] + '">\'' + yr.slice(2) + ' Draft</span></th>';
+  compareList.forEach(function(p,ci){
+    out += '<th class="cth" title="'+p.name+'" style="border-top:3px solid '+COMPARE_COLORS[ci]+';color:'+COMPARE_COLORS[ci]+'">'
+         + p.name.split(' ').pop()
+         + '<br><span style="font-size:9px;font-weight:600;opacity:.65">'+(p._year||'2026')+'</span>'
+         + '</th>';
   });
   out += '</tr></thead><tbody>';
 
-  STAT_DEFS.forEach(function(def) {
-    var vals    = compareList.map(function(p){ return p[def.k]; });
-    var numVals = vals.map(function(v){ return typeof v === 'number' ? v : null; }).filter(function(v){ return v !== null; });
-    var best    = numVals.length ? (def.higherBetter ? Math.max.apply(null, numVals) : Math.min.apply(null, numVals)) : null;
-    out += '<tr><td>' + def.l + '</td>';
-    compareList.forEach(function(p) {
-      var v      = p[def.k];
-      var isBest = (v !== null && v !== undefined && v === best && numVals.length > 1);
-      out += '<td class="' + (isBest ? 'compare-best' : '') + '">' + def.fmt(v) + '</td>';
+  out += '<tr class="compare-quick-row"><td>OVERALL</td>';
+  compareList.forEach(function(p,ci){
+    var isLdr = wins[ci]===maxWins && compareList.length>1;
+    out += '<td><span class="cqr-score'+(isLdr?' cqr-lead':'')+'">'+wins[ci]+(isLdr?'\u2605':'')+'</span>'
+         + '<span class="cqr-wins">'+wins[ci]+'\u00a0of\u00a0'+totalStats+'\u00a0leads</span></td>';
+  });
+  out += '</tr>';
+
+  SECTIONS.forEach(function(section){
+    var dc=section.depth?' ctr-depth':'', tc=section.depth?' ctr-toggle':'';
+    out += '<tr class="ctr-section'+dc+tc+'"><td colspan="'+(compareList.length+1)+'">'+section.label+'</td></tr>';
+    section.stats.forEach(function(def){
+      var vals=compareList.map(function(p){ var v=p[def.k]; return (v!=null&&v!=='') ? v:null; });
+      var numV=vals.filter(function(v){ return typeof v==='number'; });
+      var best=null;
+      if(numV.length>1&&def.hb!==null) best=def.hb?Math.max.apply(null,numV):Math.min.apply(null,numV);
+      var rowCls=(section.depth?' ctr-depth':'')+(def.k===biggestGapKey?' ctr-maxgap':'');
+      out += '<tr data-stat="'+def.k+'"'+(rowCls?' class="'+rowCls.trim()+'"':'')+'>';
+      out += '<td>'+def.l+'</td>';
+      compareList.forEach(function(p,ci){
+        var v=vals[ci], isBest=(v!==null&&v===best);
+        var d=(!isBest&&best!==null)?delta(def,v,best):null;
+        out += '<td class="'+(isBest?'compare-best':'')+'"><span class="ctd-val">'+def.fmt(v)+'</span>';
+        if(d) out += '<span class="ctd-delta '+d.cls+'">'+d.text+'</span>';
+        out += '</td>';
+      });
+      out += '</tr>';
+      if(numV.length>=2&&def.hb!==null){
+        var mn=Math.min.apply(null,numV),mx=Math.max.apply(null,numV);
+        if(mx>mn){
+          out += '<tr class="compare-gap-row'+(section.depth?' ctr-depth':'')+'"><td></td>';
+          compareList.forEach(function(p,ci){
+            var v=vals[ci], pct=v!==null?Math.round((v-mn)/(mx-mn)*100):0;
+            out += '<td><div class="cgap-track"><div class="cgap-fill" style="width:'+pct+'%;background:'+COMPARE_COLORS[ci]+'"></div></div></td>';
+          });
+          out += '</tr>';
+        }
+      }
     });
-    out += '</tr>';
   });
 
-  // Physicals
-  [['ht','Height (in)'],['wt','Weight (lbs)'],['age','Age']].forEach(function(pair) {
-    out += '<tr><td>' + pair[1] + '</td>';
-    compareList.forEach(function(p) {
-      var v    = p[pair[0]];
-      var disp = pair[0] === 'age' ? (v ? parseFloat(v).toFixed(1) : '\u2014') : (v || '\u2014');
-      out += '<td>' + disp + '</td>';
-    });
-    out += '</tr>';
-  });
+  out += '</tbody></table></div></div></div>'; // table + table-wrap + compare-panel
 
-  // Scouting fields
-  [['position','Position'],['torvik_role','Role'],['cls','Class']].forEach(function(pair) {
-    out += '<tr><td>' + pair[1] + '</td>';
-    compareList.forEach(function(p) {
-      out += '<td style="font-size:12px;color:var(--gray-600)">' + (p[pair[0]] || '\u2014') + '</td>';
-    });
-    out += '</tr>';
-  });
-
-  out += '</tbody></table></div></div>';
   el.innerHTML = out;
 
-  // ── Draw radar ───────────────────────────────────────────────────────────
+  // ── Radar ─────────────────────────────────────────────────────────
   if (compareList.length >= 2) {
-    setTimeout(function() {
+    setTimeout(function(){
       var ctx = document.getElementById('compareRadar');
       if (!ctx) return;
-      var RADAR_KEYS = [
-        { k:'metric',  l:'Metric' },
-        { k:'ts_pct',  l:'TS%' },
-        { k:'pa2_usg', l:'P+A/USG' },
-        { k:'stl_bl',  l:'Stl+Bl' },
-        { k:'ato',     l:'A/TO' },
-        { k:'ftar',    l:'FTAr' },
-        { k:'tpar',    l:'3PAr' },
-      ];
-      var datasets = compareList.map(function(p, ci) {
-        var base = p.name.indexOf(' - ') > 0 ? p.name.slice(0, p.name.indexOf(' - ')) : p.name;
-        var yr   = p._year || '2026';
-        var data = RADAR_KEYS.map(function(rk) {
-          // True rank-based percentile within the player's own draft class.
-          // Rank-based (not min-max) so cross-year comparisons are stable:
-          // "75th percentile" means the same thing regardless of class era.
-          var board = DataService.getBoard(yr);
-          var vals  = board.map(function(x){ return x[rk.k]; }).filter(function(v){ return v != null && v !== 0; });
-          if (!vals.length || p[rk.k] == null || p[rk.k] === 0) return 0;
-          var sorted = vals.slice().sort(function(a,b){ return a-b; });
-          var below  = sorted.filter(function(v){ return v < p[rk.k]; }).length;
-          return Math.round((below / sorted.length) * 100);
+      var datasets = compareList.map(function(p,ci){
+        var yr = p._year||'2026';
+        var data = RADAR_KEYS.map(function(rk){
+          var board  = DataService.getBoard(yr);
+          var vals   = board.map(function(x){ return x[rk.k]; }).filter(function(v){ return v!=null&&v!==0; });
+          if(!vals.length||p[rk.k]==null||p[rk.k]===0) return 0;
+          var sorted = vals.slice().sort(function(a,b){return a-b;});
+          return Math.round(sorted.filter(function(v){return v<p[rk.k];}).length/sorted.length*100);
         });
         var c = COMPARE_COLORS[ci];
         return {
-          label: base + ' \'' + yr.slice(2),
-          data: data,
-          backgroundColor: c + '22',
-          borderColor: c,
-          borderWidth: 2,
-          pointBackgroundColor: c,
-          pointRadius: 4,
+          label: p.name+'\''+yr.slice(2), data: data,
+          backgroundColor: c+'20', borderColor: c, borderWidth: 2,
+          pointBackgroundColor: c, pointBorderColor: '#fff',
+          pointBorderWidth: 1.5, pointRadius: 4, pointHoverRadius: 7,
         };
       });
-
-      if (window._compareRadarChart) { window._compareRadarChart.destroy(); }
+      if (window._compareRadarChart) window._compareRadarChart.destroy();
       window._compareRadarChart = new Chart(ctx, {
         type: 'radar',
         data: { labels: RADAR_KEYS.map(function(r){ return r.l; }), datasets: datasets },
         options: {
           responsive: true,
+          maintainAspectRatio: false,
           scales: { r: {
-            min: 0, max: 100,
-            ticks: { display: false, stepSize: 25 },
-            pointLabels: { font: { family: 'Barlow Condensed', weight: '700', size: 13 }, color: '#334155' },
-            grid: { color: '#E2E8F0' },
-            angleLines: { color: '#E2E8F0' }
+            min:0, max:100,
+            ticks: { display:false },
+            pointLabels: {
+              font: { family:'Barlow Condensed', weight:'700', size:13 },
+              color: '#334155', padding: 10,
+            },
+            grid:       { color:'rgba(203,213,225,.6)' },
+            angleLines: { color:'rgba(203,213,225,.6)' },
           }},
           plugins: {
-            legend: { display: true, position: 'bottom',
-              labels: { font: { family: 'DM Sans', size: 11 }, boxWidth: 12, padding: 14 } },
+            legend: { display:false },
             tooltip: {
               callbacks: {
-                label: function(ctx) { return ctx.dataset.label + ': ' + ctx.raw + ' pct'; }
+                title: function(items){ return items[0]?items[0].label:''; },
+                label: function(c){ return ' '+c.dataset.label+': '+c.raw+'th pct'; }
               }
             }
-          }
+          },
+          animation: { duration:300 },
         }
       });
     }, 50);
   }
+
+  // ── Cross-section hover sync ──────────────────────────────────────
+  var tbody = el.querySelector('.compare-table tbody');
+  if (tbody) {
+    tbody.addEventListener('mouseover', function(e){
+      var td = e.target.closest('td');
+      if (!td||td.cellIndex===0) return;
+      var ci = td.cellIndex-1;
+      el.querySelectorAll('.compare-card').forEach(function(c){
+        c.classList.toggle('crd-hover', parseInt(c.getAttribute('data-ci'),10)===ci);
+      });
+    });
+    tbody.addEventListener('mouseleave', function(){
+      el.querySelectorAll('.compare-card.crd-hover').forEach(function(c){ c.classList.remove('crd-hover'); });
+    });
+  }
 }
+
+
+
+
 
 
 // ── TWEET CARD GENERATOR ───────────────────────────────────────────────────
@@ -11951,16 +11908,14 @@ var FreeformInteraction = (function() {
 // Generates the horizontal scrollable chip strip for Big Board on mobile.
 // Each chip shows the abbreviated stat name + full descriptive label.
 function _bbMobileLegendChips() {
+  // Mobile shows 8 columns: rank | avatar | name | metric | TS% | P+A | Stl+Bl | A/TO
+  // Hidden on mobile: Ht/Wt, Pos/Role, FTAr, 3PAr
   var STATS = [
     { abbr:'MET',  full:'HW Metric' },
     { abbr:'TS%',  full:'True Shoot %' },
     { abbr:'PA/U', full:'Pts+Ast / USG' },
     { abbr:'S+B',  full:'Stl+Blk /75' },
     { abbr:'A/TO', full:'Assist / TO' },
-    { abbr:'FTAr', full:'FT Attempt Rate' },
-    { abbr:'3PAr', full:'3pt Attempt Rate' },
-    { abbr:'HT',   full:'Height / Weight' },
-    { abbr:'TIER', full:'Role / Tier' },
   ];
   return STATS.map(function(s) {
     return '<div class="bb-mobile-legend-chip">'
