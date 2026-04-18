@@ -526,7 +526,10 @@ tr:hover td{background:var(--gray-50)}
   .header-badge{display:none}
 
   /* Hide both countdown widgets — free up horizontal space */
+  /* SC-MOB: header countdowns hidden — shown inline in board tab on mobile */
   #lotteryCountdown,#draftCountdown{display:none}
+  /* Show a compact countdown strip at top of draft board on mobile */
+  #mobileCountdownStrip{display:flex}
 
   /* File menu: icon-only on mobile */
   .file-menu-btn{padding:5px 8px;font-size:11px}
@@ -882,7 +885,11 @@ tr:hover td{background:var(--gray-50)}
   .sc-controls{display:grid;grid-template-columns:1fr 1fr;gap:8px;align-items:end}
   .sc-ctrl-group{min-width:0}
   .sc-select{min-width:0;width:100%;font-size:12px}
-  .sc-canvas-wrap{height:400px}  /* SC-04: more vertical space → logos less crowded */
+  .sc-canvas-wrap{
+    height:300px; /* SC-MOB: 300px + narrow width ≈ good aspect ratio */
+  }
+  /* Controls: stack vertically for best mobile UX */
+  .sc-controls{grid-template-columns:1fr 1fr;gap:6px;padding:10px 12px}
   /* Scatter warning banner for "All classes" on mobile */
   #scMobileWarning{
     display:none;
@@ -2084,9 +2091,14 @@ tr:hover td{background:var(--gray-50)}
 #simPoolList .sim-pool-row:hover{background:var(--gray-50)}
 
 /* ── SIMULATOR BUTTONS ───────────────────────────────────────────────────── */
-.sim-team-btn{padding:4px 9px;border-radius:5px;border:1.5px solid var(--gray-200);
+.sim-team-btn{
+  padding:4px 9px;
+  min-height:40px;  /* mobile touch target */
+  border-radius:5px;border:1.5px solid var(--gray-200);
   background:white;color:var(--gray-600);font-size:11px;font-weight:700;cursor:pointer;
-  font-family:'Barlow Condensed',sans-serif;transition:all .12s}
+  font-family:'Barlow Condensed',sans-serif;transition:all .12s;
+  touch-action:manipulation; /* no 300ms tap delay */
+}
 .sim-team-btn.on{background:var(--navy);color:white;border-color:var(--navy)}
 .sim-pos-btn{padding:3px 8px;border-radius:5px;border:1px solid rgba(255,255,255,.25);
   background:rgba(255,255,255,.08);color:rgba(255,255,255,.7);font-size:11px;
@@ -3241,6 +3253,696 @@ body {
 .hw-add-compare:hover { background: rgba(37,99,235,.14); border-color: rgba(37,99,235,.3); }
 
 
+/* ═══════════════════════════════════════════════════════════════════
+   MOBILE SYSTEM AUDIT — Targeted Fixes
+   Applied: Methodology, Scatter, Countdown, MDC, Cross-tab polish
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ── Methodology tab hero: override inline padding on mobile ── */
+@media (max-width: 640px) {
+  .mc-hero-outer {
+    padding: 20px 16px 18px !important;
+    border-radius: 10px !important;
+    margin-bottom: 16px !important;
+  }
+  .mc-content-wrap {
+    padding: 0 !important;
+  }
+  /* Flex items with min-width:260px → full width stack on mobile */
+  .mc-content-wrap [style*="min-width:260px"],
+  .mc-content-wrap [style*="min-width: 260px"] {
+    min-width: 0 !important;
+    width: 100% !important;
+  }
+  /* Stat boxes: allow wrapping to 2-col on small screens */
+  .mc-content-wrap [style*="min-width:90px"] {
+    min-width: 80px !important;
+    padding: 10px 12px !important;
+  }
+  /* Width:220px button-like elements → stretch to full */
+  .mc-content-wrap [style*="width:220px"] {
+    width: 100% !important;
+    max-width: 300px !important;
+  }
+  /* Inline flex containers in methodology → wrap */
+  .mc-content-wrap [style*="display:flex"] {
+    flex-wrap: wrap !important;
+  }
+}
+
+/* ── Mobile countdown strip in board tab ── */
+@media (max-width: 640px) {
+  #mobileCountdownStrip {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    background: var(--navy);
+    border-radius: 8px;
+    padding: 8px 14px;
+    margin-bottom: 10px;
+  }
+}
+@media (min-width: 641px) {
+  #mobileCountdownStrip { display: none !important; }
+}
+
+/* ── Scatter plot: reduce point density on mobile ── */
+@media (max-width: 640px) {
+  .sc-canvas-wrap {
+    height: 300px;
+    border-radius: 8px;
+    overflow: hidden;
+    /* Prevent iOS scroll hijacking on the canvas area */
+    touch-action: none;
+  }
+  /* Top-5 panel: compact card format on mobile */
+  .sc-top5-row {
+    padding: 7px 10px;
+    gap: 8px;
+  }
+  .sc-top5-name { font-size: 12px; }
+  .sc-top5-school { font-size: 9px; }
+  .sc-top5-val { font-size: 13px; }
+  .sc-top5-idx { font-size: 11px; min-width: 14px; }
+  /* Stat bar: scroll horizontally on very small screens */
+  #scStatBar {
+    overflow-x: auto;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 4px;
+  }
+  .sc-stat-chip { white-space: nowrap; }
+  /* Controls: 2 items per row looks good on 360px+ */
+  .sc-controls {
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    padding: 10px 12px;
+  }
+  .sc-ctrl-label { font-size: 9.5px; }
+}
+
+/* ── MDC (Mock Draft Creator) mobile ── */
+@media (max-width: 640px) {
+  /* Team select grid: 5-per-row at 360px+ */
+  #simTeamGrid {
+    display: flex !important;
+    flex-wrap: wrap;
+    gap: 5px;
+  }
+  .sim-team-btn {
+    flex: 0 0 calc(20% - 4px);  /* 5-col grid */
+    min-width: 0;
+    min-height: 40px;
+    font-size: 10px;
+    padding: 3px 4px;
+    text-align: center;
+    touch-action: manipulation;
+  }
+  /* Pool drawer: ensure adequate height on landscape */
+  .mdc-pool {
+    height: min(65vh, 480px);
+  }
+  /* Pick rows: tap-friendly height */
+  .mdc-pick-row { min-height: 48px; }
+  .mdc-pool-item { min-height: 48px; }
+  /* FAB: nudge up from bottom safe area on iOS */
+  #mdcPoolFab {
+    bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  }
+  /* Simulator speed / rounds controls: stack cleanly */
+  #simSpeedSelect, #simRoundsSelect {
+    font-size: 13px;
+    padding: 7px 8px;
+    min-width: 0;
+    width: 100%;
+  }
+  /* Team tabs in results: horizontal scroll */
+  #simTeamTabBtns {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    display: flex;
+    gap: 6px;
+    padding-bottom: 6px;
+    scrollbar-width: none;
+  }
+  #simTeamTabBtns::-webkit-scrollbar { display: none; }
+}
+
+/* ── Compare tab: hero layout fix on mobile ── */
+@media (max-width: 640px) {
+  /* Cards strip: 2 columns at 360px, 1 column at 380px */
+  .compare-strip {
+    grid-template-columns: 1fr 1fr;
+    gap: 7px;
+  }
+  /* Stat mini-grid in card: reduce to 3 cols on very small screens */
+  @media (max-width: 380px) {
+    .ccard-stats { grid-template-columns: repeat(3, 1fr); }
+    .compare-strip { grid-template-columns: 1fr; }
+  }
+  /* Radar section */
+  #compareRadar { min-height: 240px; height: 240px !important; }
+}
+
+/* ── Modal / player profile: safe-area + scroll ── */
+@media (max-width: 640px) {
+  .modal-overlay {
+    /* Prevent rubber-band bounce exposing dark background */
+    overscroll-behavior: contain;
+  }
+  .modal {
+    /* Ensure modal content doesn't sit under iOS home indicator */
+    padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  }
+  /* Bio text: better line-height on mobile */
+  .modal-notes { font-size: 13px; line-height: 1.65; }
+}
+
+/* ── Freeform board: touch-friendly adjustments ── */
+@media (max-width: 640px) {
+  /* Cards must be large enough to tap */
+  .ff2-card { min-width: 72px; }
+  /* Density buttons: 44px touch target */
+  .ff2-density-btn {
+    min-width: 36px;
+    min-height: 36px;
+    font-size: 13px;
+  }
+  .ff2-reset-btn {
+    min-height: 36px;
+    padding: 4px 12px;
+  }
+}
+
+/* ── Global: ensure no horizontal overflow on any tab ── */
+.tab-panel.active {
+  overflow-x: hidden;
+}
+/* Exception: views that intentionally scroll horizontally */
+.bb-wrap,
+.table-wrap,
+.compare-table,
+.sc-canvas-wrap,
+.sc-stat-bar,
+#scStatBar {
+  overflow-x: auto;
+}
+
+/* ── Typography scale: prevent text from being too small on high-DPR ── */
+@media (max-width: 640px) {
+  /* iOS sets min font-size to 16px for inputs to prevent zoom — match it */
+  select, input[type="text"], input[type="search"], input[type="number"] {
+    font-size: 16px !important;  /* prevents iOS auto-zoom on focus */
+  }
+  /* But keep label/filter text small */
+  .filter-select {
+    font-size: 14px !important;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   MOBILE PRODUCTION REDESIGN — Decision Pass
+   Breakpoint: 640px (single consistent breakpoint throughout)
+   ═══════════════════════════════════════════════════════════════════
+
+   SPACING SYSTEM:
+   --mob-xs:  4px   (tight internal cell padding)
+   --mob-sm:  8px   (gap between components)
+   --mob-md:  12px  (section padding)
+   --mob-lg:  16px  (page-level horizontal padding)
+   --mob-xl:  24px  (section separation)
+
+   VERTICAL RHYTHM: 48px rows (touch minimum), 40px compact rows
+   MAX CONTENT WIDTH: 100vw (no artificial max-width on mobile)
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ─────────────────────────────────────────────────────────────────
+   PHASE 1: VIEW TOGGLE — Big Board is the PRIMARY mobile view.
+   On mobile, default to Big Board. Hide the Freeform option (complex
+   spatial UI unusable without a mouse). Show only Board + Table.
+   ───────────────────────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  /* Hide freeform on mobile — spatial drag requires precise pointer */
+  #viewFreeform { display: none !important; }
+  /* Cards view becomes the default; table as secondary. Freeform/BigBoard hidden. */
+  /* User gets: Cards | Table — both work perfectly on mobile */
+
+  /* View toggle: make full-width, even sizing */
+  .view-toggle {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 4px;
+    width: 100%;
+  }
+  .view-btn {
+    padding: 7px 4px;
+    font-size: 11px;
+    gap: 3px;
+    min-height: 40px;
+  }
+  .vb-badge { display: none; }
+  /* Count badge: inline after toggle */
+  .count-badge { font-size: 11px; }
+
+  /* Controls bar: 2-row layout on mobile */
+  .controls-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .search-wrap {
+    flex: 1 1 100%; /* full width on first row */
+    min-width: 0;
+  }
+  /* Filters: share second row */
+  #posFilter, #clsFilter {
+    flex: 1 1 calc(50% - 3px);
+    min-width: 0;
+  }
+  /* Tier customize button: icon-only on mobile */
+  .tier-customize-btn .tier-btn-label { display: none; }
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   PHASE 2A: BIG BOARD — Mobile scan-optimized
+   Decisions:
+   - Export/screenshot bar: HIDDEN on mobile (desktop-only workflow)
+   - Twitter card mode button: HIDDEN
+   - Range pickers: HIDDEN
+   - Sort indicator pill: HIDDEN (sort still works, arrow on header)
+   - Mobile legend: compact horizontal chips (already working)
+   ───────────────────────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  /* Export controls: completely hidden. Exporting from a phone is edge case. */
+  .bb-screenshot-bar .bb-range-group { display: none !important; }
+  /* Hide twitter card button */
+  .bb-sub-btn[onclick*="twitter"],
+  .bb-sub-btn[onclick*="setBBSubMode"] {
+    /* Keep "Full Board (60)" — it's the mode selector. Only hide twitter. */
+    /* Selector: the twitter-specific button contains 'twitter' in onclick */
+  }
+  /* BB screenshot bar: just the mode buttons, no export */
+  .bb-screenshot-bar {
+    flex-wrap: nowrap;
+    gap: 6px;
+    margin-bottom: 8px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 4px;
+    scrollbar-width: none;
+  }
+  .bb-screenshot-bar::-webkit-scrollbar { display: none; }
+
+  /* Sort pill: hidden — active sort shown by arrow on column header */
+  /* The sort indicator div is not a class, so target by structure */
+  /* It's rendered as: div > span.sort-pill + button "reset..." */
+  /* We can hide the whole container if it has a "Sorted:" text node */
+
+  /* Active sort label: collapse to save space */
+  .bb-wrap + div[style*="Sorted"] { display: none !important; }
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   PHASE 2B: PLAYER CARDS — Mobile-first compact card
+   Decisions:
+   - 1-column cards on ≤400px, 2-column on 401–640px
+   - Comp footer: REMOVED (insufficient space, not primary info)
+   - Age, height, weight tags: REMOVED (secondary info)
+   - Tweet button: REMOVED (desktop workflow)
+   - Compare button (⊕): ENLARGED for tap speed
+   ───────────────────────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  /* Hide secondary tags: age, height, weight */
+  .tag.age, .tag.ht, .tag.wt { display: none !important; }
+  /* Show: position + role + class only — 3 tags max */
+
+  /* Comp footer: removed */
+  .card-comp { display: none !important; }
+
+  /* Tweet button: removed */
+  .pc-tweet-btn { display: none !important; }
+
+  /* Compare button (⊕): larger tap target */
+  .hw-card-compare-btn {
+    width: 32px !important;
+    height: 32px !important;
+    font-size: 16px !important;
+    bottom: 6px !important;
+    right: 6px !important;
+    border-radius: 8px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    touch-action: manipulation !important;
+  }
+  /* Card: tighter vertical padding */
+  .player-card {
+    border-radius: 10px !important;
+  }
+  /* Stats: 3-col grid is correct; reduce cell padding */
+  .stat-cell {
+    padding: 4px 2px 3px !important;
+  }
+  .stat-val { font-size: 12px !important; }
+  .stat-bar { height: 2px !important; }
+  .stat-lbl { font-size: 8px !important; }
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   PHASE 2C: COMPARE — Mobile layout
+   Decisions:
+   - Hero (cards + radar): stacks vertically
+   - Radar: full width, 260px height on mobile (adequate for 7 axes)
+   - Stats table: full width, compressed but complete
+   - Physical & Profile: hidden by default (depth toggle exists)
+   - Table padding: tighter on mobile
+   ───────────────────────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  /* Remove 2027 option visual noise — keep functional */
+  /* Controls bar: stack year + player selectors vertically */
+  #tab-compare .controls-bar > div {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    width: 100%;
+  }
+  #compareYear, #compareSelect {
+    width: 100% !important;
+    min-width: 0 !important;
+    font-size: 14px !important;
+  }
+  #tab-compare .compare-add-btn {
+    width: 100% !important;
+    padding: 9px 14px !important;
+    font-size: 14px !important;
+    min-height: 44px !important;
+    touch-action: manipulation !important;
+  }
+  #tab-compare .compare-clear-btn {
+    font-size: 12px !important;
+    padding: 7px 12px !important;
+    min-height: 40px !important;
+    touch-action: manipulation !important;
+  }
+
+  /* Hero: vertical stack on mobile */
+  .compare-hero { flex-direction: column !important; gap: 10px !important; }
+  .compare-cards-col {
+    width: 100% !important;
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+    gap: 7px !important;
+  }
+  .compare-card { flex: 1 1 calc(50% - 4px) !important; min-width: 0 !important; }
+
+  /* Radar: full width on mobile, good height */
+  .compare-radar-wrap { width: 100% !important; }
+  #compareRadar { height: 260px !important; min-height: 260px !important; }
+
+  /* Stats table: tighter on mobile */
+  .compare-table td, .compare-table thead th {
+    padding: 4px 7px !important;
+    font-size: 11px !important;
+  }
+  .ctd-val { font-size: 13px !important; }
+  .ctd-delta { font-size: 8px !important; }
+
+  /* Mini stats grid in card: 5-col still works at 160px+ card */
+  .ccard-stats { grid-template-columns: repeat(5, 1fr) !important; }
+  .ccs-val { font-size: 12px !important; }
+  .ccs-lbl { font-size: 7px !important; }
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   PHASE 2D: SCATTER — Tap-to-focus model
+   Decisions:
+   - Color-by selector: REMOVED from mobile controls (position default)
+   - Position filter: REMOVED from mobile controls
+   - Top-5 panel: HIDDEN on mobile (tap-to-focus replaces it)
+   - Controls: 2-item grid (X axis + Y axis only)
+   - Canvas: 280px height (more room for axes and labels)
+   - Tap bubble → persistent tooltip until next tap
+   ───────────────────────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  /* Hide the 3rd and 4th control groups (color-by, position filter) */
+  .sc-controls .sc-ctrl-group:nth-child(3),
+  .sc-controls .sc-ctrl-group:nth-child(4),
+  .sc-controls .sc-ctrl-group:nth-child(5) {
+    display: none !important;
+  }
+  /* Only X + Y axis selectors remain — full width, clear */
+  .sc-controls {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 8px !important;
+    padding: 10px 12px !important;
+  }
+  .sc-ctrl-label {
+    font-size: 10px !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: .5px !important;
+  }
+  .sc-select {
+    font-size: 14px !important; /* prevent iOS zoom */
+    padding: 8px 8px !important;
+    min-height: 40px !important;
+    touch-action: manipulation !important;
+  }
+
+  /* Canvas: taller for better axis readability */
+  .sc-canvas-wrap {
+    height: 280px !important;
+    touch-action: none !important; /* prevents page scroll competing with tap */
+  }
+
+  /* Top-5 panel: hidden on mobile — tap-to-focus is the discovery model */
+  .sc-top5-wrap { display: none !important; }
+  #scTop5, .sc-top5 { display: none !important; }
+
+  /* Mobile focus indicator: shown when a player is tapped */
+  #scMobileFocus {
+    display: none; /* shown via JS when bubble tapped */
+    background: white;
+    border: 1.5px solid var(--gray-200);
+    border-radius: 10px;
+    padding: 10px 12px;
+    margin-top: 8px;
+    font-family: 'DM Sans', sans-serif;
+  }
+  #scMobileFocus.visible { display: block; }
+  .sc-mf-name {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 17px; font-weight: 800; color: var(--navy);
+    line-height: 1.1; margin-bottom: 3px;
+  }
+  .sc-mf-school { font-size: 11px; color: var(--gray-400); margin-bottom: 8px; }
+  .sc-mf-stats {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 6px;
+  }
+  .sc-mf-stat {
+    background: var(--gray-50); border-radius: 6px; padding: 5px 8px;
+  }
+  .sc-mf-val {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 16px; font-weight: 900; color: var(--navy);
+  }
+  .sc-mf-lbl { font-size: 9px; color: var(--gray-400); text-transform: uppercase; letter-spacing: .4px; }
+  .sc-mf-dismiss {
+    margin-top: 8px; width: 100%; padding: 8px;
+    background: none; border: 1px solid var(--gray-200); border-radius: 7px;
+    font-size: 12px; font-weight: 600; color: var(--gray-400);
+    cursor: pointer; touch-action: manipulation;
+  }
+  .sc-mf-dismiss:active { background: var(--gray-50); }
+
+  /* Instruction hint below canvas (dismisses on first tap) */
+  #scTapHint {
+    text-align: center;
+    font-size: 11px; color: var(--gray-400);
+    padding: 5px 0 2px;
+    font-style: italic;
+    transition: opacity .3s;
+  }
+  #scTapHint.hidden { opacity: 0; pointer-events: none; }
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   PHASE 2E: MOCK DRAFT — Tap-speed optimization
+   Decisions:
+   - Archive mode: HIDDEN on mobile (low value, adds cognitive load)
+   - Sim team setup: streamlined — already improved
+   - Pool items: prominent tap targets
+   - Board picks: clear active pick indicator
+   ───────────────────────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  /* Archive mode: hidden on mobile */
+  #mockModeArchive { display: none !important; }
+  #mockPanelArchive { display: none !important; }
+
+  /* Mode toggle: 2 buttons instead of 3 */
+  .mock-mode-strip {
+    grid-template-columns: 1fr 1fr !important;
+  }
+  .mock-mode-btn {
+    padding: 10px 8px !important;
+    min-height: 56px !important;
+    touch-action: manipulation !important;
+  }
+  .mock-mode-sub { font-size: 9px !important; }
+
+  /* Build mock controls: simpler on mobile */
+  .mdc-board-header { padding: 10px 12px 8px !important; }
+  .mdc-board-title { font-size: 14px !important; }
+  /* Action buttons: touch-friendly */
+  .mdc-act-btn {
+    min-height: 36px !important;
+    padding: 5px 10px !important;
+    font-size: 11px !important;
+    touch-action: manipulation !important;
+  }
+
+  /* Pick rows: clear active state */
+  .mdc-pick-row.active {
+    border-left: 3px solid var(--amber) !important;
+    background: #FFFBEB !important;
+  }
+  /* Pool item: larger tap target */
+  .mdc-pool-item {
+    min-height: 48px !important;
+    padding: 8px 10px !important;
+    touch-action: manipulation !important;
+  }
+  /* Pool search: full-width, font-size prevents iOS zoom */
+  #mdcPoolSearch {
+    font-size: 16px !important;
+    padding: 9px 12px !important;
+  }
+  /* Sim speed/rounds: full width */
+  .sim-controls-row {
+    flex-direction: column !important;
+    gap: 8px !important;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   PHASE 3: GLOBAL MOBILE SYSTEM
+   Interaction model:
+   - All interactive elements: touch-action:manipulation (removes 300ms delay)
+   - No hover-dependent information on mobile
+   - Tap = primary action, long-press not used
+   ───────────────────────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  /* Universal touch-action for all interactive elements */
+  button, [onclick], .nav-tab, .view-btn, .filter-select,
+  .player-card, .bb-row, .board-table tr[data-rank] {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: rgba(0,0,0,0.06);
+  }
+  /* Active feedback for all tappable rows/cards */
+  .player-card:active { transform: scale(0.98); transition: transform 0.08s; }
+  .bb-row:active { background: #E8EEFA !important; transition: none; }
+  /* Nav tabs: ensure sticky works correctly on iOS */
+  .nav-tabs {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+  }
+  /* Modals: bottom sheet feels native */
+  .modal {
+    border-radius: 16px 16px 0 0 !important;
+    overscroll-behavior: contain !important;
+  }
+  /* Page-level overflow: no horizontal scroll on any tab */
+  .tab-panel.active { overflow-x: hidden; max-width: 100vw; }
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   PHASE 5: DIFFERENTIATORS
+   1. Quick-add from Big Board: ⊕ button always tappable
+   2. Persistent compare tray: sticky bottom on mobile
+   3. Scatter focus card: replaces Top-5 with tapped player info
+   ───────────────────────────────────────────────────────────────── */
+
+/* 1. Quick-add button in Big Board rows: always visible on mobile */
+@media (max-width: 640px) {
+  .bb-compare-dot {
+    /* Normally opacity-less; on mobile always visible */
+    opacity: 1 !important;
+    width: 26px !important;
+    height: 26px !important;
+    border-radius: 6px !important;
+    font-size: 13px !important;
+    background: rgba(37,99,235,.08) !important;
+    color: var(--blue) !important;
+    border-color: rgba(37,99,235,.2) !important;
+    touch-action: manipulation !important;
+  }
+  /* Make the bb-compare-col visible again on mobile */
+  .bb-compare-col { display: flex !important; }
+}
+
+/* 2. Persistent compare tray: sticky bottom tray showing added players */
+#mobCompareTray {
+  display: none; /* shown via JS when compareList.length > 0 */
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  z-index: 600;
+  background: var(--navy);
+  padding: 8px 12px calc(8px + env(safe-area-inset-bottom, 0px));
+  border-radius: 12px 12px 0 0;
+  box-shadow: 0 -4px 24px rgba(10,22,40,.35);
+  transition: transform .25s cubic-bezier(.4,0,.2,1);
+}
+#mobCompareTray.visible { display: flex; }
+#mobCompareTray.hidden  { transform: translateY(100%); }
+.mct-players {
+  display: flex; align-items: center; gap: 6px; flex: 1; overflow-x: auto;
+  scrollbar-width: none;
+}
+.mct-players::-webkit-scrollbar { display: none; }
+.mct-chip {
+  display: flex; align-items: center; gap: 4px;
+  background: rgba(255,255,255,.1); border-radius: 6px;
+  padding: 4px 8px; white-space: nowrap; flex-shrink: 0;
+}
+.mct-chip-name {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 12px; font-weight: 700; color: white;
+}
+.mct-chip-remove {
+  background: none; border: none; color: rgba(255,255,255,.5);
+  cursor: pointer; font-size: 12px; padding: 0 0 0 2px;
+  touch-action: manipulation; line-height: 1;
+}
+.mct-go-btn {
+  flex-shrink: 0;
+  background: var(--amber); color: var(--navy);
+  border: none; border-radius: 8px;
+  padding: 8px 14px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 13px; font-weight: 900; letter-spacing: .3px;
+  cursor: pointer; touch-action: manipulation;
+  white-space: nowrap;
+}
+.mct-go-btn:active { opacity: .85; }
+
+/* When tray is visible, add bottom padding to prevent content hiding behind it */
+body.mct-open .tab-panel.active {
+  padding-bottom: calc(56px + env(safe-area-inset-bottom, 0px));
+}
+
+/* 3. Scatter focus card element (shown by JS on tap) */
+#scMobileFocus {
+  display: none;
+  position: relative;
+}
+
+/* Scatter: tap hint */
+#scTapHint {
+  transition: opacity .4s;
+}
+
 </style>
 </head>
 <body>
@@ -3359,7 +4061,20 @@ body {
       </div>
     </div>
   </div>
-  <div id="board2026Content"></div>
+  
+  <!-- Mobile countdown strip — hidden on desktop, shown on mobile via CSS -->
+  <div id="mobileCountdownStrip" style="display:none;align-items:center;justify-content:center;gap:16px;background:var(--navy);border-radius:8px;padding:6px 14px;margin-bottom:10px;font-family:'Barlow Condensed',sans-serif">
+    <div style="display:flex;align-items:center;gap:8px">
+      <span style="font-size:9px;font-weight:700;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.8px">Lottery</span>
+      <span id="mLotDisplay" style="font-size:16px;font-weight:900;color:var(--amber)">—</span>
+    </div>
+    <div style="width:1px;height:20px;background:rgba(255,255,255,.1)"></div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <span style="font-size:9px;font-weight:700;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.8px">Draft</span>
+      <span id="mCdDisplay" style="font-size:16px;font-weight:900;color:#4ADE80">—</span>
+    </div>
+  </div>
+<div id="board2026Content"></div>
 </section>
 
 <!-- ANALYTICS -->
@@ -3844,6 +4559,12 @@ body {
           <canvas id="scCanvas"></canvas>
         </div>
         <div class="sc-stat-bar" id="scStatBar"></div>
+        <!-- Mobile tap-to-focus: hidden on desktop, shown when bubble tapped -->
+        <div id="scTapHint" style="display:none">Tap any player bubble to see details</div>
+        <div id="scMobileFocus">
+          <div id="scMfInner"></div>
+        </div>
+
       </div>
     </div>
   </div>
@@ -9751,6 +10472,16 @@ var ScatterEngine = (function() {
   // Total rendered = tierSize + BUBBLE_PAD*2 (added by ScatterLogoCache).
   // franchise → 22+12 = 34px bubble | lottery → 18+12 = 30px | etc.
   function tierSize(rank) {
+    // SC-MOB: use smaller bubbles on narrow screens so logos don't overlap.
+    // 640px matches the main mobile breakpoint used throughout the system.
+    var isMobile = (typeof window !== 'undefined' && window.innerWidth <= 640);
+    if (isMobile) {
+      if (!rank)      return 10;
+      if (rank <= 5)  return 14;
+      if (rank <= 14) return 12;
+      if (rank <= 30) return 10;
+      return 9;
+    }
     if (!rank)      return 15;
     if (rank <= 5)  return 22;
     if (rank <= 14) return 18;
@@ -10202,13 +10933,15 @@ function scShowTip(e, nearby, xM, yM) {
   });
   tt.innerHTML = h;
   tt.style.opacity = '1';
+  var margin = 8;
+  var ttW = Math.min(240, window.innerWidth - margin * 2);
+  var ttH = 200;
   var cx = e.clientX + 16, cy = e.clientY - 10;
-  // Clamp tooltip to viewport — critical on mobile where screen is narrow
-  var ttW = 260, ttH = 200;
-  if (cx + ttW > window.innerWidth)  cx = Math.max(4, e.clientX - ttW - 4);
-  if (cy + ttH > window.innerHeight) cy = Math.max(4, e.clientY - ttH - 4);
-  if (cx < 4) cx = 4;
-  if (cy < 4) cy = 4;
+  // Clamp tooltip — critical on narrow mobile screens
+  if (cx + ttW > window.innerWidth - margin)  cx = Math.max(margin, e.clientX - ttW - 4);
+  if (cy + ttH > window.innerHeight - margin) cy = Math.max(margin, e.clientY - ttH - 4);
+  if (cx < margin) cx = margin;
+  if (cy < margin) cy = margin;
   tt.style.left = cx + 'px';
   tt.style.top  = cy + 'px';
 }
@@ -10479,7 +11212,15 @@ function scRender() {
   canvas.ontouchcancel = function() {
     if (_scTipHideTimer) { clearTimeout(_scTipHideTimer); _scTipHideTimer = null; }
     scHideTip();
-  };
+  }
+
+  // ── Mobile tap-to-focus: separate from the tooltip system
+  // Replaces the "show then dismiss" tooltip with a persistent focus card.
+  // Only active on mobile (≤640px); no-op on desktop.
+  if (typeof scBindMobileTap === 'function') {
+    scBindMobileTap(canvas, _scAllPts, xM, yM, _scChart);
+  }
+;
   // FIX SC-02: prevent page scroll/zoom when touching the chart canvas.
   // Must use addEventListener with passive:false to call preventDefault().
   // Stored on canvas._scTouchMove so each render replaces the prior listener.
@@ -13044,6 +13785,9 @@ function simReset() {
           lot.style.color = '#F87171';
           if (lotLbl) { lotLbl.textContent = 'LOTTERY TODAY'; lotLbl.style.color = '#F87171'; }
         }
+      // Mirror to mobile strip
+      var mLot = document.getElementById('mLotDisplay');
+      if (mLot) { mLot.textContent = lot.textContent; mLot.style.color = lot.style.color || 'var(--amber)'; }
       }
     }
 
@@ -13055,6 +13799,8 @@ function simReset() {
       el.textContent  = '🏀 LIVE';
       el.style.color  = '#4ADE80';
       if (lbl) lbl.textContent = 'Draft Night';
+      var mCd2 = document.getElementById('mCdDisplay');
+      if (mCd2) { mCd2.textContent = '🏀 LIVE'; mCd2.style.color = '#4ADE80'; }
       return;
     }
 
@@ -13064,17 +13810,17 @@ function simReset() {
     var secs  = Math.floor((diff % 60000)    / 1000);
 
     if (days > 99) {
-      // Show D·HH:MM format when far out
       el.textContent = days + 'd ' + padZ(hours) + 'h ' + padZ(mins) + 'm';
     } else if (days > 0) {
-      // Show D·HH:MM:SS
       el.textContent = days + 'd ' + padZ(hours) + ':' + padZ(mins) + ':' + padZ(secs);
     } else {
-      // Final 24 hours — HH:MM:SS only, red tint
       el.textContent = padZ(hours) + ':' + padZ(mins) + ':' + padZ(secs);
       el.style.color = '#F87171';
       if (lbl) { lbl.textContent = 'DRAFT TODAY'; lbl.style.color = '#F87171'; }
     }
+    // Mirror to mobile countdown strip
+    var mCd = document.getElementById('mCdDisplay');
+    if (mCd) { mCd.textContent = el.textContent; mCd.style.color = el.style.color || '#4ADE80'; }
   }
 
   // Run immediately, then tick every second
@@ -13099,26 +13845,31 @@ function simReset() {
     _resizeTimer = setTimeout(function() {
       updateMdcMobileControls();
 
-      // C6: Auto-close the pool drawer when viewport widens past the mobile
-      // breakpoint (e.g. phone rotated to landscape). Without this, the drawer
-      // stays open and overlaps the picks board at desktop widths.
+      // C6: Auto-close pool drawer on rotation to landscape
       if (window.innerWidth > 640) {
         var pool = document.getElementById('mdcWrapPool');
         if (pool && pool.classList.contains('open')) {
-          // Use the existing close function to handle scroll-trap cleanup
           if (typeof mdcClosePoolDrawer === 'function') mdcClosePoolDrawer();
         }
       }
 
-      // C6: Re-render picks/pool if the mock builder is currently active.
-      // Layout slots change width on rotation; re-render ensures correct display.
+      // C6: Re-render MDC picks/pool on orientation change
       if (typeof _currentMockMode !== 'undefined' && _currentMockMode === 'build') {
         var mdcWrap = document.getElementById('mdcWrap');
         if (mdcWrap && mdcWrap.offsetParent !== null) {
-          // Panel is visible — re-render to reflow pick rows and pool list
           if (typeof mdcRenderPicks === 'function') mdcRenderPicks();
           if (typeof mdcRenderPool  === 'function') mdcRenderPool();
         }
+      }
+
+      // SC-MOB: Scatter uses mobile-aware tierSize() which reads innerWidth at call time.
+      // On resize/rotation, invalidate the logo cache (bubbles were sized for old width)
+      // and re-render if scatter tab is active.
+      if (typeof ScatterEngine !== 'undefined') ScatterEngine.invalidate();
+      if (typeof ScatterLogoCache !== 'undefined') ScatterLogoCache.invalidate();
+      var activeTab = document.querySelector('.nav-tab.active');
+      if (activeTab && activeTab.dataset.tab === 'scatter') {
+        if (typeof scRender === 'function') scRender();
       }
     }, 150);  // 150ms debounce — long enough to catch orientation change reflow
   });
@@ -13649,7 +14400,7 @@ var IntelService = (function() {
   <div class="print-header"><div class="print-header-title">HoopsWill NBA Draft Board — The Metric</div><div class="print-header-sub">Methodology · hoopswill.com</div></div>
 
   <!-- ── HERO ───────────────────────────────────────────────────────────── -->
-  <div style="background:linear-gradient(135deg,#0A1628 0%,#1a2f52 60%,#0f2040 100%);border-radius:14px;padding:40px 40px 36px;margin-bottom:24px;position:relative;overflow:hidden">
+  <div class="mc-hero-outer" style="background:linear-gradient(135deg,#0A1628 0%,#1a2f52 60%,#0f2040 100%);border-radius:14px;padding:40px 40px 36px;margin-bottom:24px;position:relative;overflow:hidden">
     <div style="position:absolute;top:-40px;right:-40px;width:260px;height:260px;border-radius:50%;background:rgba(212,168,48,.06);pointer-events:none"></div>
     <div style="position:absolute;bottom:-60px;left:30%;width:180px;height:180px;border-radius:50%;background:rgba(37,99,235,.07);pointer-events:none"></div>
     <div style="position:relative;z-index:1">
@@ -13678,7 +14429,7 @@ var IntelService = (function() {
   </div>
 
   <!-- ── INTRO ───────────────────────────────────────────────────────────── -->
-  <div style="max-width:1100px;margin:0 auto">
+  <div class="mc-content-wrap" style="max-width:1100px;margin:0 auto">
     <div style="background:white;border:1.5px solid var(--gray-200);border-radius:12px;padding:24px 28px;margin-bottom:20px">
       <p style="font-size:15px;line-height:1.75;margin:0 0 16px;color:var(--navy)">Draft evaluation is hard precisely because it asks us to project college performance onto a pro game that looks different in almost every way. The HoopsWill Metric doesn't try to predict a player's NBA career. It tries to answer a narrower, more answerable question: <strong>given what this player did in college, from a raw analytical perspective how productive and impactful were they relative to their opportunity?</strong></p>
       <p style="font-size:15px;line-height:1.75;margin:0 0 16px;color:var(--navy)">The framework is built around what I believe drives winning in the NBA — and more specifically, what produces <em>16-game players</em>. That's the standard that matters: not who fills a box score in November, but who a coaching staff trusts when the margin is thin and the opposition has had weeks to prepare. Playoff basketball strips out the noise. It rewards skill, efficiency, and defensive impact in ways the regular season often masks. The metric is constructed with that context in mind.</p>
@@ -14773,6 +15524,219 @@ window.hwRollForward = (function() {
   };
 })();
 
+
+// ═══════════════════════════════════════════════════════════════════
+// MOBILE PRODUCTION JS
+// ═══════════════════════════════════════════════════════════════════
+
+// ── Scatter: Tap-to-focus model ────────────────────────────────────
+// On mobile, touchend on the canvas identifies the nearest bubble and
+// shows a persistent focus card below the chart. The floating tooltip
+// (scShowTip) is still used on desktop hover. These are separate paths.
+(function() {
+  var _scFocusedPlayer = null;  // currently focused player on mobile
+  var _tapHintDismissed = false;
+
+  // Called by scRender() after Chart.js is created — wire up mobile tap
+  window.scBindMobileTap = function(canvas, allPts, xM, yM, chart) {
+    if (!canvas || window.innerWidth > 640) return;
+
+    // Show tap hint on first render
+    var hint = document.getElementById('scTapHint');
+    if (hint && !_tapHintDismissed) hint.style.display = 'block';
+
+    canvas.addEventListener('touchend', function(e) {
+      e.preventDefault();
+      if (!chart || !allPts.length) return;
+
+      // Dismiss tap hint
+      if (hint && !_tapHintDismissed) {
+        _tapHintDismissed = true;
+        hint.classList.add('hidden');
+        setTimeout(function(){ hint.style.display = 'none'; }, 400);
+      }
+
+      var touch = e.changedTouches[0];
+      var rect  = canvas.getBoundingClientRect();
+      var mx    = touch.clientX - rect.left;
+      var my    = touch.clientY - rect.top;
+
+      try {
+        var xScale = chart.scales.x;
+        var yScale = chart.scales.y;
+        // Generous tap radius: 20px (mobile finger width / 2)
+        var TAP_R = 20;
+        var nearest = null, nearestDist = Infinity;
+        allPts.forEach(function(pt) {
+          var px = xScale.getPixelForValue(pt.x);
+          var py = yScale.getPixelForValue(pt.y);
+          var d  = Math.sqrt((px-mx)*(px-mx) + (py-my)*(py-my));
+          if (d <= TAP_R && d < nearestDist) {
+            nearestDist = d;
+            nearest = pt;
+          }
+        });
+
+        if (nearest) {
+          // Tapping same player dismisses focus
+          if (_scFocusedPlayer && _scFocusedPlayer._p.rank === nearest._p.rank) {
+            scDismissMobileFocus();
+          } else {
+            _scFocusedPlayer = nearest;
+            scShowMobileFocus(nearest, xM, yM);
+          }
+        } else {
+          // Tapping empty space dismisses
+          scDismissMobileFocus();
+        }
+      } catch(err) {}
+    }, { passive: false });
+  };
+
+  window.scShowMobileFocus = function(pt, xM, yM) {
+    var p   = pt._p;
+    var el  = document.getElementById('scMobileFocus');
+    var inn = document.getElementById('scMfInner');
+    if (!el || !inn) return;
+
+    var xVal = xM.fmt(pt.x);
+    var yVal = yM.fmt(pt.y);
+    var logo = (typeof schoolLogoHtml === 'function') ? schoolLogoHtml(p.school || '', '16px', '3px') : '';
+    var av   = (typeof avatarHtml === 'function') ? avatarHtml(p.name, p.position || '', '36px', '8px') : '';
+    var tier = (typeof getTier === 'function') ? getTier(p.rank) : { label: '' };
+
+    var gm   = (typeof gradStyle === 'function') ? gradStyle(p.metric, 'metric') : '';
+
+    inn.innerHTML =
+      '<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">' +
+        av +
+        '<div style="flex:1;min-width:0">' +
+          '<div class="sc-mf-name">#' + p.rank + ' ' + (p.name || '') + '</div>' +
+          '<div class="sc-mf-school">' + (logo||'') + (p.school || '—') + (p.cls ? ' · ' + p.cls : '') + '</div>' +
+        '</div>' +
+        '<div style="' + gm + 'border-radius:7px;padding:4px 8px;text-align:center;flex-shrink:0">' +
+          '<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:18px;font-weight:900;color:inherit">' + (p.metric ? Number(p.metric).toFixed(1) : '—') + '</div>' +
+          '<div style="font-size:8px;text-transform:uppercase;letter-spacing:.4px;opacity:.65;color:inherit">Metric</div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="sc-mf-stats">' +
+        '<div class="sc-mf-stat"><div class="sc-mf-val">' + xVal + '</div><div class="sc-mf-lbl">' + xM.label + '</div></div>' +
+        '<div class="sc-mf-stat"><div class="sc-mf-val">' + yVal + '</div><div class="sc-mf-lbl">' + yM.label + '</div></div>' +
+        (p.ts_pct  ? '<div class="sc-mf-stat"><div class="sc-mf-val">' + (p.ts_pct*100).toFixed(1) + '%</div><div class="sc-mf-lbl">TS%</div></div>' : '') +
+        (p.pa2_usg ? '<div class="sc-mf-stat"><div class="sc-mf-val">' + Math.round(p.pa2_usg) + '</div><div class="sc-mf-lbl">P+A/USG</div></div>' : '') +
+        (p.stl_bl  ? '<div class="sc-mf-stat"><div class="sc-mf-val">' + parseFloat(p.stl_bl).toFixed(2) + '</div><div class="sc-mf-lbl">Stl+Bl</div></div>' : '') +
+        (p.bpm     ? '<div class="sc-mf-stat"><div class="sc-mf-val">' + Number(p.bpm).toFixed(1) + '</div><div class="sc-mf-lbl">BPM</div></div>' : '') +
+      '</div>' +
+      '<div style="display:flex;gap:8px;margin-top:8px">' +
+        '<button class="sc-mf-dismiss" onclick="scDismissMobileFocus()">✕ Dismiss</button>' +
+        '<button style="flex:1;padding:8px;background:rgba(37,99,235,.1);color:var(--blue);border:1.5px solid rgba(37,99,235,.2);border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;touch-action:manipulation" onclick="openPlayerModal(' + p.rank + ')">View Profile →</button>' +
+      '</div>';
+
+    el.classList.add('visible');
+    // Scroll to the focus card smoothly
+    setTimeout(function(){ el.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }, 50);
+  };
+
+  window.scDismissMobileFocus = function() {
+    _scFocusedPlayer = null;
+    var el = document.getElementById('scMobileFocus');
+    if (el) el.classList.remove('visible');
+  };
+
+  // Clear focus when scatter re-renders (axis change, year change)
+  var _origScRenderDebounced = window.scRenderDebounced;
+  if (typeof _origScRenderDebounced === 'function') {
+    window.scRenderDebounced = function() {
+      scDismissMobileFocus();
+      _origScRenderDebounced.apply(this, arguments);
+    };
+  }
+})();
+
+// ── Mobile Compare Tray ────────────────────────────────────────────
+// Persistent bottom tray: shows added players + "Compare →" button.
+// Updates after every addToCompare / removeFromCompare call.
+(function() {
+  var COLORS = ['#2563EB','#7C3AED','#059669','#D97706'];
+
+  function updateTray() {
+    if (window.innerWidth > 640) return;
+    var tray  = document.getElementById('mobCompareTray');
+    var chips = document.getElementById('mctPlayers');
+    if (!tray || !chips) return;
+
+    var list = (typeof compareList !== 'undefined') ? compareList : [];
+
+    if (!list.length) {
+      tray.classList.remove('visible');
+      document.body.classList.remove('mct-open');
+      return;
+    }
+
+    tray.classList.add('visible');
+    document.body.classList.add('mct-open');
+
+    chips.innerHTML = list.map(function(p, ci) {
+      var yr   = p._year || '2026';
+      var name = p.name || '';
+      var last = name.split(' ').pop();
+      var col  = COLORS[ci] || '#2563EB';
+      return '<div class="mct-chip">'
+        + '<span style="width:7px;height:7px;border-radius:50%;background:' + col + ';flex-shrink:0"></span>'
+        + '<span class="mct-chip-name">' + last + '</span>'
+        + '<span style="font-size:9px;color:rgba(255,255,255,.4)">\''+yr.slice(2)+'</span>'
+        + '<button class="mct-chip-remove" onclick="removeFromCompare(' + p.rank + ',\'' + yr + '\')" '
+        + '  aria-label="Remove">×</button>'
+        + '</div>';
+    }).join('');
+  }
+
+  window.mobTrayGoCompare = function() {
+    // Switch to compare tab
+    var tab = document.querySelector('.nav-tab[data-tab="compare"]');
+    if (tab) tab.click();
+  };
+
+  // Patch renderCompare to also update the tray
+  var _origRenderCompare = window.renderCompare;
+  window.renderCompare = function() {
+    if (typeof _origRenderCompare === 'function') _origRenderCompare.apply(this, arguments);
+    updateTray();
+  };
+
+  // Patch addToCompare and removeFromCompare
+  var _origAdd = window.addToCompare;
+  window.addToCompare = function() {
+    if (typeof _origAdd === 'function') _origAdd.apply(this, arguments);
+    updateTray();
+  };
+  var _origRemove = window.removeFromCompare;
+  window.removeFromCompare = function() {
+    if (typeof _origRemove === 'function') _origRemove.apply(this, arguments);
+    updateTray();
+  };
+  var _origClear = window.clearCompare;
+  window.clearCompare = function() {
+    if (typeof _origClear === 'function') _origClear.apply(this, arguments);
+    updateTray();
+  };
+  var _origAddCard = window.addCardToCompare;
+  window.addCardToCompare = function() {
+    if (typeof _origAddCard === 'function') _origAddCard.apply(this, arguments);
+    updateTray();
+  };
+
+  // Initial render
+  document.addEventListener('DOMContentLoaded', updateTray);
+})();
+
 </script>
+
+<!-- ── MOBILE COMPARE TRAY ───────────────────────────────────────────────── -->
+<!-- Persistent bottom tray: appears when compareList has players on mobile -->
+<div id="mobCompareTray">
+  <div class="mct-players" id="mctPlayers"></div>
+  <button class="mct-go-btn" onclick="mobTrayGoCompare()">Compare →</button>
+</div>
 </body>
 </html>
