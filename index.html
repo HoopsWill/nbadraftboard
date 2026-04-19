@@ -54,7 +54,7 @@
 body{font-family:'DM Sans',sans-serif;background:var(--gray-50);color:var(--navy);min-height:100vh;line-height:1.5}
 
 /* HEADER */
-.header{background:linear-gradient(160deg,#0d1d36 0%,#0A1628 60%,#0c1a30 100%);padding:0 28px;display:flex;align-items:center;justify-content:space-between;gap:14px;height:64px;position:sticky;top:0;z-index:200;box-shadow:0 1px 0 rgba(255,255,255,.04),0 4px 24px rgba(0,0,0,.5);border-bottom:1.5px solid rgba(201,151,26,.3)}
+.header{background:linear-gradient(160deg,#0d1d36 0%,#0A1628 60%,#0c1a30 100%);padding:0 12px;display:flex;align-items:center;justify-content:space-between;gap:8px;height:52px;min-height:52px;flex-wrap:nowrap;overflow:hidden;position:sticky;top:0;z-index:200;box-shadow:0 1px 0 rgba(255,255,255,.04),0 4px 24px rgba(0,0,0,.5);border-bottom:1.5px solid rgba(201,151,26,.3)}
 .header-brand{display:flex;align-items:center;gap:11px}
 .header-logo-img{width:46px;height:46px;object-fit:contain;filter:drop-shadow(0 1px 6px rgba(212,168,48,.5));flex-shrink:0}
 .header-title{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:22px;letter-spacing:.3px;line-height:1.1}
@@ -64,26 +64,26 @@ body{font-family:'DM Sans',sans-serif;background:var(--gray-50);color:var(--navy
 .header-badge{background:rgba(212,168,48,.15);border:1px solid rgba(212,168,48,.35);color:var(--amber-light);font-size:11px;font-weight:700;padding:3px 10px;border-radius:4px;letter-spacing:.5px;text-transform:uppercase;text-shadow:0 0 8px rgba(212,168,48,.4)}
 
 /* NAV */
-.nav-tabs{background:white;border-bottom:1px solid var(--gray-200);padding:0 24px;display:flex;gap:0;overflow-x:auto;scrollbar-width:none;position:sticky;top:64px;z-index:199;box-shadow:0 1px 4px rgba(10,22,40,.04)}
+.nav-tabs{background:white;border-bottom:1px solid var(--gray-200);padding:0 8px;display:flex;gap:0;overflow-x:auto;scrollbar-width:none;position:sticky;top:52px;z-index:199;box-shadow:0 1px 4px rgba(10,22,40,.04);scroll-snap-type:x mandatory;scroll-behavior:smooth;-webkit-mask-image:linear-gradient(to right,black calc(100% - 28px),transparent 100%);mask-image:linear-gradient(to right,black calc(100% - 28px),transparent 100%)}
 .nav-tabs::-webkit-scrollbar{display:none}
-.nav-tab{padding:10px 18px;font-size:13px;font-weight:600;color:var(--gray-500);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;white-space:nowrap;transition:all .15s;display:flex;align-items:center;gap:6px;user-select:none}
+.nav-tab{padding:10px 14px;font-size:12px;font-weight:600;color:var(--gray-500);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;white-space:nowrap;scroll-snap-align:start;touch-action:manipulation;-webkit-tap-highlight-color:transparent;transition:all .15s;display:flex;align-items:center;gap:6px;user-select:none}
 .nav-tab:hover{color:var(--gold,var(--amber))}
 .nav-tab.active{color:var(--navy);border-bottom-color:var(--amber);font-weight:700;background:linear-gradient(180deg,rgba(201,151,26,.04) 0%,transparent 100%)}
 
 /* MAIN */
-.main{padding:16px 24px 32px;max-width:1440px;margin:0 auto}
+.main{padding:10px 10px;max-width:1440px;margin:0 auto}
 .tab-panel{display:none}.tab-panel.active{display:block}
 
 /* CONTROLS */
-.controls-bar{display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap}
-.search-wrap{position:relative;flex:1;min-width:180px;max-width:320px}
+.controls-bar{display:flex;align-items:center;gap:6px;margin-bottom:10px;flex-wrap:wrap}
+.search-wrap{position:relative;flex:1;min-width:120px;max-width:320px}
 .search-input{width:100%;padding:8px 12px 8px 34px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:13px;font-family:inherit;background:white;color:var(--navy);outline:none;transition:border-color .15s}
 .search-input:focus{border-color:var(--blue-light)}
 .search-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--gray-400);font-size:13px;pointer-events:none}
-.filter-select{padding:8px 12px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:13px;font-family:inherit;background:white;color:var(--navy);outline:none;cursor:pointer;transition:border-color .15s,box-shadow .15s;min-height:38px}
+.filter-select{padding:6px 8px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:16px;font-family:inherit;background:white;color:var(--navy);outline:none;cursor:pointer;transition:border-color .15s,box-shadow .15s;min-width:90px;min-height:44px}
 .filter-select:focus{border-color:var(--blue-light)}
-.view-toggle{display:flex;background:#071020;border-radius:10px;padding:3px;gap:2px;border:1px solid rgba(255,255,255,.08);box-shadow:inset 0 1px 2px rgba(0,0,0,.4),0 2px 12px rgba(0,0,0,.2)}
-.view-btn{display:flex;align-items:center;gap:5px;padding:7px 14px;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;transition:all .18s cubic-bezier(.4,0,.2,1);border:none;background:none;color:rgba(255,255,255,.5);font-family:'Barlow Condensed',sans-serif;letter-spacing:.4px;text-transform:uppercase;white-space:nowrap;position:relative}
+.view-toggle{display:flex;width:auto;flex-shrink:0;background:#071020;border-radius:10px;padding:3px;gap:2px;border:1px solid rgba(255,255,255,.08);box-shadow:inset 0 1px 2px rgba(0,0,0,.4),0 2px 12px rgba(0,0,0,.2)}
+.view-btn{display:flex;align-items:center;gap:5px;flex:1;text-align:center;padding:4px 6px;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;transition:all .18s cubic-bezier(.4,0,.2,1);border:none;background:none;color:rgba(255,255,255,.5);font-family:'Barlow Condensed',sans-serif;letter-spacing:.4px;text-transform:uppercase;white-space:nowrap;position:relative}
 .view-btn:hover:not(.active){background:rgba(255,255,255,.07);color:rgba(255,255,255,.75)}
 .view-btn.active{background:linear-gradient(135deg,#1a3a6e 0%,#0f2451 100%);color:white;box-shadow:0 2px 10px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.12);border-bottom:2px solid rgba(201,151,26,.6)}
 .vb-icon{font-size:13px;line-height:1;opacity:.8}
@@ -446,11 +446,11 @@ tr:hover td{background:var(--gray-50)}
 .td-num{text-align:center;color:var(--gray-700);font-size:12px}
 
 /* MODAL */
-.modal-overlay{position:fixed;inset:0;background:rgba(10,22,40,.72);z-index:1000;display:flex;align-items:flex-start;justify-content:center;padding:20px;overflow-y:auto;opacity:0;pointer-events:none;transition:opacity .2s;backdrop-filter:blur(4px)}
+.modal-overlay{position:fixed;inset:0;background:rgba(10,22,40,.72);z-index:1000;display:flex;align-items:flex-end;justify-content:center;padding:0;overflow-y:hidden;opacity:0;pointer-events:none;transition:opacity .2s;backdrop-filter:blur(4px)}
 .modal-overlay.open{opacity:1;pointer-events:all}
-.modal{background:white;border-radius:16px;width:100%;max-width:780px;box-shadow:var(--shadow-xl);transform:translateY(16px);transition:transform .2s;margin:auto}
+.modal{background:white;border-radius:16px 16px 0 0;width:100%;max-width:100%;max-height:88vh;box-shadow:var(--shadow-xl);transform:translateY(40px);transition:transform .2s;margin:0;display:flex;flex-direction:column;overflow:hidden}
 .modal-overlay.open .modal{transform:translateY(0)}
-.modal-header{background:var(--navy);color:white;padding:22px 26px;border-radius:16px 16px 0 0;position:relative;display:flex;gap:18px;align-items:center}
+.modal-header{background:var(--navy);color:white;padding:14px 14px 10px;border-radius:16px 16px 0 0;position:relative;display:flex;gap:18px;align-items:center;flex-shrink:0}
 .modal-close{position:absolute;top:10px;right:10px;background:rgba(255,255,255,.1);border:none;color:white;width:44px;height:44px;min-width:44px;min-height:44px;border-radius:8px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;touch-action:manipulation}
 .modal-close:hover{background:rgba(255,255,255,.2)}
 /* Mobile close bar — sticky at bottom of sheet, easier thumb reach */
@@ -598,13 +598,7 @@ tr:hover td{background:var(--gray-50)}
   /* ── MOBILE HEADER: single fixed-height row ──────────────────────────── */
   /* Strategy: collapse to logo + title + search only. Hide everything else.
      Nav sticks 52px below since header is now exactly 52px tall. */
-  .header{
-    padding:0 12px;
-    gap:8px;
-    height:52px;min-height:52px;
-    flex-wrap:nowrap; /* NEVER wrap — one row only */
-    overflow:hidden
-  }
+  
   .header-logo-img{width:30px;height:30px;flex-shrink:0}
   .header-title-rest{display:none}   /* Hide "NBA Draft Board" */
   .header-title{font-size:15px;white-space:nowrap}
@@ -637,28 +631,22 @@ tr:hover td{background:var(--gray-50)}
   /* Nav: 52px below the header */
   /* nav-tabs: sticky below 52px header; mask-image creates right-edge fade
      to hint at hidden tabs — no ::after pseudo-element needed */
-  .nav-tabs{
-    top:52px;padding:0 8px;
-    scroll-snap-type:x mandatory;scroll-behavior:smooth;
-    position:sticky;
-    -webkit-mask-image:linear-gradient(to right,black calc(100% - 28px),transparent 100%);
-    mask-image:linear-gradient(to right,black calc(100% - 28px),transparent 100%)
-  }
-  .nav-tab{scroll-snap-align:start;padding:10px 14px;font-size:12px;gap:5px}
+  
+  
 
   /* Main: account for 52px header + 42px nav = 94px combined sticky */
-  .main{padding:10px 10px}
+  
   /* Ensure the sticky nav doesn't overlap content when layout shifts */
   .tab-panel.active{padding-top:4px;overscroll-behavior:contain;overflow-x:hidden}
   /* scroll-margin accounts for combined sticky header + nav (94px total) */
   .tab-panel{scroll-margin-top:96px}
 
   /* Controls bar */
-  .controls-bar{gap:6px}
-  .search-wrap{min-width:120px}
-  .filter-select{min-width:90px;font-size:16px;padding:6px 8px}
-  .view-toggle{width:auto;flex-shrink:0}
-  .view-btn{flex:1;text-align:center;padding:4px 6px;font-size:11px}
+  
+  
+  
+  
+  
   .tier-customize-btn{font-size:10px;padding:5px 8px}
   /* C-01: Tier editor popup — anchor to viewport center so it never clips either edge */
   .tier-editor{
@@ -824,18 +812,7 @@ tr:hover td{background:var(--gray-50)}
   .bb-rk{font-size:15px;width:30px}
   .bb-av{width:28px}
 
-  /* BB-04: Column flex ratios — give name more room, compress stat cols */
-  /* Visible columns on mobile: rank | avatar | name | metric | TS% | P+A | Stl+Bl | A/TO */
-  /* Ht/Wt, Pos/Role, FTAr, 3PAr, compare are hidden (see above)             */
-  /* Target total ≈ 300px so zero horizontal scroll on 320px+ screens         */
-  .bb-cr{width:24px;flex-shrink:0}
-  .bb-cav{width:22px;flex-shrink:0}
-  .bb-cid{flex:1.8;min-width:80px;max-width:none}
-  .bb-cmet{flex:0 0 44px;min-width:44px;max-width:44px}
-  .bb-cts{flex:1;min-width:30px}
-  .bb-cpa{flex:1;min-width:30px}
-  .bb-csb{flex:1;min-width:28px}
-  .bb-cato{flex:1;min-width:28px}
+  
 
   /* BB-04: Stat cells — tighter margin, preserve color coding */
   .bb-stat-cell{margin:1px 0;border-radius:3px;padding:0 1px}
@@ -952,16 +929,9 @@ tr:hover td{background:var(--gray-50)}
     border-left:none
   }
   /* Controls: 2-column grid */
-  .sc-controls{display:grid;grid-template-columns:1fr 1fr;gap:8px;align-items:end}
-  .sc-ctrl-group{min-width:0}
-  .sc-select{min-width:0;width:100%;font-size:12px}
-  .sc-canvas-wrap{
-    height:280px; /* SC-MOB: 280px canonical height for mobile */
-    touch-action:none;   /* prevent iOS page scroll hijack on canvas */
-    -webkit-overflow-scrolling: touch;
-  }
-  /* Controls: stack vertically for best mobile UX */
-  .sc-controls{grid-template-columns:1fr 1fr;gap:6px;padding:10px 12px}
+  
+  
+
   /* Scatter warning banner for "All classes" on mobile */
   #scMobileWarning{
     display:none;
@@ -980,14 +950,10 @@ tr:hover td{background:var(--gray-50)}
   /* FIX M-01: Isolate scroll to the modal inner div, not the overlay.
      overflow-y:hidden on overlay + overflow-y:auto on modal eliminates the
      iOS elastic-bounce effect that exposed the dark backdrop. */
-  .modal-overlay{padding:0;align-items:flex-end;overflow-y:hidden}
-  .modal{
-    border-radius:16px 16px 0 0;max-width:100%;
-    max-height:88vh;margin:0;transform:translateY(40px);
-    display:flex;flex-direction:column;overflow:hidden
-  }
+  
+  
   .modal-overlay.open .modal{transform:translateY(0)}
-  .modal-header{padding:14px 14px 10px;flex-shrink:0}
+  
   /* M-01: modal body scrolls independently — overscroll-behavior:contain stops
      elastic bounce from bleeding through to the overlay (iOS overscroll chaining) */
   .modal-body{
@@ -1495,21 +1461,7 @@ tr:hover td{background:var(--gray-50)}
   /* ──────────── [179944] ──────────── */
   /* Remove 2027 option visual noise — keep functional */
   /* Controls bar: stack year + player selectors vertically */
-  #tab-compare .controls-bar > div {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 6px;
-    width: 100%;
-  }
-  #compareYear, #compareSelect {
-    width: 100%;
-    min-width: 0;
-    font-size: 14px;
-  }
-  #tab-compare .compare-add-btn {
-    width: 100%;
-    padding: 9px 14px;
-    font-size: 14px;
+nt-size: 14px;
     min-height: 44px;
     touch-action: manipulation !important;
   }
@@ -1624,14 +1576,8 @@ tr:hover td{background:var(--gray-50)}
   #mockPanelArchive { display: none !important; }
 
   /* Mode toggle: 2 buttons instead of 3 */
-  .mock-mode-strip {
-    grid-template-columns: 1fr 1fr;
-  }
-  .mock-mode-btn {
-    padding: 10px 8px;
-    min-height: 56px;
-    touch-action: manipulation !important;
-  }
+  
+  
   .mock-mode-sub { font-size: 9px; }
 
   /* Build mock controls: simpler on mobile */
@@ -1745,7 +1691,6 @@ tr:hover td{background:var(--gray-50)}
 
 
 /* ── Mobile table: constrain player column + hide low-priority cols ────── */
-}
 
 @media(max-width:640px){
   /* ── TABLE VIEW: Mobile column layout ────────────────────────────────────
@@ -1958,6 +1903,117 @@ tr:hover td{background:var(--gray-50)}
 }
 
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   DESKTOP ESCALATIONS — @media(min-width:641px)
+   ─────────────────────────────────────────────────────────────────────────
+   These rules promote mobile-base values to their full desktop versions.
+   Base styles (no MQ) = mobile. Everything below = tablet / desktop.
+   Adding new desktop behaviour: add it here, never in the base rule.
+   ═══════════════════════════════════════════════════════════════════════════ */
+@media(min-width:641px){
+
+  /* ── Layout ─────────────────────────────────────────────────────────── */
+  .header{
+    padding:0 28px;
+    gap:14px;
+    height:64px;
+    min-height:64px;
+    flex-wrap:nowrap;
+    overflow:visible;
+  }
+  .header-logo-img{width:36px;height:36px;}
+  .header-title-rest{display:inline;}
+  .header-title{font-size:18px;}
+  .header-sub{display:flex;}
+  .header-badge{display:flex;}
+
+  .nav-tabs{
+    top:64px;
+    padding:0 24px;
+    scroll-snap-type:none;
+    -webkit-mask-image:none;
+    mask-image:none;
+  }
+  .nav-tab{
+    padding:10px 18px;
+    font-size:13px;
+    scroll-snap-align:none;
+  }
+
+  .main{padding:16px 24px 32px;}
+
+  /* ── Controls bar ────────────────────────────────────────────────────── */
+  .controls-bar{gap:8px;margin-bottom:14px;}
+  .search-wrap{min-width:180px;max-width:320px;}
+  .filter-select{
+    padding:8px 12px;
+    font-size:13px;
+    min-width:120px;
+    min-height:38px;
+  }
+  .view-toggle{width:auto;}
+  .view-btn{flex:0 0 auto;padding:7px 14px;text-align:left;}
+
+  /* ── Modal — centered dialog on desktop ──────────────────────────────── */
+  .modal-overlay{
+    align-items:flex-start;
+    justify-content:center;
+    padding:20px;
+    overflow-y:auto;
+  }
+  .modal{
+    border-radius:16px;
+    max-width:780px;
+    max-height:none;
+    transform:translateY(16px);
+    margin:auto;
+    display:block;
+    overflow:visible;
+  }
+  .modal-header{
+    padding:22px 26px;
+    border-radius:16px 16px 0 0;
+    flex-shrink:unset;
+  }
+
+  /* ── Scatter controls ────────────────────────────────────────────────── */
+  .sc-controls{
+    display:flex;
+    flex-wrap:wrap;
+    gap:14px;
+    align-items:flex-end;
+    padding:14px 18px;
+  }
+  .sc-ctrl-group{width:auto;}
+  .sc-select{width:auto;min-width:120px;font-size:12px;}
+  .sc-canvas-wrap{
+    height:540px;
+    touch-action:auto;
+  }
+
+  /* ── Compare controls ────────────────────────────────────────────────── */
+  .compare-controls-row{gap:10px;margin-bottom:16px;}
+
+  /* ── Mock draft ──────────────────────────────────────────────────────── */
+  .mock-mode-strip{display:flex;gap:10px;grid-template-columns:none;}
+  .mock-mode-btn{
+    padding:14px 20px;
+    min-width:160px;
+    min-height:auto;
+    touch-action:auto;
+  }
+
+  /* ── Big Board column widths ─────────────────────────────────────────── */
+  .bb-cr{width:36px;}
+  .bb-cav{width:32px;}
+  .bb-cid{flex:1.55;min-width:100px;max-width:unset;}
+  .bb-cmet{flex:0.95;min-width:64px;max-width:unset;}
+  .bb-cts{flex:0.70;min-width:46px;}
+  .bb-cpa{flex:0.76;min-width:50px;}
+  .bb-csb{flex:0.70;min-width:46px;}
+  .bb-cato{flex:0.66;min-width:44px;}
+}
+
 @media print{
   /* Hide all chrome */
   .header, .nav-tabs, .upload-panel, .controls-bar,
@@ -2085,16 +2141,16 @@ tr:hover td{background:var(--gray-50)}
 }
 .bb-ch[data-tip]:hover::after{opacity:1}
 /* Column widths: content-aware sizing */
-.bb-cr{width:36px;flex-shrink:0;text-align:center}
-.bb-cav{width:32px;flex-shrink:0}
-.bb-cid{flex:1.55;min-width:100px}
+.bb-cr{width:24px;flex-shrink:0;text-align:center}
+.bb-cav{width:22px;flex-shrink:0}
+.bb-cid{flex:1.8;min-width:80px;max-width:none}
 .bb-cht{flex:0.62;min-width:48px;text-align:center;flex-shrink:0}
 .bb-ctag{flex:1.25;min-width:88px}
-.bb-cmet{flex:0.95;min-width:64px;text-align:center}
-.bb-cts{flex:0.70;min-width:46px;text-align:center}
-.bb-cpa{flex:0.76;min-width:50px;text-align:center}
-.bb-csb{flex:0.70;min-width:46px;text-align:center}
-.bb-cato{flex:0.66;min-width:44px;text-align:center}
+.bb-cmet{flex:0 0 44px;min-width:44px;max-width:44px;text-align:center}
+.bb-cts{flex:1;min-width:30px;text-align:center}
+.bb-cpa{flex:1;min-width:30px;text-align:center}
+.bb-csb{flex:1;min-width:28px;text-align:center}
+.bb-cato{flex:1;min-width:28px;text-align:center}
 .bb-cftar{flex:0.66;min-width:44px;text-align:center}
 .bb-ctpar{flex:0.66;min-width:44px;text-align:center}
 /* Tier band */
@@ -2359,10 +2415,10 @@ tr:hover td{background:var(--gray-50)}
 
 /* ── SCATTER PLOT TAB ────────────────────────────────────────────────────── */
 .sc-wrap{max-width:1200px;margin:0 auto}
-.sc-controls{background:white;border:1px solid var(--border-light);border-radius:12px;padding:14px 18px;margin-bottom:14px;display:flex;gap:14px;align-items:flex-end;flex-wrap:wrap;box-shadow:0 1px 8px rgba(10,22,40,.06)}
-.sc-ctrl-group{display:flex;flex-direction:column;gap:5px;min-width:0}
+.sc-controls{background:white;border:1px solid var(--border-light);border-radius:12px;padding:10px 12px;margin-bottom:14px;display:grid;grid-template-columns:1fr 1fr;gap:6px;align-items:end;box-shadow:0 1px 8px rgba(10,22,40,.06)}
+.sc-ctrl-group{display:flex;flex-direction:column;gap:5px;min-width:0;width:100%}
 .sc-ctrl-label{font-size:10px;font-weight:700;color:var(--gray-400);text-transform:uppercase;letter-spacing:.7px}
-.sc-select{background:var(--gray-50);border:1.5px solid var(--gray-200);border-radius:7px;padding:7px 10px;font-size:12px;font-weight:600;color:var(--navy);font-family:'DM Sans',sans-serif;cursor:pointer;outline:none;min-width:150px;transition:border-color .15s}
+.sc-select{background:var(--gray-50);border:1.5px solid var(--gray-200);border-radius:7px;padding:7px 10px;font-size:12px;min-width:0;width:100%;font-weight:600;color:var(--navy);font-family:'DM Sans',sans-serif;cursor:pointer;outline:none;min-width:150px;transition:border-color .15s}
 .sc-select:focus,.sc-select:hover{border-color:var(--amber)}
 .sc-toggle-group{display:flex;gap:6px;flex-wrap:wrap}
 .sc-tog{background:var(--gray-50);border:1.5px solid var(--gray-200);border-radius:6px;padding:5px 12px;font-size:11px;font-weight:700;font-family:'Barlow Condensed',sans-serif;letter-spacing:.4px;cursor:pointer;transition:all .15s;white-space:nowrap;color:var(--gray-500)}
@@ -2371,7 +2427,7 @@ tr:hover td{background:var(--gray-50)}
 .sc-plot-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px}
 .sc-plot-title{font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900;color:var(--navy);letter-spacing:.3px}
 .sc-plot-meta{font-size:11px;color:var(--gray-400);font-weight:500}
-.sc-canvas-wrap{position:relative;height:540px}
+.sc-canvas-wrap{position:relative;height:280px;touch-action:none;-webkit-overflow-scrolling:touch}
 .sc-legend{display:flex;gap:14px;flex-wrap:wrap;padding:12px 0 0;border-top:1px solid var(--gray-100);margin-top:14px}
 .sc-leg-item{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:600;color:var(--gray-500)}
 .sc-leg-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
@@ -2730,14 +2786,15 @@ tr:hover td{background:var(--gray-50)}
 
 /* ── MOCK MODE STRIP ─────────────────────────────────────────────────────── */
 .mock-mode-strip{
-  display:flex;gap:10px;flex-wrap:wrap
+  display:grid;grid-template-columns:1fr 1fr;gap:8px
 }
 .mock-mode-btn{
   display:flex;flex-direction:column;align-items:flex-start;
-  padding:14px 20px;border-radius:12px;cursor:pointer;
+  padding:10px 8px;border-radius:12px;cursor:pointer;
   border:2px solid var(--gray-200);background:white;
-  transition:all .18s;text-align:left;min-width:160px;flex:1;
-  box-shadow:0 1px 4px rgba(10,22,40,.06)
+  transition:all .18s;text-align:left;min-width:0;flex:1;
+  box-shadow:0 1px 4px rgba(10,22,40,.06);
+  min-height:56px;touch-action:manipulation
 }
 .mock-mode-btn:hover{
   border-color:var(--blue);box-shadow:0 3px 14px rgba(37,99,235,.12);
@@ -3168,9 +3225,9 @@ body {
 .compare-controls-row {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   flex-wrap: wrap;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
 }
 
 .compare-add-btn {
