@@ -268,6 +268,112 @@ body{font-family:'DM Sans',sans-serif;background:var(--gray-50);color:var(--navy
 .upload-link{color:var(--blue);font-weight:600}
 .upload-status{font-size:12px;font-weight:600;min-height:20px;line-height:1.5;color:var(--gray-500)}
 
+/* ── GLOSSARY PANEL (priority #11) ──────────────────────────────────────
+   Slide-in side panel: stat definitions, formulas, ranges, "what good
+   looks like" thresholds. Built from STAT_RANGES so numbers stay live.
+   Backdrop dims the rest of the UI; panel slides from the right. */
+.glossary-backdrop{
+  position:fixed;inset:0;background:rgba(10,22,40,.42);z-index:999;
+  opacity:0;pointer-events:none;transition:opacity .22s ease;
+  backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);
+}
+.glossary-backdrop.open{opacity:1;pointer-events:auto}
+.glossary-panel{
+  position:fixed;top:0;right:0;height:100%;width:460px;max-width:92vw;
+  background:#FFFFFF;
+  box-shadow:-8px 0 40px rgba(10,22,40,.22);z-index:1001;
+  transform:translateX(110%);transition:transform .28s cubic-bezier(.4,0,.2,1);
+  display:flex;flex-direction:column;
+}
+.glossary-panel.open{transform:translateX(0)}
+.glossary-header{
+  display:flex;align-items:flex-start;justify-content:space-between;gap:14px;
+  padding:22px 24px 16px;border-bottom:1px solid var(--gray-100);
+  background:linear-gradient(135deg,#0A1628 0%,#162340 60%,#1E3A6E 100%);
+}
+.glossary-title{
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:22px;font-weight:900;color:#FFFFFF;letter-spacing:.4px;
+  line-height:1;margin-bottom:6px;
+}
+.glossary-sub{
+  font-size:11.5px;color:rgba(255,255,255,.62);font-weight:500;letter-spacing:.2px;
+}
+.glossary-close{
+  background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);
+  color:rgba(255,255,255,.7);width:32px;height:32px;border-radius:50%;
+  cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;
+  transition:all .15s;flex-shrink:0;
+}
+.glossary-close:hover{background:rgba(239,68,68,.5);color:#fff;border-color:rgba(239,68,68,.6)}
+.glossary-body{
+  flex:1;overflow-y:auto;padding:8px 6px 12px;
+  overscroll-behavior:contain;
+}
+.glossary-footer{
+  padding:10px 24px;border-top:1px solid var(--gray-100);
+  font-size:10.5px;color:var(--gray-400);font-style:italic;
+  background:var(--gray-50);
+}
+/* Individual stat entries */
+.gloss-entry{
+  padding:14px 22px;border-bottom:1px solid var(--gray-100);
+  transition:background .12s;
+}
+.gloss-entry:hover{background:#FAFBFC}
+.gloss-entry-header{
+  display:flex;align-items:baseline;gap:10px;margin-bottom:8px;
+}
+.gloss-entry-key{
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:18px;font-weight:900;color:var(--navy);letter-spacing:.3px;
+}
+.gloss-entry-name{
+  font-size:11px;color:var(--gray-500);font-weight:600;letter-spacing:.2px;
+}
+.gloss-entry-formula{
+  font-family:'Courier New',monospace;
+  font-size:10.5px;color:var(--gray-500);background:var(--gray-50);
+  padding:3px 8px;border-radius:4px;display:inline-block;margin-bottom:6px;
+  border:1px solid var(--gray-100);
+}
+.gloss-entry-desc{
+  font-size:12.5px;color:var(--gray-700);line-height:1.55;margin-bottom:8px;
+}
+.gloss-entry-meta{
+  display:flex;gap:14px;flex-wrap:wrap;font-size:11px;margin-top:6px;
+}
+.gloss-meta-item{
+  display:flex;flex-direction:column;gap:1px;
+}
+.gloss-meta-label{
+  font-size:9px;text-transform:uppercase;letter-spacing:.8px;
+  color:var(--gray-400);font-weight:700;
+}
+.gloss-meta-val{
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:14px;font-weight:800;color:var(--navy);
+  font-variant-numeric:tabular-nums;
+}
+.gloss-meta-val.good{color:#15803d}
+.gloss-meta-val.bad{color:#b91c1c}
+.gloss-meta-val.range{color:var(--blue)}
+.gloss-section-hdr{
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:11px;font-weight:900;letter-spacing:1.5px;text-transform:uppercase;
+  color:var(--gray-500);background:var(--gray-50);
+  padding:10px 22px 8px;border-bottom:1px solid var(--gray-100);
+  border-top:1px solid var(--gray-100);
+  position:sticky;top:0;z-index:2;
+}
+.gloss-section-hdr:first-child{border-top:none}
+/* Mobile: full-width panel */
+@media(max-width:540px){
+  .glossary-panel{width:100%}
+  .gloss-entry{padding:12px 16px}
+  .glossary-header{padding:18px 18px 14px}
+}
+
 /* COMPARE */
 .compare-add-btn{background:var(--blue);color:white;border:none;border-radius:7px;padding:7px 14px;font-size:12px;font-weight:700;font-family:'Barlow Condensed',sans-serif;letter-spacing:.4px;cursor:pointer;transition:background .15s}
 .compare-add-btn:hover{background:var(--blue-light)}
@@ -455,6 +561,17 @@ tr:hover td{background:var(--gray-50)}
 @media(max-width:600px){.shot-panel-wrap{flex-direction:column}.shot-court-col{width:100%}}
 .modal-sec-title{font-size:12.5px;font-weight:800;color:var(--gray-500);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;display:flex;align-items:center;gap:6px}
 .notes-text{font-size:13px;color:var(--gray-700);line-height:1.65;background:var(--gray-50);padding:12px 14px;border-radius:8px;border:1px solid var(--gray-100)}
+/* Why Here — editorial positioning blurb (priority #1).
+   Distinctive amber accent + serif-leaning weight signals this is editorial
+   reasoning, not raw notes. Sits visually between scouting report and comps. */
+.why-here-text{
+  font-size:13.5px;color:#1E293B;line-height:1.55;
+  background:linear-gradient(180deg,#FFFBEB 0%,#FEF3C7 100%);
+  padding:14px 16px;border-radius:8px;
+  border:1px solid #FCD34D;
+  border-left:3px solid #D97706;
+  font-weight:500;letter-spacing:.05px;
+}
 .sw-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .sw-grid.has-neutral{grid-template-columns:1fr 1fr 1fr}
 .sw-col{background:var(--gray-50);border:1px solid var(--gray-100);border-radius:8px;padding:12px 14px}
@@ -691,6 +808,12 @@ tr:hover td{background:var(--gray-50)}
   /* Share btn: hide label, keep icon */
   .share-btn{padding:6px 8px;font-size:13px}
 
+  /* Glossary header button — HIDDEN on mobile (fixes bug #3).
+     The mobile header is already tight with Share + Search + File + countdowns.
+     Glossary access shifts to the File menu dropdown, which is the natural
+     home for secondary actions on small screens. */
+  .glossary-header-btn{display:none !important}
+
   /* Global search btn: grows to fill remaining space for discoverability */
   .global-search-btn{
     flex:1;
@@ -902,10 +1025,18 @@ tr:hover td{background:var(--gray-50)}
     letter-spacing:.1px
   }
 
-  /* BB-04: Tier bands — compact */
-  .bb-tier-band{height:22px;padding:0 10px;gap:6px}
-  .bb-tier-label{font-family:'Courier New',monospace;font-size:9.5px;letter-spacing:1.5px}
-  .bb-tier-sub{font-size:8.5px}
+  /* BB-04: Tier bands — mobile-tuned 2-line layout (fixes bug #1).
+     Was: height:22px (designed for the old 1-line band). The new desktop band
+     has min-height:52px with a 2-line structure (label row + rationale row).
+     On mobile we keep the 2-line structure but tune sizes: smaller fonts so
+     the rationale fits comfortably at 360px viewport, tighter padding to
+     reclaim vertical space, and a slightly lower min-height since fonts shrank.
+     Rationale wraps to 2 lines if needed; tier band absorbs the height. */
+  .bb-tier-band{min-height:44px;height:auto;padding:7px 10px 8px;gap:2px}
+  .bb-tier-band-row{gap:7px}
+  .bb-tier-label{font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:1.8px}
+  .bb-tier-sub{font-size:9px}
+  .bb-tier-rationale{font-size:9.5px;line-height:1.3;white-space:normal;-webkit-line-clamp:2;display:-webkit-box;-webkit-box-orient:vertical;overflow:hidden}
 
   /* BB-04: Screenshot bar — wrap gracefully on narrow screens */
   .bb-screenshot-bar{flex-wrap:wrap;gap:6px;margin-bottom:10px}
@@ -1719,14 +1850,26 @@ tr:hover td{background:var(--gray-50)}
   .ccs-val { font-size: 12px; }
   .ccs-lbl { font-size: 7px; }
 
-  /* ──────────── [182271] ──────────── */
-  /* Hide the 3rd and 4th control groups (color-by, position filter) */
-  .sc-controls .sc-ctrl-group:nth-child(3),
-  .sc-controls .sc-ctrl-group:nth-child(4),
-  .sc-controls .sc-ctrl-group:nth-child(5) {
+  /* ── Scatter controls — mobile coverage (fixes bug #2) ─────────────────
+     Was: hid 3rd/4th/5th groups by positional nth-child, which silently
+     hid the Quadrants button when it was added as the 5th group. Now uses
+     semantic class names so the rule is robust to reordering, and KEEPS
+     Trend + Quadrants visible — these are the most useful tap-friendly
+     analysis affordances on mobile. Hides Color By + Position filter
+     (rarely-changed selects that compete for limited horizontal space). */
+  .sc-grp-colorby,
+  .sc-grp-position {
     display: none !important;
   }
-  /* Only X + Y axis selectors remain — full width, clear */
+  /* Toggle buttons get larger tap targets on mobile — iOS HIG 44px floor.
+     Trend/Quadrants buttons sit alongside the Draft Class select. */
+  .sc-grp-trend .sc-trend-btn,
+  .sc-grp-quadrants .sc-trend-btn {
+    min-height: 36px;
+    padding: 8px 14px;
+    font-size: 12px;
+  }
+  /* Only X + Y axis selectors + Class + Trend + Quadrants remain — flexible row */
   .sc-controls {
     grid-template-columns: 1fr 1fr;
     gap: 8px;
@@ -2563,9 +2706,14 @@ tr:hover td{background:var(--gray-50)}
 .bb-ctpar{width:70px;flex-shrink:0;text-align:center}
 
 /* ── Tier bands ─────────────────────────────────────────────────────── */
+/* Tier bands — editorial chapter markers (priority #1).
+   Expanded from 28px single-line to ~52px two-line layout. Top row holds the
+   tier label + sub + pick range; second row carries the editorial rationale
+   so the board reads as authored, not generated. Vertical air at the top of
+   each band creates visible chapter-break rhythm between tiers. */
 .bb-tier-band{
-  display:flex;align-items:center;
-  height:28px;padding:0 14px;gap:12px;
+  display:flex;flex-direction:column;justify-content:center;
+  min-height:52px;padding:8px 14px 9px;gap:3px;
   overflow:hidden;
   position:relative;
 }
@@ -2577,22 +2725,35 @@ tr:hover td{background:var(--gray-50)}
   background:currentColor;
   opacity:.18;
 }
+/* Header row inside the band — label + sub + pick range */
+.bb-tier-band-row{
+  display:flex;align-items:baseline;gap:10px;line-height:1;
+}
 .bb-tier-label{
   font-family:'Barlow Condensed',sans-serif;
-  font-size:10px;font-weight:900;
+  font-size:12px;font-weight:900;
   color:white;letter-spacing:2.5px;text-transform:uppercase;
   white-space:nowrap;
 }
 .bb-tier-sub{
   font-family:'DM Sans',system-ui,sans-serif;
-  font-size:9px;color:rgba(255,255,255,.5);
+  font-size:9.5px;color:rgba(255,255,255,.55);
   font-weight:500;letter-spacing:.2px;white-space:nowrap;
 }
 .bb-tier-picks{
   margin-left:auto;
   font-family:'Barlow Condensed',sans-serif;
-  font-size:9px;color:rgba(255,255,255,.35);
+  font-size:9.5px;color:rgba(255,255,255,.4);
   letter-spacing:.8px;flex-shrink:0;
+}
+/* Rationale row — editorial one-liner, sits below the header */
+.bb-tier-rationale{
+  font-family:'DM Sans',system-ui,sans-serif;
+  font-size:10.5px;font-weight:400;
+  color:rgba(255,255,255,.72);
+  letter-spacing:.15px;line-height:1.35;
+  font-style:italic;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
 }
 
 /* ── Rows — WHITE THEME ──────────────────────────────────────────────── */
@@ -4082,10 +4243,12 @@ ock Drafts table CSS ───────────────────�
     <div id="cdDisplay" style="font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900;color:var(--amber-light,#E8BF52);line-height:1;letter-spacing:.5px">—</div>
   </div>
   <button class="share-btn" onclick="urlCopyLink()" title="Copy shareable link to this view">🔗 Share</button>
+  <button class="share-btn glossary-header-btn" onclick="openGlossary()" title="Stat glossary — what each metric means and what good looks like" style="background:rgba(59,130,246,.12);border-color:rgba(59,130,246,.35);color:#93C5FD">📖 Glossary</button>
   <button class="global-search-btn" onclick="openGlobalSearch()" title="Search all prospects (⌘K)">&#128269; Search</button>
   <div class="file-menu" id="fileMenu" style="position:relative">
     <button class="file-menu-btn" onclick="toggleFileMenu(event)">&#128196; File &#9662;</button>
     <div class="file-dropdown" id="fileDropdown">
+      <div class="file-item" onclick="openGlossary();closeFileMenu()">&#x1F4D6;&nbsp; Stat Glossary</div>
       <div class="file-item" onclick="printActiveTab();closeFileMenu()">&#x1F5A8;&nbsp; Export / Print to PDF</div>
       <div class="file-item" onclick="showUploadPanel();closeFileMenu()">&#8593;&nbsp; Refresh from Excel</div>
     </div>
@@ -4122,6 +4285,28 @@ ock Drafts table CSS ───────────────────�
     <div id="uploadStatus" class="upload-status"></div>
   </div>
 </div>
+
+<!-- ── GLOSSARY PANEL (priority #11) ─────────────────────────────────────
+     Slide-in side panel listing every stat used in the dashboard with
+     its definition, formula, what good looks like, and the current
+     class range (sourced from STAT_RANGES so numbers stay accurate).
+     Rendered once at page load; openGlossary() toggles its visibility. -->
+<div id="glossaryBackdrop" class="glossary-backdrop" onclick="closeGlossary()"></div>
+<aside id="glossaryPanel" class="glossary-panel" role="dialog" aria-label="Stat glossary">
+  <div class="glossary-header">
+    <div>
+      <div class="glossary-title">📖 Stat Glossary</div>
+      <div class="glossary-sub">What each metric means and what "good" looks like</div>
+    </div>
+    <button class="glossary-close" onclick="closeGlossary()" aria-label="Close glossary">✕</button>
+  </div>
+  <div class="glossary-body" id="glossaryBody">
+    <!-- Populated by renderGlossary() on first open -->
+  </div>
+  <div class="glossary-footer">
+    <span>Class ranges pulled live from the active 2026 board. Higher is better unless noted.</span>
+  </div>
+</aside>
 
 <main class="main">
 
@@ -4630,7 +4815,7 @@ ock Drafts table CSS ───────────────────�
         </div>
       </div>
       <div class="sc-ctrl-section sc-ctrl-section-secondary">
-        <div class="sc-ctrl-group">
+        <div class="sc-ctrl-group sc-grp-year">
           <label class="sc-ctrl-label">Draft Class</label>
           <select class="sc-select" id="scYear" onchange="scRenderDebounced()">
             <option value="2026" selected>2026</option>
@@ -4644,7 +4829,7 @@ ock Drafts table CSS ───────────────────�
             <option value="2019">2019</option>
           </select>
         </div>
-        <div class="sc-ctrl-group">
+        <div class="sc-ctrl-group sc-grp-colorby">
           <label class="sc-ctrl-label">Color By</label>
           <select class="sc-select" id="scColorBy" onchange="scRenderDebounced()">
             <option value="position">Position</option>
@@ -4652,7 +4837,7 @@ ock Drafts table CSS ───────────────────�
             <option value="tier">Tier</option>
           </select>
         </div>
-        <div class="sc-ctrl-group">
+        <div class="sc-ctrl-group sc-grp-position">
           <label class="sc-ctrl-label">Position</label>
           <select class="sc-select" id="scPosFilter" onchange="scRenderDebounced()">
             <option value="all">All</option>
@@ -4661,9 +4846,13 @@ ock Drafts table CSS ───────────────────�
             <option value="Center">Centers</option>
           </select>
         </div>
-        <div class="sc-ctrl-group">
+        <div class="sc-ctrl-group sc-grp-trend">
           <label class="sc-ctrl-label">Trend</label>
           <button class="sc-trend-btn" id="scTrendBtn" onclick="scToggleTrend()">Off</button>
+        </div>
+        <div class="sc-ctrl-group sc-grp-quadrants">
+          <label class="sc-ctrl-label">Quadrants</label>
+          <button class="sc-trend-btn" id="scQuadBtn" onclick="scToggleQuadrants()">Off</button>
         </div>
       </div>
     </div>
@@ -7104,6 +7293,19 @@ function openPlayerModal(rank, year) {
     body += '</div></div>';
   }
 
+  // Why Here — data-driven positioning blurb (priority #1).
+  // Surfaces the editorial logic behind why this player sits at this rank
+  // relative to the player immediately above. Skipped silently for rank #1.
+  if (typeof bbWhyHere === 'function') {
+    var whyText = bbWhyHere(player);
+    if (whyText) {
+      body += '<div class="modal-section">'
+        + '<div class="modal-sec-title">📍 Why #' + player.rank + '</div>'
+        + '<div class="why-here-text">' + escHtml(whyText) + '</div>'
+        + '</div>';
+    }
+  }
+
   const compStr = player.comp || player.comp_tool;
   if (compStr) {
     body += `<div class="modal-section"><div class="modal-sec-title">🔗 Player Comps</div><div class="comps-list">`;
@@ -8749,6 +8951,155 @@ function showUploadPanel() {
   document.getElementById('uploadPanel').classList.toggle('upload-open');
 }
 
+// ══ GLOSSARY MODULE (priority #11) ══════════════════════════════════════════
+// Stat glossary side panel. Definitions and "what good looks like" thresholds
+// are hand-curated; min/max/median values are computed live from STAT_RANGES
+// so the numbers always reflect the current 2026 class.
+//
+// GLOSSARY_DATA[].sections groups stats into categorical buckets so the panel
+// reads as a structured reference, not a flat list. The "elite" thresholds
+// come from analyst-level domain knowledge (e.g. TS% above 60 is elite for
+// high-usage college guards). Inverted stats (a/to where high IS good but
+// ftar/tpar are usage ratios that vary by role) are noted in the desc.
+var GLOSSARY_DATA = [
+  { section:'HEADLINE METRICS', entries:[
+    { key:'metric', name:'HW Metric', formula:'Weighted composite of TS%, P+A/USG, Stl+Bl, A/TO with age + role adjustments',
+      desc:'The HoopsWill model grade — a single number that estimates NBA outcome potential. Equal-weighted across 2026 class so a Metric of 100 is "average draftable", 140+ is lottery quality, 160+ is elite. Independent evaluation; not derived from public draft rankings.',
+      eliteThreshold:140, eliteLabel:'140+ Lottery-grade', sectionRange:'metric' },
+    { key:'bpm', name:'BPM (Box Plus/Minus)', formula:'Public model — points above league avg per 100 possessions',
+      desc:'Estimates a player\'s on-court value vs a league-average player. Strong predictive value especially when adjusted for age. Above 10 is elite for college; above 14 is once-a-class.',
+      eliteThreshold:12, eliteLabel:'12+ Elite (for college)', sectionRange:'bpm' },
+  ]},
+  { section:'SCORING & EFFICIENCY', entries:[
+    { key:'ts_pct', name:'TS% (True Shooting)', formula:'PTS / (2 × (FGA + 0.44 × FTA))',
+      desc:'The single best measure of scoring efficiency — accounts for 2-pointers, 3-pointers, and free throws in one number. 60%+ is elite at any usage; high-usage guards above 60% are exceptional. Volume matters: a 70% TS% in 4 attempts/game is not the same as in 18.',
+      eliteThreshold:0.60, eliteLabel:'60%+ Elite efficiency', sectionRange:'ts_pct' },
+    { key:'pa2_usg', name:'P+A/USG (Points + Assists per Usage)', formula:'(Points + Assists × 2.2) / Usage Rate',
+      desc:'Offensive creation volume — how much value a player generates per possession used. Captures both scoring and playmaking output relative to opportunities. Above 130 is high-volume primary-option output; above 150 is alpha-creator territory.',
+      eliteThreshold:130, eliteLabel:'130+ Primary creator', sectionRange:'pa2_usg' },
+    { key:'ftar', name:'FTAr (Free Throw Rate)', formula:'FTA / FGA',
+      desc:'How often a player gets to the free-throw line per shot attempt. Signals rim pressure, drawing fouls, and physicality. Above .50 is high for guards; centers naturally run higher. Below .20 suggests perimeter-heavy diet — context-dependent (good for spot-up wings, concerning for primary creators).',
+      eliteThreshold:0.40, eliteLabel:'.40+ Strong rim pressure', sectionRange:'ftar' },
+    { key:'tpar', name:'3PAr (Three-Point Rate)', formula:'3PA / FGA',
+      desc:'Share of shot attempts that come from beyond the arc. Higher = more outside shooter; lower = more interior/at-rim. NOT a "higher is better" stat — interpret in context of role and TS%. A 5-tool wing might be .40; a rim-attacking guard .25; a stretch-5 .55+.',
+      eliteThreshold:null, eliteLabel:'Context-dependent', sectionRange:'tpar' },
+  ]},
+  { section:'DEFENSE & PLAYMAKING', entries:[
+    { key:'stl_bl', name:'Stl+Bl per 75 (Stocks)', formula:'(Steals + Blocks) per 75 possessions',
+      desc:'Defensive activity index — combines two of the most predictive box-score signals for NBA defensive impact. Above 4.0 is elite (typically rim-protecting bigs or chaos-creating wings); 3.0+ is strong; below 2.0 is concerning for a defensive projection.',
+      eliteThreshold:4.0, eliteLabel:'4.0+ Elite defensive activity', sectionRange:'stl_bl' },
+    { key:'ato', name:'A/TO (Assist-to-Turnover Ratio)', formula:'Assists / Turnovers',
+      desc:'Decision-making quality — how clean a player\'s playmaking is. Above 2.5 is excellent for a primary handler; above 3.0 is elite. Low usage role players can post high A/TO without being creators, so interpret alongside P+A/USG. Below 1.0 is a red flag for primary ball-handlers.',
+      eliteThreshold:2.5, eliteLabel:'2.5+ Elite decision-making', sectionRange:'ato' },
+  ]},
+  { section:'PHYSICAL & CONTEXT', entries:[
+    { key:'age', name:'Age', formula:'Age on draft day (June 23, 2026)',
+      desc:'Strongest non-stat predictor of NBA upside. A 19-year-old freshman with a stat line has dramatically more projection runway than a 23-year-old senior with the same line. Model heavily weights youth for ceiling estimates.',
+      eliteThreshold:null, eliteLabel:'Younger = more upside', sectionRange:null },
+    { key:'ht', name:'Height', formula:'Inches — most recent combine or pre-draft measurement',
+      desc:'Position-relative — a 6\'5" PG is large for the position, a 6\'5" PF is undersized. Height combined with wingspan (when available) defines defensive positional projection.',
+      eliteThreshold:null, eliteLabel:'Position-relative', sectionRange:null },
+    { key:'wt', name:'Weight', formula:'Pounds — most recent combine or pre-draft measurement',
+      desc:'Frame quality and physical readiness for the NBA. Skinny prospects with good frames often add 15-25 lbs in their first 2 NBA years; players already at NBA weight at 19 are physically rare.',
+      eliteThreshold:null, eliteLabel:'Frame-relative', sectionRange:null },
+  ]},
+];
+
+// Pull live values from STAT_RANGES for a given key. Returns null if no data.
+function _glossLiveRange(key) {
+  if (typeof STAT_RANGES === 'undefined' || !STAT_RANGES[key]) return null;
+  return STAT_RANGES[key];
+}
+
+// Format a stat value using the same convention as the scatter axis labels.
+function _glossFmt(key, val) {
+  if (val == null) return '—';
+  if (key === 'ts_pct')  return (val * 100).toFixed(1) + '%';
+  if (key === 'metric')  return val.toFixed(1);
+  if (key === 'bpm')     return val.toFixed(1);
+  if (key === 'pa2_usg') return Math.round(val) + '';
+  if (key === 'stl_bl' || key === 'ato') return val.toFixed(2);
+  if (key === 'ftar' || key === 'tpar') return val.toFixed(3);
+  return String(val);
+}
+
+// Render the glossary into the panel body. Idempotent — safe to call multiple times.
+function renderGlossary() {
+  var el = document.getElementById('glossaryBody');
+  if (!el) return;
+  var h = '';
+  GLOSSARY_DATA.forEach(function(sect) {
+    h += '<div class="gloss-section-hdr">' + sect.section + '</div>';
+    sect.entries.forEach(function(e) {
+      h += '<div class="gloss-entry">';
+      h += '<div class="gloss-entry-header">';
+      h += '<span class="gloss-entry-key">' + e.key.toUpperCase() + '</span>';
+      h += '<span class="gloss-entry-name">' + e.name + '</span>';
+      h += '</div>';
+      if (e.formula) h += '<div class="gloss-entry-formula">' + e.formula + '</div>';
+      h += '<div class="gloss-entry-desc">' + e.desc + '</div>';
+
+      // Live class range + elite threshold from STAT_RANGES
+      var meta = '<div class="gloss-entry-meta">';
+      var rng = e.sectionRange ? _glossLiveRange(e.sectionRange) : null;
+      if (rng) {
+        meta += '<div class="gloss-meta-item">'
+          + '<span class="gloss-meta-label">2026 Class Range</span>'
+          + '<span class="gloss-meta-val range">' + _glossFmt(e.key, rng.mn) + ' – ' + _glossFmt(e.key, rng.mx) + '</span>'
+          + '</div>';
+      }
+      if (e.eliteThreshold != null && e.eliteLabel) {
+        meta += '<div class="gloss-meta-item">'
+          + '<span class="gloss-meta-label">What "Elite" Looks Like</span>'
+          + '<span class="gloss-meta-val good">' + e.eliteLabel + '</span>'
+          + '</div>';
+      } else if (e.eliteLabel) {
+        meta += '<div class="gloss-meta-item">'
+          + '<span class="gloss-meta-label">Interpretation</span>'
+          + '<span class="gloss-meta-val">' + e.eliteLabel + '</span>'
+          + '</div>';
+      }
+      meta += '</div>';
+      h += meta;
+      h += '</div>';
+    });
+  });
+  el.innerHTML = h;
+}
+
+function openGlossary() {
+  renderGlossary(); // re-render every open so STAT_RANGES is current
+  var panel = document.getElementById('glossaryPanel');
+  var back  = document.getElementById('glossaryBackdrop');
+  if (panel) panel.classList.add('open');
+  if (back)  back.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeGlossary() {
+  var panel = document.getElementById('glossaryPanel');
+  var back  = document.getElementById('glossaryBackdrop');
+  if (panel) panel.classList.remove('open');
+  if (back)  back.classList.remove('open');
+  // Restore body scroll if no other modal is still open
+  var anyOpen = document.querySelectorAll('.modal-overlay.open').length > 0;
+  if (!anyOpen) document.body.style.overflow = '';
+}
+
+// Esc closes glossary; wired once via DOM listener (separate from modal handler
+// because the glossary is an aside, not a modal-overlay).
+(function _wireGlossaryEsc() {
+  document.addEventListener('keydown', function(e) {
+    if (e.key !== 'Escape') return;
+    var panel = document.getElementById('glossaryPanel');
+    if (panel && panel.classList.contains('open')) {
+      closeGlossary();
+      e.stopPropagation();
+    }
+  });
+})();
+// ══ END GLOSSARY MODULE ═════════════════════════════════════════════════════
+
 
 // ══ ARCHITECTURE LAYER 4: ExcelService ══════════════════════════════════════
 // Wraps the workbook parsing pipeline in a Promise-based interface.
@@ -9613,6 +9964,73 @@ function bbExtractHook(notes) {
   return hook;
 }
 
+/* ── bbWhyHere — data-driven positioning blurb for the player modal (priority #1).
+   Compares the player to the player ranked immediately above on the board and
+   surfaces the most likely stat-based reason this player sits one slot lower.
+   Returns a single sentence like:
+     "Slides behind Cameron Boozer due to lower scoring efficiency (TS% 60.0 vs 65.3)
+      despite stronger defensive activity (Stl+Bl 3.34 vs 2.89)."
+   Pure JS — no editorial content required. If a hand-authored override is needed,
+   it can be added later as a player.why_here field; this function is the default. */
+function bbWhyHere(p) {
+  if (!p || !p.rank || p.rank <= 1) return ''; // Rank #1 has no "above" comparison
+  // Find the immediately-higher-ranked player
+  var board = (typeof DATA !== 'undefined' && DATA.board2026) ? DATA.board2026 : [];
+  var above = null;
+  for (var i = 0; i < board.length; i++) {
+    if (board[i].rank === p.rank - 1) { above = board[i]; break; }
+  }
+  if (!above) return '';
+
+  // Stats to compare with display config. Order matters — first significant
+  // gap surfaces in the blurb. ts_pct stored 0-1, formatted as percentage.
+  var STATS = [
+    { k:'metric',  label:'overall model grade',   fmt:function(v){return v.toFixed(1);},        sig:3 },
+    { k:'ts_pct',  label:'scoring efficiency',    fmt:function(v){return (v*100).toFixed(1)+'%';}, sig:0.015 },
+    { k:'pa2_usg', label:'creation volume',       fmt:function(v){return v.toFixed(0);},        sig:6 },
+    { k:'stl_bl',  label:'defensive activity',    fmt:function(v){return v.toFixed(2);},        sig:0.4 },
+    { k:'ato',     label:'playmaking quality',    fmt:function(v){return v.toFixed(2);},        sig:0.3 },
+    { k:'bpm',     label:'on-court impact (BPM)', fmt:function(v){return v.toFixed(1);},        sig:1.5 }
+  ];
+
+  // Find biggest gap in each direction
+  var weakness = null; // stat where p < above (the reason p is ranked lower)
+  var strength = null; // stat where p > above (the counterpoint)
+  for (var s = 0; s < STATS.length; s++) {
+    var stat = STATS[s];
+    var pv = p[stat.k], av = above[stat.k];
+    if (pv == null || av == null || pv === 0 || av === 0) continue;
+    var diff = pv - av;
+    if (diff <= -stat.sig && (!weakness || Math.abs(diff) > Math.abs(weakness.diff))) {
+      weakness = { stat:stat, diff:diff, pv:pv, av:av };
+    }
+    if (diff >= stat.sig && (!strength || diff > strength.diff)) {
+      strength = { stat:stat, diff:diff, pv:pv, av:av };
+    }
+  }
+
+  var aboveName = (above.name || '').split(' - ')[0];
+  // No meaningful gaps either way — player is statistically interchangeable
+  if (!weakness && !strength) {
+    return 'Sits one slot below ' + aboveName + ' on a near-equal statistical profile — ordering reflects projection nuance, scouting confidence, and class/positional fit.';
+  }
+  // Only a strength relative to the player above — the rank gap reflects intangibles
+  if (!weakness && strength) {
+    return 'Outproduces ' + aboveName + ' on ' + strength.stat.label
+      + ' (' + strength.stat.fmt(strength.pv) + ' vs ' + strength.stat.fmt(strength.av)
+      + '); ordering reflects scouting confidence on younger/higher-upside profile above.';
+  }
+  // Standard case: weakness identified, optional counterpoint strength
+  var blurb = 'Slides behind ' + aboveName + ' on ' + weakness.stat.label
+    + ' (' + weakness.stat.fmt(weakness.pv) + ' vs ' + weakness.stat.fmt(weakness.av) + ')';
+  if (strength) {
+    blurb += ' despite stronger ' + strength.stat.label
+      + ' (' + strength.stat.fmt(strength.pv) + ' vs ' + strength.stat.fmt(strength.av) + ')';
+  }
+  blurb += '.';
+  return blurb;
+}
+
 function bbBuildRow(p, idx) {
   var base   = escHtml(p.name   || '');
   var school = escHtml(p.school || '');
@@ -9946,8 +10364,11 @@ function renderBoardBigboard(players) {
         var rows = panelPlayers.filter(function(p){ return p.rank >= t.from && p.rank <= t.to; });
         if (!rows.length) return;
         html += '<div class="bb-tier-band" style="background:' + t.grad + '">'
-          + '<span class="bb-tier-label">' + t.label + '</span>'
-          + '<span class="bb-tier-sub">'   + t.sub   + '</span>'
+          + '<div class="bb-tier-band-row">'
+            + '<span class="bb-tier-label">' + t.label + '</span>'
+            + '<span class="bb-tier-sub">'   + t.sub   + '</span>'
+          + '</div>'
+          + (t.rationale ? '<div class="bb-tier-rationale">' + t.rationale + '</div>' : '')
         + '</div>';
         rows.forEach(function(p){ html += buildTwoColRow(p, idx++); });
       });
@@ -9975,10 +10396,14 @@ function renderBoardBigboard(players) {
     var rowIdx = 0;
     BB_TIERS.forEach(function(t) {
       if (t.from > rankTo || t.to < rankFrom) return; // tier entirely outside range
+      // Editorial 2-line band: header row + rationale row (priority #1)
       out += '<div class="bb-tier-band" style="background:' + t.grad + '">'
-        + '<span class="bb-tier-label">' + t.label + '</span>'
-        + '<span class="bb-tier-sub">'   + t.sub   + '</span>'
-        + '<span class="bb-tier-picks">' + t.picks + '</span>'
+        + '<div class="bb-tier-band-row">'
+          + '<span class="bb-tier-label">' + t.label + '</span>'
+          + '<span class="bb-tier-sub">'   + t.sub   + '</span>'
+          + '<span class="bb-tier-picks">' + t.picks + '</span>'
+        + '</div>'
+        + (t.rationale ? '<div class="bb-tier-rationale">' + t.rationale + '</div>' : '')
       + '</div>';
       limited.filter(function(p){ return p.rank >= t.from && p.rank <= t.to; })
              .forEach(function(p){ out += bbBuildRow(p, rowIdx++); });
@@ -12034,6 +12459,7 @@ var SC_AXES = {
 // ── Scatter state ─────────────────────────────────────────────────────────────
 var _scChart       = null;
 var _scTrend       = false;
+var _scQuadrants   = false;   // Quadrant tinting toggle (priority #6)
 var _scTipEl       = null;
 var _scAllPts      = [];     // current rendered points — used by logo-refresh + highlight
 var _scTipHideTimer = null;  // C4: module-level so all render closures share one timer
@@ -12070,6 +12496,130 @@ function scToggleTrend() {
   if (btn) { btn.textContent = _scTrend ? 'On' : 'Off'; btn.classList.toggle('active', _scTrend); }
   scRender();
 }
+
+function scToggleQuadrants() {
+  _scQuadrants = !_scQuadrants;
+  var btn = document.getElementById('scQuadBtn');
+  if (btn) { btn.textContent = _scQuadrants ? 'On' : 'Off'; btn.classList.toggle('active', _scQuadrants); }
+  // Quadrant plugin reads _scQuadrants at draw time, so a chart.update() is enough.
+  if (_scChart) { _scChart.update('none'); }
+}
+
+/* ── Chart.js plugin: quadrant background tinting (priority #6).
+   Draws four tinted rectangles behind the data series, split at the MEDIAN
+   of each axis. Median is the right divider because it adapts to actual data
+   distribution; a fixed midpoint of the visible range would over-weight
+   outliers. Colors signal:
+     • Top-right (high X + high Y, adjusted for inversion): green — elite on both
+     • Bottom-left (low X + low Y): red — lagging on both
+     • Other two quadrants: neutral light — trade-off zones
+   The plugin respects axis inversion: when an axis has reverse:true (e.g. rank
+   where lower is better), the "good" direction flips automatically.
+   Drawn in beforeDatasetsDraw so data points sit ON TOP of the tints. */
+var SC_QUADRANT_PLUGIN = {
+  id: 'scQuadrants',
+  beforeDatasetsDraw: function(chart) {
+    if (!_scQuadrants) return;
+    var ctx     = chart.ctx;
+    var xScale  = chart.scales.x;
+    var yScale  = chart.scales.y;
+    if (!xScale || !yScale) return;
+
+    // Collect actual data points (the 'Prospects' dataset is index 0; trend line is index 1+)
+    var ds = chart.data.datasets[0];
+    if (!ds || !ds.data || !ds.data.length) return;
+
+    // Compute median for each axis from the rendered data
+    var xs = ds.data.map(function(d){ return d.x; }).filter(function(v){ return v != null && isFinite(v); }).sort(function(a,b){return a-b;});
+    var ys = ds.data.map(function(d){ return d.y; }).filter(function(v){ return v != null && isFinite(v); }).sort(function(a,b){return a-b;});
+    if (xs.length < 4 || ys.length < 4) return; // not enough data to make quadrants meaningful
+
+    var xMed = xs[Math.floor(xs.length / 2)];
+    var yMed = ys[Math.floor(ys.length / 2)];
+
+    // Plot area pixel boundaries
+    var left   = xScale.left;
+    var right  = xScale.right;
+    var top    = yScale.top;
+    var bottom = yScale.bottom;
+    var xMid   = xScale.getPixelForValue(xMed);
+    var yMid   = yScale.getPixelForValue(yMed);
+
+    // Quadrant "goodness": account for axis inversion. If x is reversed, the
+    // 'high' side is the LEFT visually (because higher data values map to
+    // smaller pixel x). Same for y inversion (but charts have inverted Y by
+    // default — top = lower pixel y = higher data value, so the natural
+    // 'high y' quadrant is the TOP).
+    var xRev = !!xScale.options.reverse;
+    var yRev = !!yScale.options.reverse;
+
+    // Determine which pixel-quadrant corresponds to (high X, high Y) in data terms
+    // Pixel layout: top-left = (left, top), bottom-right = (right, bottom)
+    // Default (no reverse): high data X = right pixel; high data Y = top pixel
+    //   → "elite" quadrant = top-right pixel rect = (xMid..right, top..yMid)
+    // With xRev: high data X = left pixel → "elite" quadrant = top-LEFT pixel rect
+    // With yRev: high data Y = bottom pixel → "elite" quadrant = bottom side
+    var eliteX1 = xRev ? left  : xMid;
+    var eliteX2 = xRev ? xMid  : right;
+    var eliteY1 = yRev ? yMid  : top;
+    var eliteY2 = yRev ? bottom : yMid;
+
+    var lagX1 = xRev ? xMid  : left;
+    var lagX2 = xRev ? right : xMid;
+    var lagY1 = yRev ? top   : yMid;
+    var lagY2 = yRev ? yMid  : bottom;
+
+    // Two off-diagonal trade-off quadrants — fill the rest
+    // tradeoff A: high X, low Y (pixel = lag Y side at elite X side)
+    var tA_x1 = eliteX1, tA_x2 = eliteX2, tA_y1 = lagY1, tA_y2 = lagY2;
+    // tradeoff B: low X, high Y (pixel = elite Y side at lag X side)
+    var tB_x1 = lagX1,  tB_x2 = lagX2,  tB_y1 = eliteY1, tB_y2 = eliteY2;
+
+    ctx.save();
+    // Elite quadrant (top-right semantically) — soft green
+    ctx.fillStyle = 'rgba(34,197,94,0.07)';
+    ctx.fillRect(eliteX1, eliteY1, eliteX2 - eliteX1, eliteY2 - eliteY1);
+    // Lagging quadrant — soft red
+    ctx.fillStyle = 'rgba(239,68,68,0.06)';
+    ctx.fillRect(lagX1, lagY1, lagX2 - lagX1, lagY2 - lagY1);
+    // Trade-off quadrants — neutral light tint
+    ctx.fillStyle = 'rgba(148,163,184,0.045)';
+    ctx.fillRect(tA_x1, tA_y1, tA_x2 - tA_x1, tA_y2 - tA_y1);
+    ctx.fillRect(tB_x1, tB_y1, tB_x2 - tB_x1, tB_y2 - tB_y1);
+
+    // Median crosshair lines — subtle dashed
+    ctx.strokeStyle = 'rgba(100,116,139,0.25)';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([4, 4]);
+    ctx.beginPath();
+    ctx.moveTo(xMid, top);    ctx.lineTo(xMid, bottom);
+    ctx.moveTo(left,  yMid);  ctx.lineTo(right, yMid);
+    ctx.stroke();
+
+    // Corner labels — small, muted, in the elite + lagging quadrants only
+    ctx.setLineDash([]);
+    ctx.font = '700 9px "Barlow Condensed", sans-serif';
+    ctx.fillStyle = 'rgba(21,128,61,0.55)';   // elite — green-700
+    var elitePadX = 6, elitePadY = 14;
+    var eliteCx = eliteX1 + (eliteX2 - eliteX1) / 2;
+    var eliteCy = eliteY1 + elitePadY;
+    ctx.textAlign = 'center';
+    ctx.fillText('ELITE', eliteCx, eliteCy);
+    ctx.fillStyle = 'rgba(185,28,28,0.50)';   // lagging — red-700
+    var lagCx = lagX1 + (lagX2 - lagX1) / 2;
+    var lagCy = lagY2 - 6;
+    ctx.fillText('LAGGING', lagCx, lagCy);
+    ctx.restore();
+  }
+};
+
+// Register the plugin globally with Chart.js — done once
+(function registerQuadrantPlugin() {
+  if (typeof Chart === 'undefined' || !Chart.register) return;
+  // Avoid double-registration on bfcache restore
+  if (Chart.registry && Chart.registry.plugins.get('scQuadrants')) return;
+  try { Chart.register(SC_QUADRANT_PLUGIN); } catch(e) { /* already registered */ }
+})();
 
 // ── Tooltip ───────────────────────────────────────────────────────────────────
 function scGetTip() {
@@ -12466,21 +13016,29 @@ function scRender() {
 // ── TIER MANAGEMENT FUNCTIONS ──────────────────────────────────────────────
 function rebuildBBTiers() {
   var c = TIER_CUTS;
+  // EDITORIAL TIER RATIONALE (priority #1):
+  // Each tier carries a one-sentence positioning statement explaining what
+  // a player at this tier represents in terms of NBA projection. These are
+  // surfaced on every tier band so the board reads as authored, not generated.
   BB_TIERS = [
     { label:'Franchise',   sub:'Cornerstone Prospects',
       picks:'Picks 1\u2013'+c.franchise,
+      rationale:'Project as future All-NBA candidates with star upside — the rare prospects worth building a franchise around.',
       from:1, to:c.franchise,
       grad:'linear-gradient(90deg,#92400E,#B45309,#D97706)' },
     { label:'Lottery',     sub:'Top-'+c.lottery+' Prospects',
       picks:'Picks '+(c.franchise+1)+'\u2013'+c.lottery,
+      rationale:'High-end starters with All-Star ceilings — the talent gradient where elite skill or physical tools separate every name.',
       from:c.franchise+1, to:c.lottery,
       grad:'linear-gradient(90deg,#3B0764,#5B21B6,#7C3AED)' },
     { label:'Late First',  sub:'First Round Targets',
       picks:'Picks '+(c.lottery+1)+'\u2013'+c.lateFirst,
+      rationale:'Starter outcomes with rotation-piece floors — guaranteed contracts justified by clear translatable skills.',
       from:c.lottery+1, to:c.lateFirst,
       grad:'linear-gradient(90deg,#1E3A8A,#1D4ED8,#3B82F6)' },
     { label:'Second Round',sub:'Value Prospects',
       picks:'Picks '+(c.lateFirst+1)+'\u2013'+c.second,
+      rationale:'Rotation upside if development clicks — bets on specific archetypal skills or late-blooming physical profiles.',
       from:c.lateFirst+1, to:c.second,
       grad:'linear-gradient(90deg,#134E4A,#0D9488,#14B8A6)' },
   ];
