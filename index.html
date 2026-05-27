@@ -854,8 +854,9 @@ tr:hover td{background:var(--gray-50)}
   .bb-cpa{width:48px;flex-shrink:0}
   .bb-csb{width:48px;flex-shrink:0}
   .bb-cato{width:48px;flex-shrink:0}
-  /* Hide columns that do not fit a phone screen */
-  .bb-cht,.bb-ctag,.bb-cftar,.bb-ctpar{display:none !important}
+  /* Hide columns that do not fit a phone screen.
+     bb-cprofile (Ht/Wt + Pos/Role merged column) replaces former bb-cht+bb-ctag. */
+  .bb-cprofile,.bb-cftar,.bb-ctpar{display:none !important}
 
   /* BB-03: Header — compact but still premium on mobile */
   .bb-header{padding:12px 14px 8px}
@@ -2321,11 +2322,12 @@ tr:hover td{background:var(--gray-50)}
   #mcSearchInput{font-size:12px;}
 
   /* ── Big Board — desktop column widths (dark space theme) ───────────── */
+  /* PROFILE COLUMN MERGE: Ht/Wt + Pos/Role consolidated to single 130px Profile cell.
+     ID column widened (was 190-260, now 260-420) to absorb reclaimed space + house scouting hook. */
   .bb-cr{width:44px;flex-shrink:0;}
   .bb-cav{width:56px;flex-shrink:0;}
-  .bb-cid{flex:1;min-width:190px;max-width:260px;}
-  .bb-cht{width:70px;flex-shrink:0;}
-  .bb-ctag{width:110px;flex-shrink:0;}
+  .bb-cid{flex:1;min-width:260px;max-width:420px;}
+  .bb-cprofile{width:130px;flex-shrink:0;}
   .bb-cmet{width:82px;flex-shrink:0;}
   .bb-cts{width:70px;flex-shrink:0;}
   .bb-cpa{width:70px;flex-shrink:0;}
@@ -2550,9 +2552,8 @@ tr:hover td{background:var(--gray-50)}
 /* ── Column widths ──────────────────────────────────────────────────── */
 .bb-cr{width:44px;flex-shrink:0;text-align:center}
 .bb-cav{width:56px;flex-shrink:0}
-.bb-cid{flex:1;min-width:190px;max-width:260px}
-.bb-cht{width:70px;flex-shrink:0;text-align:center}
-.bb-ctag{width:110px;flex-shrink:0}
+.bb-cid{flex:1;min-width:260px;max-width:420px}
+.bb-cprofile{width:130px;flex-shrink:0}
 .bb-cmet{width:82px;flex-shrink:0;text-align:center}
 .bb-cts{width:72px;flex-shrink:0;text-align:center}
 .bb-cpa{width:70px;flex-shrink:0;text-align:center}
@@ -2753,6 +2754,46 @@ tr:hover td{background:var(--gray-50)}
   font-weight:500;margin-top:2px;
 }
 
+/* ── Profile cell — Ht/Wt + Class/Role consolidated (priority #3) ───────
+   Replaces former bb-ht-cell + bb-tags columns. Single 130px cell with
+   tight 2-line stack: line 1 measurements, line 2 class · role.
+   Centered alignment matches surrounding stat-cell rhythm. */
+.bb-profile-cell{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  height:100%;gap:2px;line-height:1;
+  text-align:center;
+}
+.bb-profile-line1{
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:13px;font-weight:800;
+  color:#334155;
+  font-variant-numeric:tabular-nums;
+  white-space:nowrap;letter-spacing:.1px;
+}
+.bb-profile-line2{
+  font-family:'DM Sans',system-ui,sans-serif;
+  font-size:9.5px;font-weight:600;
+  color:#64748B;
+  white-space:nowrap;letter-spacing:.1px;
+  max-width:124px;overflow:hidden;text-overflow:ellipsis;
+}
+/* Subtle middot separator inside each line */
+.bb-profile-sep{color:#CBD5E1;font-weight:500;margin:0 4px;}
+
+/* ── Scouting hook — single-line editorial signal under school (priority #2) ──
+   First phrase of p.notes, rendered at 11px muted gray below school line.
+   Truncated cleanly with ellipsis when too long; entire ID column min-width
+   was widened from 190 to 260 to give this room without sacrificing density. */
+.bb-hook{
+  font-family:'DM Sans',system-ui,sans-serif;
+  font-size:10.5px;font-weight:500;
+  color:#94A3B8;
+  line-height:1.25;letter-spacing:.1px;
+  margin-top:2px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  font-style:italic;
+}
+
 /* ── Footer — WHITE THEME ────────────────────────────────────────────── */
 .bb-footer{
   background:#F8FAFC;
@@ -2812,7 +2853,18 @@ tr:hover td{background:var(--gray-50)}
 }
 
 /* ── Two-column layout ────────────────────────────────────────────────── */
-.bb-two-col-mode{ min-width:1080px }
+/* The 2-col board is sized to its NATURAL CONTENT width. min-width keeps
+   it usable on smaller screens; max-width prevents the panels from stretching
+   past what the row content actually needs, which is what was causing the
+   blank gutter between the school line and the Metric column on wider
+   viewports. On screens wider than ~1240px the leftover space now lives in
+   the OUTSIDE margins (where .bb-wrap centers the board) rather than INSIDE
+   the row (where it looked like a layout bug). */
+.bb-two-col-mode{
+  min-width:1080px;
+  max-width:1240px;
+  margin-left:auto;margin-right:auto;
+}
 .bb-two-col-wrap{
   display:flex;
   background:#E2E8F0; /* acts as 1px column divider */
@@ -2825,7 +2877,12 @@ tr:hover td{background:var(--gray-50)}
 /* Trimmed column widths for 2-col panels — all 7 stats */
 .bb-tc-cr  {width:30px;flex-shrink:0;text-align:center}
 .bb-tc-cav {width:40px;flex-shrink:0}
-.bb-tc-cid {flex:1;min-width:100px;max-width:160px}
+/* ID column sized to actual content needs. Min 140 covers typical names
+   (~15 chars at 13px); max 170 fits the longest realistic school line
+   (e.g. "Joventut Badalona · Croatia" at 9.5px + 22px logo + breathing
+   room) without leaving dead space after shorter names. The panel's own
+   max-width (above) prevents leftover row space from accumulating here. */
+.bb-tc-cid {flex:1;min-width:140px;max-width:170px}
 .bb-tc-cmet{width:58px;flex-shrink:0;text-align:center}
 .bb-tc-cts,
 .bb-tc-cpa,
@@ -9535,6 +9592,27 @@ function bbTagCls(pos) {
   return 'bb-tag-w';
 }
 
+/* ── bbExtractHook — pull a single-line scouting hook from p.notes ─────
+   Notes are typically comma-delimited scouting phrases. We want the FIRST
+   phrase only (the "headline") which is usually the player archetype/identity
+   summary (e.g. "Generational defensive upside with insane length"). Falls
+   back gracefully when notes are missing/empty. Cap at ~80 chars so the
+   ellipsis triggers from CSS rather than awkward mid-word cuts. */
+function bbExtractHook(notes) {
+  if (!notes || typeof notes !== 'string') return '';
+  var trimmed = notes.trim();
+  if (!trimmed) return '';
+  // Split on first comma OR period (whichever comes first) — both signal phrase boundary
+  var firstComma = trimmed.indexOf(',');
+  var firstPeriod = trimmed.indexOf('. ');
+  var cutPoints = [firstComma, firstPeriod].filter(function(i){ return i > 0; });
+  var cut = cutPoints.length ? Math.min.apply(null, cutPoints) : trimmed.length;
+  var hook = trimmed.substring(0, cut).trim();
+  // Hard cap at ~80 chars for safety; CSS handles ellipsis for shorter overflow
+  if (hook.length > 80) hook = hook.substring(0, 80).replace(/\s+\S*$/, '') + '…';
+  return hook;
+}
+
 function bbBuildRow(p, idx) {
   var base   = escHtml(p.name   || '');
   var school = escHtml(p.school || '');
@@ -9547,6 +9625,17 @@ function bbBuildRow(p, idx) {
   else if (cls==='Sophomore') cls='So';
   else if (cls==='Junior')    cls='Jr';
   else if (cls==='Senior')    cls='Sr';
+
+  // Scouting hook (priority #2) — single phrase from p.notes, italicized under school
+  var hook = bbExtractHook(p.notes);
+
+  // Profile line 2 (priority #3) — class abbreviation · torvik_role
+  // Constructed defensively so missing values collapse gracefully without orphan separators
+  var role = (p.torvik_role || '').trim();
+  var profileParts = [];
+  if (cls)  profileParts.push(cls);
+  if (role) profileParts.push(escHtml(role));
+  var profileLine2 = profileParts.join('<span class="bb-profile-sep">·</span>');
 
   // Metric — light-theme fill gradient (bbMetStyle = white/light theme)
   var metSty  = bbMetStyle(p.metric);
@@ -9586,7 +9675,7 @@ function bbBuildRow(p, idx) {
     +'<div class="bb-rk bb-cr">'+rankStr+'</div>'
     // 2. Avatar
     +'<div class="bb-av bb-cav">'+avHtml+'</div>'
-    // 3. Player identity
+    // 3. Player identity — name, school, and scouting hook (priority #2)
     +'<div class="bb-id bb-cid">'
       +'<div class="bb-name">'+base+getBadgeHtml(p.name)+'</div>'
       +'<div class="bb-school-line">'
@@ -9594,22 +9683,24 @@ function bbBuildRow(p, idx) {
         +'<span class="bb-school">'+school+'</span>'
         +(cls ? '<span class="bb-cls-dot">&thinsp;·&thinsp;'+cls+'</span>' : '')
       +'</div>'
+      +(hook ? '<div class="bb-hook">'+escHtml(hook)+'</div>' : '')
     +'</div>'
-    // 4. Ht / Wt
-    +'<div class="bb-ht-cell bb-cht">'
-      +'<div class="bb-ht-val">'+ht+'</div>'
-      +(wt!=='—' ? '<div class="bb-wt-val">'+wt+'</div>' : '')
+    // 4. Profile — Ht/Wt + Pos/Role merged (priority #3)
+    //    Line 1: 6'9" · 217lb   Line 2: Fr · Wing F
+    //    Position color is preserved via the avatar's existing position styling,
+    //    so we don't need a separate position chip here.
+    +'<div class="bb-profile-cell bb-cprofile">'
+      +'<div class="bb-profile-line1">'
+        +ht
+        +(wt!=='—' ? '<span class="bb-profile-sep">·</span>'+wt : '')
+      +'</div>'
+      +(profileLine2 ? '<div class="bb-profile-line2">'+profileLine2+'</div>' : '')
     +'</div>'
-    // 5. Position + Role
-    +'<div class="bb-tags bb-ctag">'
-      +(p.position    ? '<span class="bb-tag '+bbTagCls(p.position)+'">'+p.position+'</span>' : '')
-      +(p.torvik_role ? '<span class="bb-tag bb-tag-r">'+escHtml(p.torvik_role)+'</span>' : '')
-    +'</div>'
-    // 6. Metric — glow number
+    // 5. Metric — glow number
     +'<div class="bb-met-cell bb-cmet">'
       +'<div class="bb-met-val" style="'+metSty+'">'+metVal+'</div>'
     +'</div>'
-    // 7–12. Stats with glow border cells
+    // 6–11. Stats with glow border cells
     +'<div class="bb-stat-cell bb-cts"  style="'+tsSty+'">'+SV(tsVal)+'<div class="bb-sl">TS%</div></div>'
     +'<div class="bb-stat-cell bb-cpa"  style="'+paSty+'">'+SV(paVal)+'<div class="bb-sl">P+A/USG</div></div>'
     +'<div class="bb-stat-cell bb-csb"  style="'+sbSty+'">'+SV(sbVal)+'<div class="bb-sl">STL+BL</div></div>'
@@ -9674,12 +9765,9 @@ function renderBoardBigboard(players) {
     { key:'name',     cls:'bb-cid',   label:'Player',
       tip:'Player name · click any row to open the full scouting profile',
       sortable:false, left:true },
-    { key:'ht',       cls:'bb-cht',   label:'Ht / Wt',
-      tip:'Height (ft/in) and weight (lbs) — most recent combine or pre-draft measurement',
+    { key:'ht',       cls:'bb-cprofile', label:'Profile',
+      tip:'Player profile snapshot — height, weight, class, and Torvik algorithmic role. Sort triggers by height (tallest → shortest).',
       sortable:true, left:false },
-    { key:'position', cls:'bb-ctag',  label:'Pos / Role',
-      tip:'NBA positional projection + Torvik algorithmic role — the role label is model-derived from statistical profile, not a scout label',
-      sortable:false, left:true },
     { key:'metric',   cls:'bb-cmet',  label:'Metric',
       tip:'HoopsWill Draft Model — composite of weighted per-75 stats adjusted for age, SOS and class context. 100 = class average.',
       sortable:true, left:false },
