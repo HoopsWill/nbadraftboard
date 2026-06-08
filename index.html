@@ -5041,6 +5041,431 @@ ap{
 .sc-mf-stats{display:flex;flex-wrap:wrap;gap:6px}
 .sc-stat-bar{overflow-x:auto;-webkit-overflow-scrolling:touch;border-top:1px solid var(--gray-100);padding:8px 2px 2px;margin-top:6px}
 #scStatBar{overflow-x:auto}
+
+/* ── PR1: Canvas-first restructure ─────────────────────────────────────────
+   Floating chrome over a full-bleed canvas. Pills (top-left axes), chips
+   (top-right filters/toggles), floatbar (bottom-left count + legend),
+   comparison shelf (below canvas), and a shared picker popover.
+   The old .sc-controls / .sc-plot-header / .sc-panels-strip rules above are
+   left in place but unreachable — no markup uses them after PR1.
+   ────────────────────────────────────────────────────────────────────────── */
+
+.sc-wrap-v2 .sc-body-v2{display:block}              /* override the old 2-col grid */
+.sc-wrap-v2 .sc-plot-wrap{padding:0;gap:0}
+.sc-wrap-v2 .sc-canvas-wrap{
+  position:relative;width:100%;height:640px;min-height:380px;
+  background:#FCFCFD;border-bottom:1px solid var(--gray-100);
+  padding:56px 14px 36px;            /* room for floating chrome */
+  box-sizing:border-box;
+}
+.sc-wrap-v2 .sc-canvas-wrap canvas{
+  position:absolute;inset:56px 14px 36px;width:auto;height:auto;
+}
+
+/* ── Floating axis pills (top-left) ─────────────────────────────────────── */
+.sc-pills{
+  position:absolute;top:10px;left:14px;z-index:5;
+  display:flex;align-items:center;gap:6px;
+  background:rgba(255,255,255,.92);backdrop-filter:blur(6px);
+  -webkit-backdrop-filter:blur(6px);
+  padding:5px 6px;border-radius:11px;
+  box-shadow:0 1px 2px rgba(15,23,42,.04),0 4px 14px rgba(15,23,42,.06);
+  border:1px solid rgba(15,23,42,.06);
+}
+.sc-pill{
+  display:inline-flex;align-items:center;gap:8px;
+  height:34px;padding:0 12px 0 10px;
+  background:white;border:1px solid var(--gray-200);border-radius:8px;
+  font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;color:var(--navy);
+  cursor:pointer;transition:all .12s ease;
+  -webkit-tap-highlight-color:transparent;
+}
+.sc-pill:hover{border-color:var(--amber);box-shadow:0 0 0 3px rgba(212,168,48,.1)}
+.sc-pill:focus-visible{outline:none;border-color:var(--amber);box-shadow:0 0 0 3px rgba(212,168,48,.22)}
+.sc-pill[aria-expanded="true"]{border-color:var(--amber);box-shadow:0 0 0 3px rgba(212,168,48,.18);background:rgba(212,168,48,.04)}
+.sc-pill-letter{
+  font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:900;
+  color:var(--amber);letter-spacing:.05em;line-height:1;
+  width:12px;text-align:center;flex-shrink:0;
+}
+.sc-pill-value{
+  font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:800;
+  color:var(--navy);line-height:1;letter-spacing:.2px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px;
+}
+.sc-pill-caret{width:9px;height:6px;color:var(--gray-400);flex-shrink:0}
+.sc-pill-swap{
+  width:30px;height:30px;display:inline-flex;align-items:center;justify-content:center;
+  background:transparent;border:none;border-radius:7px;color:var(--gray-400);
+  cursor:pointer;transition:all .12s ease;flex-shrink:0;
+  -webkit-tap-highlight-color:transparent;
+}
+.sc-pill-swap:hover{background:var(--gray-100);color:var(--navy)}
+.sc-pill-swap svg{width:14px;height:14px;display:block}
+
+/* ── Floating filter/display chips (top-right) ──────────────────────────── */
+.sc-chips{
+  position:absolute;top:10px;right:14px;z-index:5;
+  display:flex;align-items:center;gap:5px;
+  background:rgba(255,255,255,.92);backdrop-filter:blur(6px);
+  -webkit-backdrop-filter:blur(6px);
+  padding:5px 6px;border-radius:11px;
+  box-shadow:0 1px 2px rgba(15,23,42,.04),0 4px 14px rgba(15,23,42,.06);
+  border:1px solid rgba(15,23,42,.06);
+}
+.sc-chip{
+  display:inline-flex;align-items:center;gap:6px;
+  height:30px;padding:0 10px;
+  background:white;border:1px solid var(--gray-200);border-radius:7px;
+  font-family:'DM Sans',sans-serif;font-size:11.5px;font-weight:600;color:var(--navy);
+  cursor:pointer;transition:all .12s ease;flex-shrink:0;
+  -webkit-tap-highlight-color:transparent;
+}
+.sc-chip:hover{border-color:var(--gray-300)}
+.sc-chip:focus-visible{outline:none;border-color:var(--amber);box-shadow:0 0 0 2px rgba(212,168,48,.18)}
+.sc-chip[aria-expanded="true"]{border-color:var(--amber);background:rgba(212,168,48,.06)}
+.sc-chip-key{
+  font-size:9px;font-weight:800;color:var(--gray-400);
+  text-transform:uppercase;letter-spacing:.7px;line-height:1;
+}
+.sc-chip-val{
+  font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:800;
+  color:var(--navy);line-height:1;letter-spacing:.2px;
+  white-space:nowrap;max-width:120px;overflow:hidden;text-overflow:ellipsis;
+}
+.sc-chip-divider{width:1px;height:18px;background:var(--gray-200);margin:0 2px;flex-shrink:0}
+.sc-chip-icon{width:30px;padding:0;justify-content:center}
+.sc-chip-icon svg{width:13px;height:13px;display:block;color:var(--gray-500)}
+.sc-chip-icon:hover svg{color:var(--navy)}
+.sc-chip-icon[aria-pressed="true"]{
+  background:rgba(212,168,48,.14);border-color:rgba(212,168,48,.5);
+}
+.sc-chip-icon[aria-pressed="true"] svg{color:#92400E}
+/* PR3: Labeled toggle chips — icon + visible label so users can identify
+   functions without hovering for a title. Mobile collapses to icon-only
+   via a media-query rule below; the title attribute on each button still
+   carries the long-form description for both. */
+.sc-chip-toggle{gap:6px;padding:0 10px 0 9px}
+.sc-chip-toggle svg{width:13px;height:13px;display:block;color:var(--gray-500);flex-shrink:0}
+.sc-chip-toggle:hover svg{color:var(--navy)}
+.sc-chip-toggle[aria-pressed="true"]{
+  background:rgba(212,168,48,.14);border-color:rgba(212,168,48,.5);
+}
+.sc-chip-toggle[aria-pressed="true"] svg{color:#92400E}
+.sc-chip-toggle[aria-pressed="true"] .sc-chip-toggle-label{color:#92400E}
+.sc-chip-toggle-label{
+  font-family:'DM Sans',sans-serif;font-size:11.5px;font-weight:700;
+  color:var(--gray-600);line-height:1;letter-spacing:.1px;
+  white-space:nowrap;
+}
+/* Disabled chip — used by Ghost (no other classes available) and Zones
+   (no archetype lookup for the current axis pair). Stays visible but
+   communicates inert state. Title attribute carries the reason. */
+.sc-chip[aria-disabled="true"]{
+  opacity:.4;cursor:not-allowed;
+}
+.sc-chip[aria-disabled="true"]:hover{
+  border-color:var(--gray-200);background:white;
+}
+.sc-chip-swatches{display:inline-flex;gap:2px;align-items:center;line-height:0}
+.sc-chip-swatches i{width:7px;height:7px;border-radius:50%;display:inline-block;box-shadow:0 0 0 1px rgba(15,23,42,.08)}
+
+/* ── Floating count + legend (bottom of canvas) ─────────────────────────── */
+.sc-floatbar{
+  position:absolute;bottom:6px;left:14px;right:14px;z-index:4;
+  display:flex;align-items:center;gap:14px;
+  pointer-events:none;
+}
+.sc-count{
+  font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:800;
+  color:var(--gray-500);letter-spacing:.5px;text-transform:uppercase;
+  background:rgba(255,255,255,.85);backdrop-filter:blur(4px);
+  -webkit-backdrop-filter:blur(4px);
+  padding:3px 9px;border-radius:6px;line-height:1.4;
+  border:1px solid rgba(15,23,42,.05);
+  pointer-events:auto;
+}
+.sc-count:empty{display:none}
+.sc-wrap-v2 .sc-legend{
+  margin-left:auto;display:flex;align-items:center;gap:10px;
+  background:rgba(255,255,255,.85);backdrop-filter:blur(4px);
+  -webkit-backdrop-filter:blur(4px);
+  padding:3px 10px;border-radius:6px;
+  border:1px solid rgba(15,23,42,.05);
+  pointer-events:auto;flex-wrap:wrap;justify-content:flex-end;max-width:60%;
+}
+.sc-wrap-v2 .sc-legend:empty{display:none}
+.sc-wrap-v2 .sc-stat-bar{padding:8px 14px 8px;margin-top:0;border-top:none}
+
+/* ── Comparison shelf ───────────────────────────────────────────────────── */
+.sc-shelf{
+  background:var(--gray-50);border-top:1px solid var(--gray-100);
+  border-radius:0 0 12px 12px;
+}
+.sc-shelf-hdr{
+  display:flex;align-items:center;gap:10px;
+  padding:8px 14px;border-bottom:1px solid transparent;
+}
+.sc-shelf-title{
+  font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:900;
+  color:var(--navy);text-transform:uppercase;letter-spacing:1.2px;line-height:1;
+}
+.sc-shelf-hint{
+  font-size:11px;color:var(--gray-400);font-style:italic;line-height:1;
+}
+.sc-shelf-clear{
+  margin-left:auto;background:transparent;border:1px solid var(--gray-200);
+  color:var(--gray-500);padding:3px 9px;border-radius:6px;
+  font-size:10.5px;font-weight:700;cursor:pointer;text-transform:uppercase;
+  letter-spacing:.5px;transition:all .12s ease;
+  -webkit-tap-highlight-color:transparent;
+}
+.sc-shelf-clear:hover{border-color:#dc2626;color:#dc2626}
+.sc-shelf-rows{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:8px;
+  padding:0 14px 12px;
+}
+.sc-shelf[data-empty="true"] .sc-shelf-rows{display:none}
+.sc-shelf[data-empty="false"] .sc-shelf-hint{display:none}
+.sc-shelf-card{
+  position:relative;display:flex;align-items:center;gap:10px;
+  background:white;border:1px solid var(--gray-100);border-radius:9px;
+  padding:8px 30px 8px 10px;
+  min-height:46px;
+}
+.sc-shelf-card-logo{
+  width:30px;height:30px;flex-shrink:0;display:flex;align-items:center;justify-content:center;
+  background:var(--gray-50);border-radius:6px;
+}
+.sc-shelf-card-logo img{max-width:24px;max-height:24px;object-fit:contain}
+.sc-shelf-card-info{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
+.sc-shelf-card-name{
+  font-family:'Barlow Condensed',sans-serif;font-size:13.5px;font-weight:800;
+  color:var(--navy);line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.sc-shelf-card-vals{
+  font-size:10.5px;color:var(--gray-500);font-weight:600;line-height:1.2;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.sc-shelf-card-vals b{color:var(--navy);font-weight:800}
+.sc-shelf-card-vals .sc-shelf-delta{font-weight:700;margin-left:3px}
+.sc-shelf-card-vals .sc-shelf-delta-pos{color:#16A34A}
+.sc-shelf-card-vals .sc-shelf-delta-neg{color:#dc2626}
+.sc-shelf-card-x{
+  position:absolute;top:4px;right:4px;width:22px;height:22px;
+  background:transparent;border:none;border-radius:5px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  color:var(--gray-400);transition:all .1s ease;
+  -webkit-tap-highlight-color:transparent;
+}
+.sc-shelf-card-x:hover{background:rgba(220,38,38,.1);color:#dc2626}
+.sc-shelf-card-x svg{width:11px;height:11px}
+
+/* ── Rankings strip (Top 5 / Bottom 5) ──────────────────────────────────────
+   PR1-revision: brought back as a horizontal strip BELOW the canvas, not as
+   a side rail. The axis-toggle in the header lets the user pick whether to
+   rank by Y or X — addressing the original "ranking a 2D chart by one axis"
+   conceptual flaw. Compact rows reuse the .sc-top5-row primitives already
+   styled at the top of the scatter CSS block (lines 5014–5036). */
+.sc-rankings{
+  background:white;border-top:1px solid var(--gray-100);
+  padding:0;
+}
+.sc-rankings-hdr{
+  display:flex;align-items:center;gap:8px;
+  padding:8px 14px;border-bottom:1px solid var(--gray-100);
+  background:var(--gray-50);
+}
+.sc-rankings-title{
+  font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:900;
+  color:var(--navy);text-transform:uppercase;letter-spacing:1.2px;line-height:1;
+}
+.sc-rankings-sep{color:var(--gray-300);font-size:13px;line-height:1}
+.sc-rankings-by{
+  font-size:10px;font-weight:800;color:var(--gray-400);
+  text-transform:uppercase;letter-spacing:.7px;line-height:1;
+}
+.sc-rank-axis-toggle{
+  display:inline-flex;background:white;border:1px solid var(--gray-200);
+  border-radius:7px;padding:2px;gap:0;
+}
+.sc-rank-axis-btn{
+  display:inline-flex;align-items:center;gap:5px;
+  height:24px;padding:0 8px;
+  background:transparent;border:none;border-radius:5px;
+  font-family:'DM Sans',sans-serif;font-size:11px;font-weight:700;
+  color:var(--gray-500);cursor:pointer;transition:all .12s ease;
+  -webkit-tap-highlight-color:transparent;line-height:1;
+}
+.sc-rank-axis-btn:hover{color:var(--navy);background:var(--gray-50)}
+.sc-rank-axis-btn.active{background:rgba(212,168,48,.15);color:var(--navy)}
+.sc-rank-axis-btn.active .sc-rank-axis-letter{color:var(--amber)}
+.sc-rank-axis-letter{
+  font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:900;
+  color:var(--gray-400);letter-spacing:.05em;line-height:1;
+}
+.sc-rank-axis-label{
+  font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:800;
+  line-height:1;max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.sc-rankings-cols{
+  display:grid;grid-template-columns:1fr 1fr;
+}
+.sc-rank-col{display:flex;flex-direction:column;min-width:0}
+.sc-rank-col-top{border-right:1px solid var(--gray-100)}
+.sc-rank-col-hdr{
+  display:flex;align-items:center;gap:8px;
+  padding:7px 14px;border-bottom:1px solid var(--gray-100);
+  background:white;
+}
+.sc-rank-badge{
+  font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:1px;
+  padding:2px 7px;border-radius:20px;flex-shrink:0;
+}
+.sc-rank-badge-top{background:rgba(34,197,94,.12);color:#15803d}
+.sc-rank-badge-bot{background:rgba(239,68,68,.1);color:#dc2626}
+.sc-rank-axis-name{
+  font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:800;
+  color:var(--navy);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;
+  letter-spacing:.2px;
+}
+.sc-rank-rows{display:flex;flex-direction:column;min-height:50px}
+/* Reuse .sc-top5-row primitives (already styled). Just tighten padding here. */
+.sc-rank-rows .sc-top5-row{padding:6px 14px}
+.sc-rank-rows .sc-top5-row:last-child{border-bottom:none}
+
+/* Mobile: stack the two ranking columns vertically with a divider between. */
+@media (max-width:640px){
+  .sc-rankings-cols{grid-template-columns:1fr}
+  .sc-rank-col-top{border-right:none;border-bottom:1px solid var(--gray-100)}
+  .sc-rankings-hdr{flex-wrap:wrap;padding:8px 10px}
+  .sc-rank-axis-label{max-width:80px;font-size:11px}
+  .sc-rank-rows .sc-top5-row{padding:5px 10px}
+}
+
+/* ── Pin button injected into tooltip ───────────────────────────────────── */
+.sc-tip-pin{
+  display:inline-flex;align-items:center;gap:5px;
+  margin-top:8px;padding:5px 9px;
+  background:rgba(212,168,48,.18);border:1px solid rgba(212,168,48,.4);
+  border-radius:6px;color:#F0C94A;
+  font-family:'DM Sans',sans-serif;font-size:11px;font-weight:700;
+  cursor:pointer;letter-spacing:.3px;
+  pointer-events:auto;     /* parent tooltip is pointer-events:none */
+  -webkit-tap-highlight-color:transparent;
+}
+.sc-tip-pin:hover{background:rgba(212,168,48,.28);border-color:rgba(212,168,48,.7)}
+.sc-tip-pin[disabled]{opacity:.5;cursor:default}
+.sc-tip-pin svg{width:10px;height:10px}
+
+/* ── Picker popover (desktop) ───────────────────────────────────────────── */
+.sc-popover{
+  position:absolute;z-index:50;
+  background:white;border:1px solid var(--gray-200);border-radius:11px;
+  box-shadow:0 6px 30px rgba(15,23,42,.18),0 2px 8px rgba(15,23,42,.06);
+  min-width:240px;max-width:320px;max-height:420px;
+  display:flex;flex-direction:column;overflow:hidden;
+}
+.sc-popover[hidden]{display:none}
+.sc-popover-hdr{
+  display:flex;align-items:center;gap:6px;
+  padding:8px 8px 8px 10px;border-bottom:1px solid var(--gray-100);
+  background:var(--gray-50);
+}
+.sc-popover-search{
+  flex:1;height:32px;padding:0 10px;
+  background:white;border:1px solid var(--gray-200);border-radius:7px;
+  font-family:'DM Sans',sans-serif;font-size:13px;color:var(--navy);
+  outline:none;
+}
+.sc-popover-search:focus{border-color:var(--amber);box-shadow:0 0 0 2px rgba(212,168,48,.18)}
+.sc-popover-search::placeholder{color:var(--gray-400)}
+.sc-popover-close{
+  width:30px;height:30px;display:none;align-items:center;justify-content:center;
+  background:transparent;border:none;color:var(--gray-500);cursor:pointer;
+  border-radius:6px;flex-shrink:0;
+  -webkit-tap-highlight-color:transparent;
+}
+.sc-popover-close:hover{background:var(--gray-100);color:var(--navy)}
+.sc-popover-close svg{width:13px;height:13px}
+.sc-popover-body{
+  flex:1;overflow-y:auto;overscroll-behavior:contain;
+  padding:6px 0;-webkit-overflow-scrolling:touch;
+}
+.sc-popover-group{padding:4px 0}
+.sc-popover-group + .sc-popover-group{border-top:1px solid var(--gray-100);margin-top:2px;padding-top:6px}
+.sc-popover-group-label{
+  padding:4px 12px 6px;font-size:9.5px;font-weight:800;
+  color:var(--gray-400);text-transform:uppercase;letter-spacing:.9px;line-height:1;
+}
+.sc-popover-opt{
+  display:flex;align-items:center;gap:10px;
+  width:100%;padding:8px 12px;
+  background:transparent;border:none;text-align:left;cursor:pointer;
+  font-family:'DM Sans',sans-serif;font-size:13px;color:var(--navy);font-weight:500;
+  transition:background .08s ease;
+  -webkit-tap-highlight-color:transparent;
+}
+.sc-popover-opt:hover{background:var(--gray-50)}
+.sc-popover-opt.is-active{background:rgba(212,168,48,.1);font-weight:700}
+.sc-popover-opt.is-active::after{
+  content:'';width:6px;height:6px;border-radius:50%;background:var(--amber);
+  margin-left:auto;flex-shrink:0;
+}
+.sc-popover-opt-swatches{display:inline-flex;gap:2px;align-items:center;flex-shrink:0}
+.sc-popover-opt-swatches i{width:8px;height:8px;border-radius:50%;display:inline-block;box-shadow:0 0 0 1px rgba(15,23,42,.08)}
+.sc-popover-empty{padding:14px 12px;font-size:12px;color:var(--gray-400);font-style:italic;text-align:center}
+.sc-popover-backdrop{
+  position:fixed;inset:0;z-index:49;background:transparent;
+}
+.sc-popover-backdrop[hidden]{display:none}
+
+/* ── Mobile shell adaptations ───────────────────────────────────────────── */
+@media (max-width:640px){
+  .sc-wrap-v2 .sc-canvas-wrap{height:480px;padding:52px 8px 32px}
+  .sc-wrap-v2 .sc-canvas-wrap canvas{inset:52px 8px 32px}
+  .sc-pills{top:8px;left:8px;padding:4px;gap:4px}
+  .sc-pill{height:32px;padding:0 9px 0 8px;gap:6px}
+  .sc-pill-value{font-size:13.5px;max-width:90px}
+  .sc-pill-swap{width:26px;height:26px}
+  .sc-pill-swap svg{width:13px;height:13px}
+  .sc-chips{top:8px;right:8px;padding:4px;gap:3px}
+  .sc-chip{height:28px;padding:0 7px;gap:4px}
+  .sc-chip-key{font-size:8.5px}
+  .sc-chip-val{font-size:12px;max-width:64px}
+  .sc-chip-divider{display:none}
+  .sc-chip-icon{width:28px}
+  .sc-chip-color .sc-chip-key{display:none}
+  /* PR3: collapse toggle labels to icon-only on mobile — desktop has the
+     room to show "History/Zones/Trend/Quadrants" alongside each icon, but
+     on narrow viewports a 4-chip row with text would push the divider and
+     overflow the strip. The title attribute still provides the long-form
+     name on long-press. */
+  .sc-chip-toggle{padding:0;width:30px;justify-content:center}
+  .sc-chip-toggle-label{display:none}
+  .sc-floatbar{left:8px;right:8px;bottom:4px;gap:8px}
+  .sc-count{font-size:10.5px;padding:2px 7px}
+  .sc-wrap-v2 .sc-legend{font-size:10px;padding:2px 7px;gap:7px;max-width:62%}
+  .sc-shelf-rows{grid-template-columns:1fr;gap:6px;padding:0 10px 10px}
+  .sc-shelf-hdr{padding:7px 10px;flex-wrap:wrap}
+  .sc-shelf-hint{font-size:10.5px;width:100%;order:3}
+  .sc-shelf-clear{margin-left:auto}
+
+  /* Popover becomes a bottom sheet on coarse pointer */
+  .sc-popover{
+    position:fixed;left:0;right:0;bottom:0;top:auto;
+    min-width:0;max-width:none;width:100%;
+    max-height:72vh;
+    border-radius:14px 14px 0 0;
+    box-shadow:0 -8px 30px rgba(15,23,42,.25);
+    animation:scPopSlideUp .18s ease-out;
+  }
+  .sc-popover-close{display:inline-flex}
+  .sc-popover-backdrop{background:rgba(15,23,42,.4);backdrop-filter:blur(2px)}
+  .sc-popover-opt{padding:12px 14px;font-size:14px}
+  .sc-popover-search{height:38px;font-size:14px}
+  @keyframes scPopSlideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+}
 /* §§ /BLOCK:SC §§ */
 
 /* §§ BLOCK:FUTURE §§ */
@@ -5792,114 +6217,114 @@ ock Drafts table CSS ───────────────────�
 
 
 <section class="tab-panel" id="tab-scatter">
-  <div class="sc-wrap">
-    <!-- ── Controls: two-row hierarchy ─────────────────────────────────────
-         Row 1 (primary): the X / Y axis pair — the choices that define the
-                          entire view. Larger type, brand-accent border.
-         Row 2 (secondary): scope filters (Class, Position) + display modifiers
-                            (Color By, Trend, Quadrants). Compact, lower
-                            visual weight so axes remain the focal point.
-         The hidden #scColorBy preserves the state-read path used by scRender
-         and the URL-state machinery; the visible button group is the UI. -->
-    <div class="sc-controls">
-      <div class="sc-controls-primary">
-        <div class="sc-axis-control">
-          <span class="sc-axis-letter" aria-hidden="true">X</span>
-          <label class="sc-vh" for="scXAxis">X Axis</label>
-          <select class="sc-axis-select" id="scXAxis" data-sc-control="x"></select>
-        </div>
-        <div class="sc-axis-control">
-          <span class="sc-axis-letter" aria-hidden="true">Y</span>
-          <label class="sc-vh" for="scYAxis">Y Axis</label>
-          <select class="sc-axis-select" id="scYAxis" data-sc-control="y"></select>
-        </div>
-      </div>
-      <div class="sc-controls-secondary">
-        <div class="sc-filter-grp sc-grp-year">
-          <label class="sc-filter-label" for="scYear">Class</label>
-          <select class="sc-filter-select" id="scYear" data-sc-control="year">
-            <option value="2026" selected>2026</option>
-            <option value="all">All (2019-2026)</option>
-            <option value="2025">2025</option>
-            <option value="2024">2024</option>
-            <option value="2023">2023</option>
-            <option value="2022">2022</option>
-            <option value="2021">2021</option>
-            <option value="2020">2020</option>
-            <option value="2019">2019</option>
-          </select>
-        </div>
-        <div class="sc-filter-grp sc-grp-position">
-          <label class="sc-filter-label" for="scPosFilter">Position</label>
-          <select class="sc-filter-select" id="scPosFilter" data-sc-control="pos">
-            <option value="all">All</option>
-            <option value="Guard">Guards</option>
-            <option value="Forward">Forwards</option>
-            <option value="Center">Centers</option>
-          </select>
-        </div>
-        <!-- Color-By: visible segmented control + hidden select for state -->
-        <select class="sc-vh" id="scColorBy" data-sc-control="color" aria-hidden="true" tabindex="-1">
-          <option value="position" selected>Position</option>
-          <option value="year">Class</option>
-          <option value="tier">Tier</option>
-        </select>
-        <div class="sc-segctrl sc-grp-colorby" role="radiogroup" aria-label="Color points by">
-          <span class="sc-filter-label sc-segctrl-label">Color</span>
-          <button type="button" class="sc-seg-btn active" data-sc-action="set-color" data-value="position" aria-pressed="true">
-            <span class="sc-seg-swatches"><i style="background:#3B82F6"></i><i style="background:#8B5CF6"></i><i style="background:#0D9488"></i></span>
-            Position
-          </button>
-          <button type="button" class="sc-seg-btn" data-sc-action="set-color" data-value="year" aria-pressed="false">
-            <span class="sc-seg-swatches"><i style="background:#D97706"></i><i style="background:#3B82F6"></i><i style="background:#8B5CF6"></i></span>
-            Class
-          </button>
-          <button type="button" class="sc-seg-btn" data-sc-action="set-color" data-value="tier" aria-pressed="false">
-            <span class="sc-seg-swatches"><i style="background:#D97706"></i><i style="background:#8B5CF6"></i><i style="background:#3B82F6"></i></span>
-            Tier
-          </button>
-        </div>
-        <!-- Display modifiers — pushed right by margin-left:auto on .sc-mods -->
-        <div class="sc-mods">
-          <button type="button" class="sc-mod-btn sc-grp-trend" id="scTrendBtn" data-sc-action="toggle-trend"
-                  aria-pressed="false" aria-label="Toggle trend line" title="Trend line">
-            <svg class="sc-mod-icon" viewBox="0 0 16 16" aria-hidden="true">
-              <path d="M2 13 L14 3" stroke="currentColor" stroke-width="1.8" stroke-dasharray="3 2" fill="none" stroke-linecap="round"/>
-            </svg>
-            <span class="sc-mod-text">Trend</span>
-          </button>
-          <button type="button" class="sc-mod-btn sc-grp-quadrants" id="scQuadBtn" data-sc-action="toggle-quad"
-                  aria-pressed="false" aria-label="Toggle quadrant lines" title="Quadrant lines">
-            <svg class="sc-mod-icon" viewBox="0 0 16 16" aria-hidden="true">
-              <path d="M8 1 V15 M1 8 H15" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round"/>
-            </svg>
-            <span class="sc-mod-text">Quadrants</span>
-          </button>
-        </div>
-      </div>
-    </div>
+  <!-- ── PR1: Canvas-first restructure ───────────────────────────────────────
+       Old layout: stacked control bar → header row → canvas → side rail.
+       New layout: full-bleed canvas with floating chrome (pills + chips) and
+       a collapsible comparison shelf below. ~30% more chart real estate.
 
-    <div class="sc-body">
-      <!-- ── Main chart (full width) ── -->
+       State authority is still the hidden <select> elements at the top of the
+       wrap — scRender() reads .value from them as before. The visible pills
+       and chips are pure UI; they write into the selects and dispatch change.
+       This keeps the URL-state machinery, scPopulateAxes(), and all existing
+       render-pipeline code paths working with zero changes to their contract. -->
+  <div class="sc-wrap sc-wrap-v2">
+    <!-- Hidden state holders. scRender() reads .value from these — the user
+         interacts with the visible pills/chips which sync the selects. -->
+    <select class="sc-vh" id="scXAxis" data-sc-control="x" aria-hidden="true" tabindex="-1"></select>
+    <select class="sc-vh" id="scYAxis" data-sc-control="y" aria-hidden="true" tabindex="-1"></select>
+    <select class="sc-vh" id="scYear" data-sc-control="year" aria-hidden="true" tabindex="-1">
+      <option value="2026" selected>2026</option>
+      <option value="all">All</option>
+      <option value="2025">2025</option>
+      <option value="2024">2024</option>
+      <option value="2023">2023</option>
+      <option value="2022">2022</option>
+      <option value="2021">2021</option>
+      <option value="2020">2020</option>
+      <option value="2019">2019</option>
+    </select>
+    <select class="sc-vh" id="scPosFilter" data-sc-control="pos" aria-hidden="true" tabindex="-1">
+      <option value="all">All</option>
+      <option value="Guard">Guard</option>
+      <option value="Forward">Forward</option>
+      <option value="Center">Center</option>
+    </select>
+    <select class="sc-vh" id="scColorBy" data-sc-control="color" aria-hidden="true" tabindex="-1">
+      <option value="position" selected>Position</option>
+      <option value="year">Class</option>
+    </select>
+
+    <div class="sc-body sc-body-v2">
       <div class="sc-plot-wrap">
-        <!-- ── Header: breadcrumb scope row + hero title row ─────────────
-             Row 1 (breadcrumb): "2026 Draft Class · Guards only" — scope.
-             Row 2 (hero): "Age × TS%" as the dominant typographic element,
-                           with a "71 prospects" count chip and the legend
-                           pushed to the right. The legend belongs in this
-                           row because it's how you actually read the chart. -->
-        <div class="sc-plot-header">
-          <div class="sc-plot-scope" id="scPlotScope"></div>
-          <div class="sc-plot-titlerow">
-            <h2 class="sc-plot-title" id="scPlotTitle"></h2>
-            <span class="sc-plot-count" id="scPlotCount"></span>
-            <span class="sc-legend" id="scLegend" aria-label="Color legend"></span>
-          </div>
-        </div>
         <div class="sc-canvas-wrap">
           <canvas id="scCanvas"></canvas>
-          <!-- Empty state: shown when computePoints returns no points for the
-               current axis pair. Hidden by default. Populated by scRender. -->
+
+          <!-- Floating axis pills (top-left). Click opens the picker popover. -->
+          <div class="sc-pills" role="toolbar" aria-label="Axis selection">
+            <button type="button" class="sc-pill" id="scPillY" data-sc-pick="y" aria-haspopup="dialog">
+              <span class="sc-pill-letter" aria-hidden="true">Y</span>
+              <span class="sc-pill-value" id="scPillYVal">—</span>
+              <svg class="sc-pill-caret" viewBox="0 0 12 8" aria-hidden="true"><path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <button type="button" class="sc-pill-swap" id="scPillSwap" aria-label="Swap X and Y" title="Swap axes">
+              <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 5h9M10 3l2 2-2 2M13 11H4M6 9l-2 2 2 2" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <button type="button" class="sc-pill" id="scPillX" data-sc-pick="x" aria-haspopup="dialog">
+              <span class="sc-pill-letter" aria-hidden="true">X</span>
+              <span class="sc-pill-value" id="scPillXVal">—</span>
+              <svg class="sc-pill-caret" viewBox="0 0 12 8" aria-hidden="true"><path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+          </div>
+
+          <!-- Floating filter chips + display toggles (top-right). -->
+          <div class="sc-chips" role="toolbar" aria-label="Filters and display">
+            <button type="button" class="sc-chip" id="scChipYear" data-sc-pick="year" aria-haspopup="dialog">
+              <span class="sc-chip-key">Class</span>
+              <span class="sc-chip-val" id="scChipYearVal">2026</span>
+            </button>
+            <button type="button" class="sc-chip" id="scChipPos" data-sc-pick="pos" aria-haspopup="dialog">
+              <span class="sc-chip-key">Pos</span>
+              <span class="sc-chip-val" id="scChipPosVal">All</span>
+            </button>
+            <button type="button" class="sc-chip sc-chip-color" id="scChipColor" data-sc-pick="color" aria-haspopup="dialog">
+              <span class="sc-chip-swatches" id="scChipColorSwatches" aria-hidden="true"></span>
+              <span class="sc-chip-val" id="scChipColorVal">Position</span>
+            </button>
+            <span class="sc-chip-divider" aria-hidden="true"></span>
+            <!-- PR3-revision: removed the Zones chip — its archetype-region
+                 overlay duplicated what Quadrants already communicates with
+                 the median-driven split plus semantic corner labels. The
+                 ARCHETYPE_ZONES lookup table itself stays because the
+                 quadrant plugin still reads it via scQuadrantLabelsFor()
+                 to label the four corners ("Efficient Stars", etc.). -->
+            <button type="button" class="sc-chip sc-chip-toggle" id="scGhostBtn" data-sc-action="toggle-ghost"
+                    aria-pressed="false" aria-label="Toggle historical class overlay" title="Show prior draft classes as faded background">
+              <svg viewBox="0 0 16 16" aria-hidden="true">
+                <circle cx="4" cy="8" r="1.4" fill="currentColor" opacity=".35"/>
+                <circle cx="8" cy="5" r="1.4" fill="currentColor" opacity=".55"/>
+                <circle cx="12" cy="10" r="1.4" fill="currentColor" opacity=".75"/>
+              </svg>
+              <span class="sc-chip-toggle-label">History</span>
+            </button>
+            <button type="button" class="sc-chip sc-chip-toggle" id="scTrendBtn" data-sc-action="toggle-trend"
+                    aria-pressed="false" aria-label="Toggle trend line" title="Show a regression line through the points">
+              <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2 13 L14 3" stroke="currentColor" stroke-width="1.8" stroke-dasharray="3 2" fill="none" stroke-linecap="round"/></svg>
+              <span class="sc-chip-toggle-label">Trend</span>
+            </button>
+            <button type="button" class="sc-chip sc-chip-toggle" id="scQuadBtn" data-sc-action="toggle-quad"
+                    aria-pressed="true" aria-label="Toggle quadrant lines" title="Split the chart into four quadrants at the medians">
+              <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1 V15 M1 8 H15" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg>
+              <span class="sc-chip-toggle-label">Quadrants</span>
+            </button>
+          </div>
+
+          <!-- Floating count chip (bottom-left) + legend (bottom-right). -->
+          <div class="sc-floatbar">
+            <span class="sc-count" id="scPlotCount" aria-live="polite"></span>
+            <span class="sc-legend" id="scLegend" aria-label="Color legend"></span>
+          </div>
+
+          <!-- Empty state — unchanged contract; scShowEmptyState writes here. -->
           <div class="sc-empty" id="scEmpty" hidden>
             <svg class="sc-empty-icon" viewBox="0 0 48 48" aria-hidden="true">
               <circle cx="20" cy="20" r="14" stroke="currentColor" stroke-width="2" fill="none" opacity=".5"/>
@@ -5910,35 +6335,88 @@ ock Drafts table CSS ───────────────────�
             <div class="sc-empty-msg" id="scEmptyMsg"></div>
             <button type="button" class="sc-empty-action" id="scEmptyAction" hidden></button>
           </div>
+
+          <!-- Mobile focus card (existing behaviour) -->
+          <div id="scMobileFocus">
+            <div id="scMfInner"></div>
+          </div>
         </div>
+
+        <!-- Slim stats footer kept under the canvas. -->
         <div class="sc-stat-bar" id="scStatBar"></div>
-        <div id="scTapHint" style="display:none">Tap any player bubble to see details</div>
-        <div id="scMobileFocus">
-          <div id="scMfInner"></div>
+
+        <!-- Top 5 / Bottom 5 rankings strip ─────────────────────────────────
+             Horizontal layout (was a side rail in pre-PR1 design). Two columns
+             on desktop, stacked on mobile. The axis-toggle in the header lets
+             the user pick which dimension to rank by — fixes the original
+             1D-ranking-of-a-2D-chart conceptual flaw. Default ranks by Y.
+             Hover a row → bubble lights up on the chart (scHighlightPlayer).
+             Click a row → opens the player profile modal. -->
+        <div class="sc-rankings" id="scRankings">
+          <div class="sc-rankings-hdr">
+            <span class="sc-rankings-title">Rankings</span>
+            <span class="sc-rankings-sep" aria-hidden="true">·</span>
+            <span class="sc-rankings-by">By</span>
+            <div class="sc-rank-axis-toggle" role="radiogroup" aria-label="Rank by axis">
+              <button type="button" class="sc-rank-axis-btn active" data-sc-rank-axis="y" aria-pressed="true">
+                <span class="sc-rank-axis-letter">Y</span>
+                <span class="sc-rank-axis-label" id="scRankAxisYLabel">—</span>
+              </button>
+              <button type="button" class="sc-rank-axis-btn" data-sc-rank-axis="x" aria-pressed="false">
+                <span class="sc-rank-axis-letter">X</span>
+                <span class="sc-rank-axis-label" id="scRankAxisXLabel">—</span>
+              </button>
+            </div>
+          </div>
+          <div class="sc-rankings-cols">
+            <div class="sc-rank-col sc-rank-col-top">
+              <div class="sc-rank-col-hdr">
+                <span class="sc-rank-badge sc-rank-badge-top">Top 5</span>
+                <span class="sc-rank-axis-name" id="scTop5AxisLabel"></span>
+              </div>
+              <div id="scTop5" class="sc-rank-rows">
+                <div class="sc-top5-empty">Select axes to rank players</div>
+              </div>
+            </div>
+            <div class="sc-rank-col sc-rank-col-bot">
+              <div class="sc-rank-col-hdr">
+                <span class="sc-rank-badge sc-rank-badge-bot">Bottom 5</span>
+                <span class="sc-rank-axis-name" id="scBot5AxisLabel"></span>
+              </div>
+              <div id="scBot5" class="sc-rank-rows">
+                <div class="sc-top5-empty">Select axes to rank players</div>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
-      <!-- ── Top 5 / Bottom 5 dual-panel strip ── -->
-      <div class="sc-panels-strip">
-        <div class="sc-panel sc-panel-top">
-          <div class="sc-panel-hdr">
-            <span class="sc-panel-hdr-badge sc-panel-hdr-badge-top">Top 5</span>
-            <span class="sc-panel-hdr-axis" id="scTop5AxisLabel">TS%</span>
+
+        <!-- Comparison shelf: collapsed by default, expands on first pin.
+             Cap of 3. Pinning is offered through the hover tooltip (desktop)
+             and the mobile focus card; clicking a point still opens the
+             player modal — pin and "go deep" stay separate intents. -->
+        <div class="sc-shelf" id="scShelf" data-empty="true">
+          <div class="sc-shelf-hdr">
+            <span class="sc-shelf-title">Compare</span>
+            <span class="sc-shelf-hint" id="scShelfHint">Hover a player and tap Pin to add (max 3)</span>
+            <button type="button" class="sc-shelf-clear" id="scShelfClear" hidden>Clear</button>
           </div>
-          <div id="scTop5">
-            <div class="sc-top5-empty">Select axes to rank players</div>
-          </div>
-        </div>
-        <div class="sc-panel sc-panel-bot">
-          <div class="sc-panel-hdr">
-            <span class="sc-panel-hdr-badge sc-panel-hdr-badge-bot">Bottom 5</span>
-            <span class="sc-panel-hdr-axis" id="scBot5AxisLabel"></span>
-          </div>
-          <div id="scBot5">
-            <div class="sc-top5-empty">Select axes to rank players</div>
-          </div>
+          <div class="sc-shelf-rows" id="scShelfRows"></div>
         </div>
       </div>
     </div>
+
+    <!-- Picker popover (single shared instance). Repositioned per trigger.
+         On coarse-pointer devices it morphs into a bottom sheet via CSS. -->
+    <div class="sc-popover" id="scPopover" hidden role="dialog" aria-modal="false" aria-label="Picker">
+      <div class="sc-popover-hdr">
+        <input type="search" class="sc-popover-search" id="scPopoverSearch" placeholder="Search…" aria-label="Search options" autocomplete="off">
+        <button type="button" class="sc-popover-close" id="scPopoverClose" aria-label="Close">
+          <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 3l10 10M13 3L3 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+      <div class="sc-popover-body" id="scPopoverBody"></div>
+    </div>
+    <div class="sc-popover-backdrop" id="scPopoverBackdrop" hidden></div>
   </div>
 </section>
 
@@ -13229,7 +13707,21 @@ var ScatterEngine = (function() {
     return out;
   }
 
-  function invalidate() { _cache = null; _cacheKey = ''; }
+  // Monotonic version counter — incremented by invalidate(). The filter
+  // cache stores the version at the time it was populated PLUS a reference
+  // to the source players array. Both must match for the cache to hit.
+  //   - Version catches: invalidate() bumps version → cache misses cleanly.
+  //   - Identity catches: year change (getPlayers returns a different array
+  //     reference for a different year) — version alone misses this because
+  //     no invalidate() runs on year change. The two checks are complementary.
+  // Identity is O(1) reference compare; safer than the previous _src tag on
+  // the cache array because we don't mutate the cached object.
+  var _cacheVersion  = 0;
+  var _filteredCache = null;
+  var _filteredKey   = '';
+  var _filteredVer   = -1;
+  var _filteredSrc   = null;
+  function invalidate() { _cache = null; _cacheKey = ''; _cacheVersion++; }
 
   // ── Axis value extraction ─────────────────────────────────────────────────
   // ts_pct is stored 0-1; display as 0-100.
@@ -13264,21 +13756,25 @@ var ScatterEngine = (function() {
   }
 
   // Filter once: position filter only (year is already encoded by getPlayers
-  // since each year's data is loaded into a separate cache). Cached for the
-  // current (year, posFilter) tuple so repeated calls within a render are O(1).
-  var _filteredCache = null;
-  var _filteredKey   = '';
+  // since each year's data is loaded into a separate cache). Cache hit when
+  // (key, source players reference, and global version) all match. Cache miss
+  // when any one differs — e.g. user changes year (different players ref) or
+  // upstream data refresh (invalidate bumps version).
   function getFiltered(players, posFilter) {
     var key = (posFilter || 'all');
-    if (_filteredCache && _filteredKey === key && _filteredCache._src === players) {
+    if (_filteredCache
+        && _filteredKey === key
+        && _filteredSrc === players
+        && _filteredVer === _cacheVersion) {
       return _filteredCache;
     }
     var out = (posFilter && posFilter !== 'all')
       ? players.filter(function(p) { return p.position === posFilter; })
       : players.slice(); // shallow copy so callers can't mutate the cache
-    out._src = players;  // identity tag for cache validation
     _filteredCache = out;
     _filteredKey   = key;
+    _filteredSrc   = players;
+    _filteredVer   = _cacheVersion;
     return out;
   }
 
@@ -13286,6 +13782,19 @@ var ScatterEngine = (function() {
   // Applies a small radial offset to points that overlap so logos remain
   // individually visible. Offset is based on player rank (stable across
   // renders). Tooltip still shows true values (_xr/_yr), not jittered coords.
+  //
+  // Algorithm — spatial bucket grid:
+  //   The previous implementation scanned every pair (i, j) — O(n²). With
+  //   200 points that's 19,900 comparisons per render; with 600 points
+  //   (all-years view) it'd be 180,000, which is why the old code gated
+  //   the jitter behind a `pts.length < 200` check and silently degraded
+  //   the historical view.
+  //
+  //   We now hash each point into a grid cell of size (TX × TY). Two points
+  //   can only collide if they share or border the same cell, so each point
+  //   compares against the 3×3 = 9 neighbouring buckets only. Expected work
+  //   per point is O(1), total O(n) — the 200-point gate is gone and the
+  //   historical view gets clean jitter for free.
   var PHI = 2.39996323; // golden angle — distributes points in tight spiral
 
   function applyJitter(pts, xRange, yRange) {
@@ -13295,18 +13804,56 @@ var ScatterEngine = (function() {
     var JX = xRange * 0.011; // max jitter: 1.1% of range
     var JY = yRange * 0.011;
 
-    // Clone points so originals are untouched
-    var result = pts.map(function(pt) { return Object.assign({}, pt); });
-    for (var i = 0; i < result.length; i++) {
-      for (var j = i + 1; j < result.length; j++) {
-        if (Math.abs(result[i]._xr - result[j]._xr) < TX &&
-            Math.abs(result[i]._yr - result[j]._yr) < TY) {
-          var ai = (result[i]._p.rank || i) * PHI;
-          var aj = (result[j]._p.rank || j) * PHI;
-          result[i].x = result[i]._xr + Math.cos(ai) * JX;
-          result[i].y = result[i]._yr + Math.sin(ai) * JY;
-          result[j].x = result[j]._xr + Math.cos(aj) * JX;
-          result[j].y = result[j]._yr + Math.sin(aj) * JY;
+    // Clone so the originals are untouched (Chart.js reads .x/.y directly).
+    var n = pts.length;
+    var result = new Array(n);
+    for (var k = 0; k < n; k++) result[k] = Object.assign({}, pts[k]);
+
+    // Build the bucket index: cellKey -> array of point indices in that cell.
+    // Cell size matches the overlap threshold so two points in non-adjacent
+    // cells are guaranteed to be farther apart than TX/TY on at least one axis.
+    var buckets = Object.create(null);
+    function cellKey(cx, cy) { return cx + ',' + cy; }
+    var cells = new Array(n);
+    for (var i = 0; i < n; i++) {
+      var cx = Math.floor(result[i]._xr / TX);
+      var cy = Math.floor(result[i]._yr / TY);
+      cells[i] = [cx, cy];
+      var k1 = cellKey(cx, cy);
+      (buckets[k1] || (buckets[k1] = [])).push(i);
+    }
+
+    // For each point, walk its own cell + 8 neighbours. Skip pairs we've
+    // already processed (j > i) so we only jitter each colliding pair once.
+    // `nudged` marks points that have already been offset so a chain of
+    // colliding bubbles doesn't get jittered twice (which would compound
+    // the offset and walk the point away from its true coordinate).
+    var nudged = new Array(n);
+    for (var idx = 0; idx < n; idx++) {
+      var c = cells[idx];
+      for (var dx = -1; dx <= 1; dx++) {
+        for (var dy = -1; dy <= 1; dy++) {
+          var bucket = buckets[cellKey(c[0] + dx, c[1] + dy)];
+          if (!bucket) continue;
+          for (var b = 0; b < bucket.length; b++) {
+            var j = bucket[b];
+            if (j <= idx) continue; // already handled or self
+            if (Math.abs(result[idx]._xr - result[j]._xr) >= TX) continue;
+            if (Math.abs(result[idx]._yr - result[j]._yr) >= TY) continue;
+            // Collision — nudge both points if not yet nudged
+            if (!nudged[idx]) {
+              var ai = (result[idx]._p.rank || idx) * PHI;
+              result[idx].x = result[idx]._xr + Math.cos(ai) * JX;
+              result[idx].y = result[idx]._yr + Math.sin(ai) * JY;
+              nudged[idx] = true;
+            }
+            if (!nudged[j]) {
+              var aj = (result[j]._p.rank || j) * PHI;
+              result[j].x = result[j]._xr + Math.cos(aj) * JX;
+              result[j].y = result[j]._yr + Math.sin(aj) * JY;
+              nudged[j] = true;
+            }
+          }
         }
       }
     }
@@ -13316,7 +13863,13 @@ var ScatterEngine = (function() {
   // ── Tier-based logo inner size (px) ─────────────────────────────────────
   // This is the logo content inside the bubble — not the total rendered size.
   // Total rendered = tierSize + BUBBLE_PAD*2 (added by ScatterLogoCache).
-  // franchise → 22+12 = 34px bubble | lottery → 18+12 = 30px | etc.
+  // PR3-tweak: bumped ~30% (was 22/18/15/13) so school logos are readable at
+  // a glance rather than requiring zoom or hover. Spatial-index hit radii
+  // derive from tierSize too (queryNear / queryClosest), so the tap target
+  // and click target grow alongside the visual — a usability win on top.
+  // The cost is denser overlap in crowded regions; jitter handles that and
+  // the user can always filter by class / position to thin the cohort.
+  // franchise → 28+12 = 40px bubble | lottery → 24+12 = 36px | late1 → 20+12 = 32px
   // Reads from TIER_CUTS so logo sizes stay in sync with the user's tier
   // editor adjustments — the rest of the system already obeys these cuts.
   function tierSize(rank) {
@@ -13327,41 +13880,46 @@ var ScatterEngine = (function() {
     // 640px matches the main mobile breakpoint used throughout the system.
     var isMobile = (typeof window !== 'undefined' && window.innerWidth <= 640);
     if (isMobile) {
-      if (!rank)              return 10;
-      if (rank <= T.franchise) return 14;
-      if (rank <= T.lottery)   return 12;
-      if (rank <= T.lateFirst) return 10;
-      return 9;
+      if (!rank)              return 13;
+      if (rank <= T.franchise) return 18;
+      if (rank <= T.lottery)   return 16;
+      if (rank <= T.lateFirst) return 13;
+      return 12;
     }
-    if (!rank)              return 15;
-    if (rank <= T.franchise) return 22;
-    if (rank <= T.lottery)   return 18;
-    if (rank <= T.lateFirst) return 15;
-    return 13;
+    if (!rank)              return 20;
+    if (rank <= T.franchise) return 28;
+    if (rank <= T.lottery)   return 24;
+    if (rank <= T.lateFirst) return 20;
+    return 17;
   }
 
-  // ── Top N players by Y-axis value ────────────────────────────────────────
-  // Pure function: sorts in one pass, returns up to n entries.
-  // Takes an already-filtered player list (filter is done once upstream).
-  function topByAxis(filteredPlayers, yKey, n) {
-    var result = [];
-    filteredPlayers.forEach(function(p) {
+  // ── Top / Bottom N players by axis value ─────────────────────────────────
+  // endsByAxis does both halves in a single pass: build the value-tagged list
+  // once, sort once descending, then slice both ends. The legacy topByAxis /
+  // botByAxis remain as thin wrappers so any external callers keep working,
+  // but scRender calls endsByAxis directly — one extraction, one sort, two
+  // outputs. Previously each side did its own filter + sort independently
+  // (two passes over the same data, two O(n log n) sorts).
+  function endsByAxis(filteredPlayers, yKey, n) {
+    n = n || 5;
+    var tagged = [];
+    for (var i = 0; i < filteredPlayers.length; i++) {
+      var p = filteredPlayers[i];
       var v = axisVal(p, yKey);
-      if (v !== null) result.push({ _p: p, _val: v });
-    });
-    result.sort(function(a, b) { return b._val - a._val; });
-    return result.slice(0, n || 5);
+      if (v !== null) tagged.push({ _p: p, _val: v });
+    }
+    // Sort once, descending; slice high end for top, low end for bot.
+    tagged.sort(function(a, b) { return b._val - a._val; });
+    var top = tagged.slice(0, n);
+    // Bot = the worst N, but presented worst-first (ascending) — reverse a tail slice.
+    var bot = tagged.slice(-n).reverse();
+    return { top: top, bot: bot };
   }
 
-  function botByAxis(filteredPlayers, yKey, n) {
-    var result = [];
-    filteredPlayers.forEach(function(p) {
-      var v = axisVal(p, yKey);
-      if (v !== null) result.push({ _p: p, _val: v });
-    });
-    result.sort(function(a, b) { return a._val - b._val; });
-    return result.slice(0, n || 5);
-  }
+  // Backward-compat wrappers. New code should call endsByAxis once and read
+  // both .top and .bot rather than calling these two separately.
+  function topByAxis(filteredPlayers, yKey, n) { return endsByAxis(filteredPlayers, yKey, n).top; }
+  function botByAxis(filteredPlayers, yKey, n) { return endsByAxis(filteredPlayers, yKey, n).bot; }
 
   // ── Point color ───────────────────────────────────────────────────────────
   // Used for fallback circles (when logo not yet loaded) and tooltip accent.
@@ -13443,6 +14001,7 @@ var ScatterEngine = (function() {
     axisVal:     axisVal,     computePoints: computePoints,
     getFiltered: getFiltered,
     applyJitter: applyJitter, tierSize:    tierSize,
+    endsByAxis:  endsByAxis,
     topByAxis:   topByAxis,   botByAxis:   botByAxis,
     pointColor:  pointColor,  legendItems: legendItems,
     linReg:      linReg,      axisRange:   axisRange,
@@ -13462,14 +14021,31 @@ var ScatterLogoCache = (function() {
   var _raw      = {};  // school → HTMLImageElement | 'err' | 'loading'
   var _canvases = {};  // 'school@logoSize' → HTMLCanvasElement (total=logoSize+PAD*2)
   var _onLoad   = null;
-  var _debTimer = null;
+  var _rafScheduled = false;
 
   function setOnLoad(fn) { _onLoad = fn; }
 
+  // Coalesce logo-arrival notifications via requestAnimationFrame.
+  // Without coalescing, every logo arrival would fire onLoad — which calls
+  // chart.update('none') — yielding dozens of redundant renders during cold
+  // load. requestAnimationFrame guarantees AT MOST one fire per paint frame
+  // (~16ms), regardless of how many logos arrived in that interval. Logos
+  // that trickle in across many frames still each get a paint, so the user
+  // sees progressive loading rather than a single delayed reveal.
+  //
+  // Previously used setTimeout(60ms) which added unnecessary latency and
+  // fired only after the arrival stream STOPPED — meaning the user saw a
+  // blank chart for the full duration of the network burst, then everything
+  // popped in at once at the end. rAF gives the same coalescing benefit
+  // without the artificial wait.
   function _fireOnLoad() {
     if (!_onLoad) return;
-    clearTimeout(_debTimer);
-    _debTimer = setTimeout(_onLoad, 60);
+    if (_rafScheduled) return; // an rAF is already pending for this frame
+    _rafScheduled = true;
+    requestAnimationFrame(function() {
+      _rafScheduled = false;
+      if (_onLoad) _onLoad();
+    });
   }
 
   // Draws the school logo inside a styled bubble (white circle + subtle shadow + border).
@@ -13611,35 +14187,38 @@ var ScatterLogoCache = (function() {
 })();
 
 // ══ ScatterTopPanel ══════════════════════════════════════════════════════════
-// Renders the "Top 5 by Y-axis" leader-board panel and owns the two-way
-// highlight interaction between panel rows and scatter-plot logos.
+// Pure renderer for the "Top 5 by Y-axis" leader-board panel. Takes a list,
+// writes HTML. No interaction state — row hover/click are handled by event
+// delegation on .sc-panels-strip (see Scatter.initDelegation).
+//
+// Previous versions exported highlight/clearHighlight/select methods plus
+// an internal _highlighted state, all of which were dead code: nothing ever
+// called them. The hover delegation managed the sc-top5-row-active class
+// directly. Keeping the dead methods around created the illusion of a
+// two-system design and made debugging harder. Cleaned up to pure render.
 var ScatterTopPanel = (function() {
   'use strict';
 
-  var _topItems  = [];   // current list: [{ _p, _val }]
-  var _highlighted = null;
-
-  // ── Render ────────────────────────────────────────────────────────────────
   function render(items, yM) {
-    _topItems = items || [];
-    var el      = document.getElementById('scTop5');
-    var lblEl   = document.getElementById('scTop5AxisLabel');
+    items = items || [];
+    var el    = document.getElementById('scTop5');
+    var lblEl = document.getElementById('scTop5AxisLabel');
     if (lblEl) lblEl.textContent = yM ? yM.label : '';
     if (!el) return;
 
-    if (!_topItems.length) {
+    if (!items.length) {
       el.innerHTML = '<div class="sc-top5-empty">No data for this axis</div>';
       return;
     }
 
-    // Compute value range for fill bar scaling
-    var vals = _topItems.map(function(it){ return it._val; });
+    // Value range for the row fill-bar scaling
+    var vals = items.map(function(it){ return it._val; });
     var maxVal = Math.max.apply(null, vals);
     var minVal = Math.min.apply(null, vals);
     var range  = maxVal - minVal || 1;
 
     var h = '';
-    _topItems.forEach(function(item, i) {
+    items.forEach(function(item, i) {
       var p      = item._p;
       var color  = ScatterEngine.POS_HEX[p.position] || '#94A3B8';
       var school = p._s || '';
@@ -13663,69 +14242,40 @@ var ScatterTopPanel = (function() {
     });
 
     el.innerHTML = h;
-    if (_highlighted) _applyRowActive(_highlighted);
   }
 
-  // ── Interaction ───────────────────────────────────────────────────────────
-  function highlight(name) {
-    _highlighted = name;
-    _applyRowActive(name);
-    scHighlightPlayer(name);
-  }
-
-  function clearHighlight() {
-    _highlighted = null;
-    _applyRowActive(null);
-    scHighlightPlayer(null);
-  }
-
-  function select(el) {
-    var rank = parseInt(el.getAttribute('data-rank'), 10);
-    var year = el.getAttribute('data-year') || '2026';
-    if (rank && typeof openPlayerModal === 'function') openPlayerModal(rank, year);
-  }
-
-  function _applyRowActive(name) {
-    document.querySelectorAll('.sc-top5-row').forEach(function(row) {
-      row.classList.toggle('sc-top5-row-active', !!name && row.getAttribute('data-name') === name);
-    });
-  }
-
-  return { render: render, highlight: highlight, clearHighlight: clearHighlight, select: select };
+  return { render: render };
 })();
 
-// ── Bottom-5 panel (mirrors ScatterTopPanel, ascending sort) ─────────────────
+// ── Bottom-5 panel — pure renderer, mirrors ScatterTopPanel ───────────────
 var ScatterBotPanel = (function() {
   'use strict';
-  var _botItems = [];
-  var _highlighted = null;
 
   function render(items, yM) {
-    _botItems = items || [];
+    items = items || [];
     var el    = document.getElementById('scBot5');
     var lblEl = document.getElementById('scBot5AxisLabel');
     if (lblEl) lblEl.textContent = yM ? yM.label : '';
     if (!el) return;
-    if (!_botItems.length) {
+    if (!items.length) {
       el.innerHTML = '<div class="sc-top5-empty">No data</div>';
       return;
     }
 
     // Fill bar: bottom performers get smaller fill (inverted — worst = smallest bar)
-    var vals   = _botItems.map(function(it){ return it._val; });
+    var vals   = items.map(function(it){ return it._val; });
     var maxVal = Math.max.apply(null, vals);
     var minVal = Math.min.apply(null, vals);
     var range  = maxVal - minVal || 1;
 
     var h = '';
-    _botItems.forEach(function(item, i) {
+    items.forEach(function(item, i) {
       var p     = item._p;
       var color = ScatterEngine.POS_HEX[p.position] || '#94A3B8';
       var school = p._s || '';
       var logoH = (typeof schoolLogoHtml === 'function' && school)
         ? schoolLogoHtml(school, '20px', '2px')
         : '<div style="width:18px;height:18px;border-radius:3px;background:' + color + '20;flex-shrink:0"></div>';
-      // Bottom panel: worst value (#1 in bottom) gets smallest fill bar
       var fillPct = Math.round(((item._val - minVal) / range) * 60 + 10);
 
       h += '<div class="sc-top5-row sc-bot5-row" data-name="' + escHtml(p._n || '') + '"'
@@ -13742,34 +14292,9 @@ var ScatterBotPanel = (function() {
         + '</div>';
     });
     el.innerHTML = h;
-    if (_highlighted) _applyRowActive(_highlighted);
   }
 
-  function highlight(name) {
-    _highlighted = name;
-    _applyRowActive(name);
-    scHighlightPlayer(name);
-  }
-
-  function clearHighlight() {
-    _highlighted = null;
-    _applyRowActive(null);
-    scHighlightPlayer(null);
-  }
-
-  function select(el) {
-    var rank = parseInt(el.getAttribute('data-rank'), 10);
-    var year = el.getAttribute('data-year') || '2026';
-    if (rank && typeof openPlayerModal === 'function') openPlayerModal(rank, year);
-  }
-
-  function _applyRowActive(name) {
-    document.querySelectorAll('.sc-bot5-row').forEach(function(row) {
-      row.classList.toggle('sc-top5-row-active', !!name && row.getAttribute('data-name') === name);
-    });
-  }
-
-  return { render: render, highlight: highlight, clearHighlight: clearHighlight, select: select };
+  return { render: render };
 })();
 
 // ══ Scatter ═══════════════════════════════════════════════════════════════════
@@ -13797,9 +14322,13 @@ var Scatter = (function() {
     chart:           null,
     allPts:          [],
 
-    // Toggle state (URL-restored via setters)
+    // Toggle state (URL-restored via setters).
+    // PR3: quadrants default to true. The semantic corner labels (Efficient
+    // Stars, Empty Volume, etc., from scQuadrantLabelsFor) are the chart's
+    // primary storytelling layer; new users should see them immediately.
+    // Trend stays default-off — it's a math overlay, not a narrative one.
     trend:           false,
-    quadrants:       false,
+    quadrants:       true,
 
     // Tooltip DOM + auto-hide timer
     tipEl:           null,
@@ -13817,7 +14346,40 @@ var Scatter = (function() {
     // Spatial index (new — owned exclusively by this namespace)
     spatialIndex:    null,
     spatialIndexRev: 0,
-    delegationWired: false
+    delegationWired: false,
+
+    // PR1: Pinned-players comparison shelf. Bounded by ScatterShell.PIN_CAP.
+    // Slim copies of player records (name, school, year, rank, position) —
+    // never holds live references. Values are looked up fresh at shelf-render
+    // time so cards stay accurate across data-source changes.
+    pinned:          [],
+
+    // PR1-revision: which axis the Top 5 / Bottom 5 panels rank by.
+    // 'y' matches the pre-PR1 default; flipping to 'x' via the axis toggle
+    // in the rankings header lets the user explore both ends of either
+    // dimension without re-arranging the chart itself.
+    rankAxis:        'y',
+
+    // ── PR2: Analytical layers ──────────────────────────────────────────────
+    // ghost: Historical class overlay. When true and the active class is a
+    //   single year (not 'all'), the other classes render as faded background
+    //   dots so the user sees the current class in eight-year context. The
+    //   overlay is interaction-inert — spatial index, tooltip, modal click,
+    //   and pin all bind to the foreground only.
+    ghost:           false,
+
+    // crosshair: { x, y } in DATA coordinates when the user is hovering a
+    //   single point on a fine-pointer device, null otherwise. Read by
+    //   SC_CROSSHAIR_PLUGIN at draw time. Mutated in canvas.onmousemove and
+    //   cleared in canvas.onmouseleave so it's always in sync with the
+    //   tooltip — no separate flicker path.
+    crosshair:       null,
+
+    // percentileCache: { xSorted:[...], ySorted:[...], n:N } — the foreground
+    //   point values pre-sorted per axis so the tooltip can compute percentile
+    //   via O(log n) bisect rather than a full O(n) scan per hover. Built
+    //   once per scRender() against the final filtered+jittered set.
+    percentileCache: null
   };
 
   // ── Spatial index ────────────────────────────────────────────────────────
@@ -13907,156 +14469,146 @@ var Scatter = (function() {
     return best;
   }
 
-  // ── Targeted highlight ──────────────────────────────────────────────────
-  // Previously allocated two n-length arrays per hover transition and walked
-  // every point. This version mutates ds.pointStyle/pointRadius in place,
-  // tracking which points are currently dimmed so transitions between rows
-  // touch only the two affected indices (was O(n), now O(1) after the first
-  // highlight establishes the dimmed state).
-  var _highlightIdx = -1;  // currently highlighted point index, -1 = none
-  var _isAllDimmed  = false;
-
-  function _findIdxByName(name) {
-    if (!name) return -1;
-    for (var i = 0; i < _state.allPts.length; i++) {
-      if (_state.allPts[i]._p._n === name) return i;
-    }
-    return -1;
-  }
+  // ── Highlight system ──────────────────────────────────────────────────────
+  // SINGLE SOURCE OF TRUTH: _state.highlightName.
+  //   non-null string → dim all points except the named one, enlarge that one
+  //   null            → restore every point to its bright/full-size state
+  //
+  // No incremental "swap two indices" optimization. The previous version
+  // tracked _highlightIdx and _isAllDimmed in parallel with _state.highlightName,
+  // which produced bugs when those three got out of sync (which they did,
+  // especially after panel re-renders and logo-arrival re-applies). For the
+  // worst-case 600 points the full rebuild is <1ms; the prior microsecond
+  // savings cost more in debugging time than they ever saved at runtime.
+  //
+  // pointHoverRadius is now always kept in sync alongside pointRadius —
+  // previously the dim/restore paths only touched pointRadius, so a dimmed
+  // point that got hovered would scale to its full bright hoverRadius.
 
   function highlightPlayer(name) {
-    _state.highlightName = name;
+    _state.highlightName = name || null;
     if (!_state.chart || !_state.allPts.length || !_state.lastLogoData) return;
-    var ds = _state.chart.data.datasets[0];
-    if (!ds) return;
-
-    var newIdx = _findIdxByName(name);
-    if (newIdx === _highlightIdx) return;
-
-    var orig = _state.lastLogoData;
-    var oldIdx = _highlightIdx;
-
-    // Ensure ds.pointStyle / pointRadius are mutable arrays. They are (set
-    // by reference from logoData inside scRender), so direct mutation works.
-    if (newIdx === -1) {
-      // Clearing highlight: restore everything if we'd dimmed
-      if (_isAllDimmed) {
-        for (var j = 0; j < _state.allPts.length; j++) {
-          ds.pointStyle[j]  = orig.styles[j];
-          ds.pointRadius[j] = orig.radii[j];
-        }
-        _isAllDimmed = false;
-      }
-    } else if (!_isAllDimmed) {
-      // First highlight in this state: dim everything not selected + bump selected
-      for (var k = 0; k < _state.allPts.length; k++) {
-        if (k === newIdx) {
-          ds.pointStyle[k]  = orig.styles[k];
-          ds.pointRadius[k] = orig.radii[k] + 3;
-        } else {
-          var ptK = _state.allPts[k];
-          ds.pointStyle[k]  = ScatterLogoCache.getCanvasDimmed(ptK._p._s, ScatterEngine.tierSize(ptK._p.rank));
-          ds.pointRadius[k] = Math.max(4, orig.radii[k] * 0.72);
-        }
-      }
-      _isAllDimmed = true;
-    } else {
-      // Already dimmed; just swap the highlighted slot — 2 mutations total
-      if (oldIdx !== -1) {
-        var oldPt = _state.allPts[oldIdx];
-        ds.pointStyle[oldIdx]  = ScatterLogoCache.getCanvasDimmed(oldPt._p._s, ScatterEngine.tierSize(oldPt._p.rank));
-        ds.pointRadius[oldIdx] = Math.max(4, orig.radii[oldIdx] * 0.72);
-      }
-      ds.pointStyle[newIdx]  = orig.styles[newIdx];
-      ds.pointRadius[newIdx] = orig.radii[newIdx] + 3;
+    // PR2: with the ghost dataset prepended at index 0, the foreground sits
+    // at index 1. Find it by the $scIsForeground tag so this is robust to
+    // either layout — index lookup would silently dim ghost circles.
+    var dsList = _state.chart.data.datasets;
+    var ds = null;
+    for (var di = 0; di < dsList.length; di++) {
+      if (dsList[di].$scIsForeground) { ds = dsList[di]; break; }
     }
+    if (!ds) ds = dsList[0];
+    if (!ds) return;
+    var orig = _state.lastLogoData;
+    var n = _state.allPts.length;
 
-    _highlightIdx = newIdx;
+    if (!name) {
+      // Restore: every point goes back to bright/full-size from lastLogoData.
+      // lastLogoData is kept current by the ScatterLogoCache.setOnLoad path
+      // so any logos loaded since the highlight began are also restored.
+      for (var i = 0; i < n; i++) {
+        ds.pointStyle[i]       = orig.styles[i];
+        ds.pointRadius[i]      = orig.radii[i];
+        ds.pointHoverRadius[i] = orig.hoverRadii[i];
+      }
+    } else {
+      // Locate target by name. If not found (e.g. axis change moved the
+      // player off-chart), fall through with hi=-1 — every point gets dimmed,
+      // which visually communicates "the hovered row's player is not visible
+      // in the current view". That's correct behaviour, not a bug.
+      var hi = -1;
+      for (var j = 0; j < n; j++) {
+        if (_state.allPts[j]._p._n === name) { hi = j; break; }
+      }
+      for (var k = 0; k < n; k++) {
+        if (k === hi) {
+          ds.pointStyle[k]       = orig.styles[k];
+          ds.pointRadius[k]      = orig.radii[k] + 3;
+          ds.pointHoverRadius[k] = orig.hoverRadii[k] + 3;
+        } else {
+          var pt = _state.allPts[k];
+          ds.pointStyle[k]       = ScatterLogoCache.getCanvasDimmed(pt._p._s, ScatterEngine.tierSize(pt._p.rank));
+          ds.pointRadius[k]      = Math.max(4, orig.radii[k] * 0.72);
+          ds.pointHoverRadius[k] = Math.max(4, orig.hoverRadii[k] * 0.72);
+        }
+      }
+    }
     _state.chart.update('none');
   }
 
-  // Public reset for when scRender rebuilds the chart — the highlight tracking
-  // is per-render. Called from inside scRender after logoData is computed.
+  // Reset everything related to highlighting. Called by scRender before a
+  // fresh paint. Three pieces of state to clear:
+  //   _state.highlightName — primary state
+  //   _hoveredRow          — closed-over hover-delegation tracker
+  //   .sc-top5-row-active  — DOM class on any row that was hovered
+  // scRender's chart construction immediately follows this call and will
+  // paint bright styles, so no chart.update is needed here.
   function resetHighlight() {
-    _highlightIdx = -1;
-    _isAllDimmed  = false;
+    _state.highlightName = null;
+    _hoveredRow = null;
+    var stale = document.querySelectorAll('.sc-top5-row-active');
+    for (var i = 0; i < stale.length; i++) {
+      stale[i].classList.remove('sc-top5-row-active');
+    }
   }
 
+  // Hoisted from initDelegation so resetHighlight() above can clear it.
+  // Was previously a closure variable inside initDelegation, which meant
+  // it survived panel re-renders as a detached-DOM zombie reference.
+  var _hoveredRow = null;
+
   // ── Event delegation init ────────────────────────────────────────────────
-  // Replaces the 30+ inline onchange/onclick/onmouseenter attributes that
-  // were re-emitted on every Top5/Bot5 render. Wired once at first render
-  // (when DOM is guaranteed to exist) — _state.delegationWired prevents
-  // duplicates if init is called multiple times.
+  // PR1: the old .sc-controls container and .sc-panels-strip were deleted as
+  // part of the canvas-first restructure. Hidden <select>s and toggle buttons
+  // now live directly inside .sc-wrap-v2; the new pills/chips/popover are
+  // wired by ScatterShell separately. We listen on .sc-wrap-v2 so the same
+  // delegation contract (change on [data-sc-control], click on [data-sc-action])
+  // continues to work without any caller having to know the markup changed.
   function initDelegation() {
     if (_state.delegationWired) return;
-    var controls = document.querySelector('.sc-controls');
-    var strip    = document.querySelector('.sc-panels-strip');
-    if (!controls || !strip) return;  // DOM not ready yet — retry next render
+    var wrap = document.querySelector('.sc-wrap-v2') || document.querySelector('.sc-wrap');
+    if (!wrap) return;  // DOM not ready yet — retry next render
 
-    // Control bar: change on selects → renderDebounced
-    controls.addEventListener('change', function(e) {
+    // Hidden selects emit `change` when ScatterShell sets .value + dispatches —
+    // the existing scRenderImmediate / scRenderDebounced dispatch logic is
+    // preserved unchanged so URL-state and render contracts remain identical.
+    wrap.addEventListener('change', function(e) {
       var t = e.target;
-      if (t && t.matches && t.matches('[data-sc-control]')) {
-        scRenderDebounced();
-      }
+      if (!t || !t.matches || !t.matches('[data-sc-control]')) return;
+      var control = t.getAttribute('data-sc-control');
+      if (control === 'x' || control === 'y') scRenderImmediate();
+      else                                    scRenderDebounced();
     });
 
-    // Control bar: click on toggle buttons → dispatch by data-sc-action
-    controls.addEventListener('click', function(e) {
+    // Toggle buttons (Trend / Quadrants) keep their data-sc-action contract;
+    // they just live on the chip strip now instead of the old .sc-mods row.
+    wrap.addEventListener('click', function(e) {
       var btn = e.target.closest && e.target.closest('[data-sc-action]');
       if (!btn) return;
+      // PR2: disabled chips ignore clicks. Disabling is set on the button
+      // element by scRender (Ghost when year='all', Zones when no archetype
+      // lookup exists for the axis pair).
+      if (btn.getAttribute('aria-disabled') === 'true') return;
       var action = btn.getAttribute('data-sc-action');
-      if (action === 'toggle-trend')     scToggleTrend();
-      else if (action === 'toggle-quad') scToggleQuadrants();
-      else if (action === 'set-color') {
-        // Segmented control click — update the hidden #scColorBy select
-        // (preserves the URL-state and scRender read path) then dispatch
-        // a synthetic change event so the existing render pipeline picks
-        // it up exactly like a select change would.
-        var value = btn.getAttribute('data-value');
-        if (!value) return;
-        var sel = document.getElementById('scColorBy');
-        if (sel && sel.value !== value) {
-          sel.value = value;
-          sel.dispatchEvent(new Event('change', { bubbles: true }));
-        }
-        scSyncColorSegmented(value);
-      }
+      if      (action === 'toggle-trend')      scToggleTrend();
+      else if (action === 'toggle-quad')       scToggleQuadrants();
+      else if (action === 'toggle-ghost')      scToggleGhost();
     });
 
-    // Top/Bot panels: row hover-to-highlight + click-to-open-profile.
-    // mouseenter/leave don't bubble — use mouseover/mouseout with relatedTarget
-    // checking to fire enter/leave exactly once per row transition.
-    var _hoveredRow = null;
+    // PR1 deletes the Top-5/Bottom-5 strip. The row-hover/click delegation
+    // that lived here is gone with it; the compare shelf (ScatterShell) owns
+    // the equivalent "select a player" interaction now. Leaving the stub so
+    // that any future re-introduction has an obvious anchor.
+    /* eslint-disable no-unused-vars */
+    function _rowEnter() {}
+    function _rowLeave() {}
+    /* eslint-enable no-unused-vars */
 
-    function _rowEnter(row) {
-      if (!row || row === _hoveredRow) return;
-      if (_hoveredRow) {
-        _hoveredRow.classList.remove('sc-top5-row-active');
-      }
-      _hoveredRow = row;
-      row.classList.add('sc-top5-row-active');
-      scHighlightPlayer(row.getAttribute('data-name'));
-    }
-
-    function _rowLeave() {
-      if (!_hoveredRow) return;
-      _hoveredRow.classList.remove('sc-top5-row-active');
-      _hoveredRow = null;
-      scHighlightPlayer(null);
-    }
-
-    strip.addEventListener('mouseover', function(e) {
-      var row = e.target.closest && e.target.closest('.sc-top5-row');
-      if (row) _rowEnter(row);
-    });
-    strip.addEventListener('mouseout', function(e) {
-      var row = e.target.closest && e.target.closest('.sc-top5-row');
-      if (!row || row !== _hoveredRow) return;
-      // Only leave when relatedTarget exits the row entirely
-      var to = e.relatedTarget;
-      if (!to || !row.contains(to)) _rowLeave();
-    });
+    // Dummy node prevents the original block below from crashing on
+    // strip.addEventListener — it was wired to .sc-panels-strip which no
+    // longer exists. The branch is unreachable in practice (the strip element
+    // is null and no rows exist to dispatch from), but using a fresh detached
+    // div keeps the addEventListener calls type-safe.
+    var strip = document.createElement('div');
     strip.addEventListener('click', function(e) {
       var row = e.target.closest && e.target.closest('.sc-top5-row');
       if (!row) return;
@@ -14072,15 +14624,37 @@ var Scatter = (function() {
   }
 
   // ── Setters for URL restore (avoids reaching into module globals) ───────
+  // Must use aria-pressed + classList rather than textContent — the buttons
+  // now contain SVG icons that would be wiped by any textContent assignment.
+  // CSS [aria-pressed="true"] does the active-state visual.
   function setTrend(v) {
     _state.trend = !!v;
     var btn = document.getElementById('scTrendBtn');
-    if (btn) { btn.textContent = _state.trend ? 'On' : 'Off'; btn.classList.toggle('active', _state.trend); }
+    if (btn) {
+      btn.setAttribute('aria-pressed', _state.trend ? 'true' : 'false');
+      btn.classList.toggle('active', _state.trend);
+    }
   }
   function setQuadrants(v) {
     _state.quadrants = !!v;
     var btn = document.getElementById('scQuadBtn');
-    if (btn) { btn.textContent = _state.quadrants ? 'On' : 'Off'; btn.classList.toggle('active', _state.quadrants); }
+    if (btn) {
+      btn.setAttribute('aria-pressed', _state.quadrants ? 'true' : 'false');
+      btn.classList.toggle('active', _state.quadrants);
+    }
+  }
+  // PR2: ghost-overlay setter — same pattern as setTrend and setQuadrants.
+  // Used by URL-state restore so a refreshed page reproduces the analytical
+  // layer state exactly. The toggle handler above calls scRender itself;
+  // this setter does NOT trigger a render — the caller decides when to
+  // render after restoring state, exactly like setTrend/setQuadrants do.
+  function setGhost(v) {
+    _state.ghost = !!v;
+    var btn = document.getElementById('scGhostBtn');
+    if (btn) {
+      btn.setAttribute('aria-pressed', _state.ghost ? 'true' : 'false');
+      btn.classList.toggle('active', _state.ghost);
+    }
   }
 
   return {
@@ -14093,6 +14667,7 @@ var Scatter = (function() {
     initDelegation:         initDelegation,
     setTrend:               setTrend,
     setQuadrants:           setQuadrants,
+    setGhost:               setGhost,
     _state:                 _state
   };
 })();
@@ -14190,6 +14765,9 @@ function scPopulateAxes() {
       if (!Scatter._state.tipEl || Scatter._state.tipEl.style.opacity === '0') return;
       var canvas = document.getElementById('scCanvas');
       if (!canvas || canvas.contains(e.target)) return;
+      // PR1: also keep the tip open when the touch landed inside the tooltip
+      // itself — that's how the pin button is activated on mobile/hybrid.
+      if (Scatter._state.tipEl.contains(e.target)) return;
       // Outside canvas tap — cancel pending timer and hide immediately
       if (Scatter._state.tipHideTimer) { clearTimeout(Scatter._state.tipHideTimer); Scatter._state.tipHideTimer = null; }
       scHideTip();
@@ -14226,6 +14804,252 @@ function scToggleQuadrants() {
   if (Scatter._state.chart) { Scatter._state.chart.update('none'); }
 }
 
+// PR2: Historical-class overlay toggle.
+// Ghost dataset is built inside scRender (it depends on the current year +
+// position filter + axes), so flipping the flag requires a FULL render —
+// chart.update() would not see the new dataset. The same is true in reverse:
+// turning ghost off needs to drop the second dataset, which only the
+// recreate path inside scRender handles cleanly.
+function scToggleGhost() {
+  Scatter._state.ghost = !Scatter._state.ghost;
+  var btn = document.getElementById('scGhostBtn');
+  if (btn) {
+    btn.setAttribute('aria-pressed', Scatter._state.ghost ? 'true' : 'false');
+    btn.classList.toggle('active', Scatter._state.ghost);
+  }
+  scRender();
+}
+
+// ══ PR2: Archetype lookup ════════════════════════════════════════════════════
+// Curated zones for known (xKey, yKey) pairs. Each zone is a fraction-of-range
+// rectangle, NOT absolute data coordinates — that means zones rescale with the
+// actual data on screen rather than going off-chart when the user filters to
+// a subset (e.g. switching from All Classes to a single year).
+//
+// Format: ARCHETYPE_ZONES['xKey|yKey'] = [
+//   { x:[0..1, 0..1], y:[0..1, 0..1], label:'…', color:'#hex' },
+//   …
+// ]
+//
+// Coordinates are normalized to (xMin..xMax, yMin..yMax) of the visible data.
+// The plugin maps these to pixel space at draw time, so they survive zoom,
+// jitter padding, axis inversion, and (when implemented later) cohort filters.
+//
+// Reverse pairs (yKey|xKey) are NOT enumerated — the plugin tries both
+// orderings and swaps the x/y rect coords when matching the reversed key.
+// Labels are short (≤2 words) so they fit comfortably inside small zones.
+var ARCHETYPE_ZONES = {
+  // Production × Efficiency → the foundational star map
+  'pa2_usg|ts_pct': [
+    { x:[.55,1.0],  y:[.55,1.0],  label:'Efficient Stars',   color:'#16A34A' },
+    { x:[.55,1.0],  y:[0.0,.45],  label:'Empty Volume',      color:'#DC2626' },
+    { x:[0.0,.45],  y:[.55,1.0],  label:'Specialists',       color:'#3B82F6' },
+    { x:[0.0,.45],  y:[0.0,.45],  label:'Low Impact',        color:'#94A3B8' }
+  ],
+  // FT-rate × 3PT-rate → shot-profile typology
+  'ftar|tpar': [
+    { x:[0.0,.45],  y:[.55,1.0],  label:'Pure Shooters',     color:'#3B82F6' },
+    { x:[.55,1.0],  y:[0.0,.45],  label:'Slashers',          color:'#D97706' },
+    { x:[.55,1.0],  y:[.55,1.0],  label:'Three-Level',       color:'#7C3AED' },
+    { x:[0.0,.45],  y:[0.0,.45],  label:'Mid-Range',         color:'#94A3B8' }
+  ],
+  // Defense × Playmaking-care → two-way / connector axis
+  'stl_bl|ato': [
+    { x:[.55,1.0],  y:[.55,1.0],  label:'Two-Way Connectors',color:'#16A34A' },
+    { x:[.55,1.0],  y:[0.0,.45],  label:'Defensive Specs',   color:'#3B82F6' },
+    { x:[0.0,.45],  y:[.55,1.0],  label:'Pure Playmakers',   color:'#D97706' },
+    { x:[0.0,.45],  y:[0.0,.45],  label:'Role Players',      color:'#94A3B8' }
+  ],
+  // Physical-tools map
+  'ht|wt': [
+    { x:[.55,1.0],  y:[.55,1.0],  label:'Powerful Bigs',     color:'#7C3AED' },
+    { x:[.55,1.0],  y:[0.0,.45],  label:'Lean Wings',        color:'#3B82F6' },
+    { x:[0.0,.45],  y:[.55,1.0],  label:'Combo Guards',      color:'#D97706' },
+    { x:[0.0,.45],  y:[0.0,.45],  label:'Quick Guards',      color:'#16A34A' }
+  ],
+  // Age × HW Metric → projection lens
+  'age|metric': [
+    { x:[0.0,.45],  y:[.55,1.0],  label:'Young Stars',       color:'#16A34A' },
+    { x:[.55,1.0],  y:[.55,1.0],  label:'Polished Producers',color:'#3B82F6' },
+    { x:[0.0,.45],  y:[0.0,.45],  label:'Young Projects',    color:'#D97706' },
+    { x:[.55,1.0],  y:[0.0,.45],  label:'Older Roleplayers', color:'#94A3B8' }
+  ],
+  // Efficiency × 3PT volume → scorer type
+  'ts_pct|tpar': [
+    { x:[.55,1.0],  y:[.55,1.0],  label:'Floor Spacers',     color:'#3B82F6' },
+    { x:[.55,1.0],  y:[0.0,.45],  label:'Inside Scorers',    color:'#D97706' },
+    { x:[0.0,.45],  y:[.55,1.0],  label:'Volume Shooters',   color:'#94A3B8' },
+    { x:[0.0,.45],  y:[0.0,.45],  label:'Low Volume',        color:'#94A3B8' }
+  ],
+  // Defense × Overall talent
+  'stl_bl|metric': [
+    { x:[.55,1.0],  y:[.55,1.0],  label:'Two-Way Stars',     color:'#16A34A' },
+    { x:[.55,1.0],  y:[0.0,.45],  label:'Defense-Only',      color:'#3B82F6' },
+    { x:[0.0,.45],  y:[.55,1.0],  label:'Offensive Stars',   color:'#D97706' },
+    { x:[0.0,.45],  y:[0.0,.45],  label:'Project Profiles',  color:'#94A3B8' }
+  ],
+  // Usage × A/TO → playmaking burden
+  'pa2_usg|ato': [
+    { x:[.55,1.0],  y:[.55,1.0],  label:'Star Creators',     color:'#16A34A' },
+    { x:[.55,1.0],  y:[0.0,.45],  label:'Volume Scorers',    color:'#D97706' },
+    { x:[0.0,.45],  y:[.55,1.0],  label:'Floor Generals',    color:'#3B82F6' },
+    { x:[0.0,.45],  y:[0.0,.45],  label:'Off-Ball',          color:'#94A3B8' }
+  ],
+  // Age × Efficiency
+  'age|ts_pct': [
+    { x:[0.0,.45],  y:[.55,1.0],  label:'Young Efficient',   color:'#16A34A' },
+    { x:[.55,1.0],  y:[.55,1.0],  label:'Mature Scorers',    color:'#3B82F6' },
+    { x:[0.0,.45],  y:[0.0,.45],  label:'Young Volume',      color:'#D97706' },
+    { x:[.55,1.0],  y:[0.0,.45],  label:'Older Inefficient', color:'#94A3B8' }
+  ],
+  // FT-rate × Efficiency — foul-drawing scorer profile
+  'ftar|ts_pct': [
+    { x:[.55,1.0],  y:[.55,1.0],  label:'Foul-Drawer Stars', color:'#16A34A' },
+    { x:[0.0,.45],  y:[.55,1.0],  label:'Pure Shooters',     color:'#3B82F6' },
+    { x:[.55,1.0],  y:[0.0,.45],  label:'High-Volume Drivers',color:'#D97706' },
+    { x:[0.0,.45],  y:[0.0,.45],  label:'Low Impact',        color:'#94A3B8' }
+  ],
+  // HW Metric × HW Rank — the board's own self-consistency
+  'metric|rank': [
+    { x:[.55,1.0],  y:[0.0,.45],  label:'Top of Board',      color:'#16A34A' },
+    { x:[0.0,.45],  y:[.55,1.0],  label:'Lower of Board',    color:'#94A3B8' }
+  ],
+  // 3PT-rate × Efficiency — shooter quality
+  'tpar|ts_pct': [
+    { x:[.55,1.0],  y:[.55,1.0],  label:'Elite Spacers',     color:'#3B82F6' },
+    { x:[0.0,.45],  y:[.55,1.0],  label:'Inside Scorers',    color:'#D97706' },
+    { x:[.55,1.0],  y:[0.0,.45],  label:'Volume Shooters',   color:'#94A3B8' },
+    { x:[0.0,.45],  y:[0.0,.45],  label:'Low Volume',        color:'#94A3B8' }
+  ]
+};
+
+// Resolve archetype zones for an arbitrary (xKey, yKey) pair. Tries the
+// direct key first, then the swapped key with coordinates flipped. Returns
+// null when neither order has a curated lookup — the plugin treats null as
+// "draw nothing" so unknown pairs are silently absent rather than rendering
+// broken regions.
+function scArchetypesFor(xKey, yKey) {
+  var direct = ARCHETYPE_ZONES[xKey + '|' + yKey];
+  if (direct) return direct;
+  var swapped = ARCHETYPE_ZONES[yKey + '|' + xKey];
+  if (!swapped) return null;
+  // Flip x/y on each zone so the curated coordinates still describe the
+  // same archetype after swap. Cheap — at most 4 small objects.
+  return swapped.map(function(z) {
+    return { x: z.y, y: z.x, label: z.label, color: z.color };
+  });
+}
+
+// ══ PR2: Quadrant semantic labels ════════════════════════════════════════════
+// When the Quadrants toggle is on AND an entry exists for the axis pair,
+// the four pixel quadrants are labeled with their archetype rather than the
+// generic ELITE/LAGGING. Keyed (xKey|yKey) → { tr, br, bl, tl } where each
+// value is the label for that pixel position (top-right, bottom-right, etc.,
+// before axis-inversion correction).
+//
+// The plugin walks ARCHETYPE_ZONES first to derive labels from the curated
+// zones — DRY: one source of truth for both Zones and Quadrants. The picker
+// chooses the zone whose center is closest to each corner. Falls back to
+// ELITE/LAGGING on the diagonals when no archetype lookup exists.
+function scQuadrantLabelsFor(xKey, yKey) {
+  var zones = scArchetypesFor(xKey, yKey);
+  if (!zones || zones.length < 2) return null;
+  function pick(targetX, targetY) {
+    var best = null, bestD = Infinity;
+    zones.forEach(function(z) {
+      var cx = (z.x[0] + z.x[1]) / 2;
+      var cy = (z.y[0] + z.y[1]) / 2;
+      var d = Math.abs(cx - targetX) + Math.abs(cy - targetY);
+      if (d < bestD) { bestD = d; best = z; }
+    });
+    return best ? best.label : null;
+  }
+  return {
+    tr: pick(1, 1),  // high X, high Y in data-space
+    br: pick(1, 0),
+    bl: pick(0, 0),
+    tl: pick(0, 1)
+  };
+}
+
+// ══ PR2: Crosshair Chart.js plugin ═══════════════════════════════════════════
+// Draws faint axis-aligned guidelines from the hovered point to the X- and
+// Y-axis labels. Reads Scatter._state.crosshair set/cleared by the canvas
+// mousemove/mouseleave handlers. Drawn in afterDatasetsDraw so the lines
+// sit ON TOP of logos but UNDER the tooltip.
+var SC_CROSSHAIR_PLUGIN = {
+  id: 'scCrosshair',
+  afterDatasetsDraw: function(chart) {
+    var cross = Scatter._state.crosshair;
+    if (!cross) return;
+    var xScale = chart.scales.x;
+    var yScale = chart.scales.y;
+    if (!xScale || !yScale) return;
+
+    var px = xScale.getPixelForValue(cross.x);
+    var py = yScale.getPixelForValue(cross.y);
+    if (isNaN(px) || isNaN(py)) return;
+
+    var ctx = chart.ctx;
+    ctx.save();
+    ctx.strokeStyle = 'rgba(15,23,42,0.18)';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([2, 3]);
+    ctx.beginPath();
+    // Vertical: from point down to X axis
+    ctx.moveTo(px, py);
+    ctx.lineTo(px, yScale.bottom);
+    // Horizontal: from point left to Y axis
+    ctx.moveTo(px, py);
+    ctx.lineTo(xScale.left, py);
+    ctx.stroke();
+
+    // Small value chips at the axis intercepts. Reads formatters from the
+    // axis ticks callback so the chip values match the axis tick format.
+    var xFmt = (xScale.options.ticks && xScale.options.ticks.callback) || function(v){ return v; };
+    var yFmt = (yScale.options.ticks && yScale.options.ticks.callback) || function(v){ return v; };
+    var xLabel = String(xFmt.call(xScale, cross.x));
+    var yLabel = String(yFmt.call(yScale, cross.y));
+
+    ctx.setLineDash([]);
+    ctx.font = '700 10px "DM Sans", sans-serif';
+    ctx.textBaseline = 'top';
+
+    // X-axis chip (centered below point at axis bottom)
+    var xTextW = ctx.measureText(xLabel).width;
+    var xChipX = px - xTextW / 2 - 5;
+    var xChipY = yScale.bottom + 4;
+    ctx.fillStyle = 'rgba(15,23,42,0.92)';
+    ctx.fillRect(xChipX, xChipY, xTextW + 10, 16);
+    ctx.fillStyle = '#F0C94A';
+    ctx.textAlign = 'left';
+    ctx.fillText(xLabel, xChipX + 5, xChipY + 3);
+
+    // Y-axis chip (left of point at axis edge)
+    var yTextW = ctx.measureText(yLabel).width;
+    var yChipX = xScale.left - yTextW - 14;
+    var yChipY = py - 8;
+    ctx.fillStyle = 'rgba(15,23,42,0.92)';
+    ctx.fillRect(yChipX, yChipY, yTextW + 10, 16);
+    ctx.fillStyle = '#F0C94A';
+    ctx.fillText(yLabel, yChipX + 5, yChipY + 3);
+
+    ctx.restore();
+  }
+};
+
+// Register PR2 plugins on first run. Same idempotent pattern as the quadrant
+// plugin — multiple registrations are guarded so bfcache restore doesn't
+// stack handlers.
+(function registerPR2Plugins() {
+  if (typeof Chart === 'undefined' || !Chart.register) return;
+  if (Chart.registry) {
+    if (!Chart.registry.plugins.get('scCrosshair')) {
+      try { Chart.register(SC_CROSSHAIR_PLUGIN); } catch(e) {}
+    }
+  }
+})();
+
 /* ── Chart.js plugin: quadrant background tinting (priority #6).
    Draws four tinted rectangles behind the data series, split at the MEDIAN
    of each axis. Median is the right divider because it adapts to actual data
@@ -14246,8 +15070,15 @@ var SC_QUADRANT_PLUGIN = {
     var yScale  = chart.scales.y;
     if (!xScale || !yScale) return;
 
-    // Collect actual data points (the 'Prospects' dataset is index 0; trend line is index 1+)
-    var ds = chart.data.datasets[0];
+    // Collect actual data points. PR2: with the ghost overlay enabled the
+    // foreground dataset is at index 1, not 0 — quadrant medians need to be
+    // computed from the foreground only, otherwise ghost (historical) points
+    // skew the split. Find by $scIsForeground tag with fallback to index 0.
+    var ds = null;
+    for (var di = 0; di < chart.data.datasets.length; di++) {
+      if (chart.data.datasets[di].$scIsForeground) { ds = chart.data.datasets[di]; break; }
+    }
+    if (!ds) ds = chart.data.datasets[0];
     if (!ds || !ds.data || !ds.data.length) return;
 
     // Compute median for each axis from the rendered data
@@ -14317,19 +15148,49 @@ var SC_QUADRANT_PLUGIN = {
     ctx.moveTo(left,  yMid);  ctx.lineTo(right, yMid);
     ctx.stroke();
 
-    // Corner labels — small, muted, in the elite + lagging quadrants only
+    // Corner labels — small, muted. PR2: use semantic labels from
+    // scQuadrantLabelsFor() when the axis pair has a curated lookup.
+    // Falls back to the original ELITE/LAGGING display on the diagonals.
     ctx.setLineDash([]);
     ctx.font = '700 9px "Barlow Condensed", sans-serif';
-    ctx.fillStyle = 'rgba(21,128,61,0.55)';   // elite — green-700
-    var elitePadX = 6, elitePadY = 14;
-    var eliteCx = eliteX1 + (eliteX2 - eliteX1) / 2;
-    var eliteCy = eliteY1 + elitePadY;
-    ctx.textAlign = 'center';
-    ctx.fillText('ELITE', eliteCx, eliteCy);
-    ctx.fillStyle = 'rgba(185,28,28,0.50)';   // lagging — red-700
-    var lagCx = lagX1 + (lagX2 - lagX1) / 2;
-    var lagCy = lagY2 - 6;
-    ctx.fillText('LAGGING', lagCx, lagCy);
+    var labels = scQuadrantLabelsFor(chart.$scXKey, chart.$scYKey);
+    if (labels && labels.tr && labels.br && labels.bl && labels.tl) {
+      // Semantic mode — label all four corners with the curated archetype.
+      // Pixel positions: tr = elite quadrant (in non-inverted axes), etc.
+      // We use the same pixel-positioned coords computed above for fills
+      // so labels land squarely inside their respective quadrants. The
+      // mapping below honors axis inversion via the same eliteX/Y vars.
+      ctx.textAlign = 'center';
+      ctx.fillStyle = 'rgba(71,85,105,0.7)';
+      // (eliteX, eliteY) corner = high data X + high data Y
+      ctx.fillText(labels.tr.toUpperCase(),
+        eliteX1 + (eliteX2 - eliteX1) / 2,
+        eliteY1 + 12);
+      // (lagX, lagY) corner = low data X + low data Y
+      ctx.fillText(labels.bl.toUpperCase(),
+        lagX1 + (lagX2 - lagX1) / 2,
+        lagY2 - 6);
+      // (eliteX, lagY) corner = high data X + low data Y = trade-off A
+      ctx.fillText(labels.br.toUpperCase(),
+        eliteX1 + (eliteX2 - eliteX1) / 2,
+        lagY2 - 6);
+      // (lagX, eliteY) corner = low data X + high data Y = trade-off B
+      ctx.fillText(labels.tl.toUpperCase(),
+        lagX1 + (lagX2 - lagX1) / 2,
+        eliteY1 + 12);
+    } else {
+      // Generic mode — original ELITE/LAGGING diagonals only.
+      ctx.fillStyle = 'rgba(21,128,61,0.55)';   // elite — green-700
+      var elitePadY = 14;
+      var eliteCx = eliteX1 + (eliteX2 - eliteX1) / 2;
+      var eliteCy = eliteY1 + elitePadY;
+      ctx.textAlign = 'center';
+      ctx.fillText('ELITE', eliteCx, eliteCy);
+      ctx.fillStyle = 'rgba(185,28,28,0.50)';   // lagging — red-700
+      var lagCx = lagX1 + (lagX2 - lagX1) / 2;
+      var lagCy = lagY2 - 6;
+      ctx.fillText('LAGGING', lagCx, lagCy);
+    }
     ctx.restore();
   }
 };
@@ -14347,15 +15208,71 @@ function scGetTip() {
   if (!Scatter._state.tipEl) {
     Scatter._state.tipEl = document.createElement('div');
     Scatter._state.tipEl.style.cssText = [
-      'position:fixed','z-index:9999','pointer-events:none','opacity:0',
+      // PR1: pointer-events:auto so the pin button inside is clickable.
+      // The canvas hover handlers schedule a hide on mouseleave; the
+      // tooltip's own mouseenter cancels that timer so the user can
+      // traverse from chart → tooltip without losing it.
+      'position:fixed','z-index:9999','pointer-events:auto','opacity:0',
       'background:#0A1628','color:white','border-radius:8px','padding:10px 14px',
       "font-family:'DM Sans',sans-serif",'font-size:12px','line-height:1.5',
       'box-shadow:0 8px 24px rgba(0,0,0,.4)','max-width:240px',
       'transition:opacity .12s','border:1px solid rgba(255,255,255,.1)'
     ].join(';');
+    // Hover-traversal protection: cancel pending hide when the cursor
+    // enters the tooltip, restart it when it leaves. Without this the
+    // canvas.onmouseleave fires the instant the cursor reaches the
+    // tooltip and the pin button can never be clicked.
+    Scatter._state.tipEl.addEventListener('mouseenter', function() {
+      if (Scatter._state.tipHideTimer) {
+        clearTimeout(Scatter._state.tipHideTimer);
+        Scatter._state.tipHideTimer = null;
+      }
+    });
+    Scatter._state.tipEl.addEventListener('mouseleave', function() {
+      if (Scatter._state.tipHideTimer) clearTimeout(Scatter._state.tipHideTimer);
+      Scatter._state.tipHideTimer = setTimeout(function() {
+        scHideTip();
+        Scatter._state.tipHideTimer = null;
+      }, 120);
+    });
     document.body.appendChild(Scatter._state.tipEl);
   }
   return Scatter._state.tipEl;
+}
+
+// PR2: Bisect-left over a sorted ascending array. Returns the insertion
+// index for `v` — i.e. the count of values strictly less than v. Used by
+// percentilePct() to compute the cohort rank of a tooltip-hovered value.
+function _scBisectLeft(arr, v) {
+  var lo = 0, hi = arr.length;
+  while (lo < hi) {
+    var mid = (lo + hi) >>> 1;
+    if (arr[mid] < v) lo = mid + 1; else hi = mid;
+  }
+  return lo;
+}
+
+// Percentile of value `v` against the sorted `arr` (ascending). When `invert`
+// is true (axis where lower-is-better, e.g. rank/draft_no), returns the
+// inverted percentile so the displayed number always means "better is higher".
+// Returns null when arr is too small to be meaningful (< 3 — not enough cohort
+// for a useful percentile).
+function _scPercentile(arr, v, invert) {
+  if (!arr || arr.length < 3 || v == null || !isFinite(v)) return null;
+  var below = _scBisectLeft(arr, v);
+  var pct = (below / arr.length) * 100;
+  if (invert) pct = 100 - pct;
+  return Math.round(pct);
+}
+
+// Color a percentile pill: green for top quartile, amber for middle, muted
+// red for bottom quartile. Communicates direction at a glance.
+function _scPctColor(pct) {
+  if (pct == null) return '#94A3B8';
+  if (pct >= 75)   return '#22C55E';   // green-500
+  if (pct >= 50)   return '#F0C94A';   // amber accent
+  if (pct >= 25)   return '#FB923C';   // orange-400
+  return '#EF4444';                    // red-500
 }
 
 function scShowTip(e, nearby, xM, yM) {
@@ -14363,31 +15280,102 @@ function scShowTip(e, nearby, xM, yM) {
   if (!nearby.length) { tt.style.opacity = '0'; return; }
   var h = '';
   if (nearby.length > 1) h += '<div style="font-size:10px;color:rgba(255,255,255,.4);margin-bottom:5px">' + nearby.length + ' players here</div>';
+
+  // PR2: percentile cache built once per scRender — read .xKey/.yKey to
+  // confirm the cache matches the current axes (handles the race where
+  // a user changes axes between hover/render cycles).
+  var pc = Scatter._state.percentileCache;
+  var pcValid = pc && pc.xKey === (Scatter._state.chart && Scatter._state.chart.$scXKey)
+                   && pc.yKey === (Scatter._state.chart && Scatter._state.chart.$scYKey);
+
   nearby.forEach(function(pt, i) {
     if (i > 0) h += '<hr style="border:none;border-top:1px solid rgba(255,255,255,.1);margin:5px 0">';
     var dotColor = ScatterEngine.POS_HEX[pt._p.position] || '#94A3B8';
-    h += '<div style="display:flex;align-items:center;gap:6px;margin-bottom:3px">'
-       + '<div style="width:7px;height:7px;border-radius:50%;background:' + dotColor + ';flex-shrink:0"></div>'
-       + '<div style="font-family:Barlow Condensed,sans-serif;font-size:15px;font-weight:900">' + pt._p._n + '</div>'
+
+    // PR3: player headshot via avatarHtml — same helper used by player cards
+    // and the modal, so photo URL resolution (ESPN headshot CDN with initials
+    // fallback) is identical everywhere. The tooltip card now reads as a
+    // mini player profile: portrait left, name + school right, stats below.
+    // Falls back to position-colored initials when no photo is on file —
+    // avatarHtml handles the onerror/onload chain for placeholder images.
+    var name   = pt._p._n || pt._p.name || '';
+    var school = pt._p._s || '';
+    var photoHtml = (typeof avatarHtml === 'function')
+      ? avatarHtml(name, pt._p.position, '40px', '8px', false)
+      : '<div style="width:40px;height:40px;border-radius:8px;background:' + dotColor + '"></div>';
+
+    // Header: photo (40px) on the left, name + school on the right.
+    // gap is generous (10px) because the photo is the dominant visual now —
+    // the name needs room to breathe next to it rather than feeling crowded.
+    h += '<div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">'
+       + photoHtml
+       + '<div style="min-width:0;flex:1">'
+       +   '<div style="display:flex;align-items:center;gap:6px;margin-bottom:2px">'
+       +     '<div style="width:6px;height:6px;border-radius:50%;background:' + dotColor + ';flex-shrink:0"></div>'
+       +     '<div style="font-family:Barlow Condensed,sans-serif;font-size:15px;font-weight:900;line-height:1.1;color:white">' + escHtml(name) + '</div>'
+       +   '</div>'
+       + (school
+          ? '<div style="font-size:10px;color:rgba(255,255,255,.5);line-height:1.2">' + escHtml(school)
+             + (pt._p._y && pt._p._y !== '2026' ? ' \u00b7 \'' + String(pt._p._y).slice(2) : '')
+             + (pt._p.rank ? ' \u00b7 #' + pt._p.rank : '')
+             + '</div>'
+          : (pt._p.rank ? '<div style="font-size:10px;color:rgba(255,255,255,.5);line-height:1.2">#' + pt._p.rank + '</div>' : ''))
+       + '</div>'
        + '</div>';
-    if (pt._p._s) {
-      h += '<div style="font-size:10px;color:rgba(255,255,255,.4);margin-bottom:4px">' + pt._p._s;
-      if (pt._p._y && pt._p._y !== '2026') h += ' \u00b7 \'' + String(pt._p._y).slice(2);
-      h += '</div>';
+
+    // Per-axis value rows with PR2 percentile pills. The pill is right of
+    // the value so the eye scans label → value → "vs cohort" in one line.
+    function pctPill(pct) {
+      if (pct == null) return '';
+      var color = _scPctColor(pct);
+      // Bar-style mini ranking — fixed 36px width, fill color = pct color.
+      return '<span style="display:inline-flex;align-items:center;gap:5px;margin-left:8px">'
+           +   '<span style="position:relative;display:inline-block;width:36px;height:5px;background:rgba(255,255,255,.12);border-radius:3px;overflow:hidden">'
+           +     '<span style="position:absolute;left:0;top:0;bottom:0;width:' + Math.max(2, pct) + '%;background:' + color + ';border-radius:3px"></span>'
+           +   '</span>'
+           +   '<span style="font-size:9.5px;font-weight:800;color:' + color + ';letter-spacing:.3px">' + pct + '<span style="font-size:8px;opacity:.7">P</span></span>'
+           + '</span>';
     }
-    h += '<table style="width:100%"><tr>'
-       + '<td style="font-size:10px;color:rgba(255,255,255,.45);padding-right:8px">' + xM.label + '</td>'
-       + '<td style="font-weight:700;color:#F0C94A;text-align:right">' + xM.fmt(pt._xr) + '</td>'
+
+    var xPct = (pcValid) ? _scPercentile(pc.xSorted, pt._xr, !!xM.inv) : null;
+    var yPct = (pcValid) ? _scPercentile(pc.ySorted, pt._yr, !!yM.inv) : null;
+
+    h += '<table style="width:100%;border-spacing:0"><tr>'
+       + '<td style="font-size:10px;color:rgba(255,255,255,.5);padding-right:8px;padding-bottom:2px">' + escHtml(xM.label) + '</td>'
+       + '<td style="font-weight:700;color:#F0C94A;text-align:right;padding-bottom:2px;white-space:nowrap">' + xM.fmt(pt._xr) + pctPill(xPct) + '</td>'
        + '</tr><tr>'
-       + '<td style="font-size:10px;color:rgba(255,255,255,.45);padding-right:8px">' + yM.label + '</td>'
-       + '<td style="font-weight:700;color:#F0C94A;text-align:right">' + yM.fmt(pt._yr) + '</td>'
+       + '<td style="font-size:10px;color:rgba(255,255,255,.5);padding-right:8px">' + escHtml(yM.label) + '</td>'
+       + '<td style="font-weight:700;color:#F0C94A;text-align:right;white-space:nowrap">' + yM.fmt(pt._yr) + pctPill(yPct) + '</td>'
        + '</tr></table>';
+
+    // PR1: Pin affordance — clicking adds the player to the comparison shelf
+    // (capped at 3). If the player is already pinned, the button toggles to
+    // an "Unpin" state so the same control handles both directions. Single
+    // player only — when multiple players are stacked under the cursor we
+    // skip pin because picking the wrong one would be unforgiving.
+    if (nearby.length === 1 && typeof ScatterShell !== 'undefined') {
+      var pinned = ScatterShell.isPinned(pt._p);
+      // `name` is already declared in the header block above — reuse it.
+      var year = pt._p._y || '2026';
+      h += '<button type="button" class="sc-tip-pin"'
+         + ' data-pin-name="' + escHtml(name) + '"'
+         + ' data-pin-year="' + escHtml(year) + '">'
+         + '<svg viewBox="0 0 16 16" aria-hidden="true">'
+         + (pinned
+            ? '<path d="M3 3l10 10M13 3L3 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/>'
+            : '<path d="M8 1v9M5 6l3-5 3 5M5 13h6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" fill="none"/>')
+         + '</svg>'
+         + (pinned ? 'Unpin' : 'Pin to compare')
+         + '</button>';
+    }
   });
   tt.innerHTML = h;
   tt.style.opacity = '1';
   var margin = 8;
-  var ttW = Math.min(240, window.innerWidth - margin * 2);
-  var ttH = 200;
+  // PR2: wider tooltip to accommodate percentile pills without wrap. Cap at
+  // viewport width minus margins for narrow mobile screens.
+  var ttW = Math.min(280, window.innerWidth - margin * 2);
+  var ttH = 220;
   var cx = e.clientX + 16, cy = e.clientY - 10;
   // Clamp tooltip — critical on narrow mobile screens
   if (cx + ttW > window.innerWidth - margin)  cx = Math.max(margin, e.clientX - ttW - 4);
@@ -14397,15 +15385,199 @@ function scShowTip(e, nearby, xM, yM) {
   tt.style.left = cx + 'px';
   tt.style.top  = cy + 'px';
 }
-function scHideTip() { var tt = scGetTip(); tt.style.opacity = '0'; }
+function scHideTip() {
+  var tt = scGetTip();
+  tt.style.opacity = '0';
+  // PR2: clear crosshair when tip is hidden so the guidelines vanish with
+  // the tooltip. The mousemove path will set a new crosshair on next hover.
+  if (Scatter._state.crosshair) {
+    Scatter._state.crosshair = null;
+    if (Scatter._state.chart) { try { Scatter._state.chart.update('none'); } catch(e){} }
+  }
+}
 
 // ── Debounced render ──────────────────────────────────────────────────────────
-function scRenderDebounced() {
-  // Dismiss mobile focus card on axis/year change — stale state on fresh chart
+// Debounced render — used for select changes. Two variants:
+//   scRenderImmediate: 0ms — for deliberate, low-rate inputs like the axis
+//     selects. The user picked a specific axis; they expect instant feedback.
+//   scRenderDebounced:  60ms — for the modifier filters where the user might
+//     tab through options quickly (year/position dropdowns on keyboard nav,
+//     accidental double-clicks). 150ms felt sluggish; 60ms still coalesces.
+// The control-bar change delegation picks the right one based on the
+// target's data-sc-control value — see initDelegation in ScatterUI.
+function scRenderImmediate() {
   if (typeof scDismissMobileFocus === 'function') scDismissMobileFocus();
   clearTimeout(Scatter._state.renderTimer);
-  Scatter._state.renderTimer = setTimeout(scRender, 150);
+  Scatter._state.renderTimer = null;
+  scRender();
 }
+function scRenderDebounced() {
+  if (typeof scDismissMobileFocus === 'function') scDismissMobileFocus();
+  clearTimeout(Scatter._state.renderTimer);
+  Scatter._state.renderTimer = setTimeout(scRender, 60);
+}
+
+// ── ScatterInteraction module ────────────────────────────────────────────────
+// Owns all canvas event-handler wiring: mouse proximity tooltip, touch tooltip,
+// canvas click → player modal, mobile tap-to-focus binding, and the canvas
+// touchmove cleanup. Previously inline in scRender — 100 lines of fragile
+// handler-stacking code documented as the source of multiple regressions
+// (touchstart accumulating after every render; mobile focus card double-firing).
+// Concentrating it in one function makes the interaction model auditable and
+// gives scRender a clean one-call orchestration point.
+//
+// Contract: every handler is assigned via `canvas.onX = ...` (not addEventListener)
+// so subsequent renders replace rather than accumulate. Coarse-pointer devices
+// get the mobile focus-card path exclusively; fine-pointer devices get the
+// proximity-tooltip path. The two are mutually exclusive — never both.
+var ScatterInteraction = (function() {
+  function wire(canvas, pts, xM, yM, chart) {
+    if (!canvas) return;
+
+    // Hover proximity tooltip — uses Scatter.queryNear (spatial index).
+    // At 600 points the index reduces per-frame work from 600 getPixelForValue
+    // calls to ~5-15 (avg points in the 9 surrounding cells), a 40-100× win.
+    canvas.onmousemove = function(e) {
+      if (!Scatter._state.chart || !Scatter._state.allPts.length) return;
+      var rect = canvas.getBoundingClientRect();
+      var mx = e.clientX - rect.left;
+      var my = e.clientY - rect.top;
+      try {
+        var isTouchEvent = (e.pointerType === 'touch') ||
+          (window.matchMedia && matchMedia('(pointer:coarse)').matches);
+        var touchBoost = isTouchEvent ? 14 : 0;
+        var near = Scatter.queryNear(mx, my, touchBoost);
+        scShowTip(e, near, xM, yM);
+        // PR2: drive the crosshair plugin from the same proximity query.
+        // Only paint guidelines when the cursor is on EXACTLY one point —
+        // stacked points would draw competing crosshairs through the same
+        // pixel position, which adds visual noise without information.
+        if (near.length === 1) {
+          var pt = near[0];
+          var prev = Scatter._state.crosshair;
+          if (!prev || prev.x !== pt._xr || prev.y !== pt._yr) {
+            Scatter._state.crosshair = { x: pt._xr, y: pt._yr };
+            // Chart.js update('none') skips animations and triggers a redraw.
+            // Cheap (~1ms) and the only way the crosshair plugin sees the
+            // new state. Wrapped in try because chart can be destroyed mid-
+            // hover during rapid axis switches.
+            try { Scatter._state.chart.update('none'); } catch (err) {}
+          }
+        } else if (Scatter._state.crosshair) {
+          // Cursor is over a stack OR over nothing — clear the crosshair.
+          Scatter._state.crosshair = null;
+          try { Scatter._state.chart.update('none'); } catch (err) {}
+        }
+      } catch (err) { scHideTip(); }
+    };
+    canvas.onmouseleave = function() {
+      // PR1: defer the hide so the cursor can traverse from the chart to
+      // the tooltip (which now contains a clickable Pin button). The
+      // tooltip's own mouseenter handler clears this timer.
+      if (Scatter._state.tipHideTimer) clearTimeout(Scatter._state.tipHideTimer);
+      Scatter._state.tipHideTimer = setTimeout(function() {
+        scHideTip();
+        Scatter._state.tipHideTimer = null;
+      }, 180);
+      // PR2: crosshair clears on the same timer schedule as the tooltip
+      // (scHideTip's own clear logic handles it) so the lines and tooltip
+      // disappear together rather than the lines lingering after the tip.
+    };
+
+    // Coarse pointer (touch) vs fine pointer (mouse) bifurcation.
+    // The mobile focus card and the proximity tooltip are mutually exclusive
+    // interaction models. Wiring both caused both to fire on the same tap,
+    // producing a flickering UI. Pick one and null out the other.
+    var isCoarse = (typeof window !== 'undefined'
+      && window.matchMedia
+      && window.matchMedia('(pointer:coarse)').matches);
+
+    if (isCoarse) {
+      // Coarse: focus card is the entire story. Null all tooltip handlers.
+      canvas.onmousemove   = null;
+      canvas.onmouseleave  = null;
+      canvas.ontouchstart  = null;
+      canvas.ontouchend    = null;
+      canvas.ontouchcancel = null;
+      if (Scatter._state.tipHideTimer) {
+        clearTimeout(Scatter._state.tipHideTimer);
+        Scatter._state.tipHideTimer = null;
+      }
+      scHideTip();
+    } else {
+      // Fine pointer: hybrid pointer+touch devices (Surface, iPad with mouse)
+      // get the proximity tooltip on touch too. Touch handlers are wired but
+      // only fire on the rare hybrid hardware — pure-touch devices took the
+      // coarse branch above.
+      if (Scatter._state.tipHideTimer) {
+        clearTimeout(Scatter._state.tipHideTimer);
+        Scatter._state.tipHideTimer = null;
+      }
+      canvas.ontouchstart = function(e) {
+        if (Scatter._state.tipHideTimer) {
+          clearTimeout(Scatter._state.tipHideTimer);
+          Scatter._state.tipHideTimer = null;
+        }
+        if (!Scatter._state.chart || !Scatter._state.allPts.length) return;
+        var rect = canvas.getBoundingClientRect();
+        var touch = e.touches[0];
+        if (!touch) return;
+        var mx = touch.clientX - rect.left;
+        var my = touch.clientY - rect.top;
+        try {
+          var near = Scatter.queryNear(mx, my, 14);
+          if (near.length) scShowTip({ clientX: touch.clientX, clientY: touch.clientY }, near, xM, yM);
+          else scHideTip();
+        } catch (err) { scHideTip(); }
+      };
+      canvas.ontouchend = function() {
+        if (Scatter._state.tipHideTimer) clearTimeout(Scatter._state.tipHideTimer);
+        Scatter._state.tipHideTimer = setTimeout(function() {
+          scHideTip();
+          Scatter._state.tipHideTimer = null;
+        }, 600);
+      };
+      canvas.ontouchcancel = function() {
+        if (Scatter._state.tipHideTimer) {
+          clearTimeout(Scatter._state.tipHideTimer);
+          Scatter._state.tipHideTimer = null;
+        }
+        scHideTip();
+      };
+    }
+
+    // Mobile tap-to-focus — separate persistent focus card. Only active on
+    // ≤640px viewports; a no-op on desktop. Defined elsewhere; we just call.
+    if (typeof scBindMobileTap === 'function') {
+      scBindMobileTap(canvas, Scatter._state.allPts, xM, yM, chart);
+    }
+
+    // Clean up the legacy canvas touchmove preventDefault — see scRender.
+    if (canvas._scTouchMove) {
+      canvas.removeEventListener('touchmove', canvas._scTouchMove, { passive: false });
+      canvas._scTouchMove = null;
+    }
+
+    // Click a logo → open player profile modal. Uses queryClosest (spatial index).
+    canvas.onclick = function(e) {
+      if (!Scatter._state.chart || !Scatter._state.allPts.length) return;
+      var rect = canvas.getBoundingClientRect();
+      var mx = e.clientX - rect.left;
+      var my = e.clientY - rect.top;
+      try {
+        var isTap = (e.pointerType === 'touch') ||
+          (window.matchMedia && matchMedia('(pointer:coarse)').matches);
+        var tapBoost = isTap ? 16 : 0;
+        var clicked = Scatter.queryClosest(mx, my, tapBoost);
+        if (clicked && typeof openPlayerModal === 'function') {
+          openPlayerModal(clicked._p.rank, clicked._p._y || '2026');
+        }
+      } catch (err) {}
+    };
+  }
+
+  return { wire: wire };
+})();
 
 // ── Legend renderer ──────────────────────────────────────────────────────────
 // Reads the current color-by mode from ScatterEngine.legendItems() and emits
@@ -14491,6 +15663,710 @@ function scShowEmptyState(xM, yM, year, posFil, wrapEl, emptyEl) {
   }
 }
 
+// ══ ScatterRankings ═══════════════════════════════════════════════════════════
+// PR1-revision: re-introduces Top 5 / Bottom 5 below the canvas (was a side
+// rail before; now a horizontal strip). Owns:
+//
+//   1. The axis-toggle in the rankings header — flips Scatter._state.rankAxis
+//      between 'y' (default) and 'x', then re-renders the chart so the panels
+//      sort by the user-selected axis. The chart itself does not move.
+//   2. Hover-to-highlight + click-to-open-modal delegation on rank rows.
+//      The pre-PR1 code wired these on .sc-panels-strip; now we wire them
+//      on #scRankings since the strip element is gone.
+//
+// The actual row rendering still lives in ScatterTopPanel / ScatterBotPanel
+// (they predate PR1 and were left intact as pure renderers).
+var ScatterRankings = (function() {
+
+  // Update the toggle button labels to show the actual axis names. Called
+  // from scRender so the toggle stays in sync with the current axis selection.
+  // Also updates aria-pressed and active class on the buttons.
+  function syncAxisToggle(xM, yM) {
+    var rankAxis = Scatter._state.rankAxis || 'y';
+    var xLab = document.getElementById('scRankAxisXLabel');
+    var yLab = document.getElementById('scRankAxisYLabel');
+    if (xLab) xLab.textContent = xM ? xM.short : '—';
+    if (yLab) yLab.textContent = yM ? yM.short : '—';
+    var btns = document.querySelectorAll('[data-sc-rank-axis]');
+    for (var i = 0; i < btns.length; i++) {
+      var on = btns[i].getAttribute('data-sc-rank-axis') === rankAxis;
+      btns[i].classList.toggle('active', on);
+      btns[i].setAttribute('aria-pressed', on ? 'true' : 'false');
+    }
+  }
+
+  // Set the rank axis and trigger a re-render. Used by both the toggle button
+  // click handler and (potentially) by URL state restore in the future.
+  function setRankAxis(axis) {
+    if (axis !== 'x' && axis !== 'y') return;
+    if (Scatter._state.rankAxis === axis) return;
+    Scatter._state.rankAxis = axis;
+    // Re-render through the standard immediate path so the rankings update
+    // alongside any chart state change (no separate rankings-only render
+    // path means there's only one way for the panels to get out of sync,
+    // and it's "by a bug in scRender"). Cheap because nothing else changed.
+    if (typeof scRenderImmediate === 'function') scRenderImmediate();
+  }
+
+  // Wire delegation on #scRankings: axis-toggle clicks, row hover, row click.
+  // Idempotent via _wired guard. The hover behaviour mirrors the pre-PR1
+  // .sc-panels-strip wiring (highlights the corresponding bubble on the
+  // chart via scHighlightPlayer); without this rankings would feel
+  // disconnected from the chart they describe.
+  var _wired = false;
+  var _hoveredRow = null;
+
+  function wire() {
+    if (_wired) return;
+    var root = document.getElementById('scRankings');
+    if (!root) return;
+
+    // Axis-toggle clicks
+    root.addEventListener('click', function(e) {
+      var btn = e.target.closest && e.target.closest('[data-sc-rank-axis]');
+      if (btn) {
+        setRankAxis(btn.getAttribute('data-sc-rank-axis'));
+        return;
+      }
+      // Row click → open profile modal
+      var row = e.target.closest && e.target.closest('.sc-top5-row');
+      if (row) {
+        var rank = parseInt(row.getAttribute('data-rank'), 10);
+        var year = row.getAttribute('data-year') || '2026';
+        if (rank && typeof openPlayerModal === 'function') openPlayerModal(rank, year);
+      }
+    });
+
+    // Hover → cross-highlight on chart. Use mouseover/mouseout with the
+    // _hoveredRow guard so we don't fire enter/leave on every internal
+    // child transition (logo img, name span, etc.).
+    root.addEventListener('mouseover', function(e) {
+      var row = e.target.closest && e.target.closest('.sc-top5-row');
+      if (!row || row === _hoveredRow) return;
+      if (_hoveredRow) _hoveredRow.classList.remove('sc-top5-row-active');
+      _hoveredRow = row;
+      row.classList.add('sc-top5-row-active');
+      if (typeof scHighlightPlayer === 'function') {
+        scHighlightPlayer(row.getAttribute('data-name'));
+      }
+    });
+    root.addEventListener('mouseout', function(e) {
+      var row = e.target.closest && e.target.closest('.sc-top5-row');
+      if (!row || row !== _hoveredRow) return;
+      // Only leave the row when relatedTarget exits the row entirely —
+      // otherwise hovering over the logo or name (child elements) would
+      // fire spurious leave/enter cycles.
+      var to = e.relatedTarget;
+      if (!to || !row.contains(to)) {
+        _hoveredRow.classList.remove('sc-top5-row-active');
+        _hoveredRow = null;
+        if (typeof scHighlightPlayer === 'function') scHighlightPlayer(null);
+      }
+    });
+
+    _wired = true;
+  }
+
+  return {
+    wire:            wire,
+    syncAxisToggle:  syncAxisToggle,
+    setRankAxis:     setRankAxis,
+  };
+})();
+
+// ══ ScatterShell ══════════════════════════════════════════════════════════════
+// PR1: owns all of the new floating-chrome UI introduced by the canvas-first
+// restructure. Three responsibilities:
+//
+//   1. Sync visible pills/chips with the hidden <select> state (one direction
+//      only — selects remain the state authority so scRender() and URL-state
+//      logic stay unchanged).
+//   2. Drive the shared picker popover for any pill/chip click. Same component
+//      handles axis metric pickers, year filter, position filter, color mode.
+//   3. Manage the pinned-players comparison shelf — bounded by Scatter._state.pinned
+//      with a hard cap of 3, mirrored to URL state for shareable views.
+//
+// ScatterShell does not call scRender directly; it sets select.value and
+// dispatches `change`, which the delegation in initDelegation() turns into
+// the appropriate immediate/debounced render. This preserves the contract
+// the old visible selects had and means scRender is reached through exactly
+// one path regardless of which UI surface initiated the change.
+var ScatterShell = (function() {
+
+  // Per-pick metadata. The picker popover renders one of these on demand
+  // when a pill/chip is tapped. Keys match the values of [data-sc-pick].
+  // ──────────────────────────────────────────────────────────────────────────
+  // For x/y we read SC_AXES + SC_AXIS_GROUPS at picker-build time so any
+  // future addition to the metric list flows through automatically. For the
+  // smaller fixed lists (year/pos/color) we declare options inline since
+  // their copy is editorial (e.g. "All Classes 2019–2026" reads better than
+  // the raw "all" select value).
+  var POS_SWATCH = { Guard:'#3B82F6', Forward:'#8B5CF6', Center:'#0D9488' };
+  var YEAR_SWATCH = { '2026':'#D97706', '2025':'#B45309', '2024':'#7C3AED', '2023':'#5B21B6',
+                      '2022':'#3B82F6', '2021':'#1D4ED8', '2020':'#0D9488', '2019':'#0F766E',
+                      'all':'#475569' };
+
+  function pickConfig(pickKey) {
+    if (pickKey === 'x' || pickKey === 'y') {
+      // Build from SC_AXES — single source of truth.
+      var groups = SC_AXIS_GROUPS.map(function(g) {
+        var opts = [];
+        Object.keys(SC_AXES).forEach(function(k) {
+          var a = SC_AXES[k];
+          if (a.group !== g.key) return;
+          opts.push({ value: k, label: a.short, hint: a.label });
+        });
+        return { label: g.label, opts: opts };
+      });
+      return {
+        title: pickKey === 'x' ? 'X Axis' : 'Y Axis',
+        selectId: pickKey === 'x' ? 'scXAxis' : 'scYAxis',
+        searchable: true,
+        groups: groups,
+      };
+    }
+    if (pickKey === 'year') {
+      return {
+        title: 'Class',
+        selectId: 'scYear',
+        searchable: false,
+        groups: [{ label: '', opts: [
+          { value: '2026', label: '2026 Draft Class' },
+          { value: '2025', label: '2025' },
+          { value: '2024', label: '2024' },
+          { value: '2023', label: '2023' },
+          { value: '2022', label: '2022' },
+          { value: '2021', label: '2021' },
+          { value: '2020', label: '2020' },
+          { value: '2019', label: '2019' },
+          { value: 'all',  label: 'All Classes (2019–2026)' },
+        ]}],
+      };
+    }
+    if (pickKey === 'pos') {
+      return {
+        title: 'Position',
+        selectId: 'scPosFilter',
+        searchable: false,
+        groups: [{ label: '', opts: [
+          { value: 'all',     label: 'All Positions' },
+          { value: 'Guard',   label: 'Guards',   swatches:['#3B82F6'] },
+          { value: 'Forward', label: 'Forwards', swatches:['#8B5CF6'] },
+          { value: 'Center',  label: 'Centers',  swatches:['#0D9488'] },
+        ]}],
+      };
+    }
+    if (pickKey === 'color') {
+      return {
+        title: 'Color By',
+        selectId: 'scColorBy',
+        searchable: false,
+        groups: [{ label: '', opts: [
+          { value: 'position', label: 'Position', swatches:['#3B82F6','#8B5CF6','#0D9488'] },
+          { value: 'year',     label: 'Class',    swatches:['#D97706','#3B82F6','#8B5CF6'] },
+        ]}],
+      };
+    }
+    return null;
+  }
+
+  // ── Sync visible chrome from current select values ─────────────────────────
+  // Called from scRender after the render-pipeline has determined what the
+  // chart actually shows. The pills/chips are pure mirrors — they never lie
+  // about what's on screen because they're updated from the same xKey/yKey
+  // values scRender just used to build the chart.
+  function syncFromState(xKey, yKey, year, posFil, colorBy, count) {
+    var xM = SC_AXES[xKey], yM = SC_AXES[yKey];
+    var setText = function(id, txt) { var el = document.getElementById(id); if (el) el.textContent = txt; };
+
+    if (xM) setText('scPillXVal', xM.short);
+    if (yM) setText('scPillYVal', yM.short);
+
+    setText('scChipYearVal', year === 'all' ? 'All' : year);
+    setText('scChipPosVal',  posFil === 'all' ? 'All' : posFil + 's');
+
+    var colorLabel = colorBy === 'year' ? 'Class' : 'Position';
+    setText('scChipColorVal', colorLabel);
+
+    // Color chip swatches — show 3 sample dots in the active mode's palette.
+    var swEl = document.getElementById('scChipColorSwatches');
+    if (swEl) {
+      var sw = colorBy === 'year'
+        ? ['#D97706','#3B82F6','#8B5CF6']
+        : ['#3B82F6','#8B5CF6','#0D9488'];
+      swEl.innerHTML = sw.map(function(c){ return '<i style="background:'+c+'"></i>'; }).join('');
+    }
+
+    setText('scPlotCount', count == null
+      ? ''
+      : (count + (count === 1 ? ' prospect' : ' prospects')));
+
+    // ── PR2: Chip availability sync ───────────────────────────────────────
+    // The Ghost chip is only meaningful for a single class (need other
+    // classes to contrast against). On 'all' the chip greys out with a
+    // title explaining why. Disabling is structural (aria-disabled + CSS) —
+    // clicks are also gated in the action dispatcher so even keyboard
+    // activation is inert.
+    var ghostBtn = document.getElementById('scGhostBtn');
+    if (ghostBtn) {
+      var ghostDisabled = (year === 'all');
+      ghostBtn.setAttribute('aria-disabled', ghostDisabled ? 'true' : 'false');
+      ghostBtn.title = ghostDisabled
+        ? 'Historical overlay needs a single class — already showing all classes'
+        : 'Show prior draft classes as faded background';
+      // If the toggle was on when the user switched to 'all', visually
+      // depress it but the plugin condition (ghostActive in scRender)
+      // already prevents the dataset from being added. Don't auto-clear
+      // the underlying flag — the user's intent should re-engage when
+      // they pick a single class again.
+    }
+  }
+
+  // ── Picker popover ─────────────────────────────────────────────────────────
+  // Single shared instance. The opener pill/chip is tracked so the popover
+  // can be positioned relative to it (desktop) and so we know which select
+  // to write to when a selection is made.
+  var _openerEl = null;
+  var _currentPick = null;
+
+  function _buildBody(cfg, currentValue, searchText) {
+    var body = document.getElementById('scPopoverBody');
+    if (!body) return;
+    var q = (searchText || '').trim().toLowerCase();
+    var html = '';
+    var anyMatch = false;
+    cfg.groups.forEach(function(g) {
+      var matchedOpts = g.opts.filter(function(o) {
+        if (!q) return true;
+        var hay = (o.label + ' ' + (o.hint || '')).toLowerCase();
+        return hay.indexOf(q) !== -1;
+      });
+      if (!matchedOpts.length) return;
+      anyMatch = true;
+      html += '<div class="sc-popover-group">';
+      if (g.label) html += '<div class="sc-popover-group-label">' + escHtml(g.label) + '</div>';
+      matchedOpts.forEach(function(o) {
+        var isActive = (o.value === currentValue);
+        var swHtml = '';
+        if (o.swatches) {
+          swHtml = '<span class="sc-popover-opt-swatches">'
+            + o.swatches.map(function(c){ return '<i style="background:'+c+'"></i>'; }).join('')
+            + '</span>';
+        }
+        html += '<button type="button" class="sc-popover-opt' + (isActive?' is-active':'') + '" '
+             +  'data-sc-opt="' + escHtml(o.value) + '">'
+             +  swHtml + escHtml(o.label) + '</button>';
+      });
+      html += '</div>';
+    });
+    if (!anyMatch) html = '<div class="sc-popover-empty">No matches</div>';
+    body.innerHTML = html;
+  }
+
+  function _positionPopover(triggerEl) {
+    var pop = document.getElementById('scPopover');
+    if (!pop || !triggerEl) return;
+    // On mobile/coarse pointer the bottom-sheet CSS handles positioning —
+    // we just clear any inline position state.
+    var isCoarse = (window.matchMedia && window.matchMedia('(pointer:coarse)').matches);
+    if (isCoarse) {
+      pop.style.top = ''; pop.style.left = ''; pop.style.right = '';
+      pop.style.minWidth = ''; pop.style.maxWidth = '';
+      return;
+    }
+    var wrap = triggerEl.closest('.sc-canvas-wrap') || triggerEl.parentElement;
+    if (!wrap) return;
+    var wrapRect = wrap.getBoundingClientRect();
+    var trigRect = triggerEl.getBoundingClientRect();
+    // Position popover within .sc-canvas-wrap (which has position:relative);
+    // anchor below the trigger by default, clamp to the canvas wrap bounds.
+    var leftWithinWrap = trigRect.left - wrapRect.left;
+    var topWithinWrap  = trigRect.bottom - wrapRect.top + 6;
+    pop.style.left = Math.max(8, leftWithinWrap) + 'px';
+    pop.style.top  = topWithinWrap + 'px';
+    pop.style.right = 'auto';
+    pop.style.minWidth = Math.max(220, trigRect.width + 40) + 'px';
+    // After render measure popover width; if it overflows the wrap right edge
+    // flip to right-anchor.
+    requestAnimationFrame(function() {
+      var popRect = pop.getBoundingClientRect();
+      if (popRect.right > wrapRect.right - 8) {
+        pop.style.left = 'auto';
+        pop.style.right = Math.max(8, wrapRect.right - trigRect.right) + 'px';
+      }
+    });
+  }
+
+  function openPicker(pickKey, triggerEl) {
+    var cfg = pickConfig(pickKey);
+    if (!cfg) return;
+    var pop = document.getElementById('scPopover');
+    var backdrop = document.getElementById('scPopoverBackdrop');
+    var search = document.getElementById('scPopoverSearch');
+    if (!pop || !backdrop) return;
+
+    // Move popover into the canvas wrap so absolute positioning is local
+    // to the chart container rather than the body.
+    var wrap = triggerEl.closest('.sc-canvas-wrap');
+    if (wrap && pop.parentElement !== wrap) wrap.appendChild(pop);
+
+    _currentPick = pickKey;
+    _openerEl = triggerEl;
+
+    var sel = document.getElementById(cfg.selectId);
+    var currentValue = sel ? sel.value : '';
+
+    if (search) {
+      search.value = '';
+      search.style.display = cfg.searchable ? '' : 'none';
+      search.placeholder = cfg.searchable ? 'Search metrics…' : '';
+    }
+    _buildBody(cfg, currentValue, '');
+
+    pop.hidden = false;
+    backdrop.hidden = false;
+    triggerEl.setAttribute('aria-expanded', 'true');
+    _positionPopover(triggerEl);
+
+    if (cfg.searchable && search) {
+      // Defer focus to next frame — focusing inside the same touch handler
+      // can be hostile on iOS Safari (causes the picker to immediately blur).
+      requestAnimationFrame(function() { try { search.focus(); } catch(e){} });
+    }
+  }
+
+  function closePicker() {
+    var pop = document.getElementById('scPopover');
+    var backdrop = document.getElementById('scPopoverBackdrop');
+    if (pop) pop.hidden = true;
+    if (backdrop) backdrop.hidden = true;
+    if (_openerEl) _openerEl.setAttribute('aria-expanded', 'false');
+    _openerEl = null;
+    _currentPick = null;
+  }
+
+  function _onSearchInput(e) {
+    if (!_currentPick) return;
+    var cfg = pickConfig(_currentPick);
+    if (!cfg) return;
+    var sel = document.getElementById(cfg.selectId);
+    _buildBody(cfg, sel ? sel.value : '', e.target.value);
+  }
+
+  function _onOptClick(value) {
+    if (!_currentPick) return;
+    var cfg = pickConfig(_currentPick);
+    if (!cfg) return;
+    var sel = document.getElementById(cfg.selectId);
+    if (sel && sel.value !== value) {
+      sel.value = value;
+      sel.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+    closePicker();
+  }
+
+  // ── Swap axes ──────────────────────────────────────────────────────────────
+  function swapAxes() {
+    var xSel = document.getElementById('scXAxis');
+    var ySel = document.getElementById('scYAxis');
+    if (!xSel || !ySel) return;
+    var x = xSel.value, y = ySel.value;
+    xSel.value = y;
+    ySel.value = x;
+    // Single dispatch (both selects share the immediate render path; firing
+    // both would double-render. Firing the x one alone triggers re-read of
+    // both .value's in scRender so the swap takes effect in one frame.)
+    xSel.dispatchEvent(new Event('change', { bubbles: true }));
+  }
+
+  // ── Comparison shelf / pinning ─────────────────────────────────────────────
+  // Cap of 3 — tight enough that the shelf stays scannable in one row of
+  // cards. Pinned players persist across renders (they live in Scatter._state.pinned
+  // keyed by name+year so they survive class-filter changes too).
+  var PIN_CAP = 3;
+
+  function _pinKey(p) {
+    if (!p) return '';
+    var name = p._n || p.name || '';
+    var year = p._y || '2026';
+    return name + '|' + year;
+  }
+
+  function pin(player) {
+    if (!player) return;
+    if (!Scatter._state.pinned) Scatter._state.pinned = [];
+    var key = _pinKey(player);
+    // Toggle: clicking pin on an already-pinned player removes it.
+    var existingIdx = -1;
+    for (var i = 0; i < Scatter._state.pinned.length; i++) {
+      if (_pinKey(Scatter._state.pinned[i]) === key) { existingIdx = i; break; }
+    }
+    if (existingIdx !== -1) {
+      Scatter._state.pinned.splice(existingIdx, 1);
+    } else {
+      if (Scatter._state.pinned.length >= PIN_CAP) {
+        // FIFO: dropping the oldest makes pinning feel forgiving rather than
+        // making the user manually clear before they can add a new one.
+        Scatter._state.pinned.shift();
+      }
+      // Store a slim copy — only the fields the shelf needs. Avoids holding
+      // a reference into the live player array (which can change identity
+      // across renders if we ever swap data sources).
+      Scatter._state.pinned.push({
+        _n: player._n || player.name,
+        _s: player._s || player.school || '',
+        _y: player._y || '2026',
+        rank: player.rank,
+        position: player.position,
+      });
+    }
+    renderShelf();
+    _syncUrlPinned();
+  }
+
+  function unpinByKey(key) {
+    if (!Scatter._state.pinned) return;
+    Scatter._state.pinned = Scatter._state.pinned.filter(function(p) {
+      return _pinKey(p) !== key;
+    });
+    renderShelf();
+    _syncUrlPinned();
+  }
+
+  function clearPinned() {
+    Scatter._state.pinned = [];
+    renderShelf();
+    _syncUrlPinned();
+  }
+
+  function isPinned(player) {
+    if (!player || !Scatter._state.pinned) return false;
+    var key = _pinKey(player);
+    return Scatter._state.pinned.some(function(p){ return _pinKey(p) === key; });
+  }
+
+  // ── Shelf rendering ────────────────────────────────────────────────────────
+  // Re-reads the current X/Y axis state on every call so the per-card values
+  // and delta-to-cohort columns stay live as the user changes axes. The shelf
+  // is the only place the pinned players appear in chart context.
+  function renderShelf() {
+    var shelf = document.getElementById('scShelf');
+    var rowsEl = document.getElementById('scShelfRows');
+    var clearBtn = document.getElementById('scShelfClear');
+    if (!shelf || !rowsEl) return;
+
+    var pinned = (Scatter._state && Scatter._state.pinned) || [];
+    if (!pinned.length) {
+      shelf.setAttribute('data-empty', 'true');
+      rowsEl.innerHTML = '';
+      if (clearBtn) clearBtn.hidden = true;
+      return;
+    }
+    shelf.setAttribute('data-empty', 'false');
+    if (clearBtn) clearBtn.hidden = false;
+
+    // Current axes / chart context.
+    var xSel = document.getElementById('scXAxis');
+    var ySel = document.getElementById('scYAxis');
+    var xKey = xSel ? xSel.value : 'age';
+    var yKey = ySel ? ySel.value : 'ts_pct';
+    var xM = SC_AXES[xKey], yM = SC_AXES[yKey];
+
+    // Cohort averages for delta — pulled from current filtered set.
+    var pts = (Scatter._state && Scatter._state.allPts) || [];
+    var xs = pts.map(function(p){ return p._xr; }).filter(function(v){ return v != null && !isNaN(v); });
+    var ys = pts.map(function(p){ return p._yr; }).filter(function(v){ return v != null && !isNaN(v); });
+    var xAvg = xs.length ? xs.reduce(function(a,b){return a+b;},0) / xs.length : null;
+    var yAvg = ys.length ? ys.reduce(function(a,b){return a+b;},0) / ys.length : null;
+
+    function formatDelta(val, avg, m) {
+      if (val == null || avg == null || !m) return '';
+      var d = val - avg;
+      if (Math.abs(d) < 0.001) return '<span class="sc-shelf-delta">≈ avg</span>';
+      var cls = d > 0 ? 'sc-shelf-delta-pos' : 'sc-shelf-delta-neg';
+      var sign = d > 0 ? '+' : '';
+      return '<span class="sc-shelf-delta ' + cls + '">' + sign + m.fmt(d).replace(/^\+/, '') + ' vs avg</span>';
+    }
+
+    var html = '';
+    pinned.forEach(function(p) {
+      // Look up live player values from the master data; pinned cards store
+      // identity only, so a render-time lookup keeps the displayed values
+      // honest against the currently selected data source.
+      var live = _findPlayer(p._n, p._y);
+      var xv = live ? _valueOf(live, xKey) : null;
+      var yv = live ? _valueOf(live, yKey) : null;
+      var school = (live && live.school) || p._s || '';
+      var logoH = (typeof schoolLogoHtml === 'function' && school)
+        ? schoolLogoHtml(school, '24px', '3px')
+        : '<div style="width:22px;height:22px;background:var(--gray-200);border-radius:4px"></div>';
+      var key = _pinKey(p);
+
+      var xLine = (xv != null && xM) ? '<b>' + xM.short + '</b> ' + xM.fmt(xv) + ' ' + formatDelta(xv, xAvg, xM) : '<b>' + (xM ? xM.short : 'X') + '</b> —';
+      var yLine = (yv != null && yM) ? '<b>' + yM.short + '</b> ' + yM.fmt(yv) + ' ' + formatDelta(yv, yAvg, yM) : '<b>' + (yM ? yM.short : 'Y') + '</b> —';
+
+      html += '<div class="sc-shelf-card" data-pin-key="' + escHtml(key) + '" data-rank="' + (p.rank||'') + '" data-year="' + (p._y||'2026') + '">'
+           +  '<div class="sc-shelf-card-logo">' + logoH + '</div>'
+           +  '<div class="sc-shelf-card-info">'
+           +    '<div class="sc-shelf-card-name">' + escHtml(p._n || '') + '</div>'
+           +    '<div class="sc-shelf-card-vals">' + xLine + ' &nbsp;·&nbsp; ' + yLine + '</div>'
+           +  '</div>'
+           +  '<button type="button" class="sc-shelf-card-x" aria-label="Remove from comparison" data-sc-unpin="' + escHtml(key) + '">'
+           +    '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 3l10 10M13 3L3 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>'
+           +  '</button>'
+           +  '</div>';
+    });
+    rowsEl.innerHTML = html;
+  }
+
+  // Find a player in the current data by name + year. Used by renderShelf to
+  // refresh card values from live data rather than the snapshot taken at
+  // pin time.
+  function _findPlayer(name, year) {
+    try {
+      var src;
+      if (year === '2026' || !year) src = DATA && DATA.board2026;
+      else src = (DATA && DATA.historical && DATA.historical[String(year)]) || null;
+      if (!src) return null;
+      for (var i = 0; i < src.length; i++) {
+        if (src[i].name === name) return src[i];
+      }
+    } catch(e) {}
+    return null;
+  }
+
+  // Pull a raw axis value off a player record. Mirrors the same access shape
+  // ScatterEngine.computePoints uses so the shelf values match the chart.
+  function _valueOf(player, key) {
+    if (!player) return null;
+    var v = player[key];
+    if (key === 'ts_pct' && v != null && v < 2) v = v * 100;
+    return (typeof v === 'number' && !isNaN(v)) ? v : null;
+  }
+
+  // ── URL state for pinned ───────────────────────────────────────────────────
+  // Encoded as a `\` separated list of `name|year` pairs in the `sp` param.
+  // Reads/writes go through urlSetState/urlGetState so the hash stays canonical.
+  function _syncUrlPinned() {
+    if (typeof urlSetState !== 'function') return;
+    var pinned = (Scatter._state && Scatter._state.pinned) || [];
+    var sp = pinned.map(_pinKey).join('\\');
+    try { urlSetState({ sp: sp }); } catch(e) {}
+  }
+
+  function restoreFromUrl() {
+    if (typeof urlGetState !== 'function') return;
+    var p = urlGetState();
+    if (!p || !p.sp) return;
+    var keys = String(p.sp).split('\\').filter(Boolean);
+    if (!keys.length) return;
+    Scatter._state.pinned = [];
+    keys.forEach(function(k) {
+      var parts = k.split('|');
+      var name = parts[0];
+      var year = parts[1] || '2026';
+      var live = _findPlayer(name, year);
+      if (live) {
+        Scatter._state.pinned.push({
+          _n: live.name, _s: live.school || '', _y: year,
+          rank: live.rank, position: live.position,
+        });
+      }
+    });
+    renderShelf();
+  }
+
+  // ── Wire shell-specific event listeners (idempotent) ───────────────────────
+  var _wired = false;
+  function wire() {
+    if (_wired) return;
+    var wrap = document.querySelector('.sc-wrap-v2');
+    if (!wrap) return;
+
+    // Pills and chips with data-sc-pick open the picker.
+    wrap.addEventListener('click', function(e) {
+      var pickBtn = e.target.closest && e.target.closest('[data-sc-pick]');
+      if (pickBtn) {
+        var key = pickBtn.getAttribute('data-sc-pick');
+        // Toggle: clicking the open trigger again closes the popover.
+        if (_openerEl === pickBtn) closePicker();
+        else openPicker(key, pickBtn);
+        return;
+      }
+      // Swap axes button
+      if (e.target.closest && e.target.closest('#scPillSwap')) {
+        swapAxes();
+        return;
+      }
+      // Shelf unpin / clear
+      var unpinBtn = e.target.closest && e.target.closest('[data-sc-unpin]');
+      if (unpinBtn) {
+        unpinByKey(unpinBtn.getAttribute('data-sc-unpin'));
+        return;
+      }
+      if (e.target.closest && e.target.closest('#scShelfClear')) {
+        clearPinned();
+        return;
+      }
+    });
+
+    // Popover internal events (search + option select)
+    var pop = document.getElementById('scPopover');
+    if (pop) {
+      pop.addEventListener('click', function(e) {
+        var opt = e.target.closest && e.target.closest('[data-sc-opt]');
+        if (opt) {
+          _onOptClick(opt.getAttribute('data-sc-opt'));
+          return;
+        }
+        if (e.target.closest && e.target.closest('#scPopoverClose')) {
+          closePicker();
+        }
+      });
+      var search = document.getElementById('scPopoverSearch');
+      if (search) search.addEventListener('input', _onSearchInput);
+    }
+
+    // Click outside → close. Uses the dedicated backdrop layer so we don't
+    // have to hand-roll an "is the click outside my popover" check.
+    var backdrop = document.getElementById('scPopoverBackdrop');
+    if (backdrop) backdrop.addEventListener('click', closePicker);
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' && _openerEl) closePicker();
+    });
+
+    // Tooltip pin button — delegated on the document since the tooltip
+    // element lives on document.body and the button is injected inline.
+    document.addEventListener('click', function(e) {
+      var btn = e.target.closest && e.target.closest('.sc-tip-pin');
+      if (!btn || btn.hasAttribute('disabled')) return;
+      e.preventDefault(); e.stopPropagation();
+      var name = btn.getAttribute('data-pin-name');
+      var year = btn.getAttribute('data-pin-year') || '2026';
+      if (!name) return;
+      var live = _findPlayer(name, year);
+      if (live) pin({ _n: live.name, _s: live.school || '', _y: year, rank: live.rank, position: live.position });
+      // Hide tooltip after pinning — feels resolved.
+      if (typeof scHideTip === 'function') scHideTip();
+    });
+
+    _wired = true;
+  }
+
+  return {
+    wire:              wire,
+    syncFromState:     syncFromState,
+    renderShelf:       renderShelf,
+    pin:               pin,
+    isPinned:          isPinned,
+    clearPinned:       clearPinned,
+    restoreFromUrl:    restoreFromUrl,
+    openPicker:        openPicker,
+    closePicker:       closePicker,
+    PIN_CAP:           PIN_CAP,
+  };
+})();
+
 // ── Main render ───────────────────────────────────────────────────────────────
 function scRender() {
   // Populate the X/Y axis selects from SC_AXES on first call — idempotent
@@ -14499,6 +16375,16 @@ function scRender() {
   // Must run BEFORE the Chart.js availability check so the controls work
   // even if the chart library is still loading from CDN.
   scPopulateAxes();
+
+  // PR1: wire the shell BEFORE the Chart-availability bailout so pills/chips
+  // are interactive even while Chart.js is still loading from the CDN. The
+  // wire() call is idempotent — only the first invocation attaches listeners,
+  // every later one is a no-op.
+  ScatterShell.wire();
+  // PR1-revision: rankings delegation (axis-toggle, row hover, row click).
+  // Same early-wire rationale as ScatterShell — the toggle should work
+  // immediately, before any chart paint.
+  ScatterRankings.wire();
 
   if (typeof Chart === 'undefined') return;
 
@@ -14546,34 +16432,27 @@ function scRender() {
       syear:  year,
       scolor: colorBy,
       spos:   posFil,
-      strend: Scatter._state.trend ? '1' : '0',
-      squad:  Scatter._state.quadrants ? '1' : '0'
+      strend: Scatter._state.trend      ? '1' : '0',
+      squad:  Scatter._state.quadrants  ? '1' : '0',
+      // PR2: persist the analytical-layer toggle so a shared link reproduces
+      // the full view, not just the axes and filters.
+      sghost: Scatter._state.ghost      ? '1' : '0'
     });
   } catch(e) {}
 
-  // ── Header update ─────────────────────────────────────────────────────────
-  // Three elements drive the new typographic hierarchy:
-  //   #scPlotScope  — small breadcrumb: class scope + position filter
-  //   #scPlotTitle  — hero title: "X × Y" — the analytical question itself
-  //   #scPlotCount  — count chip: "N prospects"
-  // Color mode is communicated entirely through the legend; no more "by Pos"
-  // text in the header (it'd duplicate the legend).
-  var titleEl = document.getElementById('scPlotTitle');
-  var countEl = document.getElementById('scPlotCount');
-  var scopeEl = document.getElementById('scPlotScope');
-  if (titleEl) titleEl.textContent = xM.label + ' × ' + yM.label;
-  if (scopeEl) {
-    var classTxt = year === 'all' ? 'All Classes 2019–2026' : year + ' Draft Class';
-    var posTxt   = posFil !== 'all' ? ' · ' + posFil + 's only' : '';
-    scopeEl.textContent = classTxt + posTxt;
-  }
-  // Keep the visible color segmented control in sync with the state value.
-  scSyncColorSegmented(colorBy);
+  // ── PR1: Shell update ─────────────────────────────────────────────────────
+  // The old header (#scPlotTitle/#scPlotScope) was deleted along with the
+  // .sc-plot-header element. The visible state now lives on the floating
+  // pills/chips and the bottom-bar count chip. ScatterShell.syncFromState()
+  // is the single integration point — same arguments scRender computed
+  // anyway, no extra work done here. (ScatterShell.wire() runs earlier,
+  // before the Chart.js check, so chrome stays interactive during loading.)
 
   // ── Data pipeline (ScatterEngine) ─────────────────────────────────────────
-  // Filter once by position (cached inside getFiltered) — then derive points,
-  // top5, bot5 from the same filtered list. Previously each downstream call
-  // re-filtered independently — three passes over the same data per render.
+  // Filter once by position (cached inside getFiltered) — then derive points
+  // from the same filtered list. Top-5/Bottom-5 rankings (PR1-revision) read
+  // from the same filtered set; their ranking dimension is Scatter._state.rankAxis
+  // ('x' or 'y') — defaulted to 'y' to match the pre-PR1 contract.
   var players  = ScatterEngine.getPlayers(year);
   var filtered = ScatterEngine.getFiltered(players, posFil);
   var pts      = ScatterEngine.computePoints(filtered, xKey, yKey);
@@ -14589,30 +16468,43 @@ function scRender() {
   var wrapEl = document.querySelector('.sc-canvas-wrap');
   var emptyEl = document.getElementById('scEmpty');
   if (!pts.length) {
-    if (countEl) countEl.textContent = '0 prospects';
+    ScatterShell.syncFromState(xKey, yKey, year, posFil, colorBy, 0);
     scShowEmptyState(xM, yM, year, posFil, wrapEl, emptyEl);
     if (Scatter._state.chart) { Scatter._state.chart.destroy(); Scatter._state.chart = null; }
-    // Top/Bot panels — clear them since there's nothing to rank
+    // Rankings: clear both panels since there's nothing to rank.
     ScatterTopPanel.render([], yM);
     ScatterBotPanel.render([], yM);
+    // Sync the axis-toggle labels even when empty so users still see what
+    // they'd be ranking by if data appeared.
+    ScatterRankings.syncAxisToggle(xM, yM);
+    // Refresh the compare shelf — keep pinned players visible even when the
+    // chart itself is empty; the shelf renders "—" for missing values.
+    ScatterShell.renderShelf();
     return;
   }
   if (wrapEl) wrapEl.classList.remove('is-empty');
   if (emptyEl) emptyEl.hidden = true;
 
-  // Set the count chip — "71 prospects" / "1 prospect" / "545 prospects"
-  if (countEl) countEl.textContent = pts.length + (pts.length === 1 ? ' prospect' : ' prospects');
+  // Sync visible chrome with the count we just computed.
+  ScatterShell.syncFromState(xKey, yKey, year, posFil, colorBy, pts.length);
 
-  // Update Top 5 + Bottom 5 panels — both use the same pre-filtered list
-  var topItems = ScatterEngine.topByAxis(filtered, yKey, 5);
-  ScatterTopPanel.render(topItems, yM);
-  var botItems = ScatterEngine.botByAxis(filtered, yKey, 5);
-  ScatterBotPanel.render(botItems, yM);
+  // ── Rankings: Top 5 / Bottom 5 by user-selected axis ─────────────────────
+  // The rank axis defaults to 'y' (preserves the pre-PR1 behaviour) but the
+  // user can flip to 'x' via the toggle in the rankings header. Single sort
+  // pass over filtered; both ends sliced (see ScatterEngine.endsByAxis).
+  var rankAxis = Scatter._state.rankAxis || 'y';
+  var rankKey  = rankAxis === 'x' ? xKey : yKey;
+  var rankM    = rankAxis === 'x' ? xM   : yM;
+  var ends = ScatterEngine.endsByAxis(filtered, rankKey, 5);
+  ScatterTopPanel.render(ends.top, rankM);
+  ScatterBotPanel.render(ends.bot, rankM);
+  ScatterRankings.syncAxisToggle(xM, yM);
 
-  // Apply jitter only when point count is manageable (< 200)
-  if (pts.length < 200) {
-    pts = ScatterEngine.applyJitter(pts, ScatterEngine.axisRange(pts, 'x'), ScatterEngine.axisRange(pts, 'y'));
-  }
+  // Apply jitter unconditionally — the spatial-bucket implementation is O(n)
+  // and handles the historical (~545 point) view without breaking a sweat.
+  // (Previously gated behind pts.length < 200 because the old O(n²) version
+  //  blew up; that gate is no longer needed.)
+  pts = ScatterEngine.applyJitter(pts, ScatterEngine.axisRange(pts, 'x'), ScatterEngine.axisRange(pts, 'y'));
 
   Scatter._state.allPts = pts;
 
@@ -14624,7 +16516,15 @@ function scRender() {
   ScatterLogoCache.setOnLoad(function() {
     if (myToken !== Scatter._state.renderToken) return;
     if (!Scatter._state.chart || !Scatter._state.allPts.length) return;
-    var ds = Scatter._state.chart.data.datasets[0];
+    // PR2: find foreground dataset by tag — index 0 is the ghost dataset
+    // when the historical-overlay toggle is on, and we never want to paint
+    // logo styles onto ghost circles.
+    var dsList = Scatter._state.chart.data.datasets;
+    var ds = null;
+    for (var dsi = 0; dsi < dsList.length; dsi++) {
+      if (dsList[dsi].$scIsForeground) { ds = dsList[dsi]; break; }
+    }
+    if (!ds) ds = dsList[0];
     if (!ds) return;
     var logoData = ScatterLogoCache.getPointStyles(Scatter._state.allPts, ScatterEngine.tierSize);
     // Always keep Scatter._state.lastLogoData current — it is the authoritative restore target.
@@ -14636,9 +16536,12 @@ function scRender() {
       // rather than overwriting with full-brightness logos and losing the dim state.
       scHighlightPlayer(Scatter._state.highlightName);
     } else {
-      ds.pointStyle       = logoData.styles;
-      ds.pointRadius      = logoData.radii;
-      ds.pointHoverRadius = logoData.hoverRadii;
+      // Give ds.* independent copies — see the rationale at the dataset
+      // construction site below. Without .slice() here, subsequent highlight
+      // mutations would contaminate the lastLogoData we just stored.
+      ds.pointStyle       = logoData.styles.slice();
+      ds.pointRadius      = logoData.radii.slice();
+      ds.pointHoverRadius = logoData.hoverRadii.slice();
       Scatter._state.chart.update('none');
     }
   });
@@ -14655,17 +16558,109 @@ function scRender() {
   // ── Trend line (computed once, used for both dataset and stat bar) ─────────
   var reg = (Scatter._state.trend && pts.length >= 3) ? ScatterEngine.linReg(pts) : null;
 
+  // ── PR2: Percentile cache for tooltip ─────────────────────────────────────
+  // Pre-sort foreground x and y values so the tooltip can compute percentile
+  // via binary search per hover. Built once per render so the work amortizes
+  // across every mouseover for the duration of the chart's lifetime.
+  (function buildPercentileCache() {
+    var xs = [], ys = [];
+    for (var i = 0; i < pts.length; i++) {
+      var p = pts[i];
+      if (p._xr != null && isFinite(p._xr)) xs.push(p._xr);
+      if (p._yr != null && isFinite(p._yr)) ys.push(p._yr);
+    }
+    xs.sort(function(a,b){ return a-b; });
+    ys.sort(function(a,b){ return a-b; });
+    Scatter._state.percentileCache = { xSorted: xs, ySorted: ys, n: pts.length, xKey: xKey, yKey: yKey };
+  })();
+
+  // ── PR2: Ghost dataset (historical-class overlay) ─────────────────────────
+  // Computed BEFORE the foreground dataset so we can prepend it to the
+  // datasets array — Chart.js renders datasets in array order, so ghost
+  // points need to be first to sit BEHIND the foreground logos.
+  //
+  // Active only when:
+  //   1. The Ghost toggle is on, AND
+  //   2. The user is viewing a single year (not 'all') — there's nothing to
+  //      contrast against when 'all' is already showing every class.
+  // Position filter is honored so a Guards-only view shows ghost guards too,
+  // not a confused mix of positions.
+  //
+  // Ghost points use plain colored circles (no logos) at low opacity. They
+  // are NOT added to Scatter._state.allPts so the spatial index, tooltip,
+  // mobile focus card, click-to-modal, and pin-to-shelf all bind only to
+  // the foreground — ghosts are visual-only context.
+  var ghostDs = null;
+  var ghostActive = Scatter._state.ghost && year !== 'all';
+  if (ghostActive) {
+    var ghostYears = [];
+    var historical = (typeof DATA !== 'undefined' && DATA.historical) || {};
+    Object.keys(historical).forEach(function(yr) {
+      if (yr !== year) ghostYears.push(yr);
+    });
+    // Also include 2026 when viewing a non-2026 historical year — the user
+    // probably wants the current draft class as the contextual layer too.
+    if (year !== '2026' && DATA && DATA.board2026) ghostYears.push('2026');
+
+    var ghostPts = [];
+    var ghostColors = [];
+    var YEAR_COLOR = { '2026':'#D97706','2025':'#B45309','2024':'#7C3AED','2023':'#5B21B6',
+                       '2022':'#3B82F6','2021':'#1D4ED8','2020':'#0D9488','2019':'#0F766E' };
+    ghostYears.forEach(function(yr) {
+      var ghostPlayers = ScatterEngine.getPlayers(yr);
+      var ghostFiltered = ScatterEngine.getFiltered(ghostPlayers, posFil);
+      var ghostYearPts = ScatterEngine.computePoints(ghostFiltered, xKey, yKey);
+      var color = YEAR_COLOR[yr] || '#94A3B8';
+      ghostYearPts.forEach(function(pt) {
+        ghostPts.push({ x: pt.x, y: pt.y });
+        ghostColors.push(color + '44');  // ~27% alpha — present but recessive
+      });
+    });
+    if (ghostPts.length) {
+      ghostDs = {
+        label:            'Ghost ' + ghostPts.length,
+        data:             ghostPts,
+        pointStyle:       'circle',
+        backgroundColor:  ghostColors,
+        borderColor:      ghostColors,
+        borderWidth:      0,
+        pointRadius:      3,
+        pointHoverRadius: 3,
+        // Tag so the archetype/quadrant plugins know which dataset to ignore
+        // when computing data range — ghosts can extend outside the foreground
+        // range and we don't want zones rescaling around them.
+        $scIsGhost:       true
+      };
+    }
+  }
+
   // ── Build datasets ────────────────────────────────────────────────────────
-  var datasets = [{
-    label:            'Prospects',
-    data:             pts,
-    pointStyle:       logoData.styles,
-    backgroundColor:  bgColors,
-    borderColor:      bgColors,
-    borderWidth:      0,
-    pointRadius:      logoData.radii,
-    pointHoverRadius: logoData.hoverRadii,
-  }];
+  // CRITICAL: assign SLICES of the logoData arrays to the dataset — not the
+  // arrays themselves. Why: `highlightPlayer` mutates ds.pointStyle/pointRadius
+  // in place when dimming/restoring. If those arrays are the same references
+  // stored in `_state.lastLogoData`, the dim writes contaminate the "original"
+  // we later try to restore from. Result: the chart can never be restored to
+  // bright after the first dim cycle.
+  //
+  // Independent arrays keep `_state.lastLogoData` as an immutable bright
+  // reference for restore. Memory cost: 3 × N pointers (~5KB for 600 points).
+  // The same slice() trick is required wherever ds.* is reassigned from
+  // logoData below (the canUpdate-patch path and the setOnLoad callback).
+  var foregroundDs = {
+    label:             'Prospects',
+    data:              pts,
+    pointStyle:        logoData.styles.slice(),
+    backgroundColor:   bgColors,
+    borderColor:       bgColors,
+    borderWidth:       0,
+    pointRadius:       logoData.radii.slice(),
+    pointHoverRadius:  logoData.hoverRadii.slice(),
+    // PR2: tag so plugins (archetypes, quadrants) can find the foreground
+    // dataset by attribute rather than relying on the index — adding the
+    // ghost dataset shifts the foreground from index 0 to index 1.
+    $scIsForeground:   true
+  };
+  var datasets = ghostDs ? [ghostDs, foregroundDs] : [foregroundDs];
 
   if (reg) {
     datasets.push({
@@ -14738,6 +16733,11 @@ function scRender() {
       if (ds.borderDash  !== undefined) existing.borderDash  = ds.borderDash;
       if (ds.borderWidth !== undefined) existing.borderWidth = ds.borderWidth;
       if (ds.label       !== undefined) existing.label       = ds.label;
+      // PR2: re-tag foreground/ghost so the plugins keep targeting the
+      // right dataset. Tags don't survive Chart.js' internal update merging,
+      // so we explicitly re-assert them on every render.
+      existing.$scIsForeground = !!ds.$scIsForeground;
+      existing.$scIsGhost      = !!ds.$scIsGhost;
     });
     // Sync all axis config: label, reverse, and tick formatter
     var sx = Scatter._state.chart.options.scales.x;
@@ -14748,11 +16748,22 @@ function scRender() {
     sy.reverse    = !!yM.inv;
     sx.ticks.callback = function(v){ return xM.fmt(v); };
     sy.ticks.callback = function(v){ return yM.fmt(v); };
+    // PR2: update axis-key tags so plugins (archetypes/quadrants/crosshair)
+    // see the current axis pair without having to look the selects up.
+    Scatter._state.chart.$scXKey = xKey;
+    Scatter._state.chart.$scYKey = yKey;
     Scatter._state.chart.update('none');
   } else {
     // Full recreate: first render or dataset count changed
     if (Scatter._state.chart) { Scatter._state.chart.destroy(); Scatter._state.chart = null; }
     Scatter._state.chart = new Chart(canvas, chartConfig);
+    // PR2: stamp current axis pair onto the chart instance for the plugins.
+    // The plugins receive `chart` but not the surrounding lexical scope, so
+    // we attach the keys directly. Replaces the more fragile approach of
+    // reading the hidden <select> elements inside the plugin (which would
+    // tie plugin draw timing to DOM state).
+    Scatter._state.chart.$scXKey = xKey;
+    Scatter._state.chart.$scYKey = yKey;
 
     // BLANK-ON-TAB-OPEN FIX
     // When the user switches into the scatter tab, scRender() runs in the
@@ -14789,122 +16800,12 @@ function scRender() {
     }
   }
 
-  // ── Proximity tooltip ─────────────────────────────────────────────────────
-  // Uses Scatter.queryNear (spatial index) instead of walking every point.
-  // At 600 points the index reduces per-frame work from 600 getPixelForValue
-  // calls to ~5-15 (avg points in the 9 surrounding cells), a 40-100× win.
-  canvas.onmousemove = function(e) {
-    if (!Scatter._state.chart || !Scatter._state.allPts.length) return;
-    var rect  = canvas.getBoundingClientRect();
-    var mx    = e.clientX - rect.left;
-    var my    = e.clientY - rect.top;
-    try {
-      var isTouchEvent = (e.pointerType === 'touch') || (window.matchMedia && matchMedia('(pointer:coarse)').matches);
-      var touchBoost = isTouchEvent ? 14 : 0;
-      var near = Scatter.queryNear(mx, my, touchBoost);
-      scShowTip(e, near, xM, yM);
-    } catch(e) { scHideTip(); }
-  };
-  canvas.onmouseleave = function() { scHideTip(); };
-
-  // ── Touch tooltip: ONLY on coarse-pointerless devices ───────────────────
-  // On touch devices, the persistent focus card (#scMobileFocus, wired by
-  // scBindMobileTap below) is the canonical tap response. Wiring the
-  // touch-proximity tooltip in parallel caused both to fire on the same tap:
-  // the dark tooltip flickered in, the focus card slid in below, then the
-  // tooltip auto-dismissed mid-thought. One interaction model wins.
-  // We explicitly null out any previously-assigned coarse-device handlers
-  // in case the user resized from desktop into mobile (rare but possible
-  // with browser devtools).
-  var _isCoarsePointer = (typeof window !== 'undefined'
-    && window.matchMedia
-    && window.matchMedia('(pointer:coarse)').matches);
-
-  if (_isCoarsePointer) {
-    // Coarse pointer: focus card is the sole interaction. Null any prior
-    // touch handlers and skip the proximity-tooltip setup entirely.
-    canvas.ontouchstart  = null;
-    canvas.ontouchend    = null;
-    canvas.ontouchcancel = null;
-    if (Scatter._state.tipHideTimer) { clearTimeout(Scatter._state.tipHideTimer); Scatter._state.tipHideTimer = null; }
-    scHideTip();
-  } else {
-    // ── Mobile touch: touchstart shows proximity tooltip; touchend dismisses it.
-    // IMPORTANT: use onX= assignment (not addEventListener) so each scRender()
-    // call replaces the handler rather than accumulating another copy.
-    // Using addEventListener without removal caused N tooltip show/hide handlers
-    // after N axis changes (verified regression: 10 renders → 10 simultaneous handlers).
-    // C4: Scatter._state.tipHideTimer is module-level — no local declaration needed.
-    // Clearing it here ensures any pending hide from a previous render is cancelled
-    // before new touch handlers are attached (prevents ghost dismiss on axis change).
-    if (Scatter._state.tipHideTimer) { clearTimeout(Scatter._state.tipHideTimer); Scatter._state.tipHideTimer = null; }
-    canvas.ontouchstart = function(e) {
-      if (Scatter._state.tipHideTimer) { clearTimeout(Scatter._state.tipHideTimer); Scatter._state.tipHideTimer = null; }
-      if (!Scatter._state.chart || !Scatter._state.allPts.length) return;
-      var rect  = canvas.getBoundingClientRect();
-      var touch = e.touches[0];
-      if (!touch) return;
-      var mx = touch.clientX - rect.left;
-      var my = touch.clientY - rect.top;
-      try {
-        var near = Scatter.queryNear(mx, my, 14);
-        if (near.length) scShowTip({ clientX: touch.clientX, clientY: touch.clientY }, near, xM, yM);
-        else scHideTip();
-      } catch(err) { scHideTip(); }
-    };
-    canvas.ontouchend = function() {
-      // Cancel any pending hide from a previous tap before scheduling new one
-      if (Scatter._state.tipHideTimer) clearTimeout(Scatter._state.tipHideTimer);
-      Scatter._state.tipHideTimer = setTimeout(function() { scHideTip(); Scatter._state.tipHideTimer = null; }, 600);
-    };
-    canvas.ontouchcancel = function() {
-      if (Scatter._state.tipHideTimer) { clearTimeout(Scatter._state.tipHideTimer); Scatter._state.tipHideTimer = null; }
-      scHideTip();
-    };
-  }
-
-  // Also short-circuit the hover proximity tooltip on coarse pointers — they
-  // can synthesize mousemove events on tap which would re-fire the tooltip
-  // path even though we just disabled the touch entry points above.
-  if (_isCoarsePointer) {
-    canvas.onmousemove  = null;
-    canvas.onmouseleave = null;
-  }
-
-  // ── Mobile tap-to-focus: separate from the tooltip system
-  // Replaces the "show then dismiss" tooltip with a persistent focus card.
-  // Only active on mobile (≤640px); no-op on desktop.
-  if (typeof scBindMobileTap === 'function') {
-    scBindMobileTap(canvas, Scatter._state.allPts, xM, yM, Scatter._state.chart);
-  }
-
-  // Note: a previous version preventDefault'd touchmove on the canvas to stop
-  // in-chart panning. Chart.js scatter has no pan gesture, so that listener
-  // was blocking the user's ability to scroll the page when their finger
-  // happened to drag across the chart — a major mobile UX cost for no benefit.
-  // Removed. If a future feature adds genuine in-chart gestures we'll
-  // selectively prevent default only while that gesture is active.
-  if (canvas._scTouchMove) {
-    canvas.removeEventListener('touchmove', canvas._scTouchMove, { passive: false });
-    canvas._scTouchMove = null;
-  }
-
-  // Click a logo → open player profile modal.
-  // Uses queryClosest (spatial index) instead of walking every point.
-  canvas.onclick = function(e) {
-    if (!Scatter._state.chart || !Scatter._state.allPts.length) return;
-    var rect = canvas.getBoundingClientRect();
-    var mx   = e.clientX - rect.left;
-    var my   = e.clientY - rect.top;
-    try {
-      var isTap   = (e.pointerType === 'touch') || (window.matchMedia && matchMedia('(pointer:coarse)').matches);
-      var tapBoost = isTap ? 16 : 0;
-      var clicked  = Scatter.queryClosest(mx, my, tapBoost);
-      if (clicked && typeof openPlayerModal === 'function') {
-        openPlayerModal(clicked._p.rank, clicked._p._y || '2026');
-      }
-    } catch(err) {}
-  };
+  // ── Interaction wiring ────────────────────────────────────────────────────
+  // All canvas event handlers (mouse proximity tooltip, touch tooltip, click
+  // → modal, mobile focus card, touchmove cleanup) live in ScatterInteraction.
+  // The contract: handlers are assigned via canvas.onX (not addEventListener),
+  // so each render replaces rather than accumulates. See module for details.
+  ScatterInteraction.wire(canvas, pts, xM, yM, Scatter._state.chart);
 
   // ── Stats bar ─────────────────────────────────────────────────────────────
   var statEl = document.getElementById('scStatBar');
@@ -14925,6 +16826,10 @@ function scRender() {
     }
     statEl.innerHTML = statChip(xs, xM) + statChip(ys, yM) + r2html;
   }
+
+  // Refresh the comparison shelf — cohort-relative deltas need the new pts.
+  // Called last so Scatter._state.allPts has the current jittered/filtered set.
+  ScatterShell.renderShelf();
 }
 
 
@@ -15122,7 +17027,15 @@ function urlRestoreState() {
   // through Scatter.setTrend / setQuadrants so the button label/active class
   // stays in sync with the underlying flag.
   if (p.strend === '1') Scatter.setTrend(true);
-  if (p.squad  === '1') Scatter.setQuadrants(true);
+  // PR3: quadrants now default to true (see _state.quadrants). Honour an
+  // explicit '0' from a user who deliberately turned them off — otherwise
+  // their saved view would silently re-enable on reload. Missing param
+  // keeps the default (true).
+  if      (p.squad === '0') Scatter.setQuadrants(false);
+  else if (p.squad === '1') Scatter.setQuadrants(true);
+  // PR2: restore ghost overlay. Default is false so a missing param needs
+  // no special handling.
+  if (p.sghost === '1') Scatter.setGhost(true);
   var renders={
     board2026:renderBoard2026,analytics:renderAnalytics,
     history:renderHistory,future:renderFuture,mocks:renderMocks,
@@ -15130,6 +17043,14 @@ function urlRestoreState() {
     compare:function(){populateCompareSelect();renderCompare();}
   };
   if(renders[p.tab]) renders[p.tab]();
+
+  // PR1: restore pinned players from URL state after the scatter render
+  // has wired ScatterShell. Done unconditionally — if the user shared a
+  // link with pinned players and then navigates to scatter later we still
+  // want them present. ScatterShell.restoreFromUrl no-ops on missing sp.
+  if (p.tab === 'scatter' && typeof ScatterShell !== 'undefined') {
+    ScatterShell.restoreFromUrl();
+  }
 }
 
 var COMP_HT_WT = {
