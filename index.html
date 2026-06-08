@@ -1144,9 +1144,13 @@ tr:hover td{background:var(--gray-50)}
   #mdcPoolFab:active{transform:scale(.96);box-shadow:0 4px 16px rgba(37,99,235,.4)}
   #mdcPoolFab .fab-icon{font-size:18px;line-height:1}
 
-  /* Scatter: chart full width, panels strip below */
-  .sc-body{flex-direction:column}
-  .sc-panels-strip{grid-template-columns:1fr 1fr;border-radius:0 0 10px 10px}
+  /* Scatter: single-column stack on mobile. The right-rail desktop grid
+     collapses to one column here; the panels strip flips back to side-by-side
+     (it's a column-flex on desktop, but on mobile horizontal flex saves
+     vertical space). */
+  .sc-body{grid-template-columns:1fr}
+  .sc-panels-strip{flex-direction:row;border-left:none;border-top:1px solid var(--gray-100);border-radius:0 0 10px 10px}
+  .sc-panel-top{border-bottom:none;border-right:1px solid var(--gray-100)}
   .sc-plot-wrap{order:1}
   /* sc-top5 compact styles consolidated at ~line 1768 */
   .sc-top5-school{display:none}
@@ -1854,45 +1858,33 @@ tr:hover td{background:var(--gray-50)}
   .ccs-val { font-size: 12px; }
   .ccs-lbl { font-size: 7px; }
 
-  /* ── Scatter controls — mobile coverage (fixes bug #2) ─────────────────
-     Was: hid 3rd/4th/5th groups by positional nth-child, which silently
-     hid the Quadrants button when it was added as the 5th group. Now uses
-     semantic class names so the rule is robust to reordering, and KEEPS
-     Trend + Quadrants visible — these are the most useful tap-friendly
-     analysis affordances on mobile. Hides Color By + Position filter
-     (rarely-changed selects that compete for limited horizontal space). */
+  /* ── Scatter controls — mobile layout ─────────────────────────────────
+     On narrow screens, hide the Color-By segmented control (rarely changed,
+     hardest to fit) and the Position filter. Trend + Quadrants remain
+     visible — they're the tap-friendliest analysis affordances. The two
+     control rows wrap naturally. */
   .sc-grp-colorby,
   .sc-grp-position {
     display: none !important;
   }
-  /* Toggle buttons get larger tap targets on mobile — iOS HIG 44px floor.
-     Trend/Quadrants buttons sit alongside the Draft Class select. */
-  .sc-grp-trend .sc-trend-btn,
-  .sc-grp-quadrants .sc-trend-btn {
-    min-height: 36px;
-    padding: 8px 14px;
-    font-size: 12px;
-  }
-  /* Only X + Y axis selectors + Class + Trend + Quadrants remain — flexible row */
-  .sc-controls {
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-    padding: 10px 12px;
-  }
-  .sc-ctrl-label {
-    font-size: 10px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: .5px;
-  }
-  /* sc-select: font-size 16px set globally in CONTROLS BAR block above (iOS zoom prevention) */
+  /* Primary row: still axes side-by-side, but tighter padding + iOS 16px
+     font on selects to suppress auto-zoom on focus. */
+  .sc-controls-primary{padding:10px 12px 8px;gap:10px;flex-wrap:wrap}
+  .sc-axis-select{font-size:16px;min-width:130px;flex:1}
+  .sc-axis-letter{font-size:14px}
+  /* Secondary row: compact, with mods pushed right */
+  .sc-controls-secondary{padding:8px 12px 10px;gap:10px}
+  .sc-filter-select{font-size:13px;padding:6px 22px 6px 9px;min-height:32px}
+  .sc-mod-btn{padding:7px 12px;font-size:12px;min-height:36px}
+  .sc-mod-icon{width:12px;height:12px}
 
-  /* P7: Scatter — taller canvas + trimmed panels on mobile ──────────────
-     Problem: 300px canvas + full 5-row panels leaves almost no room above
-     the fold; users must scroll to see the plot and both panels at once.
-     Fix: 360px canvas, trim each panel to 3 rows via nth-child (no JS change),
-     compact axis controls. Net result: plot + controls + panels all visible
-     in ~580px — fits a 390px iPhone with 94px sticky chrome consumed.       */
+  /* Hero title scales down on mobile */
+  .sc-plot-title{font-size:18px}
+  .sc-plot-scope{font-size:10px}
+  .sc-plot-count{font-size:10px;padding:3px 7px}
+  .sc-plot-header{padding:2px 2px 9px}
+
+  /* P7: Scatter — taller canvas + trimmed panels on mobile */
   .sc-canvas-wrap{height:360px;min-height:280px}
 
   /* Trim top/bottom panels to 3 rows on mobile — rows 4 & 5 hidden */
@@ -2144,7 +2136,8 @@ tr:hover td{background:var(--gray-50)}
 
   /* Controls bar — font sizing for iOS zoom prevention */
   .search-input{font-size:16px;padding:8px 10px 8px 32px;letter-spacing:.01em;min-height:38px;border-radius:8px}
-  .sc-select{font-size:16px;padding:8px 8px;min-height:40px}
+  /* Scatter selects already use font-size:16px in the .sc-controls-secondary
+     mobile rules above — no separate override needed here. */
   .modal-search-input{font-size:16px}
   #histSearch{font-size:16px}
   #mcSearchInput{font-size:16px}
@@ -2171,12 +2164,8 @@ tr:hover td{background:var(--gray-50)}
   }
   .analytics-sub{font-size:11px;color:var(--text-muted);margin-bottom:10px;font-weight:500}
 
-  /* Scatter: controls tighter */
-  .sc-ctrl-section{padding:8px 10px;gap:6px}
-  .sc-select{font-size:15px;padding:6px 7px}
+  /* Scatter: tighter wrap padding on small screens */
   .sc-plot-wrap{padding:10px 12px}
-  .sc-plot-title{font-size:14px}
-  .sc-plot-meta{font-size:10px}
 
   /* Compare tab */
   .compare-hero{grid-template-columns:1fr}
@@ -2435,12 +2424,7 @@ tr:hover td{background:var(--gray-50)}
   .meas-grid{grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:7px}
   .meas-item{padding:7px 10px}
 
-  /* ── Scatter controls ────────────────────────────────────────────────── */
-  .sc-controls{flex-wrap:nowrap}
-  .sc-ctrl-section-primary{gap:10px}
-  .sc-ctrl-section-secondary{gap:10px}
-  .sc-select{width:auto;min-width:130px;max-width:190px;font-size:12px;min-height:auto;}
-  .sc-ctrl-section-primary .sc-select{min-width:150px;}
+  /* ── Scatter: desktop-only escalations ──────────────────────────────── */
   .sc-canvas-wrap{
     height:620px;
     touch-action:auto;
@@ -4828,36 +4812,197 @@ ap{
 /* ── Scatter plot base CSS ───────────────────────────────────────────────── */
 .sc-wrap{display:flex;flex-direction:column;gap:0;background:white;border-radius:12px;overflow:hidden;box-shadow:0 2px 20px rgba(10,22,40,.08)}
 
-/* Controls bar — compact inline layout with two logical groups */
-.sc-controls{display:flex;flex-wrap:wrap;align-items:flex-end;gap:0;padding:0;background:var(--gray-50);border-bottom:1px solid var(--gray-100)}
-.sc-ctrl-section{display:flex;align-items:flex-end;gap:6px;padding:10px 14px;flex-wrap:wrap}
-.sc-ctrl-section-primary{border-right:1px solid var(--gray-100);background:white}
-.sc-ctrl-section-secondary{gap:8px}
-.sc-ctrl-group{display:flex;flex-direction:column;gap:3px}
-.sc-ctrl-label{font-size:9.5px;font-weight:800;color:var(--gray-400);text-transform:uppercase;letter-spacing:.7px;white-space:nowrap}
-/* Primary axis selects — slightly more prominent */
-.sc-ctrl-section-primary .sc-select{border-color:rgba(212,168,48,.4);color:var(--navy);font-size:13px;min-width:140px;max-width:180px}
-.sc-select{padding:6px 8px;border:1.5px solid var(--gray-200);border-radius:7px;font-size:12px;font-family:'Barlow Condensed',sans-serif;font-weight:700;color:var(--navy);background:white;cursor:pointer;max-width:150px}
-/* Trend toggle pill */
-.sc-trend-btn{background:var(--gray-50);border:1.5px solid var(--gray-200);border-radius:20px;padding:5px 14px;font-size:11px;font-weight:800;font-family:'Barlow Condensed',sans-serif;color:var(--gray-500);cursor:pointer;transition:all .15s;white-space:nowrap;letter-spacing:.3px}
-.sc-trend-btn.active{background:rgba(212,168,48,.12);border-color:rgba(212,168,48,.5);color:var(--amber)}
+/* Visually-hidden utility for screen-reader-only labels on the X/Y selects.
+   The visible "X" / "Y" letter glyphs sit next to the inputs but are
+   aria-hidden because they aren't semantically labels. */
+.sc-vh{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 
-/* Body: chart is the dominant element, panels sit below */
-.sc-body{display:flex;flex-direction:column;align-items:stretch;min-height:0}
-.sc-plot-wrap{flex:1;min-width:0;display:flex;flex-direction:column;padding:10px 16px 10px;gap:0}
-/* Plot header: tight descriptor strip — not a hero title */
-.sc-plot-header{display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:4px 2px 6px}
-.sc-plot-title{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:800;color:var(--navy);line-height:1;letter-spacing:.2px}
-.sc-plot-meta{font-size:11px;color:var(--gray-400);font-weight:500}
-.sc-plot-sep{width:1px;height:12px;background:var(--gray-200);flex-shrink:0}
+/* ── Controls: two-row stack ──────────────────────────────────────────────
+   The control surface is a single .sc-controls block with internal rows.
+   Row 1 (primary) gives the axis pair visual prominence; row 2 (secondary)
+   holds filters and display modifiers in a lighter weight. */
+.sc-controls{display:flex;flex-direction:column;background:white;border-bottom:1px solid var(--gray-100)}
+
+/* Row 1: axes — generous padding, white background, gold-tinted border on
+   the selects to signal that these are the headline choice. */
+.sc-controls-primary{display:flex;align-items:center;gap:18px;padding:14px 18px 12px;border-bottom:1px solid var(--gray-100)}
+.sc-axis-control{display:flex;align-items:center;gap:10px;flex:0 1 auto;min-width:0}
+.sc-axis-letter{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;color:var(--amber);letter-spacing:.05em;line-height:1;width:14px;text-align:center;flex-shrink:0}
+.sc-axis-select{
+  padding:8px 30px 8px 12px;
+  border:1.5px solid rgba(212,168,48,.35);
+  border-radius:8px;
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:15px;font-weight:700;letter-spacing:.2px;
+  color:var(--navy);
+  background:white;
+  cursor:pointer;
+  min-width:160px;max-width:220px;
+  transition:border-color .15s,box-shadow .15s;
+  appearance:none;-webkit-appearance:none;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path d='M1 1l4 4 4-4' stroke='%23C9971A' stroke-width='1.5' fill='none' stroke-linecap='round'/></svg>");
+  background-repeat:no-repeat;background-position:right 10px center;
+}
+.sc-axis-select:hover{border-color:var(--amber)}
+.sc-axis-select:focus{outline:none;border-color:var(--amber);box-shadow:0 0 0 3px rgba(212,168,48,.18)}
+
+/* Row 2: filters + color seg control + modifiers (right-aligned) */
+.sc-controls-secondary{display:flex;align-items:center;gap:14px;padding:9px 18px 11px;background:var(--gray-50);flex-wrap:wrap}
+.sc-filter-grp{display:flex;align-items:center;gap:7px;flex-shrink:0}
+.sc-filter-label{font-size:9.5px;font-weight:800;color:var(--gray-400);text-transform:uppercase;letter-spacing:.7px;white-space:nowrap;line-height:1}
+.sc-filter-select{
+  padding:5px 24px 5px 9px;
+  border:1.5px solid var(--gray-200);
+  border-radius:6px;
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:12px;font-weight:700;
+  color:var(--navy);background:white;cursor:pointer;
+  appearance:none;-webkit-appearance:none;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='9' height='6' viewBox='0 0 10 6'><path d='M1 1l4 4 4-4' stroke='%2364748B' stroke-width='1.5' fill='none' stroke-linecap='round'/></svg>");
+  background-repeat:no-repeat;background-position:right 8px center;
+  transition:border-color .15s;
+}
+.sc-filter-select:hover{border-color:var(--gray-300)}
+.sc-filter-select:focus{outline:none;border-color:var(--amber);box-shadow:0 0 0 2px rgba(212,168,48,.15)}
+
+/* Segmented color-by control — three buttons with stacked color swatches.
+   Active state uses the brand amber tint to match the primary axes. */
+.sc-segctrl{display:flex;align-items:center;gap:0;background:white;border:1px solid var(--gray-200);border-radius:8px;padding:2px;flex-shrink:0}
+.sc-segctrl-label{padding:0 8px 0 4px;color:var(--gray-400);flex-shrink:0}
+.sc-seg-btn{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:5px 9px;
+  border:none;background:transparent;cursor:pointer;
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:11.5px;font-weight:700;color:var(--gray-500);letter-spacing:.2px;
+  border-radius:6px;
+  transition:all .15s;
+  white-space:nowrap;
+}
+.sc-seg-btn:hover{color:var(--navy);background:var(--gray-50)}
+.sc-seg-btn.active{background:rgba(212,168,48,.14);color:var(--navy)}
+.sc-seg-btn.active:hover{background:rgba(212,168,48,.2)}
+.sc-seg-swatches{display:inline-flex;gap:1px}
+.sc-seg-swatches i{width:7px;height:7px;border-radius:50%;display:inline-block;box-shadow:0 0 0 1px rgba(15,23,42,.08)}
+
+/* Display modifiers (Trend, Quadrants) — pushed right by margin-left:auto */
+.sc-mods{display:flex;align-items:center;gap:6px;margin-left:auto;flex-shrink:0}
+.sc-mod-btn{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:5px 11px;
+  background:white;
+  border:1.5px solid var(--gray-200);
+  border-radius:7px;
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:11.5px;font-weight:700;letter-spacing:.3px;
+  color:var(--gray-500);
+  cursor:pointer;transition:all .15s;
+  white-space:nowrap;
+}
+.sc-mod-btn:hover{border-color:var(--gray-300);color:var(--navy)}
+.sc-mod-btn[aria-pressed="true"]{
+  background:rgba(212,168,48,.12);
+  border-color:rgba(212,168,48,.5);
+  color:var(--amber);
+}
+.sc-mod-icon{width:13px;height:13px;flex-shrink:0;display:block}
+.sc-mod-text{line-height:1}
+
+/* ── Body: chart on left, leaderboard rail on right (desktop) ───────────
+   The chart wants vertical space; the Top/Bot leaderboards want a stable
+   side rail. CSS Grid gives us this with one rule, falls back to a single
+   column on mobile via media query in the responsive block. */
+.sc-body{display:grid;grid-template-columns:minmax(0,1fr) 280px;align-items:stretch;min-height:0}
+.sc-plot-wrap{min-width:0;display:flex;flex-direction:column;padding:14px 18px 12px;gap:0}
+
+/* ── Plot header: breadcrumb scope row + hero title row ─────────────────
+   Scope row is small and subordinate — establishes context.
+   Title row is the dominant element — axis pair as the analytical question.
+   Count and legend ride alongside the title, right-aligned. */
+.sc-plot-header{display:flex;flex-direction:column;gap:4px;padding:2px 2px 12px}
+.sc-plot-scope{
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;
+  color:var(--gray-400);line-height:1;
+  min-height:11px; /* reserves space so the title row doesn't jump on first render */
+}
+.sc-plot-titlerow{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+.sc-plot-title{
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:24px;font-weight:900;letter-spacing:-.2px;
+  color:var(--navy);line-height:1.05;margin:0;
+  min-width:0; /* allow flex shrink rather than overflow */
+}
+.sc-plot-count{
+  font-size:11px;font-weight:700;color:var(--gray-500);letter-spacing:.4px;
+  text-transform:uppercase;line-height:1;
+  padding:4px 9px;
+  background:var(--surface-inset);border-radius:12px;
+  white-space:nowrap;
+  flex-shrink:0;
+}
+
+/* Legend: right-aligned chip strip. Each chip is a swatch + label pair,
+   designed to read at a glance without stealing focus from the chart. */
+.sc-legend{display:flex;align-items:center;gap:11px;margin-left:auto;flex-wrap:wrap;justify-content:flex-end}
+.sc-legend-item{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:var(--gray-600);letter-spacing:.01em;line-height:1;white-space:nowrap}
+.sc-legend-swatch{width:9px;height:9px;border-radius:50%;flex-shrink:0;box-shadow:0 0 0 1px rgba(15,23,42,.06)}
+
 /* Canvas wrap: chart is the dominant element */
 .sc-canvas-wrap{position:relative;width:100%;height:560px;min-height:320px}
 .sc-canvas{position:absolute;inset:0;width:100%;height:100%}
 
-/* ── Dual-panel strip: Top 5 LEFT | Bottom 5 RIGHT ───────────────────────── */
-.sc-panels-strip{display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--gray-100);background:var(--gray-50)}
-.sc-panel{display:flex;flex-direction:column}
-.sc-panel-top{border-right:1px solid var(--gray-100)}
+/* ── Empty state: shown when no points are computable for current axes ──
+   Replaces the dead-blank chart canvas with a guided redirect. Sits inside
+   .sc-canvas-wrap, absolutely centered, so the canvas can stay in the DOM
+   (Chart.js needs persistent canvas) while we visually replace it. */
+.sc-empty{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:10px;
+  background:var(--gray-50);
+  border-radius:8px;
+  padding:24px;
+  text-align:center;
+  z-index:2;
+}
+/* The HTML hidden attribute uses display:none by default, but our display:flex
+   above out-specifies that. Restore the intended behaviour. Same trick for the
+   inner action button which uses display:inline-block via its border/padding. */
+.sc-empty[hidden],
+.sc-empty-action[hidden]{display:none !important}
+.sc-empty-icon{width:44px;height:44px;color:var(--gray-300);margin-bottom:4px}
+.sc-empty-title{
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:16px;font-weight:800;color:var(--navy);
+  letter-spacing:.2px;
+}
+.sc-empty-msg{
+  font-size:13px;font-weight:500;color:var(--gray-500);
+  max-width:380px;line-height:1.5;
+}
+.sc-empty-msg strong{color:var(--navy);font-weight:700}
+.sc-empty-action{
+  margin-top:6px;
+  padding:7px 14px;
+  background:white;
+  border:1.5px solid rgba(212,168,48,.5);
+  color:var(--amber);
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:12px;font-weight:800;letter-spacing:.4px;
+  border-radius:7px;cursor:pointer;
+  transition:all .15s;
+}
+.sc-empty-action:hover{background:rgba(212,168,48,.1);border-color:var(--amber)}
+.sc-canvas-wrap.is-empty canvas{visibility:hidden}
+
+/* ── Dual-panel strip: Top 5 ABOVE Bottom 5 in the right rail (desktop).
+   On mobile the .sc-body grid collapses to one column and we restore the
+   side-by-side strip layout via the media query below ~640px. */
+.sc-panels-strip{display:flex;flex-direction:column;border-left:1px solid var(--gray-100);background:var(--gray-50);min-width:0}
+.sc-panel{display:flex;flex-direction:column;min-width:0}
+.sc-panel-top{border-bottom:1px solid var(--gray-100);flex:1 1 0;min-height:0}
+.sc-panel-bot{flex:1 1 0;min-height:0}
 .sc-panel-hdr{display:flex;align-items:center;gap:8px;padding:8px 14px 7px;border-bottom:1px solid var(--gray-100);background:white}
 .sc-panel-hdr-badge{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:1px;padding:2px 7px;border-radius:20px;flex-shrink:0}
 .sc-panel-hdr-badge-top{background:rgba(34,197,94,.12);color:#15803d}
@@ -5648,62 +5793,31 @@ ock Drafts table CSS ───────────────────�
 
 <section class="tab-panel" id="tab-scatter">
   <div class="sc-wrap">
-    <!-- Controls: primary axis group | secondary filter group -->
+    <!-- ── Controls: two-row hierarchy ─────────────────────────────────────
+         Row 1 (primary): the X / Y axis pair — the choices that define the
+                          entire view. Larger type, brand-accent border.
+         Row 2 (secondary): scope filters (Class, Position) + display modifiers
+                            (Color By, Trend, Quadrants). Compact, lower
+                            visual weight so axes remain the focal point.
+         The hidden #scColorBy preserves the state-read path used by scRender
+         and the URL-state machinery; the visible button group is the UI. -->
     <div class="sc-controls">
-      <div class="sc-ctrl-section sc-ctrl-section-primary">
-        <div class="sc-ctrl-group">
-          <label class="sc-ctrl-label">X Axis</label>
-          <select class="sc-select" id="scXAxis" data-sc-control="x">
-            <optgroup label="Physical">
-              <option value="age" selected>Age</option>
-              <option value="ht">Height (in)</option>
-              <option value="wt">Weight (lbs)</option>
-            </optgroup>
-            <optgroup label="Board">
-              <option value="rank">HW Rank</option>
-              <option value="metric">HW Metric</option>
-              <option value="draft_no">Draft Pick</option>
-              <option value="draft_diff">Rank vs Pick</option>
-            </optgroup>
-            <optgroup label="Stats">
-              <option value="ts_pct">TS%</option>
-              <option value="pa2_usg">P+A/USG</option>
-              <option value="stl_bl">Stl+Bl</option>
-              <option value="ato">A/TO</option>
-              <option value="ftar">FTAr</option>
-              <option value="tpar">3PAr</option>
-            </optgroup>
-          </select>
+      <div class="sc-controls-primary">
+        <div class="sc-axis-control">
+          <span class="sc-axis-letter" aria-hidden="true">X</span>
+          <label class="sc-vh" for="scXAxis">X Axis</label>
+          <select class="sc-axis-select" id="scXAxis" data-sc-control="x"></select>
         </div>
-        <div class="sc-ctrl-group">
-          <label class="sc-ctrl-label">Y Axis</label>
-          <select class="sc-select" id="scYAxis" data-sc-control="y">
-            <optgroup label="Stats">
-              <option value="ts_pct" selected>TS%</option>
-              <option value="pa2_usg">P+A/USG</option>
-              <option value="stl_bl">Stl+Bl</option>
-              <option value="ato">A/TO</option>
-              <option value="ftar">FTAr</option>
-              <option value="tpar">3PAr</option>
-            </optgroup>
-            <optgroup label="Board">
-              <option value="metric">HW Metric</option>
-              <option value="rank">HW Rank</option>
-              <option value="draft_no">Draft Pick</option>
-              <option value="draft_diff">Rank vs Pick</option>
-            </optgroup>
-            <optgroup label="Physical">
-              <option value="age">Age</option>
-              <option value="ht">Height (in)</option>
-              <option value="wt">Weight (lbs)</option>
-            </optgroup>
-          </select>
+        <div class="sc-axis-control">
+          <span class="sc-axis-letter" aria-hidden="true">Y</span>
+          <label class="sc-vh" for="scYAxis">Y Axis</label>
+          <select class="sc-axis-select" id="scYAxis" data-sc-control="y"></select>
         </div>
       </div>
-      <div class="sc-ctrl-section sc-ctrl-section-secondary">
-        <div class="sc-ctrl-group sc-grp-year">
-          <label class="sc-ctrl-label">Draft Class</label>
-          <select class="sc-select" id="scYear" data-sc-control="year">
+      <div class="sc-controls-secondary">
+        <div class="sc-filter-grp sc-grp-year">
+          <label class="sc-filter-label" for="scYear">Class</label>
+          <select class="sc-filter-select" id="scYear" data-sc-control="year">
             <option value="2026" selected>2026</option>
             <option value="all">All (2019-2026)</option>
             <option value="2025">2025</option>
@@ -5715,30 +5829,52 @@ ock Drafts table CSS ───────────────────�
             <option value="2019">2019</option>
           </select>
         </div>
-        <div class="sc-ctrl-group sc-grp-colorby">
-          <label class="sc-ctrl-label">Color By</label>
-          <select class="sc-select" id="scColorBy" data-sc-control="color">
-            <option value="position">Position</option>
-            <option value="year">Draft Class</option>
-            <option value="tier">Tier</option>
-          </select>
-        </div>
-        <div class="sc-ctrl-group sc-grp-position">
-          <label class="sc-ctrl-label">Position</label>
-          <select class="sc-select" id="scPosFilter" data-sc-control="pos">
+        <div class="sc-filter-grp sc-grp-position">
+          <label class="sc-filter-label" for="scPosFilter">Position</label>
+          <select class="sc-filter-select" id="scPosFilter" data-sc-control="pos">
             <option value="all">All</option>
             <option value="Guard">Guards</option>
             <option value="Forward">Forwards</option>
             <option value="Center">Centers</option>
           </select>
         </div>
-        <div class="sc-ctrl-group sc-grp-trend">
-          <label class="sc-ctrl-label">Trend</label>
-          <button class="sc-trend-btn" id="scTrendBtn" data-sc-action="toggle-trend">Off</button>
+        <!-- Color-By: visible segmented control + hidden select for state -->
+        <select class="sc-vh" id="scColorBy" data-sc-control="color" aria-hidden="true" tabindex="-1">
+          <option value="position" selected>Position</option>
+          <option value="year">Class</option>
+          <option value="tier">Tier</option>
+        </select>
+        <div class="sc-segctrl sc-grp-colorby" role="radiogroup" aria-label="Color points by">
+          <span class="sc-filter-label sc-segctrl-label">Color</span>
+          <button type="button" class="sc-seg-btn active" data-sc-action="set-color" data-value="position" aria-pressed="true">
+            <span class="sc-seg-swatches"><i style="background:#3B82F6"></i><i style="background:#8B5CF6"></i><i style="background:#0D9488"></i></span>
+            Position
+          </button>
+          <button type="button" class="sc-seg-btn" data-sc-action="set-color" data-value="year" aria-pressed="false">
+            <span class="sc-seg-swatches"><i style="background:#D97706"></i><i style="background:#3B82F6"></i><i style="background:#8B5CF6"></i></span>
+            Class
+          </button>
+          <button type="button" class="sc-seg-btn" data-sc-action="set-color" data-value="tier" aria-pressed="false">
+            <span class="sc-seg-swatches"><i style="background:#D97706"></i><i style="background:#8B5CF6"></i><i style="background:#3B82F6"></i></span>
+            Tier
+          </button>
         </div>
-        <div class="sc-ctrl-group sc-grp-quadrants">
-          <label class="sc-ctrl-label">Quadrants</label>
-          <button class="sc-trend-btn" id="scQuadBtn" data-sc-action="toggle-quad">Off</button>
+        <!-- Display modifiers — pushed right by margin-left:auto on .sc-mods -->
+        <div class="sc-mods">
+          <button type="button" class="sc-mod-btn sc-grp-trend" id="scTrendBtn" data-sc-action="toggle-trend"
+                  aria-pressed="false" aria-label="Toggle trend line" title="Trend line">
+            <svg class="sc-mod-icon" viewBox="0 0 16 16" aria-hidden="true">
+              <path d="M2 13 L14 3" stroke="currentColor" stroke-width="1.8" stroke-dasharray="3 2" fill="none" stroke-linecap="round"/>
+            </svg>
+            <span class="sc-mod-text">Trend</span>
+          </button>
+          <button type="button" class="sc-mod-btn sc-grp-quadrants" id="scQuadBtn" data-sc-action="toggle-quad"
+                  aria-pressed="false" aria-label="Toggle quadrant lines" title="Quadrant lines">
+            <svg class="sc-mod-icon" viewBox="0 0 16 16" aria-hidden="true">
+              <path d="M8 1 V15 M1 8 H15" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+            </svg>
+            <span class="sc-mod-text">Quadrants</span>
+          </button>
         </div>
       </div>
     </div>
@@ -5746,13 +5882,34 @@ ock Drafts table CSS ───────────────────�
     <div class="sc-body">
       <!-- ── Main chart (full width) ── -->
       <div class="sc-plot-wrap">
+        <!-- ── Header: breadcrumb scope row + hero title row ─────────────
+             Row 1 (breadcrumb): "2026 Draft Class · Guards only" — scope.
+             Row 2 (hero): "Age × TS%" as the dominant typographic element,
+                           with a "71 prospects" count chip and the legend
+                           pushed to the right. The legend belongs in this
+                           row because it's how you actually read the chart. -->
         <div class="sc-plot-header">
-          <span class="sc-plot-title" id="scPlotTitle">Age vs TS%</span>
-          <span class="sc-plot-sep"></span>
-          <span class="sc-plot-meta" id="scPlotMeta"></span>
+          <div class="sc-plot-scope" id="scPlotScope"></div>
+          <div class="sc-plot-titlerow">
+            <h2 class="sc-plot-title" id="scPlotTitle"></h2>
+            <span class="sc-plot-count" id="scPlotCount"></span>
+            <span class="sc-legend" id="scLegend" aria-label="Color legend"></span>
+          </div>
         </div>
         <div class="sc-canvas-wrap">
           <canvas id="scCanvas"></canvas>
+          <!-- Empty state: shown when computePoints returns no points for the
+               current axis pair. Hidden by default. Populated by scRender. -->
+          <div class="sc-empty" id="scEmpty" hidden>
+            <svg class="sc-empty-icon" viewBox="0 0 48 48" aria-hidden="true">
+              <circle cx="20" cy="20" r="14" stroke="currentColor" stroke-width="2" fill="none" opacity=".5"/>
+              <path d="M30 30 L42 42" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+              <path d="M14 20 H26 M20 14 V26" stroke="currentColor" stroke-width="1.5" opacity=".4"/>
+            </svg>
+            <div class="sc-empty-title" id="scEmptyTitle"></div>
+            <div class="sc-empty-msg" id="scEmptyMsg"></div>
+            <button type="button" class="sc-empty-action" id="scEmptyAction" hidden></button>
+          </div>
         </div>
         <div class="sc-stat-bar" id="scStatBar"></div>
         <div id="scTapHint" style="display:none">Tap any player bubble to see details</div>
@@ -7005,25 +7162,37 @@ function setView(v) {
   // Skip animation for reduced-motion preference
   var reducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   if (reducedMotion) {
-    renderBoard2026();
-    if (window.hwIntel) hwIntel.refreshBadges();
+    try { renderBoard2026(); }
+    catch (err) { console.error('[setView] render failed:', err); }
+    try { if (window.hwIntel) hwIntel.refreshBadges(); } catch (_) {}
     return;
   }
 
   // Single rAF render: no transitionend listener, no setTimeout race.
   // The exit class adds a brief opacity fade; render fires on the next frame
   // so the browser paints the fade-start before the DOM swap occurs.
+  //
+  // ERROR BOUNDARY: render is wrapped in try/finally so that ANY thrown
+  // exception inside renderBoard2026 (or its helpers) still clears the
+  // view-exit class. Without this, a single broken helper would leave the
+  // container at opacity:0 and the user would see "nothing rendered". The
+  // error is logged but the view machinery always returns to a clean state.
   el.classList.add('view-exit');
   requestAnimationFrame(function() {
     // Abort if a newer setView call has already taken over
     if (myToken !== _setViewToken) return;
-    renderBoard2026();
-    el.classList.remove('view-exit');
-    el.classList.add('view-enter');
-    requestAnimationFrame(function() {
-      el.classList.remove('view-enter');
-      if (window.hwIntel) hwIntel.refreshBadges();
-    });
+    try {
+      renderBoard2026();
+    } catch (err) {
+      console.error('[setView] render failed:', err);
+    } finally {
+      el.classList.remove('view-exit');
+      el.classList.add('view-enter');
+      requestAnimationFrame(function() {
+        el.classList.remove('view-enter');
+        try { if (window.hwIntel) hwIntel.refreshBadges(); } catch (_) {}
+      });
+    }
   });
 }
 
@@ -11131,8 +11300,10 @@ function bbBuildRow(p, idx) {
     +'<div class="bb-stat-cell bb-cato" style="'+atoSty+'">'+SV(atoVal)+'<div class="bb-sl">A/TO</div></div>'
     +'<div class="bb-stat-cell bb-cftar" style="'+ftarSty+'">'+SV(ftarVal)+'<div class="bb-sl">FTAr</div></div>'
     +'<div class="bb-stat-cell bb-ctpar" style="'+tparSty+'">'+SV(tparVal)+'<div class="bb-sl">3PAr</div></div>'
-    // Compare button
-    +'<div class="bb-compare-col" style="flex-shrink:0;display:flex;align-items:center;justify-content:center">'
+    // Compare button — bb-ccomp class matches the header's column width (36px) so
+    // the row stays aligned with the column header bar; bb-compare-col is retained
+    // for the mobile visibility rule (.bb-compare-col { display:flex !important })
+    +'<div class="bb-ccomp bb-compare-col">'
     +'<button class="bb-compare-dot" onclick="event.stopPropagation();addCardToCompare('+p.rank+')" title="Add to Compare" style="border-radius:5px;cursor:pointer;font-size:11px;display:flex;align-items:center;justify-content:center;font-weight:700">+</button>'
     +'</div>'
   +'</div>';
@@ -11195,22 +11366,22 @@ function renderBoardBigboard(players) {
     { key:'metric',   cls:'bb-cmet',  label:'Metric',
       tip:'HoopsWill Draft Model — composite of weighted per-75 stats adjusted for age, SOS and class context. 100 = class average.',
       sortable:true, left:false },
-    { key:'ts_pct',   cls:'bb-cts',   label:'TS%',
+    { key:'ts_pct',   cls:'bb-cts',   label:'TS%',     chip:'True Shooting',
       tip:'True Shooting % — accounts for 2-pointers, 3-pointers, and free throws in a single efficiency rate. Class-graded; green = above average.',
       sortable:true, left:false },
-    { key:'pa2_usg',  cls:'bb-cpa',   label:'P+A/USG',
+    { key:'pa2_usg',  cls:'bb-cpa',   label:'P+A/USG', chip:'Scoring + Playmaking',
       tip:'Points + 2× Assists per 100 possession usage (per 75). Captures scoring AND playmaking relative to how often a player uses possessions.',
       sortable:true, left:false },
-    { key:'stl_bl',   cls:'bb-csb',   label:'Stl+Bl',
+    { key:'stl_bl',   cls:'bb-csb',   label:'Stl+Bl',  chip:'Defensive Events',
       tip:'Steals + Blocks per 75 possessions — combined defensive disruption rate. Strong predictor of defensive impact at the next level.',
       sortable:true, left:false },
-    { key:'ato',      cls:'bb-cato',  label:'A/TO',
+    { key:'ato',      cls:'bb-cato',  label:'A/TO',    chip:'Assist : TO',
       tip:'Assist-to-Turnover ratio — quality of decision-making as a ball-handler. Higher = better ball security. Does not penalise low-volume players.',
       sortable:true, left:false },
-    { key:'ftar',     cls:'bb-cftar', label:'FTAr',
+    { key:'ftar',     cls:'bb-cftar', label:'FTAr',    chip:'FT Attempt Rate',
       tip:'Free Throw Attempt Rate — FTA ÷ FGA. Measures ability to draw fouls and attack the basket. Elite finishers and drivers show high rates.',
       sortable:true, left:false },
-    { key:'tpar',     cls:'bb-ctpar', label:'3PAr',
+    { key:'tpar',     cls:'bb-ctpar', label:'3PAr',    chip:'3PT Attempt Rate',
       tip:'3-Point Attempt Rate — 3PA ÷ FGA. Indicates perimeter orientation. Context-dependent: high for wing scorers, naturally low for post players.',
       sortable:true, left:false },
     // Compare-button spacer — must match the 30px compare col in data rows
@@ -11235,6 +11406,18 @@ function renderBoardBigboard(players) {
       + col.label
       + '<span class="bb-sort-icon">' + arrow + '</span>'
       + '</div>';
+  }
+
+  // Helper: build mobile stat-legend chips, derived from COLS (single source of truth).
+  // Any COL entry with a `chip` string becomes a chip — abbreviation = col.label, full = col.chip.
+  // Adding/removing/reordering stat columns automatically syncs the legend.
+  function _bbMobileLegendChips() {
+    return COLS.filter(function(c){ return !!c.chip; }).map(function(c){
+      return '<div class="bb-mobile-legend-chip">'
+        + '<span class="bb-mlc-abbr">' + c.label + '</span>'
+        + '<span class="bb-mlc-full">' + c.chip + '</span>'
+      + '</div>';
+    }).join('');
   }
 
   // Controls bar
@@ -13204,6 +13387,34 @@ var ScatterEngine = (function() {
     }
   }
 
+  // Legend items for the current color-by mode. Returns [{label, color}, ...]
+  // so the legend stays structurally tied to pointColor() — adding a new color
+  // mode only requires editing this module. For 'year' mode the list is
+  // derived from the actual data so we don't show legend entries for years
+  // not present in the current filter.
+  function legendItems(colorBy, players) {
+    if (colorBy === 'year') {
+      var seen = {};
+      (players || []).forEach(function(p) { if (p._y) seen[p._y] = true; });
+      var years = Object.keys(seen).sort().reverse();
+      return years.map(function(y) { return { label: y, color: YEAR_HEX[y] || '#94A3B8' }; });
+    }
+    if (colorBy === 'tier') {
+      return [
+        { label:'Franchise', color:TIER_HEX.franchise },
+        { label:'Lottery',   color:TIER_HEX.lottery },
+        { label:'Late 1st',  color:TIER_HEX.late1 },
+        { label:'Second',    color:TIER_HEX.second }
+      ];
+    }
+    // default: position
+    return [
+      { label:'Guard',   color:POS_HEX.Guard },
+      { label:'Forward', color:POS_HEX.Forward },
+      { label:'Center',  color:POS_HEX.Center }
+    ];
+  }
+
   // ── Linear regression ─────────────────────────────────────────────────────
   function linReg(pts) {
     var n = pts.length;
@@ -13233,7 +13444,7 @@ var ScatterEngine = (function() {
     getFiltered: getFiltered,
     applyJitter: applyJitter, tierSize:    tierSize,
     topByAxis:   topByAxis,   botByAxis:   botByAxis,
-    pointColor:  pointColor,
+    pointColor:  pointColor,  legendItems: legendItems,
     linReg:      linReg,      axisRange:   axisRange,
     POS_HEX:     POS_HEX,
   };
@@ -13797,6 +14008,20 @@ var Scatter = (function() {
       var action = btn.getAttribute('data-sc-action');
       if (action === 'toggle-trend')     scToggleTrend();
       else if (action === 'toggle-quad') scToggleQuadrants();
+      else if (action === 'set-color') {
+        // Segmented control click — update the hidden #scColorBy select
+        // (preserves the URL-state and scRender read path) then dispatch
+        // a synthetic change event so the existing render pipeline picks
+        // it up exactly like a select change would.
+        var value = btn.getAttribute('data-value');
+        if (!value) return;
+        var sel = document.getElementById('scColorBy');
+        if (sel && sel.value !== value) {
+          sel.value = value;
+          sel.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+        scSyncColorSegmented(value);
+      }
     });
 
     // Top/Bot panels: row hover-to-highlight + click-to-open-profile.
@@ -13880,22 +14105,72 @@ function scHighlightPlayer(name) {
   return Scatter.highlightPlayer(name);
 }
 
-// ── Axis definitions (kept top-level; used by tooltip formatting) ─────────────
+// ── Axis definitions ─────────────────────────────────────────────────────────
+// SINGLE SOURCE OF TRUTH for all scatter axes. Adding a new axis only requires
+// editing this object: the dropdowns are populated programmatically from
+// SC_AXES by scPopulateAxes() on tab init. The tooltip and chart formatters
+// also read directly from here. Drift between selects and JS is structurally
+// impossible.
 var SC_AXES = {
-  age:       { label:'Age (yrs)',      fmt:function(v){ return v.toFixed(1)+'y'; },                     inv:false },
-  ht:        { label:'Height (in)',    fmt:function(v){ return Math.floor(v/12)+"'"+Math.round(v%12)+'"'; }, inv:false },
-  wt:        { label:'Weight (lbs)',   fmt:function(v){ return Math.round(v)+'lb'; },                   inv:false },
-  rank:      { label:'HW Rank',        fmt:function(v){ return '#'+Math.round(v); },                    inv:false },
-  metric:    { label:'HW Metric',      fmt:function(v){ return v.toFixed(1); },                         inv:false },
-  draft_no:  { label:'Draft Pick',     fmt:function(v){ return '#'+Math.round(v); },                    inv:false },
-  draft_diff:{ label:'Rank vs Pick',   fmt:function(v){ return (v>0?'+':'')+Math.round(v); },           inv:false },
-  ts_pct:    { label:'TS%',            fmt:function(v){ return v.toFixed(1)+'%'; },                     inv:false },
-  pa2_usg:   { label:'P+A/USG',        fmt:function(v){ return Math.round(v)+''; },                     inv:false },
-  stl_bl:    { label:'Stl+Bl',         fmt:function(v){ return v.toFixed(2); },                         inv:false },
-  ato:       { label:'A/TO',           fmt:function(v){ return v.toFixed(2); },                         inv:false },
-  ftar:      { label:'FTAr',           fmt:function(v){ return v.toFixed(3); },                         inv:false },
-  tpar:      { label:'3PAr',           fmt:function(v){ return v.toFixed(3); },                         inv:false }
+  age:       { label:'Age (yrs)',    short:'Age',         group:'physical', fmt:function(v){ return v.toFixed(1)+'y'; },                              inv:false },
+  ht:        { label:'Height (in)',  short:'Height',      group:'physical', fmt:function(v){ return Math.floor(v/12)+"'"+Math.round(v%12)+'"'; },    inv:false },
+  wt:        { label:'Weight (lbs)', short:'Weight',      group:'physical', fmt:function(v){ return Math.round(v)+'lb'; },                           inv:false },
+  rank:      { label:'HW Rank',      short:'HW Rank',     group:'board',    fmt:function(v){ return '#'+Math.round(v); },                            inv:false },
+  metric:    { label:'HW Metric',    short:'HW Metric',   group:'board',    fmt:function(v){ return v.toFixed(1); },                                 inv:false },
+  draft_no:  { label:'Draft Pick',   short:'Draft Pick',  group:'board',    fmt:function(v){ return '#'+Math.round(v); },                            inv:false },
+  draft_diff:{ label:'Rank vs Pick', short:'Rank vs Pick',group:'board',    fmt:function(v){ return (v>0?'+':'')+Math.round(v); },                   inv:false },
+  ts_pct:    { label:'TS%',          short:'TS%',         group:'stats',    fmt:function(v){ return v.toFixed(1)+'%'; },                             inv:false },
+  pa2_usg:   { label:'P+A/USG',      short:'P+A/USG',     group:'stats',    fmt:function(v){ return Math.round(v)+''; },                             inv:false },
+  stl_bl:    { label:'Stl+Bl',       short:'Stl+Bl',      group:'stats',    fmt:function(v){ return v.toFixed(2); },                                 inv:false },
+  ato:       { label:'A/TO',         short:'A/TO',        group:'stats',    fmt:function(v){ return v.toFixed(2); },                                 inv:false },
+  ftar:      { label:'FTAr',         short:'FTAr',        group:'stats',    fmt:function(v){ return v.toFixed(3); },                                 inv:false },
+  tpar:      { label:'3PAr',         short:'3PAr',        group:'stats',    fmt:function(v){ return v.toFixed(3); },                                 inv:false }
 };
+
+// Group ordering for the dropdowns. Same order on BOTH X and Y selects so the
+// user only learns the list once. Stats first because they are the most
+// frequently-chosen axis target, then Board (analytical), then Physical.
+var SC_AXIS_GROUPS = [
+  { key:'stats',    label:'Stats' },
+  { key:'board',    label:'Board' },
+  { key:'physical', label:'Physical' }
+];
+
+// Populate the X and Y axis <select> elements from SC_AXES.
+// Idempotent: skips if already populated. Called on first scRender() so we
+// don't depend on DOM-ready timing or tab-activation order.
+function scPopulateAxes() {
+  var xSel = document.getElementById('scXAxis');
+  var ySel = document.getElementById('scYAxis');
+  if (!xSel || !ySel) return;
+  if (xSel.options.length > 0 && ySel.options.length > 0) return;
+
+  // Preserve any existing selection that might have been set from URL state
+  // before populate runs (defensive — currently selects are empty at parse time).
+  var xWant = xSel.value || 'age';
+  var yWant = ySel.value || 'ts_pct';
+
+  SC_AXIS_GROUPS.forEach(function(g) {
+    var xGrp = document.createElement('optgroup');
+    var yGrp = document.createElement('optgroup');
+    xGrp.label = g.label;
+    yGrp.label = g.label;
+    Object.keys(SC_AXES).forEach(function(k) {
+      var a = SC_AXES[k];
+      if (a.group !== g.key) return;
+      var xo = document.createElement('option'); xo.value = k; xo.textContent = a.short;
+      var yo = document.createElement('option'); yo.value = k; yo.textContent = a.short;
+      xGrp.appendChild(xo);
+      yGrp.appendChild(yo);
+    });
+    xSel.appendChild(xGrp);
+    ySel.appendChild(yGrp);
+  });
+
+  // Restore selections (or apply defaults).
+  xSel.value = xWant;
+  ySel.value = yWant;
+}
 
 // Scatter state is fully owned by Scatter._state above — no module-level
 // globals here. Render token, tooltip state, chart instance, point list,
@@ -13931,14 +14206,22 @@ var SC_AXES = {
 function scToggleTrend() {
   Scatter._state.trend = !Scatter._state.trend;
   var btn = document.getElementById('scTrendBtn');
-  if (btn) { btn.textContent = Scatter._state.trend ? 'On' : 'Off'; btn.classList.toggle('active', Scatter._state.trend); }
+  if (btn) {
+    // Keep the icon markup intact — communicate state through aria-pressed
+    // and the [aria-pressed="true"] CSS rule, not textContent.
+    btn.setAttribute('aria-pressed', Scatter._state.trend ? 'true' : 'false');
+    btn.classList.toggle('active', Scatter._state.trend);
+  }
   scRender();
 }
 
 function scToggleQuadrants() {
   Scatter._state.quadrants = !Scatter._state.quadrants;
   var btn = document.getElementById('scQuadBtn');
-  if (btn) { btn.textContent = Scatter._state.quadrants ? 'On' : 'Off'; btn.classList.toggle('active', Scatter._state.quadrants); }
+  if (btn) {
+    btn.setAttribute('aria-pressed', Scatter._state.quadrants ? 'true' : 'false');
+    btn.classList.toggle('active', Scatter._state.quadrants);
+  }
   // Quadrant plugin reads Scatter._state.quadrants at draw time, so a chart.update() is enough.
   if (Scatter._state.chart) { Scatter._state.chart.update('none'); }
 }
@@ -14124,8 +14407,99 @@ function scRenderDebounced() {
   Scatter._state.renderTimer = setTimeout(scRender, 150);
 }
 
+// ── Legend renderer ──────────────────────────────────────────────────────────
+// Reads the current color-by mode from ScatterEngine.legendItems() and emits
+// a swatch+label strip into #scLegend. Pure DOM write — no Chart.js dependency.
+// Called from scRender() so the legend always matches the colorBy + data on
+// screen (e.g. 'year' mode legend only shows years actually present).
+function scRenderLegend(colorBy, players) {
+  var el = document.getElementById('scLegend');
+  if (!el) return;
+  var items = ScatterEngine.legendItems(colorBy, players);
+  if (!items.length) { el.innerHTML = ''; return; }
+  var html = '';
+  for (var i = 0; i < items.length; i++) {
+    html += '<span class="sc-legend-item">'
+         +   '<span class="sc-legend-swatch" style="background:' + items[i].color + '"></span>'
+         +   items[i].label
+         + '</span>';
+  }
+  el.innerHTML = html;
+}
+
+// ── Segmented Color-By active-state sync ─────────────────────────────────────
+// Reflects the current colorBy value on the visible button group. The hidden
+// <select id="scColorBy"> remains the state authority; this function just
+// styles whichever button corresponds to its value. Called from scRender so
+// the buttons stay correct even when state changes from elsewhere (URL load,
+// programmatic .value assignment).
+function scSyncColorSegmented(value) {
+  var btns = document.querySelectorAll('.sc-seg-btn[data-sc-action="set-color"]');
+  for (var i = 0; i < btns.length; i++) {
+    var on = btns[i].getAttribute('data-value') === value;
+    btns[i].classList.toggle('active', on);
+    btns[i].setAttribute('aria-pressed', on ? 'true' : 'false');
+  }
+}
+
+// ── Empty state: guided redirect when the current axis pair has no data ─────
+// Composes a contextual title + message identifying the specific axes and
+// scope that produced the empty result, then proposes a fallback action
+// when one makes sense (e.g. "Try All Years" if we're on a single class).
+function scShowEmptyState(xM, yM, year, posFil, wrapEl, emptyEl) {
+  if (!emptyEl) return;
+  if (wrapEl) wrapEl.classList.add('is-empty');
+  emptyEl.hidden = false;
+
+  var titleEl  = document.getElementById('scEmptyTitle');
+  var msgEl    = document.getElementById('scEmptyMsg');
+  var actionEl = document.getElementById('scEmptyAction');
+
+  if (titleEl) titleEl.textContent = 'No data for this combination';
+
+  if (msgEl) {
+    var scope;
+    if (year === 'all' && posFil === 'all')          scope = 'across the historical board';
+    else if (year === 'all' && posFil !== 'all')     scope = 'for ' + posFil + 's across all classes';
+    else if (year !== 'all' && posFil === 'all')     scope = 'in the ' + year + ' class';
+    else                                              scope = 'for ' + posFil + 's in the ' + year + ' class';
+    msgEl.innerHTML = 'No prospects have both <strong>' + xM.label +
+      '</strong> and <strong>' + yM.label + '</strong> recorded ' + scope + '.';
+  }
+
+  // Fallback action: if we're filtered to a single class, offer to broaden.
+  // If position-filtered, offer to clear that instead. If both, prefer
+  // clearing the year filter as it usually surfaces more data.
+  if (actionEl) {
+    actionEl.hidden = false;
+    if (year !== 'all') {
+      actionEl.textContent = 'Show all classes instead';
+      actionEl.onclick = function() {
+        var yr = document.getElementById('scYear');
+        if (yr) { yr.value = 'all'; yr.dispatchEvent(new Event('change', { bubbles: true })); }
+      };
+    } else if (posFil !== 'all') {
+      actionEl.textContent = 'Clear position filter';
+      actionEl.onclick = function() {
+        var p = document.getElementById('scPosFilter');
+        if (p) { p.value = 'all'; p.dispatchEvent(new Event('change', { bubbles: true })); }
+      };
+    } else {
+      actionEl.hidden = true;
+      actionEl.onclick = null;
+    }
+  }
+}
+
 // ── Main render ───────────────────────────────────────────────────────────────
 function scRender() {
+  // Populate the X/Y axis selects from SC_AXES on first call — idempotent
+  // after that. Doing this here (rather than at DOM-ready) keeps the populate
+  // step lazy: it only runs once the scatter tab is actually opened.
+  // Must run BEFORE the Chart.js availability check so the controls work
+  // even if the chart library is still loading from CDN.
+  scPopulateAxes();
+
   if (typeof Chart === 'undefined') return;
 
   // Increment render token — any async callback (logo onLoad) registered
@@ -14177,16 +14551,24 @@ function scRender() {
     });
   } catch(e) {}
 
-  // Update plot descriptor — "Showing: X vs Y · Class · Color"
+  // ── Header update ─────────────────────────────────────────────────────────
+  // Three elements drive the new typographic hierarchy:
+  //   #scPlotScope  — small breadcrumb: class scope + position filter
+  //   #scPlotTitle  — hero title: "X × Y" — the analytical question itself
+  //   #scPlotCount  — count chip: "N prospects"
+  // Color mode is communicated entirely through the legend; no more "by Pos"
+  // text in the header (it'd duplicate the legend).
   var titleEl = document.getElementById('scPlotTitle');
-  var metaEl  = document.getElementById('scPlotMeta');
-  if (titleEl) titleEl.textContent = xM.label + ' vs ' + yM.label;
-  if (metaEl) {
-    var classTxt  = year === 'all' ? 'All Classes' : year + ' Class';
-    var colorTxt  = colorBy === 'position' ? 'by Position' : colorBy === 'year' ? 'by Class' : 'by Tier';
-    var posTxt    = posFil !== 'all' ? ' · ' + posFil + 's' : '';
-    metaEl.textContent = classTxt + posTxt + ' · ' + colorTxt;
+  var countEl = document.getElementById('scPlotCount');
+  var scopeEl = document.getElementById('scPlotScope');
+  if (titleEl) titleEl.textContent = xM.label + ' × ' + yM.label;
+  if (scopeEl) {
+    var classTxt = year === 'all' ? 'All Classes 2019–2026' : year + ' Draft Class';
+    var posTxt   = posFil !== 'all' ? ' · ' + posFil + 's only' : '';
+    scopeEl.textContent = classTxt + posTxt;
   }
+  // Keep the visible color segmented control in sync with the state value.
+  scSyncColorSegmented(colorBy);
 
   // ── Data pipeline (ScatterEngine) ─────────────────────────────────────────
   // Filter once by position (cached inside getFiltered) — then derive points,
@@ -14196,14 +14578,30 @@ function scRender() {
   var filtered = ScatterEngine.getFiltered(players, posFil);
   var pts      = ScatterEngine.computePoints(filtered, xKey, yKey);
 
+  // Render the color legend — uses the filtered list so 'year' mode only
+  // shows classes actually present in the current view.
+  scRenderLegend(colorBy, filtered);
+
+  // ── Empty state: show a guided redirect rather than a blank chart ────────
+  // The canvas-wrap gets `.is-empty` which hides the canvas (CSS rule), and
+  // #scEmpty is unhidden with contextual messaging. If we have a fallback
+  // suggestion (e.g. "Try All Years"), the action button is wired up.
+  var wrapEl = document.querySelector('.sc-canvas-wrap');
+  var emptyEl = document.getElementById('scEmpty');
   if (!pts.length) {
-    var _mEl = document.getElementById('scPlotMeta');
-    if (_mEl) _mEl.textContent = 'No data for this combination';
+    if (countEl) countEl.textContent = '0 prospects';
+    scShowEmptyState(xM, yM, year, posFil, wrapEl, emptyEl);
     if (Scatter._state.chart) { Scatter._state.chart.destroy(); Scatter._state.chart = null; }
+    // Top/Bot panels — clear them since there's nothing to rank
+    ScatterTopPanel.render([], yM);
+    ScatterBotPanel.render([], yM);
     return;
   }
-  // Append count to the descriptor line already set above
-  if (metaEl) metaEl.textContent += ' · ' + pts.length + ' players';
+  if (wrapEl) wrapEl.classList.remove('is-empty');
+  if (emptyEl) emptyEl.hidden = true;
+
+  // Set the count chip — "71 prospects" / "1 prospect" / "545 prospects"
+  if (countEl) countEl.textContent = pts.length + (pts.length === 1 ? ' prospect' : ' prospects');
 
   // Update Top 5 + Bottom 5 panels — both use the same pre-filtered list
   var topItems = ScatterEngine.topByAxis(filtered, yKey, 5);
@@ -14355,6 +14753,40 @@ function scRender() {
     // Full recreate: first render or dataset count changed
     if (Scatter._state.chart) { Scatter._state.chart.destroy(); Scatter._state.chart = null; }
     Scatter._state.chart = new Chart(canvas, chartConfig);
+
+    // BLANK-ON-TAB-OPEN FIX
+    // When the user switches into the scatter tab, scRender() runs in the
+    // same synchronous step as `panel.classList.add('active')`. The browser
+    // has not yet laid out the panel, so Chart.js measures the canvas at
+    // its default 300×150 and the chart renders into a tiny rectangle while
+    // the canvas-wrap container is 1320×560. The result is a "blank" chart
+    // until the user interacts with a control.
+    //
+    // Fix: schedule a chart.resize() on the next animation frame. By then
+    // the panel has been laid out and the canvas knows its real container
+    // size. myToken guards against races: if a newer scRender() has run
+    // while this rAF was pending, we abort rather than resizing a chart
+    // that has since been replaced.
+    requestAnimationFrame(function() {
+      if (myToken !== Scatter._state.renderToken) return;
+      if (Scatter._state.chart) Scatter._state.chart.resize();
+    });
+
+    // Wire a ResizeObserver once on the canvas-wrap so subsequent layout
+    // changes (window resize, sidebar toggle, mobile rotation) also trigger
+    // chart.resize(). Chart.js' built-in responsive listener can miss these
+    // when the chart was created at the wrong size to begin with. The
+    // observer reference is held on Scatter._state so we don't re-create
+    // it on every render — the flag is checked first.
+    if (!Scatter._state.resizeObserver && typeof ResizeObserver !== 'undefined') {
+      var wrap = canvas.parentElement; // .sc-canvas-wrap
+      if (wrap) {
+        Scatter._state.resizeObserver = new ResizeObserver(function() {
+          if (Scatter._state.chart) Scatter._state.chart.resize();
+        });
+        Scatter._state.resizeObserver.observe(wrap);
+      }
+    }
   }
 
   // ── Proximity tooltip ─────────────────────────────────────────────────────
@@ -14445,13 +14877,17 @@ function scRender() {
   if (typeof scBindMobileTap === 'function') {
     scBindMobileTap(canvas, Scatter._state.allPts, xM, yM, Scatter._state.chart);
   }
-;
-  // FIX SC-02: prevent page scroll/zoom when touching the chart canvas.
-  // Must use addEventListener with passive:false to call preventDefault().
-  // Stored on canvas._scTouchMove so each render replaces the prior listener.
-  if (canvas._scTouchMove) canvas.removeEventListener('touchmove', canvas._scTouchMove, { passive: false });
-  canvas._scTouchMove = function(e) { e.preventDefault(); };
-  canvas.addEventListener('touchmove', canvas._scTouchMove, { passive: false });
+
+  // Note: a previous version preventDefault'd touchmove on the canvas to stop
+  // in-chart panning. Chart.js scatter has no pan gesture, so that listener
+  // was blocking the user's ability to scroll the page when their finger
+  // happened to drag across the chart — a major mobile UX cost for no benefit.
+  // Removed. If a future feature adds genuine in-chart gestures we'll
+  // selectively prevent default only while that gesture is active.
+  if (canvas._scTouchMove) {
+    canvas.removeEventListener('touchmove', canvas._scTouchMove, { passive: false });
+    canvas._scTouchMove = null;
+  }
 
   // Click a logo → open player profile modal.
   // Uses queryClosest (spatial index) instead of walking every point.
