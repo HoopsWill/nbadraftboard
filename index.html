@@ -1514,9 +1514,9 @@ tr:hover td{background:var(--gray-50)}
 
   /* ──────────── [61879] ──────────── */
   .ff2-viewport{height:72vh !important;min-height:340px}
-  /* Freeform board: mobile label scaling */
-  .ff2-rail{width:60px}
-  .ff2-col-bar{grid-template-columns:60px 1fr}
+  /* Freeform board: mobile label scaling.
+     Rail width is now driven by --ff-rail-w on the shell — set in the
+     more-comprehensive max-width:767px block. Only label/font tweaks here. */
   .ff2-rail-label{font-size:9.5px;letter-spacing:2px}
   .ff2-col-hdr-name{font-size:13px;letter-spacing:2px}
   .ff2-col-hdr-sub{font-size:8.5px}
@@ -1666,9 +1666,8 @@ tr:hover td{background:var(--gray-50)}
   }
 
   /* ──────────── [175174] ──────────── */
-  /* Hide freeform on mobile — spatial drag requires precise pointer */
-  #viewFreeform { display: none !important; }
-  /* Cards view becomes the default; table as secondary. Freeform hidden on mobile. */
+  /* Freeform is now mobile-enabled — touch handlers, pinch-zoom, and
+     responsive PLOT_H wire it up. CSS below adjusts headers + density. */
 
   /* P4: Controls bar — 2-row grid on mobile
      Row 1: [search .................] [tier btn]
@@ -4053,13 +4052,17 @@ ap{
   /* Density-derived sizing (overridden by .ff2-density-* modifiers) */
   --ff-card-w:        108px;
   --ff-card-fs-name:  11px;
-  --ff-card-fs-rank:  9px;
+  --ff-card-fs-rank:  12px;
   --ff-card-fs-role:  8px;
   --ff-card-pad-x:    6px;
   --ff-card-pad-y:    3px;
   --ff-card-radius:   6px;
   --ff-stripe-h:      2px;
   --ff-mbar-h:        2.5px;
+
+  /* Rail width — single source of truth. Used by .ff2-rail and to inset
+     .ff2-zoom-layer so the canvas aligns with the column-header grid. */
+  --ff-rail-w:        76px;
 
   /* Per-card slots (set inline as --x/--y/--tier-color/etc.) */
   --tier-color:    #8B5CF6;
@@ -4077,7 +4080,7 @@ ap{
 .ff2-shell.ff2-density-compact{
   --ff-card-w:        78px;
   --ff-card-fs-name:  10px;
-  --ff-card-fs-rank:  8px;
+  --ff-card-fs-rank:  10.5px;
   --ff-card-fs-role:  0px;
   --ff-card-pad-x:    4px;
   --ff-card-pad-y:    2px;
@@ -4086,7 +4089,7 @@ ap{
 .ff2-shell.ff2-density-comfortable{
   --ff-card-w:        140px;
   --ff-card-fs-name:  13px;
-  --ff-card-fs-rank:  10px;
+  --ff-card-fs-rank:  14px;
   --ff-card-fs-role:  9px;
   --ff-card-pad-x:    8px;
   --ff-card-pad-y:    5px;
@@ -4117,7 +4120,7 @@ ap{
 
 /* ── Column header bar ──────────────────────────────────────────────────── */
 .ff2-col-bar{
-  display:grid;grid-template-columns:76px 1fr;
+  display:grid;grid-template-columns:var(--ff-rail-w) 1fr;
   background:#060D1A;border-bottom:1px solid rgba(255,255,255,.07);
   flex-shrink:0;
 }
@@ -4142,15 +4145,31 @@ ap{
   touch-action:none;background:#060D1A;
 }
 .ff2-zoom-layer{
-  position:absolute;inset:0;transform-origin:0 0;background:#060D1A;
+  /* Now starts AFTER the rail (which is absolute-positioned outside this layer).
+     This makes the canvas align with the column-header grid and lets the rail
+     stay fixed at the viewport's left edge while the rest of the content
+     pans/scales. */
+  position:absolute;left:var(--ff-rail-w);right:0;top:0;bottom:0;
+  transform-origin:0 0;background:#060D1A;
 }
 .ff2-zoom-layer.is-interacting{will-change:transform}
 .ff2-body{display:flex;height:100%;position:relative;background:#060D1A}
 
-/* ── Tier rail (horizontal labels — refactored from vertical writing-mode) ─ */
+/* ── Tier rail — LIFTED out of the zoom layer ──────────────────────────────
+   Rail container is fixed to the left edge of the viewport (doesn't scale,
+   doesn't translate horizontally). Items inside have data-orig-top /
+   data-orig-h carrying their unscaled coordinates; FreeformInteraction._apply
+   rewrites top/height per frame as: top = origTop*s + ty,  height = origH*s.
+   This keeps the labels visually attached to the tier bands they describe
+   while the bands themselves move with the zoom transform. */
 .ff2-rail{
-  width:76px;flex-shrink:0;position:relative;
-  background:rgba(0,0,0,.3);border-right:1px solid rgba(255,255,255,.055);
+  position:absolute;left:0;top:0;bottom:0;
+  width:var(--ff-rail-w);
+  background:rgba(0,0,0,.3);
+  border-right:1px solid rgba(255,255,255,.055);
+  overflow:hidden;
+  pointer-events:none;
+  z-index:4;
 }
 .ff2-rail-item{
   position:absolute;left:0;right:0;
@@ -4208,31 +4227,50 @@ ap{
   background:rgba(6,13,26,.7);padding:1px 4px;border-radius:2px;
 }
 
-/* ── Axis labels ────────────────────────────────────────────────────────── */
+/* ── Axis labels ───────────────────────────────────────────────────────────
+   Positioned at VIEWPORT scope (sibling of .ff2-zoom-layer), so they stay
+   fixed when the user pans or zooms. Originally these were inside .ff2-plot
+   inside the zoom layer, which made them scroll with the data — wrong for
+   UI scaffold. */
 .ff2-axis-y{
-  position:absolute;left:-12px;top:50%;
-  transform:translateY(-50%) rotate(-90deg);transform-origin:center center;
+  position:absolute;
+  left:78px;          /* just right of the 76px rail */
+  top:50%;
+  transform:translate(-50%,-50%) rotate(-90deg);transform-origin:center center;
   font-family:'Barlow Condensed',sans-serif;
-  font-size:10px;font-weight:800;letter-spacing:3.5px;text-transform:uppercase;
-  color:rgba(255,255,255,.35);pointer-events:none;white-space:nowrap;z-index:2;
+  font-size:12px;font-weight:900;letter-spacing:3.5px;text-transform:uppercase;
+  color:#FFFFFF;
+  text-shadow:0 1px 2px rgba(0,0,0,.8), 0 0 8px rgba(0,0,0,.5);
+  pointer-events:none;white-space:nowrap;z-index:6;
+  background:rgba(6,13,26,.92);padding:5px 13px;border-radius:4px;
+  border:1px solid rgba(255,255,255,.16);
+  box-shadow:0 2px 10px rgba(0,0,0,.55), 0 0 0 1px rgba(0,0,0,.4);
 }
 .ff2-axis-x{
-  position:absolute;left:50%;bottom:8px;transform:translateX(-50%);
+  position:absolute;
+  left:50%;bottom:10px;
+  transform:translateX(-50%);
   font-family:'Barlow Condensed',sans-serif;
-  font-size:10px;font-weight:800;letter-spacing:3.5px;text-transform:uppercase;
-  color:rgba(255,255,255,.35);pointer-events:none;white-space:nowrap;z-index:2;
+  font-size:12px;font-weight:900;letter-spacing:3.5px;text-transform:uppercase;
+  color:#FFFFFF;
+  text-shadow:0 1px 2px rgba(0,0,0,.8), 0 0 8px rgba(0,0,0,.5);
+  pointer-events:none;white-space:nowrap;z-index:6;
   display:flex;align-items:center;gap:10px;
-  background:rgba(6,13,26,.65);padding:4px 10px;border-radius:4px;
+  background:rgba(6,13,26,.94);padding:6px 16px;border-radius:5px;
+  border:1px solid rgba(255,255,255,.18);
+  box-shadow:0 4px 14px rgba(0,0,0,.6), 0 0 0 1px rgba(0,0,0,.4);
 }
 .ff2-axis-info{
   display:inline-flex;align-items:center;justify-content:center;
-  width:14px;height:14px;border-radius:50%;
-  border:1px solid rgba(255,255,255,.3);color:rgba(255,255,255,.5);
-  font-size:9px;font-weight:700;font-family:Georgia,serif;letter-spacing:0;font-style:italic;
-  cursor:help;pointer-events:auto;background:rgba(0,0,0,.5);
+  width:16px;height:16px;border-radius:50%;
+  border:1px solid rgba(255,255,255,.55);color:#FFFFFF;
+  font-size:10px;font-weight:700;font-family:Georgia,serif;letter-spacing:0;font-style:italic;
+  cursor:help;pointer-events:auto;background:rgba(0,0,0,.6);
   transition:color .12s,border-color .12s,background .12s;
 }
-.ff2-axis-info:hover{color:white;border-color:rgba(255,255,255,.6);background:rgba(0,0,0,.7)}
+.ff2-axis-info:hover,.ff2-axis-info:focus{
+  color:#FBBF24;border-color:#FBBF24;background:rgba(245,158,11,.18);outline:none;
+}
 
 /* ── Player card — pure CSS-var driven ──────────────────────────────────── */
 .ff2-card{
@@ -4276,6 +4314,21 @@ ap{
   height:var(--ff-stripe-h);flex-shrink:0;width:100%;
   background:var(--tier-color);
 }
+/* Position-color left stripe — adds a second color encoding axis.
+   Top stripe = tier, left stripe = position. Together they make
+   card identity glanceable even in the dense 2nd-round area where
+   cards almost touch. ::before is reserved for the franchise halo. */
+.ff2-card::after{
+  content:'';position:absolute;
+  left:0;top:0;bottom:0;width:3px;
+  background:var(--pos-color);opacity:.85;
+  border-radius:var(--ff-card-radius) 0 0 var(--ff-card-radius);
+  pointer-events:none;
+  z-index:1;
+}
+/* Hidden on expanded cards — the expanded panel has its own treatment
+   and the stripe would clip awkwardly against the larger frame. */
+.ff2-card.is-expanded::after{display:none}
 .ff2-card-top{
   display:flex;align-items:center;gap:4px;
   padding:var(--ff-card-pad-y) var(--ff-card-pad-x) 1px;
@@ -4283,22 +4336,35 @@ ap{
 .ff2-card-rank{
   font-family:'Barlow Condensed',sans-serif;
   font-size:var(--ff-card-fs-rank);font-weight:900;
-  color:var(--tier-color);opacity:.85;flex-shrink:0;line-height:1;
+  color:var(--tier-color);opacity:1;flex-shrink:0;line-height:1;
+  letter-spacing:0;
 }
-.ff2-card-tier-dot{
-  width:5px;height:5px;border-radius:50%;flex-shrink:0;opacity:.75;
-  background:var(--pos-color);margin-left:auto;
+/* Metric value displayed in the top row — replaces the redundant pos-color
+   dot. Tabular-nums keeps the digits aligned column-to-column across cards. */
+.ff2-card-metric{
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:calc(var(--ff-card-fs-rank) * 0.78);
+  font-weight:800;line-height:1;flex-shrink:0;
+  margin-left:auto;letter-spacing:.2px;
+  color:var(--pos-color);opacity:.88;
+  font-variant-numeric:tabular-nums;
+  font-feature-settings:"tnum" 1;
 }
 .ff2-card-name{
   font-family:'Barlow Condensed',sans-serif;
   font-size:var(--ff-card-fs-name);font-weight:900;
-  color:rgba(255,255,255,.93);
+  color:rgba(255,255,255,.95);
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
   line-height:1.15;padding:0 var(--ff-card-pad-x);
+  letter-spacing:.15px;
 }
+/* Role: brightened from .42 to a tier-tinted mix so it inherits a faint
+   cast of the tier color (gold on franchise, purple on lottery, etc.) —
+   adds a second tier signal at the same time as making it readable. */
 .ff2-card-role{
-  font-size:var(--ff-card-fs-role);color:rgba(255,255,255,.42);
-  font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  font-size:var(--ff-card-fs-role);
+  color:color-mix(in srgb, var(--tier-color) 28%, rgba(255,255,255,.78));
+  font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
   padding:0 var(--ff-card-pad-x) 3px;line-height:1.2;
 }
 .ff2-card-mbar-wrap{padding:0 var(--ff-card-pad-x) var(--ff-card-pad-y)}
@@ -4319,15 +4385,58 @@ ap{
   }
 }
 
-/* Franchise tier — real treatment */
+/* Franchise tier — headline treatment. This is the top-of-board tier and
+   must read as such at a glance: larger footprint, gold border + ring,
+   stronger glow, gold-tinted backdrop, thicker stripe, gold rank text. */
 .ff2-card.is-franchise{
-  border-color:rgba(245,158,11,.32);
-  box-shadow:0 2px 14px rgba(0,0,0,.5),0 0 0 1px rgba(245,158,11,.22),inset 0 1px 0 rgba(255,255,255,.07);
+  /* +14% width — visually obvious without disrupting the grid */
+  min-width:calc(var(--ff-card-w) * 1.14);
+  /* Slightly more vertical padding so the card breathes */
+  --ff-card-pad-y:calc(var(--ff-card-pad-y) + 1px);
+  /* Thicker top stripe — 2× standard */
+  --ff-stripe-h:calc(var(--ff-stripe-h) * 2);
+  /* Card background gets a gold tint behind the existing color */
+  background:
+    linear-gradient(180deg,rgba(245,158,11,.10),rgba(245,158,11,.04) 40%,transparent 80%),
+    var(--card-bg);
+  border-color:rgba(245,158,11,.55);
+  box-shadow:
+    0 4px 22px rgba(0,0,0,.55),
+    0 0 0 1px rgba(245,158,11,.40),
+    inset 0 1px 0 rgba(255,255,255,.10),
+    0 0 24px -8px rgba(245,158,11,.55);
+  /* Gold-tinted backdrop-filter — subtle warm bias on whatever's behind */
+  -webkit-backdrop-filter:saturate(1.1) hue-rotate(-2deg);
+          backdrop-filter:saturate(1.1) hue-rotate(-2deg);
 }
+/* Outer glow halo — bigger and stronger than before */
 .ff2-card.is-franchise::before{
-  content:'';position:absolute;inset:-3px;border-radius:calc(var(--ff-card-radius) + 2px);
-  background:radial-gradient(60% 90% at 50% 0%,rgba(245,158,11,.22),transparent 70%);
+  content:'';position:absolute;inset:-6px;
+  border-radius:calc(var(--ff-card-radius) + 4px);
+  background:radial-gradient(70% 100% at 50% 0%,rgba(245,158,11,.32),transparent 75%);
   pointer-events:none;z-index:-1;
+  filter:blur(2px);
+}
+/* Rank number goes gold on franchise cards — small detail, big "this matters" signal */
+.ff2-card.is-franchise .ff2-card-rank{
+  color:#FBBF24;opacity:1;
+  text-shadow:0 0 8px rgba(245,158,11,.45);
+}
+/* Metric value goes gold on franchise cards too — same identity rule */
+.ff2-card.is-franchise .ff2-card-metric{
+  color:#FBBF24;opacity:1;
+  text-shadow:0 0 6px rgba(245,158,11,.4);
+}
+/* Hover on a franchise card — push the gold further, not the white ring */
+@media (hover:hover) and (pointer:fine){
+  .ff2-card.is-franchise:hover:not(.is-dragging):not(.is-expanded){
+    border-color:rgba(245,158,11,.85);
+    box-shadow:
+      0 6px 28px rgba(0,0,0,.6),
+      0 0 0 1.5px rgba(245,158,11,.65),
+      inset 0 1px 0 rgba(255,255,255,.12),
+      0 0 36px -6px rgba(245,158,11,.7);
+  }
 }
 
 /* Edited (manual rank override) */
@@ -4580,6 +4689,138 @@ ap{
 }
 .ff2-tooltip.is-visible{opacity:1}
 .ff2-tooltip b{color:#FBBF24;font-weight:800}
+
+/* ── Mobile-specific overrides ─────────────────────────────────────────────
+   Below 768px the header reflows to two rows (title row + controls row),
+   density/zoom buttons grow for touch (38×30 min), legend chips can wrap,
+   compare strip is full-bleed, and tooltips re-anchor inside the viewport. */
+@media (max-width: 767px){
+  .ff2-shell{ border-radius:0; --ff-rail-w:46px }
+  .ff2-head{ padding:10px 12px 8px; gap:6px }
+  .ff2-head-left{ width:100%; flex-direction:row; align-items:center; justify-content:space-between; gap:8px }
+  .ff2-title{ font-size:15px }
+  .ff2-meta{ font-size:10px; line-height:1.2 }
+  .ff2-head-controls{ width:100%; justify-content:space-between; gap:6px; flex-wrap:wrap }
+  .ff2-density-bar,.ff2-zoom-bar{ padding:2px }
+  .ff2-density-btn{ min-width:32px; min-height:28px; padding:4px 6px; font-size:12px }
+  .ff2-zoom-btn{ min-width:32px; min-height:28px; padding:4px 8px; font-size:15px }
+  .ff2-reset-btn{ padding:5px 10px; font-size:11px }
+  .ff2-legend{ width:100%; gap:4px; order:10 }
+  .ff2-leg-item{ flex:1; justify-content:center; padding:6px 4px }
+  .ff2-leg-name{ font-size:10px; letter-spacing:.2px }
+  .ff2-leg-count{ font-size:9.5px }
+
+  /* Column header — denser */
+  .ff2-col-bar{ grid-template-columns:0 1fr }
+  .ff2-col-bar-spacer{ display:none }
+  .ff2-col-hdr{ padding:7px 0 6px; gap:1px }
+  .ff2-col-hdr-name{ font-size:12px; letter-spacing:1.5px }
+  .ff2-col-hdr-sub{ font-size:8.5px; letter-spacing:.2px }
+
+  /* Rail — shrink */
+  .ff2-rail-bar{ width:2px }
+  .ff2-rail-label{ font-size:8.5px; letter-spacing:.8px }
+  .ff2-rail-count{ font-size:8.5px }
+  .ff2-axis-y{ left:48px; font-size:9px; letter-spacing:2px; padding:3px 8px }
+  .ff2-axis-x{ font-size:9px; letter-spacing:2px; padding:4px 10px; bottom:6px }
+
+  /* Cards — compact density by default. The .ff-card-w variable
+     is overridden by .ff2-density-compact on the shell, this is just
+     additional safety: cap at 88px and shrink fonts. */
+  .ff2-shell.ff2-density-compact{
+    --ff-card-w:        72px;
+    --ff-card-fs-name:  9.5px;
+    --ff-card-fs-rank:  10px;
+  }
+  .ff2-shell.ff2-density-standard{
+    --ff-card-w:        92px;
+    --ff-card-fs-name:  10.5px;
+  }
+
+  /* Expanded card — fill more of viewport on tap */
+  .ff2-card.is-expanded{
+    min-width:78vw; max-width:88vw;
+  }
+  .ff2-exp-body{ padding:12px }
+  .ff2-exp-actions{ gap:6px }
+  .ff2-exp-btn{ padding:8px 8px; font-size:12px } /* 36px+ touch target */
+
+  /* Compare strip — taller for touch */
+  .ff2-compare-strip{ padding:8px 10px }
+  .ff2-cmp-label{ font-size:9.5px; padding-right:6px }
+  .ff2-cmp-card{ min-width:130px; padding:6px 22px 6px 8px }
+  .ff2-cmp-card-name{ font-size:11.5px; max-width:120px }
+  .ff2-cmp-card-stats{ font-size:9.5px; gap:6px }
+  .ff2-cmp-card-x{ padding:6px 8px; font-size:16px }  /* 32px+ touch target */
+  .ff2-cmp-clear{ padding:6px 10px }
+
+  /* Tooltip — pull in from edges */
+  .ff2-tooltip{ max-width:78vw; font-size:11px }
+
+  /* Pin badge — readable at smaller card sizes */
+  .ff2-card.is-pinned > .ff2-pin-badge{
+    width:16px; height:16px; font-size:10px;
+    top:-6px; right:-6px;
+  }
+}
+
+/* ── Export overlay (modal for picking size preset + downloading) ───────── */
+.ff2-export-overlay{
+  position:fixed;inset:0;z-index:9999;
+  background:rgba(2,6,15,.78);backdrop-filter:blur(6px);
+  display:flex;align-items:center;justify-content:center;padding:20px;
+  opacity:0;pointer-events:none;transition:opacity .18s;
+}
+.ff2-export-overlay.is-visible{opacity:1;pointer-events:auto}
+.ff2-export-modal{
+  background:#0A1525;border:1px solid rgba(255,255,255,.12);
+  border-radius:12px;padding:22px;max-width:440px;width:100%;
+  box-shadow:0 24px 64px rgba(0,0,0,.7);
+  font-family:'Barlow Condensed',sans-serif;color:white;
+}
+.ff2-export-title{
+  font-size:18px;font-weight:900;letter-spacing:.5px;margin:0 0 4px;
+}
+.ff2-export-sub{font-size:12px;color:rgba(255,255,255,.55);margin-bottom:18px;font-weight:500}
+.ff2-export-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.ff2-export-grid > *:nth-child(3n){grid-column:span 2}
+.ff2-export-preset{
+  background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);
+  border-radius:8px;padding:14px 12px;cursor:pointer;text-align:left;
+  display:flex;flex-direction:column;gap:3px;
+  font-family:inherit;color:inherit;
+  transition:background .15s,border-color .15s,transform .12s;
+}
+.ff2-export-preset:hover{background:rgba(245,158,11,.08);border-color:rgba(245,158,11,.35);transform:translateY(-1px)}
+.ff2-export-preset:disabled{opacity:.5;cursor:not-allowed}
+.ff2-export-preset-name{font-size:14px;font-weight:800;letter-spacing:.3px}
+.ff2-export-preset-size{font-size:11px;color:rgba(255,255,255,.5);font-weight:600;letter-spacing:.2px}
+.ff2-export-actions{display:flex;gap:8px;justify-content:flex-end;border-top:1px solid rgba(255,255,255,.08);padding-top:12px}
+.ff2-export-cancel{
+  background:none;border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.7);
+  padding:7px 14px;border-radius:6px;cursor:pointer;font-family:inherit;
+  font-size:12px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;
+}
+.ff2-export-cancel:hover{color:white;border-color:rgba(255,255,255,.4)}
+.ff2-export-status{
+  font-size:12px;color:rgba(255,255,255,.6);font-weight:600;letter-spacing:.2px;
+  display:flex;align-items:center;gap:6px;min-height:20px;
+}
+.ff2-export-status .ff2-spinner{
+  width:12px;height:12px;border:2px solid rgba(255,255,255,.2);border-top-color:#F59E0B;
+  border-radius:50%;animation:ff2-spin 700ms linear infinite;
+}
+@keyframes ff2-spin{to{transform:rotate(360deg)}}
+
+.ff2-export-btn{
+  background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);
+  border-radius:6px;padding:5px 12px;
+  font-family:'Barlow Condensed',sans-serif;font-size:11.5px;font-weight:800;
+  letter-spacing:.5px;color:rgba(255,255,255,.75);cursor:pointer;
+  transition:background .12s,color .12s,border-color .12s;line-height:1;
+  display:inline-flex;align-items:center;gap:5px;
+}
+.ff2-export-btn:hover{background:rgba(245,158,11,.12);color:#FBBF24;border-color:rgba(245,158,11,.35)}
 
 /* §§ /BLOCK:FF2 §§ */
 
@@ -5412,7 +5653,7 @@ ock Drafts table CSS ───────────────────�
       <div class="sc-ctrl-section sc-ctrl-section-primary">
         <div class="sc-ctrl-group">
           <label class="sc-ctrl-label">X Axis</label>
-          <select class="sc-select" id="scXAxis" onchange="scRenderDebounced()">
+          <select class="sc-select" id="scXAxis" data-sc-control="x">
             <optgroup label="Physical">
               <option value="age" selected>Age</option>
               <option value="ht">Height (in)</option>
@@ -5436,7 +5677,7 @@ ock Drafts table CSS ───────────────────�
         </div>
         <div class="sc-ctrl-group">
           <label class="sc-ctrl-label">Y Axis</label>
-          <select class="sc-select" id="scYAxis" onchange="scRenderDebounced()">
+          <select class="sc-select" id="scYAxis" data-sc-control="y">
             <optgroup label="Stats">
               <option value="ts_pct" selected>TS%</option>
               <option value="pa2_usg">P+A/USG</option>
@@ -5462,7 +5703,7 @@ ock Drafts table CSS ───────────────────�
       <div class="sc-ctrl-section sc-ctrl-section-secondary">
         <div class="sc-ctrl-group sc-grp-year">
           <label class="sc-ctrl-label">Draft Class</label>
-          <select class="sc-select" id="scYear" onchange="scRenderDebounced()">
+          <select class="sc-select" id="scYear" data-sc-control="year">
             <option value="2026" selected>2026</option>
             <option value="all">All (2019-2026)</option>
             <option value="2025">2025</option>
@@ -5476,7 +5717,7 @@ ock Drafts table CSS ───────────────────�
         </div>
         <div class="sc-ctrl-group sc-grp-colorby">
           <label class="sc-ctrl-label">Color By</label>
-          <select class="sc-select" id="scColorBy" onchange="scRenderDebounced()">
+          <select class="sc-select" id="scColorBy" data-sc-control="color">
             <option value="position">Position</option>
             <option value="year">Draft Class</option>
             <option value="tier">Tier</option>
@@ -5484,7 +5725,7 @@ ock Drafts table CSS ───────────────────�
         </div>
         <div class="sc-ctrl-group sc-grp-position">
           <label class="sc-ctrl-label">Position</label>
-          <select class="sc-select" id="scPosFilter" onchange="scRenderDebounced()">
+          <select class="sc-select" id="scPosFilter" data-sc-control="pos">
             <option value="all">All</option>
             <option value="Guard">Guards</option>
             <option value="Forward">Forwards</option>
@@ -5493,11 +5734,11 @@ ock Drafts table CSS ───────────────────�
         </div>
         <div class="sc-ctrl-group sc-grp-trend">
           <label class="sc-ctrl-label">Trend</label>
-          <button class="sc-trend-btn" id="scTrendBtn" onclick="scToggleTrend()">Off</button>
+          <button class="sc-trend-btn" id="scTrendBtn" data-sc-action="toggle-trend">Off</button>
         </div>
         <div class="sc-ctrl-group sc-grp-quadrants">
           <label class="sc-ctrl-label">Quadrants</label>
-          <button class="sc-trend-btn" id="scQuadBtn" onclick="scToggleQuadrants()">Off</button>
+          <button class="sc-trend-btn" id="scQuadBtn" data-sc-action="toggle-quad">Off</button>
         </div>
       </div>
     </div>
@@ -12822,12 +13063,13 @@ var ScatterEngine = (function() {
   }
 
   // ── Point computation ─────────────────────────────────────────────────────
-  function computePoints(players, xKey, yKey, posFilter) {
-    var src = (posFilter && posFilter !== 'all')
-      ? players.filter(function(p) { return p.position === posFilter; })
-      : players;
+  // Takes an already-filtered player list (caller pre-filters by year + pos).
+  // This removes the triple-filter pattern where computePoints/topByAxis/
+  // botByAxis each ran the same posFilter independently — three passes over
+  // the player list when one would do.
+  function computePoints(filteredPlayers, xKey, yKey) {
     var pts = [];
-    src.forEach(function(p) {
+    filteredPlayers.forEach(function(p) {
       var xv = axisVal(p, xKey);
       var yv = axisVal(p, yKey);
       if (xv === null || yv === null) return;
@@ -12836,6 +13078,25 @@ var ScatterEngine = (function() {
       pts.push({ x: xv, y: yv, _xr: xv, _yr: yv, _p: p });
     });
     return pts;
+  }
+
+  // Filter once: position filter only (year is already encoded by getPlayers
+  // since each year's data is loaded into a separate cache). Cached for the
+  // current (year, posFilter) tuple so repeated calls within a render are O(1).
+  var _filteredCache = null;
+  var _filteredKey   = '';
+  function getFiltered(players, posFilter) {
+    var key = (posFilter || 'all');
+    if (_filteredCache && _filteredKey === key && _filteredCache._src === players) {
+      return _filteredCache;
+    }
+    var out = (posFilter && posFilter !== 'all')
+      ? players.filter(function(p) { return p.position === posFilter; })
+      : players.slice(); // shallow copy so callers can't mutate the cache
+    out._src = players;  // identity tag for cache validation
+    _filteredCache = out;
+    _filteredKey   = key;
+    return out;
   }
 
   // ── Deterministic collision jitter ────────────────────────────────────────
@@ -12873,33 +13134,35 @@ var ScatterEngine = (function() {
   // This is the logo content inside the bubble — not the total rendered size.
   // Total rendered = tierSize + BUBBLE_PAD*2 (added by ScatterLogoCache).
   // franchise → 22+12 = 34px bubble | lottery → 18+12 = 30px | etc.
+  // Reads from TIER_CUTS so logo sizes stay in sync with the user's tier
+  // editor adjustments — the rest of the system already obeys these cuts.
   function tierSize(rank) {
+    var T = (typeof TIER_CUTS === 'object' && TIER_CUTS)
+      ? TIER_CUTS
+      : { franchise:5, lottery:14, lateFirst:30 };
     // SC-MOB: use smaller bubbles on narrow screens so logos don't overlap.
     // 640px matches the main mobile breakpoint used throughout the system.
     var isMobile = (typeof window !== 'undefined' && window.innerWidth <= 640);
     if (isMobile) {
-      if (!rank)      return 10;
-      if (rank <= 5)  return 14;
-      if (rank <= 14) return 12;
-      if (rank <= 30) return 10;
+      if (!rank)              return 10;
+      if (rank <= T.franchise) return 14;
+      if (rank <= T.lottery)   return 12;
+      if (rank <= T.lateFirst) return 10;
       return 9;
     }
-    if (!rank)      return 15;
-    if (rank <= 5)  return 22;
-    if (rank <= 14) return 18;
-    if (rank <= 30) return 15;
+    if (!rank)              return 15;
+    if (rank <= T.franchise) return 22;
+    if (rank <= T.lottery)   return 18;
+    if (rank <= T.lateFirst) return 15;
     return 13;
   }
 
   // ── Top N players by Y-axis value ────────────────────────────────────────
-  // Pure function: filters + sorts in one pass, returns up to n entries.
-  // Used by ScatterTopPanel to populate the leader-board panel.
-  function topByAxis(players, yKey, posFilter, n) {
-    var src = (posFilter && posFilter !== 'all')
-      ? players.filter(function(p) { return p.position === posFilter; })
-      : players;
+  // Pure function: sorts in one pass, returns up to n entries.
+  // Takes an already-filtered player list (filter is done once upstream).
+  function topByAxis(filteredPlayers, yKey, n) {
     var result = [];
-    src.forEach(function(p) {
+    filteredPlayers.forEach(function(p) {
       var v = axisVal(p, yKey);
       if (v !== null) result.push({ _p: p, _val: v });
     });
@@ -12907,12 +13170,9 @@ var ScatterEngine = (function() {
     return result.slice(0, n || 5);
   }
 
-  function botByAxis(players, yKey, posFilter, n) {
-    var src = (posFilter && posFilter !== 'all')
-      ? players.filter(function(p) { return p.position === posFilter; })
-      : players;
+  function botByAxis(filteredPlayers, yKey, n) {
     var result = [];
-    src.forEach(function(p) {
+    filteredPlayers.forEach(function(p) {
       var v = axisVal(p, yKey);
       if (v !== null) result.push({ _p: p, _val: v });
     });
@@ -12932,7 +13192,13 @@ var ScatterEngine = (function() {
       case 'year': return YEAR_HEX[pt._p._y] || '#94A3B8';
       case 'tier': {
         var r = pt._p.rank || 99;
-        return r <= 5 ? TIER_HEX.franchise : r <= 14 ? TIER_HEX.lottery : r <= 30 ? TIER_HEX.late1 : TIER_HEX.second;
+        var T = (typeof TIER_CUTS === 'object' && TIER_CUTS)
+          ? TIER_CUTS
+          : { franchise:5, lottery:14, lateFirst:30 };
+        return r <= T.franchise ? TIER_HEX.franchise
+             : r <= T.lottery   ? TIER_HEX.lottery
+             : r <= T.lateFirst ? TIER_HEX.late1
+             : TIER_HEX.second;
       }
       default: return POS_HEX[pt._p.position] || '#94A3B8';
     }
@@ -12964,6 +13230,7 @@ var ScatterEngine = (function() {
   return {
     getPlayers:  getPlayers,  invalidate:  invalidate,
     axisVal:     axisVal,     computePoints: computePoints,
+    getFiltered: getFiltered,
     applyJitter: applyJitter, tierSize:    tierSize,
     topByAxis:   topByAxis,   botByAxis:   botByAxis,
     pointColor:  pointColor,
@@ -13172,10 +13439,8 @@ var ScatterTopPanel = (function() {
 
       h += '<div class="sc-top5-row" data-name="' + escHtml(p._n || '') + '"'
         + ' data-rank="' + (p.rank || '') + '" data-year="' + (p._y || '2026') + '"'
-        + ' style="--row-fill:' + fillPct + '%;--row-fill-color:' + color + '"'
-        + ' onmouseenter="ScatterTopPanel.highlight(this.dataset.name)"'
-        + ' onmouseleave="ScatterTopPanel.clearHighlight()"'
-        + ' onclick="ScatterTopPanel.select(this)">'
+        + ' data-sc-side="top"'
+        + ' style="--row-fill:' + fillPct + '%;--row-fill-color:' + color + '">'
         + '<div class="sc-top5-idx sc-top5-idx-top">' + (i + 1) + '</div>'
         + '<div class="sc-top5-logo">' + logoH + '</div>'
         + '<div class="sc-top5-info">'
@@ -13254,10 +13519,8 @@ var ScatterBotPanel = (function() {
 
       h += '<div class="sc-top5-row sc-bot5-row" data-name="' + escHtml(p._n || '') + '"'
         + ' data-rank="' + (p.rank || '') + '" data-year="' + (p._y || '2026') + '"'
-        + ' style="--row-fill:' + fillPct + '%;--row-fill-color:#ef4444"'
-        + ' onmouseenter="ScatterBotPanel.highlight(this.dataset.name)"'
-        + ' onmouseleave="ScatterBotPanel.clearHighlight()"'
-        + ' onclick="ScatterBotPanel.select(this)">'
+        + ' data-sc-side="bot"'
+        + ' style="--row-fill:' + fillPct + '%;--row-fill-color:#ef4444">'
         + '<div class="sc-top5-idx sc-top5-idx-bot">' + (i + 1) + '</div>'
         + '<div class="sc-top5-logo">' + logoH + '</div>'
         + '<div class="sc-top5-info">'
@@ -13298,42 +13561,323 @@ var ScatterBotPanel = (function() {
   return { render: render, highlight: highlight, clearHighlight: clearHighlight, select: select };
 })();
 
-// ── Chart highlight: dim all points except the named player ──────────────────
-// Called by ScatterTopPanel on hover.  Uses pre-computed dimmed canvases from
-// ScatterLogoCache so no image reloads occur during interaction.
-var _scCurrentColorBy = 'position';
-var _scLastLogoData   = null;
-var _scHighlightName  = null;
+// ══ Scatter ═══════════════════════════════════════════════════════════════════
+// Owns all scatter-tab state and behavior:
+//   • _state: single source of truth (11 fields migrated from module globals)
+//   • Spatial index for O(bucket) mousemove/click hit detection
+//   • Targeted in-place highlight (was allocating two n-length arrays per hover)
+//   • Event delegation for control bar + top/bot panel rows
+//
+// External callers reach in via the public API only:
+//   • Scatter.render() / .renderDebounced() — entry points (also exposed as
+//     window.scRender / scRenderDebounced for back-compat)
+//   • Scatter.toggleTrend() / .toggleQuadrants() — control button handlers
+//   • Scatter.highlightPlayer(name) — cross-panel highlight
+//   • Scatter.setTrend(v) / .setQuadrants(v) — URL-restore setters
+var Scatter = (function() {
+  'use strict';
 
-function scHighlightPlayer(name) {
-  _scHighlightName = name;
-  if (!_scChart || !_scAllPts.length || !_scLastLogoData) return;
-  var ds = _scChart.data.datasets[0];
-  if (!ds) return;
+  // ── State — single source of truth for all scatter module state ─────────
+  // Migrated from 11 module-level globals. External code that needs to read
+  // or write trend/quadrants toggles goes through Scatter.setTrend/setQuadrants.
+  // Tooltip/chart references and async-render tokens are managed internally.
+  var _state = {
+    // Chart instance + rendered point list
+    chart:           null,
+    allPts:          [],
 
-  if (!name) {
-    // Restore original logo data
-    ds.pointStyle     = _scLastLogoData.styles;
-    ds.pointRadius    = _scLastLogoData.radii;
-    ds.pointHoverRadius = _scLastLogoData.hoverRadii;
-  } else {
-    // M8: single pass — was two separate .map() calls over _scAllPts
-    var newStyles = new Array(_scAllPts.length);
-    var newRadii  = new Array(_scAllPts.length);
-    for (var _hi = 0; _hi < _scAllPts.length; _hi++) {
-      var _pt = _scAllPts[_hi];
-      if (_pt._p._n === name) {
-        newStyles[_hi] = _scLastLogoData.styles[_hi];
-        newRadii[_hi]  = _scLastLogoData.radii[_hi] + 3;
-      } else {
-        newStyles[_hi] = ScatterLogoCache.getCanvasDimmed(_pt._p._s, ScatterEngine.tierSize(_pt._p.rank));
-        newRadii[_hi]  = Math.max(4, _scLastLogoData.radii[_hi] * 0.72);
+    // Toggle state (URL-restored via setters)
+    trend:           false,
+    quadrants:       false,
+
+    // Tooltip DOM + auto-hide timer
+    tipEl:           null,
+    tipHideTimer:    null,
+
+    // Highlight tracking — populated during render, read on every hover
+    lastLogoData:    null,
+    highlightName:   null,
+    currentColorBy:  'position',
+
+    // Async-render guards
+    renderToken:     0,    // bumped per render; async callbacks bail if stale
+    renderTimer:     null, // debounce timer for renderDebounced
+
+    // Spatial index (new — owned exclusively by this namespace)
+    spatialIndex:    null,
+    spatialIndexRev: 0,
+    delegationWired: false
+  };
+
+  // ── Spatial index ────────────────────────────────────────────────────────
+  // Coarse pixel-grid bucketing of currently-rendered points. Built lazily on
+  // first query of each render; rebuilt when invalidate() is called.
+  //
+  // Cell size 64px is the sweet spot for typical scatter densities: a 600×400
+  // canvas with 200 points averages ~5 points per cell. mousemove queries 9
+  // cells (center + 8 neighbors) = ~45 candidates checked instead of 200, a
+  // 4-5× reduction. At 600 points the win is 13×.
+  var SPATIAL_CELL = 64;
+
+  function invalidateSpatialIndex() {
+    _state.spatialIndex = null;
+  }
+
+  function buildSpatialIndex() {
+    if (!_state.chart || !_state.allPts.length) return null;
+    var xScale = _state.chart.scales.x;
+    var yScale = _state.chart.scales.y;
+    if (!xScale || !yScale) return null;
+    var grid = Object.create(null);
+    for (var i = 0; i < _state.allPts.length; i++) {
+      var pt = _state.allPts[i];
+      var px = xScale.getPixelForValue(pt.x);
+      var py = yScale.getPixelForValue(pt.y);
+      var cx = Math.floor(px / SPATIAL_CELL);
+      var cy = Math.floor(py / SPATIAL_CELL);
+      var key = cx + ',' + cy;
+      if (!grid[key]) grid[key] = [];
+      grid[key].push({ i: i, px: px, py: py });
+    }
+    _state.spatialIndex = { grid: grid };
+    return _state.spatialIndex;
+  }
+
+  // Returns ALL points within `extraR` pixels of (mx, my). The radius for
+  // each point is `tierSize(rank)/2 + 2 + extraR`. Walks 9 cells (center +
+  // 8 neighbors) instead of all n points.
+  function queryNear(mx, my, extraR) {
+    var idx = _state.spatialIndex || buildSpatialIndex();
+    if (!idx) return [];
+    var grid = idx.grid;
+    var cx = Math.floor(mx / SPATIAL_CELL);
+    var cy = Math.floor(my / SPATIAL_CELL);
+    var hits = [];
+    for (var dx = -1; dx <= 1; dx++) {
+      for (var dy = -1; dy <= 1; dy++) {
+        var bucket = grid[(cx + dx) + ',' + (cy + dy)];
+        if (!bucket) continue;
+        for (var k = 0; k < bucket.length; k++) {
+          var entry = bucket[k];
+          var pt = _state.allPts[entry.i];
+          var r = ScatterEngine.tierSize(pt._p.rank) / 2 + 2 + (extraR || 0);
+          var dxp = entry.px - mx, dyp = entry.py - my;
+          if (dxp * dxp + dyp * dyp <= r * r) hits.push(pt);
+        }
       }
     }
-    ds.pointStyle  = newStyles;
-    ds.pointRadius = newRadii;
+    return hits;
   }
-  _scChart.update('none');
+
+  // Click variant — returns the SINGLE closest point within the click radius,
+  // or null. Click radius is slightly larger than hover radius (includes
+  // BUBBLE_PAD) so taps are forgiving.
+  function queryClosest(mx, my, extraR) {
+    var idx = _state.spatialIndex || buildSpatialIndex();
+    if (!idx) return null;
+    var grid = idx.grid;
+    var cx = Math.floor(mx / SPATIAL_CELL);
+    var cy = Math.floor(my / SPATIAL_CELL);
+    var best = null, bestD = Infinity;
+    for (var dx = -1; dx <= 1; dx++) {
+      for (var dy = -1; dy <= 1; dy++) {
+        var bucket = grid[(cx + dx) + ',' + (cy + dy)];
+        if (!bucket) continue;
+        for (var k = 0; k < bucket.length; k++) {
+          var entry = bucket[k];
+          var pt = _state.allPts[entry.i];
+          var r = ScatterEngine.tierSize(pt._p.rank) / 2 + ScatterLogoCache.BUBBLE_PAD + 2 + (extraR || 0);
+          var dxp = entry.px - mx, dyp = entry.py - my;
+          var d2 = dxp * dxp + dyp * dyp;
+          if (d2 <= r * r && d2 < bestD) { bestD = d2; best = pt; }
+        }
+      }
+    }
+    return best;
+  }
+
+  // ── Targeted highlight ──────────────────────────────────────────────────
+  // Previously allocated two n-length arrays per hover transition and walked
+  // every point. This version mutates ds.pointStyle/pointRadius in place,
+  // tracking which points are currently dimmed so transitions between rows
+  // touch only the two affected indices (was O(n), now O(1) after the first
+  // highlight establishes the dimmed state).
+  var _highlightIdx = -1;  // currently highlighted point index, -1 = none
+  var _isAllDimmed  = false;
+
+  function _findIdxByName(name) {
+    if (!name) return -1;
+    for (var i = 0; i < _state.allPts.length; i++) {
+      if (_state.allPts[i]._p._n === name) return i;
+    }
+    return -1;
+  }
+
+  function highlightPlayer(name) {
+    _state.highlightName = name;
+    if (!_state.chart || !_state.allPts.length || !_state.lastLogoData) return;
+    var ds = _state.chart.data.datasets[0];
+    if (!ds) return;
+
+    var newIdx = _findIdxByName(name);
+    if (newIdx === _highlightIdx) return;
+
+    var orig = _state.lastLogoData;
+    var oldIdx = _highlightIdx;
+
+    // Ensure ds.pointStyle / pointRadius are mutable arrays. They are (set
+    // by reference from logoData inside scRender), so direct mutation works.
+    if (newIdx === -1) {
+      // Clearing highlight: restore everything if we'd dimmed
+      if (_isAllDimmed) {
+        for (var j = 0; j < _state.allPts.length; j++) {
+          ds.pointStyle[j]  = orig.styles[j];
+          ds.pointRadius[j] = orig.radii[j];
+        }
+        _isAllDimmed = false;
+      }
+    } else if (!_isAllDimmed) {
+      // First highlight in this state: dim everything not selected + bump selected
+      for (var k = 0; k < _state.allPts.length; k++) {
+        if (k === newIdx) {
+          ds.pointStyle[k]  = orig.styles[k];
+          ds.pointRadius[k] = orig.radii[k] + 3;
+        } else {
+          var ptK = _state.allPts[k];
+          ds.pointStyle[k]  = ScatterLogoCache.getCanvasDimmed(ptK._p._s, ScatterEngine.tierSize(ptK._p.rank));
+          ds.pointRadius[k] = Math.max(4, orig.radii[k] * 0.72);
+        }
+      }
+      _isAllDimmed = true;
+    } else {
+      // Already dimmed; just swap the highlighted slot — 2 mutations total
+      if (oldIdx !== -1) {
+        var oldPt = _state.allPts[oldIdx];
+        ds.pointStyle[oldIdx]  = ScatterLogoCache.getCanvasDimmed(oldPt._p._s, ScatterEngine.tierSize(oldPt._p.rank));
+        ds.pointRadius[oldIdx] = Math.max(4, orig.radii[oldIdx] * 0.72);
+      }
+      ds.pointStyle[newIdx]  = orig.styles[newIdx];
+      ds.pointRadius[newIdx] = orig.radii[newIdx] + 3;
+    }
+
+    _highlightIdx = newIdx;
+    _state.chart.update('none');
+  }
+
+  // Public reset for when scRender rebuilds the chart — the highlight tracking
+  // is per-render. Called from inside scRender after logoData is computed.
+  function resetHighlight() {
+    _highlightIdx = -1;
+    _isAllDimmed  = false;
+  }
+
+  // ── Event delegation init ────────────────────────────────────────────────
+  // Replaces the 30+ inline onchange/onclick/onmouseenter attributes that
+  // were re-emitted on every Top5/Bot5 render. Wired once at first render
+  // (when DOM is guaranteed to exist) — _state.delegationWired prevents
+  // duplicates if init is called multiple times.
+  function initDelegation() {
+    if (_state.delegationWired) return;
+    var controls = document.querySelector('.sc-controls');
+    var strip    = document.querySelector('.sc-panels-strip');
+    if (!controls || !strip) return;  // DOM not ready yet — retry next render
+
+    // Control bar: change on selects → renderDebounced
+    controls.addEventListener('change', function(e) {
+      var t = e.target;
+      if (t && t.matches && t.matches('[data-sc-control]')) {
+        scRenderDebounced();
+      }
+    });
+
+    // Control bar: click on toggle buttons → dispatch by data-sc-action
+    controls.addEventListener('click', function(e) {
+      var btn = e.target.closest && e.target.closest('[data-sc-action]');
+      if (!btn) return;
+      var action = btn.getAttribute('data-sc-action');
+      if (action === 'toggle-trend')     scToggleTrend();
+      else if (action === 'toggle-quad') scToggleQuadrants();
+    });
+
+    // Top/Bot panels: row hover-to-highlight + click-to-open-profile.
+    // mouseenter/leave don't bubble — use mouseover/mouseout with relatedTarget
+    // checking to fire enter/leave exactly once per row transition.
+    var _hoveredRow = null;
+
+    function _rowEnter(row) {
+      if (!row || row === _hoveredRow) return;
+      if (_hoveredRow) {
+        _hoveredRow.classList.remove('sc-top5-row-active');
+      }
+      _hoveredRow = row;
+      row.classList.add('sc-top5-row-active');
+      scHighlightPlayer(row.getAttribute('data-name'));
+    }
+
+    function _rowLeave() {
+      if (!_hoveredRow) return;
+      _hoveredRow.classList.remove('sc-top5-row-active');
+      _hoveredRow = null;
+      scHighlightPlayer(null);
+    }
+
+    strip.addEventListener('mouseover', function(e) {
+      var row = e.target.closest && e.target.closest('.sc-top5-row');
+      if (row) _rowEnter(row);
+    });
+    strip.addEventListener('mouseout', function(e) {
+      var row = e.target.closest && e.target.closest('.sc-top5-row');
+      if (!row || row !== _hoveredRow) return;
+      // Only leave when relatedTarget exits the row entirely
+      var to = e.relatedTarget;
+      if (!to || !row.contains(to)) _rowLeave();
+    });
+    strip.addEventListener('click', function(e) {
+      var row = e.target.closest && e.target.closest('.sc-top5-row');
+      if (!row) return;
+      var rank = parseInt(row.getAttribute('data-rank'), 10);
+      var year = row.getAttribute('data-year') || '2026';
+      if (rank && typeof openPlayerModal === 'function') openPlayerModal(rank, year);
+    });
+
+    // Window resize invalidates pixel positions — index will rebuild on next query
+    window.addEventListener('resize', invalidateSpatialIndex);
+
+    _state.delegationWired = true;
+  }
+
+  // ── Setters for URL restore (avoids reaching into module globals) ───────
+  function setTrend(v) {
+    _state.trend = !!v;
+    var btn = document.getElementById('scTrendBtn');
+    if (btn) { btn.textContent = _state.trend ? 'On' : 'Off'; btn.classList.toggle('active', _state.trend); }
+  }
+  function setQuadrants(v) {
+    _state.quadrants = !!v;
+    var btn = document.getElementById('scQuadBtn');
+    if (btn) { btn.textContent = _state.quadrants ? 'On' : 'Off'; btn.classList.toggle('active', _state.quadrants); }
+  }
+
+  return {
+    invalidateSpatialIndex: invalidateSpatialIndex,
+    buildSpatialIndex:      buildSpatialIndex,
+    queryNear:              queryNear,
+    queryClosest:           queryClosest,
+    highlightPlayer:        highlightPlayer,
+    resetHighlight:         resetHighlight,
+    initDelegation:         initDelegation,
+    setTrend:               setTrend,
+    setQuadrants:           setQuadrants,
+    _state:                 _state
+  };
+})();
+
+function scHighlightPlayer(name) {
+  // Delegate to Scatter.highlightPlayer — in-place mutation of pointStyle/
+  // pointRadius arrays instead of allocating new n-length arrays per hover.
+  // First highlight in a fresh chart state is still O(n) (must dim everything),
+  // but subsequent row-to-row transitions are O(1).
+  return Scatter.highlightPlayer(name);
 }
 
 // ── Axis definitions (kept top-level; used by tooltip formatting) ─────────────
@@ -13353,13 +13897,10 @@ var SC_AXES = {
   tpar:      { label:'3PAr',           fmt:function(v){ return v.toFixed(3); },                         inv:false }
 };
 
-// ── Scatter state ─────────────────────────────────────────────────────────────
-var _scChart       = null;
-var _scTrend       = false;
-var _scQuadrants   = false;   // Quadrant tinting toggle (priority #6)
-var _scTipEl       = null;
-var _scAllPts      = [];     // current rendered points — used by logo-refresh + highlight
-var _scTipHideTimer = null;  // C4: module-level so all render closures share one timer
+// Scatter state is fully owned by Scatter._state above — no module-level
+// globals here. Render token, tooltip state, chart instance, point list,
+// trend/quadrants flags all live in the namespace. External callers go
+// through Scatter.setTrend / Scatter.setQuadrants / Scatter.render etc.
 
 // C4: Document-level touch handler — dismiss scatter tooltip when tapping outside canvas.
 // Wired once at module init (not per-render) so no duplicate listeners accumulate.
@@ -13371,11 +13912,11 @@ var _scTipHideTimer = null;  // C4: module-level so all render closures share on
     _scDocTouchWired = true;
     document.addEventListener('touchstart', function(e) {
       // Only dismiss if a tip is currently visible AND the touch is outside the canvas
-      if (!_scTipEl || _scTipEl.style.opacity === '0') return;
+      if (!Scatter._state.tipEl || Scatter._state.tipEl.style.opacity === '0') return;
       var canvas = document.getElementById('scCanvas');
       if (!canvas || canvas.contains(e.target)) return;
       // Outside canvas tap — cancel pending timer and hide immediately
-      if (_scTipHideTimer) { clearTimeout(_scTipHideTimer); _scTipHideTimer = null; }
+      if (Scatter._state.tipHideTimer) { clearTimeout(Scatter._state.tipHideTimer); Scatter._state.tipHideTimer = null; }
       scHideTip();
     }, { passive: true, capture: true });
   }
@@ -13388,18 +13929,18 @@ var _scTipHideTimer = null;  // C4: module-level so all render closures share on
 })();
 
 function scToggleTrend() {
-  _scTrend = !_scTrend;
+  Scatter._state.trend = !Scatter._state.trend;
   var btn = document.getElementById('scTrendBtn');
-  if (btn) { btn.textContent = _scTrend ? 'On' : 'Off'; btn.classList.toggle('active', _scTrend); }
+  if (btn) { btn.textContent = Scatter._state.trend ? 'On' : 'Off'; btn.classList.toggle('active', Scatter._state.trend); }
   scRender();
 }
 
 function scToggleQuadrants() {
-  _scQuadrants = !_scQuadrants;
+  Scatter._state.quadrants = !Scatter._state.quadrants;
   var btn = document.getElementById('scQuadBtn');
-  if (btn) { btn.textContent = _scQuadrants ? 'On' : 'Off'; btn.classList.toggle('active', _scQuadrants); }
-  // Quadrant plugin reads _scQuadrants at draw time, so a chart.update() is enough.
-  if (_scChart) { _scChart.update('none'); }
+  if (btn) { btn.textContent = Scatter._state.quadrants ? 'On' : 'Off'; btn.classList.toggle('active', Scatter._state.quadrants); }
+  // Quadrant plugin reads Scatter._state.quadrants at draw time, so a chart.update() is enough.
+  if (Scatter._state.chart) { Scatter._state.chart.update('none'); }
 }
 
 /* ── Chart.js plugin: quadrant background tinting (priority #6).
@@ -13416,7 +13957,7 @@ function scToggleQuadrants() {
 var SC_QUADRANT_PLUGIN = {
   id: 'scQuadrants',
   beforeDatasetsDraw: function(chart) {
-    if (!_scQuadrants) return;
+    if (!Scatter._state.quadrants) return;
     var ctx     = chart.ctx;
     var xScale  = chart.scales.x;
     var yScale  = chart.scales.y;
@@ -13520,18 +14061,18 @@ var SC_QUADRANT_PLUGIN = {
 
 // ── Tooltip ───────────────────────────────────────────────────────────────────
 function scGetTip() {
-  if (!_scTipEl) {
-    _scTipEl = document.createElement('div');
-    _scTipEl.style.cssText = [
+  if (!Scatter._state.tipEl) {
+    Scatter._state.tipEl = document.createElement('div');
+    Scatter._state.tipEl.style.cssText = [
       'position:fixed','z-index:9999','pointer-events:none','opacity:0',
       'background:#0A1628','color:white','border-radius:8px','padding:10px 14px',
       "font-family:'DM Sans',sans-serif",'font-size:12px','line-height:1.5',
       'box-shadow:0 8px 24px rgba(0,0,0,.4)','max-width:240px',
       'transition:opacity .12s','border:1px solid rgba(255,255,255,.1)'
     ].join(';');
-    document.body.appendChild(_scTipEl);
+    document.body.appendChild(Scatter._state.tipEl);
   }
-  return _scTipEl;
+  return Scatter._state.tipEl;
 }
 
 function scShowTip(e, nearby, xM, yM) {
@@ -13576,22 +14117,37 @@ function scShowTip(e, nearby, xM, yM) {
 function scHideTip() { var tt = scGetTip(); tt.style.opacity = '0'; }
 
 // ── Debounced render ──────────────────────────────────────────────────────────
-var _scRenderTimer = null;
 function scRenderDebounced() {
   // Dismiss mobile focus card on axis/year change — stale state on fresh chart
   if (typeof scDismissMobileFocus === 'function') scDismissMobileFocus();
-  clearTimeout(_scRenderTimer);
-  _scRenderTimer = setTimeout(scRender, 150);
+  clearTimeout(Scatter._state.renderTimer);
+  Scatter._state.renderTimer = setTimeout(scRender, 150);
 }
 
 // ── Main render ───────────────────────────────────────────────────────────────
 function scRender() {
   if (typeof Chart === 'undefined') return;
 
+  // Increment render token — any async callback (logo onLoad) registered
+  // during this render captures myToken in closure and bails if a newer
+  // render has taken over before it fires.
+  Scatter._state.renderToken++;
+  var myToken = Scatter._state.renderToken;
+
+  // Invalidate spatial index and reset highlight tracking — the chart layout
+  // is about to change so old pixel positions are stale. The next mousemove
+  // will rebuild the index lazily against the new chart.
+  Scatter.invalidateSpatialIndex();
+  Scatter.resetHighlight();
+
+  // Wire delegated event listeners on first render after DOM is built.
+  // Cheap no-op on subsequent calls (gated by _state.delegationWired).
+  Scatter.initDelegation();
+
   // C4: Hide any visible tooltip before re-rendering (axis change, year switch).
   // Without this a tooltip from the previous render stays visible indefinitely
   // because the new canvas handlers don't know about the old tooltip state.
-  if (_scTipHideTimer) { clearTimeout(_scTipHideTimer); _scTipHideTimer = null; }
+  if (Scatter._state.tipHideTimer) { clearTimeout(Scatter._state.tipHideTimer); Scatter._state.tipHideTimer = null; }
   scHideTip();
 
   var xEl = document.getElementById('scXAxis');
@@ -13607,9 +14163,18 @@ function scRender() {
   var xM      = SC_AXES[xKey] || { label:xKey, fmt:function(v){ return String(v); }, inv:false };
   var yM      = SC_AXES[yKey] || { label:yKey, fmt:function(v){ return String(v); }, inv:false };
 
-  // Persist state to URL
+  // Persist state to URL — full control set so reload reproduces the view.
+  // Previously only x/y/year/color were stored; pos/trend/quadrants got lost.
   try {
-    if (xEl && yEl) urlSetState({ x:xKey, y:yKey, syear:year, scolor:colorBy });
+    if (xEl && yEl) urlSetState({
+      x:      xKey,
+      y:      yKey,
+      syear:  year,
+      scolor: colorBy,
+      spos:   posFil,
+      strend: Scatter._state.trend ? '1' : '0',
+      squad:  Scatter._state.quadrants ? '1' : '0'
+    });
   } catch(e) {}
 
   // Update plot descriptor — "Showing: X vs Y · Class · Color"
@@ -13624,22 +14189,26 @@ function scRender() {
   }
 
   // ── Data pipeline (ScatterEngine) ─────────────────────────────────────────
-  var players = ScatterEngine.getPlayers(year);
-  var pts     = ScatterEngine.computePoints(players, xKey, yKey, posFil);
+  // Filter once by position (cached inside getFiltered) — then derive points,
+  // top5, bot5 from the same filtered list. Previously each downstream call
+  // re-filtered independently — three passes over the same data per render.
+  var players  = ScatterEngine.getPlayers(year);
+  var filtered = ScatterEngine.getFiltered(players, posFil);
+  var pts      = ScatterEngine.computePoints(filtered, xKey, yKey);
 
   if (!pts.length) {
     var _mEl = document.getElementById('scPlotMeta');
     if (_mEl) _mEl.textContent = 'No data for this combination';
-    if (_scChart) { _scChart.destroy(); _scChart = null; }
+    if (Scatter._state.chart) { Scatter._state.chart.destroy(); Scatter._state.chart = null; }
     return;
   }
   // Append count to the descriptor line already set above
   if (metaEl) metaEl.textContent += ' · ' + pts.length + ' players';
 
-  // Update Top 5 + Bottom 5 panels
-  var topItems = ScatterEngine.topByAxis(players, yKey, posFil, 5);
+  // Update Top 5 + Bottom 5 panels — both use the same pre-filtered list
+  var topItems = ScatterEngine.topByAxis(filtered, yKey, 5);
   ScatterTopPanel.render(topItems, yM);
-  var botItems = ScatterEngine.botByAxis(players, yKey, posFil, 5);
+  var botItems = ScatterEngine.botByAxis(filtered, yKey, 5);
   ScatterBotPanel.render(botItems, yM);
 
   // Apply jitter only when point count is manageable (< 200)
@@ -13647,42 +14216,46 @@ function scRender() {
     pts = ScatterEngine.applyJitter(pts, ScatterEngine.axisRange(pts, 'x'), ScatterEngine.axisRange(pts, 'y'));
   }
 
-  _scAllPts = pts;
+  Scatter._state.allPts = pts;
 
   // ── Logo rendering (ScatterLogoCache) ─────────────────────────────────────
-  // Set onLoad callback — fires (debounced) when any logo arrives after initial render
+  // Set onLoad callback — fires (debounced) when any logo arrives after initial render.
+  // Captures myToken in closure: if a newer scRender() has run while logos
+  // were loading from the network, Scatter._state.renderToken !== myToken and we bail
+  // rather than painting old data references onto the new chart.
   ScatterLogoCache.setOnLoad(function() {
-    if (!_scChart || !_scAllPts.length) return;
-    var ds = _scChart.data.datasets[0];
+    if (myToken !== Scatter._state.renderToken) return;
+    if (!Scatter._state.chart || !Scatter._state.allPts.length) return;
+    var ds = Scatter._state.chart.data.datasets[0];
     if (!ds) return;
-    var logoData = ScatterLogoCache.getPointStyles(_scAllPts, ScatterEngine.tierSize);
-    // Always keep _scLastLogoData current — it is the authoritative restore target.
+    var logoData = ScatterLogoCache.getPointStyles(Scatter._state.allPts, ScatterEngine.tierSize);
+    // Always keep Scatter._state.lastLogoData current — it is the authoritative restore target.
     // Without this update it stays stale (contains 'circle' for logos that loaded
     // after the initial render) and clearHighlight() would restore the old circles.
-    _scLastLogoData = logoData;
-    if (_scHighlightName) {
+    Scatter._state.lastLogoData = logoData;
+    if (Scatter._state.highlightName) {
       // A Top-5 highlight is active — re-apply it with the freshly-loaded canvases
       // rather than overwriting with full-brightness logos and losing the dim state.
-      scHighlightPlayer(_scHighlightName);
+      scHighlightPlayer(Scatter._state.highlightName);
     } else {
       ds.pointStyle       = logoData.styles;
       ds.pointRadius      = logoData.radii;
       ds.pointHoverRadius = logoData.hoverRadii;
-      _scChart.update('none');
+      Scatter._state.chart.update('none');
     }
   });
 
   var logoData  = ScatterLogoCache.getPointStyles(pts, ScatterEngine.tierSize);
 
   // Store for highlight system (ScatterTopPanel.highlight → scHighlightPlayer)
-  _scCurrentColorBy = colorBy;
-  _scLastLogoData   = logoData;
+  Scatter._state.currentColorBy = colorBy;
+  Scatter._state.lastLogoData   = logoData;
 
   // fallback circles use the colorBy value for semantic color
   var bgColors  = pts.map(function(pt) { return ScatterEngine.pointColor(pt, colorBy) + 'CC'; });
 
   // ── Trend line (computed once, used for both dataset and stat bar) ─────────
-  var reg = (_scTrend && pts.length >= 3) ? ScatterEngine.linReg(pts) : null;
+  var reg = (Scatter._state.trend && pts.length >= 3) ? ScatterEngine.linReg(pts) : null;
 
   // ── Build datasets ────────────────────────────────────────────────────────
   var datasets = [{
@@ -13750,14 +14323,14 @@ function scRender() {
   // Updating is dramatically faster than destroy+new: no full canvas repaint,
   // no plugin re-registration, no scale reconstruction.
   var needsDatasets = datasets.length;
-  var canUpdate = _scChart
-    && _scChart.data
-    && _scChart.data.datasets.length === needsDatasets;
+  var canUpdate = Scatter._state.chart
+    && Scatter._state.chart.data
+    && Scatter._state.chart.data.datasets.length === needsDatasets;
 
   if (canUpdate) {
     // Patch existing datasets in-place — Chart.js reads these on next update()
     datasets.forEach(function(ds, i) {
-      var existing = _scChart.data.datasets[i];
+      var existing = Scatter._state.chart.data.datasets[i];
       existing.data             = ds.data;
       existing.pointStyle       = ds.pointStyle;
       existing.backgroundColor  = ds.backgroundColor;
@@ -13769,89 +14342,108 @@ function scRender() {
       if (ds.label       !== undefined) existing.label       = ds.label;
     });
     // Sync all axis config: label, reverse, and tick formatter
-    var sx = _scChart.options.scales.x;
-    var sy = _scChart.options.scales.y;
+    var sx = Scatter._state.chart.options.scales.x;
+    var sy = Scatter._state.chart.options.scales.y;
     sx.title.text = xM.label;
     sy.title.text = yM.label;
     sx.reverse    = !!xM.inv;
     sy.reverse    = !!yM.inv;
     sx.ticks.callback = function(v){ return xM.fmt(v); };
     sy.ticks.callback = function(v){ return yM.fmt(v); };
-    _scChart.update('none');
+    Scatter._state.chart.update('none');
   } else {
     // Full recreate: first render or dataset count changed
-    if (_scChart) { _scChart.destroy(); _scChart = null; }
-    _scChart = new Chart(canvas, chartConfig);
+    if (Scatter._state.chart) { Scatter._state.chart.destroy(); Scatter._state.chart = null; }
+    Scatter._state.chart = new Chart(canvas, chartConfig);
   }
 
   // ── Proximity tooltip ─────────────────────────────────────────────────────
-  // Detect hover within radius matching largest logo size (franchise = 28px)
+  // Uses Scatter.queryNear (spatial index) instead of walking every point.
+  // At 600 points the index reduces per-frame work from 600 getPixelForValue
+  // calls to ~5-15 (avg points in the 9 surrounding cells), a 40-100× win.
   canvas.onmousemove = function(e) {
-    if (!_scChart || !_scAllPts.length) return;
+    if (!Scatter._state.chart || !Scatter._state.allPts.length) return;
     var rect  = canvas.getBoundingClientRect();
     var mx    = e.clientX - rect.left;
     var my    = e.clientY - rect.top;
     try {
-      var xScale = _scChart.scales.x;
-      var yScale = _scChart.scales.y;
       var isTouchEvent = (e.pointerType === 'touch') || (window.matchMedia && matchMedia('(pointer:coarse)').matches);
       var touchBoost = isTouchEvent ? 14 : 0;
-      var near   = _scAllPts.filter(function(pt) {
-        var px  = xScale.getPixelForValue(pt.x);
-        var py  = yScale.getPixelForValue(pt.y);
-        var r   = ScatterEngine.tierSize(pt._p.rank) / 2 + 2 + touchBoost;
-        return Math.sqrt((px-mx)*(px-mx) + (py-my)*(py-my)) <= r;
-      });
+      var near = Scatter.queryNear(mx, my, touchBoost);
       scShowTip(e, near, xM, yM);
     } catch(e) { scHideTip(); }
   };
   canvas.onmouseleave = function() { scHideTip(); };
 
-  // ── Mobile touch: touchstart shows proximity tooltip; touchend dismisses it.
-  // IMPORTANT: use onX= assignment (not addEventListener) so each scRender()
-  // call replaces the handler rather than accumulating another copy.
-  // Using addEventListener without removal caused N tooltip show/hide handlers
-  // after N axis changes (verified regression: 10 renders → 10 simultaneous handlers).
-  // C4: _scTipHideTimer is module-level — no local declaration needed.
-  // Clearing it here ensures any pending hide from a previous render is cancelled
-  // before new touch handlers are attached (prevents ghost dismiss on axis change).
-  if (_scTipHideTimer) { clearTimeout(_scTipHideTimer); _scTipHideTimer = null; }
-  canvas.ontouchstart = function(e) {
-    if (_scTipHideTimer) { clearTimeout(_scTipHideTimer); _scTipHideTimer = null; }
-    if (!_scChart || !_scAllPts.length) return;
-    var rect  = canvas.getBoundingClientRect();
-    var touch = e.touches[0];
-    if (!touch) return;
-    var mx = touch.clientX - rect.left;
-    var my = touch.clientY - rect.top;
-    try {
-      var xScale = _scChart.scales.x;
-      var yScale = _scChart.scales.y;
-      var near = _scAllPts.filter(function(pt) {
-        var px = xScale.getPixelForValue(pt.x);
-        var py = yScale.getPixelForValue(pt.y);
-        var r  = ScatterEngine.tierSize(pt._p.rank) / 2 + 16;
-        return Math.sqrt((px-mx)*(px-mx)+(py-my)*(py-my)) <= r;
-      });
-      if (near.length) scShowTip({ clientX: touch.clientX, clientY: touch.clientY }, near, xM, yM);
-      else scHideTip();
-    } catch(err) { scHideTip(); }
-  };
-  canvas.ontouchend = function() {
-    // Cancel any pending hide from a previous tap before scheduling new one
-    if (_scTipHideTimer) clearTimeout(_scTipHideTimer);
-    _scTipHideTimer = setTimeout(function() { scHideTip(); _scTipHideTimer = null; }, 600);
-  };
-  canvas.ontouchcancel = function() {
-    if (_scTipHideTimer) { clearTimeout(_scTipHideTimer); _scTipHideTimer = null; }
+  // ── Touch tooltip: ONLY on coarse-pointerless devices ───────────────────
+  // On touch devices, the persistent focus card (#scMobileFocus, wired by
+  // scBindMobileTap below) is the canonical tap response. Wiring the
+  // touch-proximity tooltip in parallel caused both to fire on the same tap:
+  // the dark tooltip flickered in, the focus card slid in below, then the
+  // tooltip auto-dismissed mid-thought. One interaction model wins.
+  // We explicitly null out any previously-assigned coarse-device handlers
+  // in case the user resized from desktop into mobile (rare but possible
+  // with browser devtools).
+  var _isCoarsePointer = (typeof window !== 'undefined'
+    && window.matchMedia
+    && window.matchMedia('(pointer:coarse)').matches);
+
+  if (_isCoarsePointer) {
+    // Coarse pointer: focus card is the sole interaction. Null any prior
+    // touch handlers and skip the proximity-tooltip setup entirely.
+    canvas.ontouchstart  = null;
+    canvas.ontouchend    = null;
+    canvas.ontouchcancel = null;
+    if (Scatter._state.tipHideTimer) { clearTimeout(Scatter._state.tipHideTimer); Scatter._state.tipHideTimer = null; }
     scHideTip();
+  } else {
+    // ── Mobile touch: touchstart shows proximity tooltip; touchend dismisses it.
+    // IMPORTANT: use onX= assignment (not addEventListener) so each scRender()
+    // call replaces the handler rather than accumulating another copy.
+    // Using addEventListener without removal caused N tooltip show/hide handlers
+    // after N axis changes (verified regression: 10 renders → 10 simultaneous handlers).
+    // C4: Scatter._state.tipHideTimer is module-level — no local declaration needed.
+    // Clearing it here ensures any pending hide from a previous render is cancelled
+    // before new touch handlers are attached (prevents ghost dismiss on axis change).
+    if (Scatter._state.tipHideTimer) { clearTimeout(Scatter._state.tipHideTimer); Scatter._state.tipHideTimer = null; }
+    canvas.ontouchstart = function(e) {
+      if (Scatter._state.tipHideTimer) { clearTimeout(Scatter._state.tipHideTimer); Scatter._state.tipHideTimer = null; }
+      if (!Scatter._state.chart || !Scatter._state.allPts.length) return;
+      var rect  = canvas.getBoundingClientRect();
+      var touch = e.touches[0];
+      if (!touch) return;
+      var mx = touch.clientX - rect.left;
+      var my = touch.clientY - rect.top;
+      try {
+        var near = Scatter.queryNear(mx, my, 14);
+        if (near.length) scShowTip({ clientX: touch.clientX, clientY: touch.clientY }, near, xM, yM);
+        else scHideTip();
+      } catch(err) { scHideTip(); }
+    };
+    canvas.ontouchend = function() {
+      // Cancel any pending hide from a previous tap before scheduling new one
+      if (Scatter._state.tipHideTimer) clearTimeout(Scatter._state.tipHideTimer);
+      Scatter._state.tipHideTimer = setTimeout(function() { scHideTip(); Scatter._state.tipHideTimer = null; }, 600);
+    };
+    canvas.ontouchcancel = function() {
+      if (Scatter._state.tipHideTimer) { clearTimeout(Scatter._state.tipHideTimer); Scatter._state.tipHideTimer = null; }
+      scHideTip();
+    };
+  }
+
+  // Also short-circuit the hover proximity tooltip on coarse pointers — they
+  // can synthesize mousemove events on tap which would re-fire the tooltip
+  // path even though we just disabled the touch entry points above.
+  if (_isCoarsePointer) {
+    canvas.onmousemove  = null;
+    canvas.onmouseleave = null;
   }
 
   // ── Mobile tap-to-focus: separate from the tooltip system
   // Replaces the "show then dismiss" tooltip with a persistent focus card.
   // Only active on mobile (≤640px); no-op on desktop.
   if (typeof scBindMobileTap === 'function') {
-    scBindMobileTap(canvas, _scAllPts, xM, yM, _scChart);
+    scBindMobileTap(canvas, Scatter._state.allPts, xM, yM, Scatter._state.chart);
   }
 ;
   // FIX SC-02: prevent page scroll/zoom when touching the chart canvas.
@@ -13861,26 +14453,17 @@ function scRender() {
   canvas._scTouchMove = function(e) { e.preventDefault(); };
   canvas.addEventListener('touchmove', canvas._scTouchMove, { passive: false });
 
-  // Click a logo → open player profile modal
+  // Click a logo → open player profile modal.
+  // Uses queryClosest (spatial index) instead of walking every point.
   canvas.onclick = function(e) {
-    if (!_scChart || !_scAllPts.length) return;
-    var rect  = canvas.getBoundingClientRect();
-    var mx    = e.clientX - rect.left;
-    var my    = e.clientY - rect.top;
+    if (!Scatter._state.chart || !Scatter._state.allPts.length) return;
+    var rect = canvas.getBoundingClientRect();
+    var mx   = e.clientX - rect.left;
+    var my   = e.clientY - rect.top;
     try {
-      var xScale  = _scChart.scales.x;
-      var yScale  = _scChart.scales.y;
-      var clicked = null;
-      var minDist = Infinity;
       var isTap   = (e.pointerType === 'touch') || (window.matchMedia && matchMedia('(pointer:coarse)').matches);
       var tapBoost = isTap ? 16 : 0;
-      _scAllPts.forEach(function(pt) {
-        var px   = xScale.getPixelForValue(pt.x);
-        var py   = yScale.getPixelForValue(pt.y);
-        var r    = ScatterEngine.tierSize(pt._p.rank) / 2 + ScatterLogoCache.BUBBLE_PAD + 2 + tapBoost;
-        var dist = Math.sqrt((px - mx) * (px - mx) + (py - my) * (py - my));
-        if (dist <= r && dist < minDist) { minDist = dist; clicked = pt; }
-      });
+      var clicked  = Scatter.queryClosest(mx, my, tapBoost);
       if (clicked && typeof openPlayerModal === 'function') {
         openPlayerModal(clicked._p.rank, clicked._p._y || '2026');
       }
@@ -14098,6 +14681,12 @@ function urlRestoreState() {
   function setEl(id,val){var el=document.getElementById(id);if(el&&val)el.value=val;}
   setEl('posFilter',p.pos); setEl('clsFilter',p.cls); setEl('search2026',p.search);
   setEl('scXAxis',p.x); setEl('scYAxis',p.y); setEl('scYear',p.syear); setEl('scColorBy',p.scolor);
+  setEl('scPosFilter',p.spos);
+  // Trend/quadrants are toggle buttons backed by module-level globals — go
+  // through Scatter.setTrend / setQuadrants so the button label/active class
+  // stays in sync with the underlying flag.
+  if (p.strend === '1') Scatter.setTrend(true);
+  if (p.squad  === '1') Scatter.setQuadrants(true);
   var renders={
     board2026:renderBoard2026,analytics:renderAnalytics,
     history:renderHistory,future:renderFuture,mocks:renderMocks,
@@ -14574,7 +15163,7 @@ function compAvatarHtml(name, position, size, borderRadius) {
 
 // ── SCATTER LOGO REFRESH: now handled by ScatterLogoCache.setOnLoad() ─────
 // The onLoad callback is registered inside scRender() on each render pass.
-// ScatterLogoCache debounces logo arrivals and calls _scChart.update('none').
+// ScatterLogoCache debounces logo arrivals and calls Scatter._state.chart.update('none').
 
 
 
@@ -14584,10 +15173,10 @@ function compAvatarHtml(name, position, size, borderRadius) {
 // Defined once at load time — never re-allocated inside render loops.
 var FREEFORM_CONFIG = {
   TIERS: {
-    franchise: { color: '#F59E0B', bg: 'rgba(245,158,11,.065)',  label: 'Franchise' },
-    lottery:   { color: '#8B5CF6', bg: 'rgba(139,92,246,.055)', label: 'Lottery'   },
-    lateFirst: { color: '#3B82F6', bg: 'rgba(59,130,246,.045)', label: 'Late 1st'  },
-    second:    { color: '#10B981', bg: 'rgba(16,185,129,.038)', label: '2nd Rd'    },
+    franchise: { color: '#F59E0B', bg: 'rgba(245,158,11,.14)', label: 'Franchise' },
+    lottery:   { color: '#8B5CF6', bg: 'rgba(139,92,246,.10)', label: 'Lottery'   },
+    lateFirst: { color: '#3B82F6', bg: 'rgba(59,130,246,.07)', label: 'Late 1st'  },
+    second:    { color: '#10B981', bg: 'rgba(16,185,129,.04)', label: '2nd Rd'    },
   },
   CARD_BG: {
     franchise: 'rgba(245,158,11,.08)',
@@ -14695,9 +15284,14 @@ var FreeformLayout = (function() {
   }
 
   // Resolve vertical overlaps by nudging Y only (X is immutable after assignment).
-  function resolveYCollisions(placed, plotH, layout) {
+  // plotW is in px (the actual rendered canvas width). MIN_X derives from it,
+  // so collision avoidance works at any viewport — was hardcoded to 920px.
+  function resolveYCollisions(placed, plotH, plotW, layout) {
     var MIN_Y = (52 + 14) / plotH * 100;
-    var MIN_X = (110 + 10) / 920 * 100;
+    // Card-width-in-percent: standard card is ~108px + 12px gap.
+    // On a narrower plot, MIN_X is larger in % terms — denser collision detection.
+    var CARD_W_PX = 110, GAP_PX = 12;
+    var MIN_X = (CARD_W_PX + GAP_PX) / Math.max(plotW, 300) * 100;
     for (var pass = 0; pass < layout.COLLISION_PASSES; pass++) {
       for (var i = 1; i < placed.length; i++) {
         for (var j = 0; j < i; j++) {
@@ -14736,8 +15330,11 @@ var FreeformLayout = (function() {
   }
 
   // Public: run the full layout pipeline.
+  // Inputs: players, tierCuts, cfg, AND optional dims = {h, w} (overrides cfg.PLOT_H).
   // Returns { placed, unplaced, metricMax, maxRank, rankToYPct (bound fn) }
-  function run(players, tierCuts, cfg) {
+  function run(players, tierCuts, cfg, dims) {
+    var plotH = (dims && dims.h) || cfg.PLOT_H;
+    var plotW = (dims && dims.w) || 920;  // fallback only if not measured
     var ranked   = players.filter(function(p) { return p.rank <= 75; });
     var sized    = [];
     var unplaced = [];
@@ -14758,7 +15355,7 @@ var FreeformLayout = (function() {
     });
 
     var xAssigned = assignXPositions(sized, cfg.LAYOUT);
-    var resolved  = resolveYCollisions(xAssigned, cfg.PLOT_H, cfg.LAYOUT);
+    var resolved  = resolveYCollisions(xAssigned, plotH, plotW, cfg.LAYOUT);
     var enriched  = enrichItems(resolved, tierCuts, cfg);
 
     var metricMax = enriched.reduce(function(m, it) {
@@ -14807,9 +15404,10 @@ var FreeformState = (function() {
   /* ── Position filter ───────────────────────────────────────────────── */
   function getFilter()   { return _posFilter; }
   function hasFilter()   { return _posFilter !== null; }
-  function clearFilter() { _posFilter = null; }
+  function clearFilter() { _posFilter = null; _persist(); }
   function toggleFilter(pos) {
     _posFilter = (_posFilter === pos) ? null : pos;
+    _persist();
     return _posFilter;
   }
 
@@ -14829,10 +15427,10 @@ var FreeformState = (function() {
   /* ── Rank overrides (drag-to-reorder) ──────────────────────────────── */
   // Override map stores FRACTIONAL ranks so drag-between-two-cards is unambiguous;
   // they get resequenced to integers in applyOverrides().
-  function setOverride(name, fractionalRank) { _overrides[name] = fractionalRank; }
+  function setOverride(name, fractionalRank) { _overrides[name] = fractionalRank; _persist(); }
   function hasOverride(name) { return _overrides[name] != null; }
   function anyOverrides() { return Object.keys(_overrides).length > 0; }
-  function clearOverrides() { _overrides = Object.create(null); }
+  function clearOverrides() { _overrides = Object.create(null); _persist(); }
 
   // Apply overrides to a player array: returns new array with integer ranks.
   // Pure function — does not mutate input.
@@ -14857,33 +15455,69 @@ var FreeformState = (function() {
   function isPinned(name) { return _pinned.indexOf(name) >= 0; }
   function togglePin(name) {
     var i = _pinned.indexOf(name);
-    if (i >= 0) { _pinned.splice(i, 1); return false; }
+    if (i >= 0) { _pinned.splice(i, 1); _persist(); return false; }
     if (_pinned.length >= MAX_PIN) {
       // Push out the oldest pin
       _pinned.shift();
     }
     _pinned.push(name);
+    _persist();
     return true;
   }
   function pinnedList() { return _pinned.slice(); }
-  function clearPins() { _pinned = []; }
+  function clearPins() { _pinned = []; _persist(); }
 
   /* ── Zoom mirror (for header display) ──────────────────────────────── */
   function setZoom(z) { _zoomLevel = z; }
   function getZoom() { return _zoomLevel; }
+
+  /* ── URL persistence ───────────────────────────────────────────────────
+     Encode pins, overrides, and position filter into the URL hash so a
+     reload or shared link reproduces the user's work. The base `density`
+     key is set elsewhere by ffSetDensity. Format:
+       ffp = pins joined by '|'    (URL-encoded names)
+       ffo = overrides as "name~rank|name~rank"
+       fff = position filter (single value)                              */
+  function _persist() {
+    if (typeof urlSetState !== 'function') return;
+    var ffp = _pinned.length ? _pinned.join('|') : '';
+    var ovKeys = Object.keys(_overrides);
+    var ffo = ovKeys.length ? ovKeys.map(function(k){ return k + '~' + _overrides[k]; }).join('|') : '';
+    var fff = _posFilter || '';
+    urlSetState({ ffp: ffp, ffo: ffo, fff: fff });
+  }
+
+  // Restore state from URL hash. Called once before the first mount.
+  function restoreFromURL() {
+    if (typeof urlGetState !== 'function') return;
+    var p = urlGetState();
+    if (p.ffp) _pinned = p.ffp.split('|').filter(Boolean).slice(0, MAX_PIN);
+    if (p.ffo) {
+      _overrides = Object.create(null);
+      p.ffo.split('|').forEach(function(pair){
+        var parts = pair.split('~');
+        if (parts.length === 2) {
+          var r = parseFloat(parts[1]);
+          if (!isNaN(r)) _overrides[parts[0]] = r;
+        }
+      });
+    }
+    if (p.fff) _posFilter = p.fff;
+  }
 
   /* ── Init per mount ────────────────────────────────────────────────── */
   function reset(players) { _buildMap(players); }
   // Hard reset: also blow away overrides + pins. Called by user "reset edits" action.
   function resetAll(players) {
     _buildMap(players);
-    clearOverrides();
-    clearPins();
-    clearFilter();
+    _overrides = Object.create(null);
+    _pinned = [];
+    _posFilter = null;
+    _persist();
   }
 
   return {
-    reset: reset, resetAll: resetAll,
+    reset: reset, resetAll: resetAll, restoreFromURL: restoreFromURL,
     getPlayer: getPlayer, getPlayerByRank: getPlayerByRank, allPlayers: allPlayers,
     getFilter: getFilter, hasFilter: hasFilter, clearFilter: clearFilter, toggleFilter: toggleFilter,
     setOverride: setOverride, hasOverride: hasOverride, anyOverrides: anyOverrides,
@@ -14946,17 +15580,21 @@ var FreeformComponents = (function() {
         '--metric-pct:' + metricPct      + ';' +
         '--ff-stagger:' + staggerMs + 'ms';
 
+    // Metric value shown in top-right (replaces the redundant tier-dot).
+    // Shows the player's quantitative metric — currently locked behind hover.
+    var metricVal = (p.metric && p.metric > 0) ? p.metric.toFixed(1) : '';
+
     return '<div class="' + classes.join(' ') + '"'
       + ' data-name="' + _escAttr(p.name) + '"'
       + ' data-rank="' + p.rank + '"'
       + ' data-pos="' + (item.pos || '') + '"'
       + ' tabindex="0" role="button"'
-      + ' aria-label="Rank ' + p.rank + ', ' + _escAttr(displayName) + ', ' + (item.pos || 'Unknown') + '"'
+      + ' aria-label="Rank ' + p.rank + ', ' + _escAttr(displayName) + ', ' + (item.pos || 'Unknown') + (metricVal ? ', metric ' + metricVal : '') + '"'
       + ' style="' + style + '">'
       + '<div class="ff2-card-stripe"></div>'
       + '<div class="ff2-card-top">'
       +   '<span class="ff2-card-rank">#' + p.rank + '</span>'
-      +   '<span class="ff2-card-tier-dot"></span>'
+      +   '<span class="ff2-card-metric">' + metricVal + '</span>'
       + '</div>'
       + '<div class="ff2-card-name">' + displayName + '</div>'
       + (roleLabel ? '<div class="ff2-card-role">' + roleLabel + '</div>' : '')
@@ -15001,9 +15639,13 @@ var FreeformComponents = (function() {
       + '</div>';
   }
 
-  // TierRail — horizontal labels (was vertical writing-mode in v1)
+  // TierRail — emits the rail wrapper + items. Rail wrapper is now positioned
+  // absolutely (CSS), so no inline height; items carry data-orig-top /
+  // data-orig-h for FreeformInteraction._updateRail() to rewrite per frame as
+  // top = origTop * scale + ty, height = origH * scale. This is what lets the
+  // labels track the tier bands during pan/zoom without scaling horizontally.
   function TierRail(tierCuts, maxRank, placed, plotH, rankToYPctFn) {
-    var out      = '<div class="ff2-rail" style="height:' + plotH + 'px">';
+    var out      = '<div class="ff2-rail">';
     var tierKeys = ['franchise', 'lottery', 'lateFirst', 'second'];
     var prevRank = 0;
 
@@ -15019,7 +15661,10 @@ var FreeformComponents = (function() {
         return it.p.rank > prevRank && it.p.rank <= cutRank;
       }).length;
 
-      out += '<div class="ff2-rail-item" style="top:' + topPx.toFixed(1) + 'px;height:' + h.toFixed(1) + 'px;--rail-color:' + tc.color + '">'
+      out += '<div class="ff2-rail-item"'
+        + ' data-orig-top="' + topPx.toFixed(1) + '"'
+        + ' data-orig-h="'   + h.toFixed(1)     + '"'
+        + ' style="top:' + topPx.toFixed(1) + 'px;height:' + h.toFixed(1) + 'px;--rail-color:' + tc.color + '">'
         + '<div class="ff2-rail-bar"></div>'
         + '<div class="ff2-rail-label-group">'
         +   '<div class="ff2-rail-label">' + tc.label + '</div>'
@@ -15105,7 +15750,16 @@ var FreeformComponents = (function() {
 })();
 
 // ── Freeform density state ────────────────────────────────────────────────────
-var _ffDensity = (typeof window !== 'undefined' && window.innerWidth < 768) ? 'compact' : 'standard';
+// Density init: URL hash > viewport default. Persisted by ffSetDensity().
+var _ffDensity = (function(){
+  try {
+    if (typeof urlGetState === 'function') {
+      var s = urlGetState();
+      if (s.density && /^(compact|standard|comfortable)$/.test(s.density)) return s.density;
+    }
+  } catch(e) {}
+  return (typeof window !== 'undefined' && window.innerWidth < 768) ? 'compact' : 'standard';
+})();
 
 // Pure CSS-class swap — no re-render, no layout recalc. Real density is now wired
 // through CSS custom properties on the .ff2-shell.
@@ -15138,6 +15792,12 @@ var FreeformInteraction = (function() {
   var _layer = null, _vp = null;
   var _resetBtn = null, _zoomLevelEl = null;
   var _layerW = 0, _layerH = 0;
+  var _naturalLayerW = 0;        // layer.offsetWidth at scale 1, no inline width
+                                  // override. Used for the zoom-out width-expansion
+                                  // math (was using viewport width — wrong now that
+                                  // the rail is OUTSIDE the layer).
+  var _railEl = null;             // .ff2-rail (now a viewport sibling, not in the layer)
+  var _railItems = null;          // NodeList of .ff2-rail-item — updated each _apply
 
   var _dragActive = false, _dragStart = null, _dragMoved = false;
   var _pinchActive = false, _lastDist = 0, _lastMid = null;
@@ -15161,24 +15821,56 @@ var FreeformInteraction = (function() {
     var vpW = _vp.offsetWidth, vpH = _vp.offsetHeight;
     var cW = _layerW * _s, cH = _layerH * _s;
     var em = EDGE_MARGIN;
-    _tx = Math.max(-(cW - em), Math.min(vpW - em, _tx));
+    // At zoom ≤ 1, cards already fill the available canvas width (the layer
+    // is width-expanded in _apply), so horizontal panning is meaningless and
+    // would just slide content off-screen. Pin _tx to 0.
+    if (_s <= 1) {
+      _tx = 0;
+    } else {
+      _tx = Math.max(-(cW - em), Math.min(vpW - em, _tx));
+    }
     _ty = Math.max(-(cH - em), Math.min(em, _ty));
   }
 
+  // Track rail items to the tier bands they label. Called from _apply().
+  // Items carry data-orig-top / data-orig-h in unscaled pixels (set at mount).
+  // Visual top = origTop * scale + ty;  visual height = origH * scale.
+  // Rail wrapper itself never moves horizontally — only the items inside it
+  // shift vertically, so the rail appears fixed at the left edge while
+  // following the band positions on the right side of its border.
+  function _updateRail() {
+    if (!_railItems || !_railItems.length) return;
+    for (var i = 0; i < _railItems.length; i++) {
+      var item = _railItems[i];
+      var origTop = parseFloat(item.getAttribute('data-orig-top')) || 0;
+      var origH   = parseFloat(item.getAttribute('data-orig-h'))   || 0;
+      item.style.top    = (origTop * _s + _ty) + 'px';
+      item.style.height = (origH   * _s)       + 'px';
+    }
+  }
+
+  var _widthIsCleared = true;  // tracks layer.style.width === '' without re-reading
   function _apply() {
     if (!_layer || !_vp) return;
-    var vpW = _vp.offsetWidth;
-    if (_s < 1 && vpW > 0) {
-      var expandedW = Math.round(vpW / _s);
+    // Width-expansion: when zoomed out, expand the layer so that after
+    // scale(s) it visually fills _naturalLayerW. Use the layer's NATURAL
+    // width (canvas area, not viewport) — the rail no longer lives inside
+    // the layer so vpW would over-expand by railW.
+    if (_s < 1 && _naturalLayerW > 0) {
+      var expandedW = Math.round(_naturalLayerW / _s);
       if (_layerW !== expandedW) {
         _layer.style.width = expandedW + 'px';
         _layerW = expandedW;
+        _widthIsCleared = false;
       }
-    } else if (_layer.style.width) {
+    } else if (!_widthIsCleared) {
       _layer.style.width = '';
+      _widthIsCleared = true;
+      _layerW = 0;
     }
     _layer.style.transform =
       'translate3d(' + _tx.toFixed(1) + 'px,' + _ty.toFixed(1) + 'px,0) scale(' + _s.toFixed(4) + ')';
+    _updateRail();
     if (typeof FreeformState !== 'undefined') FreeformState.setZoom(_s);
     _syncZoomLevel();
   }
@@ -15278,6 +15970,11 @@ var FreeformInteraction = (function() {
     function apply(w, h) {
       if (!w || !h) return false;
       _layerW = w; _layerH = h;
+      // _naturalLayerW = layer's CSS-computed width at scale 1 (canvas area).
+      // Only set on the FIRST successful measure — subsequent calls happen
+      // after we've already overridden style.width for zoom-out expansion,
+      // and we don't want to overwrite the natural value with the inflated one.
+      if (!_naturalLayerW) _naturalLayerW = w;
       _apply(); _syncResetBtn();
       return true;
     }
@@ -15304,8 +16001,15 @@ var FreeformInteraction = (function() {
     _vp = vpEl; _layer = layerEl;
     _resetBtn    = document.querySelector('.ff2-reset-btn');
     _zoomLevelEl = document.querySelector('.ff2-zoom-level');
+    _railEl      = document.querySelector('.ff2-rail');
+    _railItems   = _railEl ? _railEl.querySelectorAll('.ff2-rail-item') : null;
     _pinchActive = false; _dragActive = false; _dragMoved = false; _dragStart = null;
     if (resetView) { _s = 1; _tx = 0; _ty = 0; }
+    // Reset natural width so it re-measures fresh on remount (viewport may
+    // have changed, rail width may have changed via media query, etc.)
+    _naturalLayerW = 0;
+    _widthIsCleared = true;
+    if (_layer && _layer.style.width) _layer.style.width = '';
     _measureLayerDimensions();
     vpEl.addEventListener('touchstart', _onTouchStart, { passive:false });
     vpEl.addEventListener('touchmove',  _onTouchMove,  { passive:false });
@@ -15587,6 +16291,197 @@ var FreeformTooltip = (function() {
   return { show:show, hide:hide };
 })();
 
+// ── MODULE: Freeform Export (NEW) ────────────────────────────────────────────
+// Lazy-loads html2canvas from CDN on first use, then renders the .ff2-shell
+// element to a canvas at one of three preset sizes and triggers a PNG
+// download. The shell is unmodified during capture — html2canvas reads the
+// computed styles. We temporarily reset the zoom transform so the export
+// captures the full board, not the user's current pan/zoom state.
+var FreeformExport = (function() {
+  'use strict';
+
+  var CDN_URL = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+  var _loading = null;  // promise cache
+
+  // Presets — width × height in CSS px, at 2× device pixel ratio for retina.
+  var PRESETS = [
+    { id:'twitter',  name:'Twitter / X',  size:'1200 × 675',  w:1200, h:675  },
+    { id:'square',   name:'Square',       size:'1080 × 1080', w:1080, h:1080 },
+    { id:'full',     name:'Full Board',   size:'1600 × 2200', w:1600, h:2200 },
+  ];
+
+  function _loadLib() {
+    if (typeof window.html2canvas === 'function') return Promise.resolve();
+    if (_loading) return _loading;
+    _loading = new Promise(function(resolve, reject) {
+      var s = document.createElement('script');
+      s.src = CDN_URL;
+      s.async = true;
+      s.onload  = function() { resolve(); };
+      s.onerror = function() { _loading = null; reject(new Error('Failed to load html2canvas')); };
+      document.head.appendChild(s);
+    });
+    return _loading;
+  }
+
+  function _openModal() {
+    var existing = document.getElementById('ff2ExportOverlay');
+    if (existing) existing.remove();
+
+    var overlay = document.createElement('div');
+    overlay.id = 'ff2ExportOverlay';
+    overlay.className = 'ff2-export-overlay';
+
+    var grid = PRESETS.map(function(p, i) {
+      return '<button class="ff2-export-preset" data-preset="' + p.id + '">'
+        + '<span class="ff2-export-preset-name">' + p.name + '</span>'
+        + '<span class="ff2-export-preset-size">' + p.size + '</span>'
+        + '</button>';
+    }).join('');
+
+    overlay.innerHTML =
+        '<div class="ff2-export-modal" role="dialog" aria-label="Export board">'
+      +   '<h3 class="ff2-export-title">Export Big Board</h3>'
+      +   '<div class="ff2-export-sub">Choose a size — downloads as PNG.</div>'
+      +   '<div class="ff2-export-grid">' + grid + '</div>'
+      +   '<div class="ff2-export-actions">'
+      +     '<div class="ff2-export-status" id="ff2ExportStatus"></div>'
+      +     '<button class="ff2-export-cancel" data-act="close">Cancel</button>'
+      +   '</div>'
+      + '</div>';
+
+    document.body.appendChild(overlay);
+    requestAnimationFrame(function() { overlay.classList.add('is-visible'); });
+
+    function close() {
+      overlay.classList.remove('is-visible');
+      setTimeout(function(){ overlay.remove(); }, 200);
+    }
+
+    overlay.addEventListener('click', function(e) {
+      if (e.target === overlay) { close(); return; }
+      var btn = e.target.closest('[data-preset]');
+      if (btn) {
+        var preset = PRESETS.find(function(p){ return p.id === btn.getAttribute('data-preset'); });
+        if (preset) _runExport(preset, overlay);
+        return;
+      }
+      if (e.target.closest('[data-act="close"]')) close();
+    });
+    return overlay;
+  }
+
+  function _setStatus(overlay, text, busy) {
+    var s = overlay.querySelector('#ff2ExportStatus');
+    if (!s) return;
+    s.innerHTML = (busy ? '<span class="ff2-spinner"></span>' : '') + (text || '');
+  }
+  function _setDisabled(overlay, disabled) {
+    overlay.querySelectorAll('.ff2-export-preset').forEach(function(b){ b.disabled = disabled; });
+  }
+
+  function _runExport(preset, overlay) {
+    var shell = document.querySelector('.ff2-shell');
+    if (!shell) { _setStatus(overlay, 'Board not visible', false); return; }
+
+    _setDisabled(overlay, true);
+    _setStatus(overlay, 'Loading renderer…', true);
+
+    _loadLib().then(function() {
+      _setStatus(overlay, 'Rendering ' + preset.name + '…', true);
+      return _capture(shell, preset);
+    }).then(function(canvas) {
+      _setStatus(overlay, 'Downloading…', true);
+      _download(canvas, preset);
+      _setStatus(overlay, '✓ Saved', false);
+      setTimeout(function() {
+        overlay.classList.remove('is-visible');
+        setTimeout(function(){ overlay.remove(); }, 200);
+      }, 600);
+    }).catch(function(err) {
+      _setStatus(overlay, 'Failed: ' + (err && err.message || 'unknown'), false);
+      _setDisabled(overlay, false);
+    });
+  }
+
+  function _capture(shell, preset) {
+    // Temporarily reset zoom layer so we capture the full board, not the
+    // user's pan/zoom view. We save state, force scale 1 / translate 0,
+    // then restore after capture.
+    var layer = document.getElementById('ff2ZoomLayer');
+    var prevTransform = layer ? layer.style.transform : '';
+    var prevWidth     = layer ? layer.style.width     : '';
+    if (layer) {
+      layer.style.transform = 'translate3d(0,0,0) scale(1)';
+      layer.style.width     = '';
+    }
+
+    // Render at 2× for sharpness, then resize. html2canvas honors scale.
+    var rect = shell.getBoundingClientRect();
+    var scale = Math.max(1, Math.min(2, preset.w / rect.width));
+
+    return window.html2canvas(shell, {
+      backgroundColor: '#060D1A',
+      scale: scale,
+      useCORS: true,
+      logging: false,
+      width:  rect.width,
+      height: rect.height,
+      windowWidth:  rect.width,
+      windowHeight: rect.height,
+    }).then(function(srcCanvas) {
+      if (layer) { layer.style.transform = prevTransform; layer.style.width = prevWidth; }
+      // Resize/letterbox into the preset frame.
+      var out = document.createElement('canvas');
+      out.width = preset.w; out.height = preset.h;
+      var ctx = out.getContext('2d');
+      ctx.fillStyle = '#060D1A';
+      ctx.fillRect(0, 0, preset.w, preset.h);
+      // Fit source into preset while preserving aspect ratio
+      var sR = srcCanvas.width / srcCanvas.height;
+      var dR = preset.w / preset.h;
+      var dw, dh, dx, dy;
+      if (sR > dR) {
+        dw = preset.w; dh = preset.w / sR;
+        dx = 0; dy = (preset.h - dh) / 2;
+      } else {
+        dh = preset.h; dw = preset.h * sR;
+        dy = 0; dx = (preset.w - dw) / 2;
+      }
+      ctx.drawImage(srcCanvas, 0, 0, srcCanvas.width, srcCanvas.height, dx, dy, dw, dh);
+      return out;
+    }).catch(function(err) {
+      if (layer) { layer.style.transform = prevTransform; layer.style.width = prevWidth; }
+      throw err;
+    });
+  }
+
+  function _download(canvas, preset) {
+    var stamp = new Date().toISOString().slice(0, 10);
+    var fn = 'big-board-' + preset.id + '-' + stamp + '.png';
+    if (canvas.toBlob) {
+      canvas.toBlob(function(blob) {
+        var a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = fn;
+        document.body.appendChild(a); a.click();
+        setTimeout(function() {
+          URL.revokeObjectURL(a.href);
+          a.remove();
+        }, 100);
+      }, 'image/png');
+    } else {
+      var a = document.createElement('a');
+      a.href = canvas.toDataURL('image/png');
+      a.download = fn;
+      document.body.appendChild(a); a.click(); a.remove();
+    }
+  }
+
+  return { open: _openModal };
+})();
+
+
 // ── MODULE: Freeform Board (v2, refactored) ──────────────────────────────────
 // mount() builds the scaffold once. relayout() updates positions without
 // rebuilding DOM. update() toggles class-based visual state. All event handlers
@@ -15606,6 +16501,7 @@ var FreeformBoard = (function() {
   var _resetEditsTimer = null;
   var _mountedSignature = null; // hash-ish of mounted player set
   var _lastLayout = null;       // cached layout result for relayout
+  var _dims       = null;       // {h, w} for current mount — viewport-derived
 
   function _signature(players) {
     // Fast signature: count + first 5 names + last 5 names + tier cut values
@@ -15617,9 +16513,16 @@ var FreeformBoard = (function() {
   }
 
   // ── Public: render. Delegates to mount or relayout depending on state. ──
+  var _urlRestored = false;
   function render(players) {
     _container = document.getElementById('board2026Content');
     if (!_container) return;
+
+    // Restore pins/overrides/filter from URL hash, once per page load.
+    if (!_urlRestored) {
+      _urlRestored = true;
+      if (FreeformState.restoreFromURL) FreeformState.restoreFromURL();
+    }
 
     var sig = _signature(players);
     var needsMount = _mountedSignature !== sig
@@ -15635,18 +16538,43 @@ var FreeformBoard = (function() {
     }
   }
 
+  // ── Plot dimensions — measured fresh each mount, viewport-derived ───────
+  // PLOT_H was a hardcoded 1160; that's ~28% of a small laptop screen but
+  // 60% of a phone. Now we compute from the actual viewport with sensible
+  // bounds. PLOT_W is read from the container width minus rail width.
+  function _getPlotDimensions(container) {
+    var vw = window.innerWidth  || document.documentElement.clientWidth  || 1024;
+    var vh = window.innerHeight || document.documentElement.clientHeight || 800;
+    var isMobile = vw < 768;
+    // Plot height: leave room for header (~58px) + col bar (~52px) + compare
+    // strip (~64px if pins). Use a percentage of viewport with clamps.
+    // On mobile we want a TALL board (most of the screen). On desktop ~75%
+    // of viewport, capped so it never feels empty on huge monitors.
+    var h;
+    if (isMobile) {
+      h = Math.max(560, Math.min(vh - 180, 1200));
+    } else {
+      h = Math.max(720, Math.min(Math.round(vh * 0.78), 1320));
+    }
+    // Plot width: container width minus the 76px rail and ~32px of chrome.
+    var containerW = (container && container.offsetWidth) || vw;
+    var w = Math.max(280, containerW - 108);
+    return { h: h, w: w };
+  }
+
   // ── Mount: build the entire scaffold from scratch ────────────────────────
   function _mount(players) {
     var withOverrides = FreeformState.applyOverrides
       ? FreeformState.applyOverrides(players)
       : players;
-    var layout = FreeformLayout.run(withOverrides, TIER_CUTS, CFG);
+    _dims = _getPlotDimensions(_container);
+    var layout = FreeformLayout.run(withOverrides, TIER_CUTS, CFG, _dims);
     _lastLayout = layout;
 
     // Reset state map — keep overrides + pins across remounts
     FreeformState.reset(layout.placed.map(function(it){ return it.p; }));
 
-    var plotH    = CFG.PLOT_H;
+    var plotH    = _dims.h;
     var maxRank  = layout.maxRank;
     var toYPct   = layout.rankToYPct;
     var tierKeys = ['franchise','lottery','lateFirst','second'];
@@ -15656,7 +16584,7 @@ var FreeformBoard = (function() {
     var densityBtns = ['compact','standard','comfortable'].map(function(m) {
       return '<button class="ff2-density-btn' + (_ffDensity === m ? ' is-active' : '') + '"'
         + ' data-act="density" data-density="' + m + '"'
-        + ' title="' + m.charAt(0).toUpperCase() + m.slice(1) + ' density">'
+        + ' data-tip="' + m.charAt(0).toUpperCase() + m.slice(1) + ' density">'
         + (m === 'compact' ? 'S' : m === 'comfortable' ? 'L' : 'M')
         + '</button>';
     }).join('');
@@ -15664,17 +16592,20 @@ var FreeformBoard = (function() {
     // Zoom buttons (new)
     var zoomBar =
         '<div class="ff2-zoom-bar" role="group" aria-label="Zoom controls">'
-      +   '<button class="ff2-zoom-btn" data-act="zoom-out" title="Zoom out" aria-label="Zoom out">−</button>'
+      +   '<button class="ff2-zoom-btn" data-act="zoom-out" data-tip="Zoom out" aria-label="Zoom out">−</button>'
       +   '<span class="ff2-zoom-level">100%</span>'
-      +   '<button class="ff2-zoom-btn" data-act="zoom-in" title="Zoom in" aria-label="Zoom in">+</button>'
+      +   '<button class="ff2-zoom-btn" data-act="zoom-in" data-tip="Zoom in" aria-label="Zoom in">+</button>'
       + '</div>';
 
     var resetBtn =
-        '<button class="ff2-reset-btn" data-act="reset-view" title="Reset zoom &amp; pan">&#8634; Reset</button>';
+        '<button class="ff2-reset-btn" data-act="reset-view" data-tip="Reset zoom and pan">&#8634; Reset</button>';
+
+    var exportBtn =
+        '<button class="ff2-export-btn" data-act="export" data-tip="Export board as PNG" aria-label="Export">⇲ Export</button>';
 
     // Edited badge
     var editedBadge = FreeformState.anyOverrides
-      ? '<span class="ff2-meta-edited" data-act="reset-edits" title="Reset to algorithmic order">⟲ Edited · reset</span>'
+      ? '<span class="ff2-meta-edited" data-act="reset-edits" data-tip="Reset to algorithmic order">⟲ Edited · reset</span>'
       : '';
 
     var out = '<div class="ff2-shell ff2-density-' + _ffDensity + '">';
@@ -15691,6 +16622,7 @@ var FreeformBoard = (function() {
       + '</div>'
       + '<div class="ff2-head-controls">'
       +   resetBtn
+      +   exportBtn
       +   '<div class="ff2-density-bar" role="group" aria-label="Card density">' + densityBtns + '</div>'
       +   zoomBar
       +   '<div class="ff2-legend">' + Comp.BoardLegend(layout.placed) + '</div>'
@@ -15700,20 +16632,26 @@ var FreeformBoard = (function() {
     // Column header
     out += Comp.ColumnHeader();
 
-    // Viewport + zoom layer + body
+    // Viewport + axes + rail (sibling of zoom layer) + zoom layer
+    //
+    // Structural note: .ff2-axis-y, .ff2-axis-x, AND .ff2-rail are all siblings
+    // of .ff2-zoom-layer. They live in the viewport's fixed coordinate space
+    // and do NOT scale or translate horizontally with the zoom transform. The
+    // rail items track the tier bands vertically via JS — FreeformInteraction
+    // rewrites their top/height on each _apply() call.
     out += '<div class="ff2-viewport" id="ff2Viewport" style="height:' + plotH + 'px">'
-      +   '<div class="ff2-zoom-layer" id="ff2ZoomLayer">'
-      +     '<div class="ff2-body">';
+      +   '<div class="ff2-axis-y">RANK ↓</div>'
+      +   '<div class="ff2-axis-x">← SMALLER · SIZE · LARGER →'
+      +     '<span class="ff2-axis-info" data-act="axis-info" tabindex="0" role="button" aria-label="About these axes">i</span>'
+      +   '</div>';
 
+    // Rail — OUTSIDE zoom layer
     out += Comp.TierRail(TIER_CUTS, maxRank, layout.placed, plotH, toYPct);
 
-    out += '<div class="ff2-canvas"><div class="ff2-plot" id="ff2Plot" style="height:' + plotH + 'px">';
+    out +=  '<div class="ff2-zoom-layer" id="ff2ZoomLayer">'
+      +     '<div class="ff2-body">';
 
-    // Axis labels
-    out += '<div class="ff2-axis-y">RANK ↓</div>';
-    out += '<div class="ff2-axis-x">← SMALLER · SIZE · LARGER →'
-      + '<span class="ff2-axis-info" data-act="axis-info" tabindex="0" role="button" aria-label="About these axes">i</span>'
-      + '</div>';
+    out += '<div class="ff2-canvas"><div class="ff2-plot" id="ff2Plot" style="height:' + plotH + 'px">';
 
     // Background column tints + dividers
     out += '<div class="ff2-col-zone" style="left:0;width:33.33%;background:rgba(59,130,246,.022)"></div>'
@@ -15785,6 +16723,35 @@ var FreeformBoard = (function() {
     _renderCompareStrip();   // render existing pinned comparison cards
     _applyFilterState();     // re-apply position filter dim if any
     ffSetDensity(_ffDensity);
+    _wireResize();           // remount on substantial viewport change
+  }
+
+  // Resize handling — debounced full remount when viewport changes enough to
+  // matter (>40px in either dimension). Bound ONCE per session via _resizeWired
+  // so multiple mounts don't stack listeners.
+  var _resizeWired = false, _resizeTimer = null, _lastVw = 0, _lastVh = 0;
+  function _wireResize() {
+    if (_resizeWired) return;
+    _resizeWired = true;
+    _lastVw = window.innerWidth;
+    _lastVh = window.innerHeight;
+    window.addEventListener('resize', function() {
+      if (_resizeTimer) clearTimeout(_resizeTimer);
+      _resizeTimer = setTimeout(function() {
+        // Only remount if the change is substantial AND the freeform view is visible
+        var dw = Math.abs(window.innerWidth  - _lastVw);
+        var dh = Math.abs(window.innerHeight - _lastVh);
+        if (dw < 40 && dh < 40) return;
+        _lastVw = window.innerWidth;
+        _lastVh = window.innerHeight;
+        var view = document.getElementById('viewFreeform');
+        if (!view || view.offsetParent === null) return; // hidden — skip
+        // Full remount: dims change, MIN_X changes, collision must rerun
+        _mountedSignature = null;
+        var players = FreeformState.allPlayers();
+        if (players.length) render(players);
+      }, 200);
+    });
   }
 
   // ── Soft relayout: update --x/--y CSS vars on existing cards ─────────────
@@ -15794,7 +16761,7 @@ var FreeformBoard = (function() {
     if (!_plotEl) return;
     var allPlayers = FreeformState.allPlayers();
     var withOverrides = FreeformState.applyOverrides(allPlayers);
-    var layout = FreeformLayout.run(withOverrides, TIER_CUTS, CFG);
+    var layout = FreeformLayout.run(withOverrides, TIER_CUTS, CFG, _dims);
     _lastLayout = layout;
     var n = layout.placed.length;
 
@@ -15834,7 +16801,7 @@ var FreeformBoard = (function() {
     var slot = _shellEl.querySelector('.ff2-edited-slot');
     if (slot) {
       slot.innerHTML = FreeformState.anyOverrides()
-        ? '<span class="ff2-meta-edited" data-act="reset-edits" title="Reset to algorithmic order">⟲ Edited · reset</span>'
+        ? '<span class="ff2-meta-edited" data-act="reset-edits" data-tip="Reset to algorithmic order">⟲ Edited · reset</span>'
         : '';
     }
   }
@@ -15844,7 +16811,7 @@ var FreeformBoard = (function() {
     var rail = _shellEl.querySelector('.ff2-rail');
     if (rail) {
       // Replace inner HTML of rail (cheap — small subtree)
-      var html = Comp.TierRail(TIER_CUTS, layout.maxRank, layout.placed, CFG.PLOT_H, layout.rankToYPct);
+      var html = Comp.TierRail(TIER_CUTS, layout.maxRank, layout.placed, (_dims && _dims.h) || CFG.PLOT_H, layout.rankToYPct);
       // TierRail returns the outer .ff2-rail wrapper; extract its children only
       var temp = document.createElement('div');
       temp.innerHTML = html;
@@ -15885,6 +16852,40 @@ var FreeformBoard = (function() {
       axisInfo.addEventListener('focus', _showAxisTooltip);
       axisInfo.addEventListener('blur',  function(){ FreeformTooltip.hide(); });
     }
+
+    // Generic [data-tip] tooltips — replaces native title= so styling matches.
+    // Uses delegated pointerover/pointerout (one listener, no per-button binding).
+    // Skipped on touch-coarse pointers; touch users get the action immediately.
+    if (!window.matchMedia || window.matchMedia('(pointer:fine)').matches) {
+      _shellEl.addEventListener('pointerover', _onTipOver);
+      _shellEl.addEventListener('pointerout',  _onTipOut);
+      _shellEl.addEventListener('focusin',     _onTipFocus);
+      _shellEl.addEventListener('focusout',    _onTipOut);
+    }
+  }
+
+  function _onTipOver(ev) {
+    var el = ev.target && ev.target.closest && ev.target.closest('[data-tip]');
+    if (!el) return;
+    if (ev.relatedTarget && el.contains(ev.relatedTarget)) return; // moving within same target
+    var tip = el.getAttribute('data-tip');
+    if (!tip) return;
+    var r = el.getBoundingClientRect();
+    FreeformTooltip.show(tip, r.left + r.width / 2, r.top);
+  }
+  function _onTipFocus(ev) {
+    var el = ev.target && ev.target.closest && ev.target.closest('[data-tip]');
+    if (!el) return;
+    var tip = el.getAttribute('data-tip');
+    if (!tip) return;
+    var r = el.getBoundingClientRect();
+    FreeformTooltip.show(tip, r.left + r.width / 2, r.top);
+  }
+  function _onTipOut(ev) {
+    var el = ev.target && ev.target.closest && ev.target.closest('[data-tip]');
+    if (!el) return;
+    if (ev.relatedTarget && el.contains(ev.relatedTarget)) return;
+    FreeformTooltip.hide();
   }
 
   function _showAxisTooltip(ev) {
@@ -15915,6 +16916,7 @@ var FreeformBoard = (function() {
       if (a === 'zoom-in')      { FreeformInteraction.zoomBy(1.2);  return; }
       if (a === 'zoom-out')     { FreeformInteraction.zoomBy(1/1.2); return; }
       if (a === 'reset-view')   { FreeformInteraction.reset(); return; }
+      if (a === 'export')       { FreeformExport.open(); return; }
       if (a === 'reset-edits')  {
         FreeformState.clearOverrides();
         relayout();
@@ -16143,7 +17145,7 @@ var FreeformBoard = (function() {
     var allP = FreeformState.allPlayers();
     var withOverrides = FreeformState.applyOverrides(allP);
     // Need the same layout enrichment for color tokens
-    var layout = _lastLayout || FreeformLayout.run(withOverrides, TIER_CUTS, CFG);
+    var layout = _lastLayout || FreeformLayout.run(withOverrides, TIER_CUTS, CFG, _dims);
     var byName = {};
     layout.placed.forEach(function(it){ byName[it.p.name] = it; });
     var html = '<div class="ff2-cmp-label">Compare <span class="ff2-cmp-count">' + pinned.length + '/' + FreeformState.MAX_PIN + '</span></div>';
