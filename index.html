@@ -9,6 +9,13 @@
   <!-- display=swap: browsers show fallback font immediately, swap when loaded — eliminates FOIT -->
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<!-- PR3: pinch-zoom + drag-pan + wheel-zoom on the scatter chart. hammerjs is
+     required for touch gestures (chartjs-plugin-zoom checks for it and gates
+     pinch support on its presence). Both loaded after Chart.js so the plugin
+     can self-register; if either fails to load the chart still renders, just
+     without zoom (handled by the typeof check in scRender chartConfig). -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-zoom/2.0.1/chartjs-plugin-zoom.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
 
@@ -5158,6 +5165,25 @@ ap{
   color:var(--gray-600);line-height:1;letter-spacing:.1px;
   white-space:nowrap;
 }
+
+/* PR3: Reset-zoom floating chip. Appears on canvas only when the user has
+   zoomed or panned (Scatter._state.zoomed → JS sets [hidden] accordingly).
+   Sits above the floatbar so it doesn't overlap the count chip; on mobile
+   it shifts to the bottom-left for thumb reach. */
+.sc-zoom-reset{
+  position:absolute;top:54px;right:14px;z-index:6;
+  display:inline-flex;align-items:center;gap:5px;
+  height:28px;padding:0 10px;
+  background:rgba(15,23,42,.92);color:white;border:none;border-radius:7px;
+  font-family:'DM Sans',sans-serif;font-size:11px;font-weight:700;
+  letter-spacing:.3px;cursor:pointer;
+  box-shadow:0 2px 10px rgba(15,23,42,.25);
+  -webkit-tap-highlight-color:transparent;
+  transition:opacity .15s ease, transform .15s ease;
+}
+.sc-zoom-reset[hidden]{display:none}
+.sc-zoom-reset:hover{background:rgba(15,23,42,1)}
+.sc-zoom-reset svg{width:12px;height:12px;color:#F0C94A}
 /* Disabled chip — used by Ghost (no other classes available) and Zones
    (no archetype lookup for the current axis pair). Stays visible but
    communicates inert state. Title attribute carries the reason. */
@@ -5443,6 +5469,9 @@ ap{
      name on long-press. */
   .sc-chip-toggle{padding:0;width:30px;justify-content:center}
   .sc-chip-toggle-label{display:none}
+  /* PR3: reset-zoom chip moves to top-left below the pills on mobile so
+     it sits within thumb reach and doesn't crowd the count chip. */
+  .sc-zoom-reset{top:auto;bottom:42px;right:auto;left:8px}
   .sc-floatbar{left:8px;right:8px;bottom:4px;gap:8px}
   .sc-count{font-size:10.5px;padding:2px 7px}
   .sc-wrap-v2 .sc-legend{font-size:10px;padding:2px 7px;gap:7px;max-width:62%}
@@ -6318,6 +6347,20 @@ ock Drafts table CSS ───────────────────�
             </button>
           </div>
 
+          <!-- PR3: Reset-zoom floating chip — hidden until the user pans
+               or zooms (scSyncZoomChrome toggles the hidden attribute based
+               on Scatter._state.zoomed). Sits at the bottom-right of the
+               canvas, above the floatbar's right edge so the count and
+               legend stay readable. Clicking it calls chart.resetZoom()
+               and the chip self-hides via the same sync function. -->
+          <button type="button" class="sc-zoom-reset" id="scResetZoom" hidden
+                  aria-label="Reset zoom and pan" title="Reset zoom and pan">
+            <svg viewBox="0 0 16 16" aria-hidden="true">
+              <path d="M2 8a6 6 0 1 0 1.76-4.24M2 3v3h3" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span>Reset</span>
+          </button>
+
           <!-- Floating count chip (bottom-left) + legend (bottom-right). -->
           <div class="sc-floatbar">
             <span class="sc-count" id="scPlotCount" aria-live="polite"></span>
@@ -6968,9 +7011,14 @@ function schoolInitialsBadge(school, size, borderRadius) {
 
 function schoolLogoHtml(school, size, borderRadius) {
   size = size || '20px'; borderRadius = borderRadius || '3px';
+  // SAFETY-1B: do the lookups against the RAW school name (URL maps + the
+  // initials-badge generator both expect the original string), but escape
+  // for the alt="" attribute so the function is self-safe — callers can
+  // pass raw p.school without having to remember to escape downstream.
   var url = schoolLogoUrl(school);
   var fallback = schoolInitialsBadge(school, size, borderRadius);
   if (!url) return fallback;
+  var schoolAlt = escHtml(school);
   var swap = "this.style.display='none';"
            + "var fb=this.nextElementSibling;"
            + "if(fb)fb.style.display='inline-flex';";
@@ -6979,7 +7027,7 @@ function schoolLogoHtml(school, size, borderRadius) {
        + '<img src="' + url + '" '
        + 'loading="lazy" '
        + 'style="width:'+size+';height:'+size+';object-fit:contain;flex-shrink:0;border-radius:'+borderRadius+'" '
-       + 'onload="'+loadChk+'" onerror="'+swap+'" alt="'+school+'">'
+       + 'onload="'+loadChk+'" onerror="'+swap+'" alt="'+schoolAlt+'">'
        + '<span style="display:none">'+fallback+'</span>'
        + '</span>';
 }
@@ -7683,17 +7731,56 @@ var DataService = (function() {
   'use strict';
 
   // ── Normalization: canonical player object schema ─────────────────────────
+  // PERF-1A: the normalized object now carries pre-derived fields used by
+  // hot render and filter paths. These fields are computed ONCE here (at
+  // normalize-time, which runs at most once per player per data version)
+  // and read O(1) thereafter — instead of being recomputed per render
+  // (buildPlayerCard renders 100+ times per board) or per keystroke
+  // (applyFilters/runGlobalSearch run on every input change). Names start
+  // with `_` to mark them as derived/internal vs raw schema fields.
+  //
+  // Derived fields:
+  //   _searchBoard  — lowercase "name|school|role" for board filter searches.
+  //   _search       — lowercase "name|school|role|position|comp|cls" for the
+  //                   global cross-year search (broader haystack).
+  //   _clsAbbr      — short class tag ("FR"/"SO"/"JR"/"SR"/3-letter fallback).
+  //   _htStr        — pre-formatted "6'8\"" height; if no height, "—".
   function normalize(raw) {
     if (!raw) return null;
+    var rawName  = _name(raw.name);
+    var rawSchool = _school(raw.name);
+    var rawRole  = _str(raw.torvik_role);
+    var rawPos   = _str(raw.position);
+    var rawComp  = _str(raw.comp || raw.comp_tool);
+    var rawCls   = _str(raw.cls);
+    var rawHt    = _int(raw.ht);
+
+    // _clsAbbr: canonical 2-letter class tag. Inlined classification — same
+    // table as the old buildPlayerCard logic but now amortized across all
+    // future renders rather than re-evaluated per render.
+    var clsAbbr = '';
+    if (rawCls) {
+      var cl = rawCls.toLowerCase();
+      if      (cl === 'freshman'  || cl === 'fresh') clsAbbr = 'FR';
+      else if (cl === 'sophomore')                   clsAbbr = 'SO';
+      else if (cl === 'junior')                      clsAbbr = 'JR';
+      else if (cl === 'senior')                      clsAbbr = 'SR';
+      else                                           clsAbbr = rawCls.slice(0,3).toUpperCase();
+    }
+
+    // _htStr: feet'inches" — the pattern that appears in 8+ render call
+    // sites. Precomputing once means none of them have to do the math.
+    var htStr = rawHt ? (Math.floor(rawHt/12) + "'" + (rawHt%12) + '"') : '—';
+
     return {
       rank:        _int(raw.rank),
-      name:        _name(raw.name),
-      school:      _school(raw.name),
-      position:    _str(raw.position),
-      cls:         _str(raw.cls),
-      torvik_role: _str(raw.torvik_role),
+      name:        rawName,
+      school:      rawSchool,
+      position:    rawPos,
+      cls:         rawCls,
+      torvik_role: rawRole,
       age:         _float(raw.age),
-      ht:          _int(raw.ht),
+      ht:          rawHt,
       wt:          _int(raw.wt),
       wingspan:    _float(raw.wingspan),
       standing_reach: _float(raw.standing_reach),
@@ -7707,12 +7794,18 @@ var DataService = (function() {
       bpm:         _float(raw.bpm),
       obpm:        _float(raw.obpm),
       dbpm:        _float(raw.dbpm),
-      comp:        _str(raw.comp || raw.comp_tool),
+      comp:        rawComp,
       notes:       _str(raw.notes),
       prior_teams: _str(raw.prior_teams),
       team:        _str(raw.team),
       draft_no:    _int(raw.draft_no),
       draft_diff:  _int(raw.draft_diff),
+      // PERF-1A derived fields ────────────────────────────────────────────
+      _searchBoard: (rawName + '|' + rawSchool + '|' + rawRole).toLowerCase(),
+      _search:      (rawName + '|' + rawSchool + '|' + rawRole + '|'
+                    + rawPos + '|' + rawComp + '|' + rawCls).toLowerCase(),
+      _clsAbbr:     clsAbbr,
+      _htStr:       htStr
     };
   }
 
@@ -7841,13 +7934,25 @@ var LayoutEngine = (function() {
     var pos    =  filters.posFilter || '';
     var cls    =  filters.clsFilter || '';
 
+    // PERF-1A: read pre-lowercased p._searchBoard built at normalize-time
+    // rather than running 3 toLowerCase calls per player per keystroke.
+    // Fast-path empty-search bypasses the indexOf entirely.
+    if (!search) {
+      // No text filter — drop the includes() branch from the hot loop too.
+      if (!pos && !cls) return players.slice();  // no filters at all
+      return players.filter(function(p) {
+        if (pos && p.position !== pos) return false;
+        if (cls && p.cls      !== cls) return false;
+        return true;
+      });
+    }
     return players.filter(function(p) {
-      if (search) {
-        var n = (p.name        || '').toLowerCase();
-        var s = (p.school      || '').toLowerCase();
-        var r = (p.torvik_role || '').toLowerCase();
-        if (!n.includes(search) && !s.includes(search) && !r.includes(search)) return false;
-      }
+      // p._searchBoard is guaranteed to exist on every DataService-normalized
+      // record. Old code had a length-3 disjunction across name|school|role;
+      // the same haystack is now a single concatenated lowercase string.
+      if (p._searchBoard ? p._searchBoard.indexOf(search) === -1
+                         : !(p.name||'').toLowerCase().includes(search))
+        return false;
       if (pos && p.position !== pos) return false;
       if (cls && p.cls      !== cls) return false;
       return true;
@@ -8036,6 +8141,10 @@ function posRingHtml(value, statKey, position) {
 // ── buildSchoolLogoHtml: renders school logo in a circular crisp container.
 // Wrapping in .card-logo-ring prevents the logo from ever stretching and keeps
 // alignment identical across every card regardless of logo dimensions.
+// SAFETY-1B: takes RAW school name and self-escapes for the alt attribute.
+// This matches the contract on schoolLogoHtml — callers pass the original
+// p.school so the URL lookup (keyed by raw string) still hits, and the alt
+// is escaped here so a name with `"` cannot break out of the attribute.
 function buildSchoolLogoHtml(school) {
   if (!school) return '';
   var url = schoolLogoUrl(school);
@@ -8043,10 +8152,11 @@ function buildSchoolLogoHtml(school) {
     // Fallback: colour-keyed initials badge, same size as the ring
     return '<div class="card-logo-ring">' + schoolInitialsBadge(school, '16px', '50%') + '</div>';
   }
+  var schoolAlt = escHtml(school);
   var swap = "this.style.display='none';this.nextElementSibling.style.display='flex';";
   var loadChk = "if(this.naturalWidth<16||this.naturalHeight<16){" + swap + "}";
   return '<div class="card-logo-ring">'
-    + '<img src="' + url + '" loading="lazy" onload="' + loadChk + '" onerror="' + swap + '" alt="' + school + '">'
+    + '<img src="' + url + '" loading="lazy" onload="' + loadChk + '" onerror="' + swap + '" alt="' + schoolAlt + '">'
     + '<span style="display:none">' + schoolInitialsBadge(school, '16px', '50%') + '</span>'
     + '</div>';
 }
@@ -8103,8 +8213,15 @@ function ordSfx(n) {
 }
 
 function buildPlayerCard(p, tierKey, _metricsSorted) {
-  var name   = escHtml(splitName(p.name || '')[0]);
-  var school = escHtml(p.school || '');
+  // SAFETY-1B: raw values for lookups (buildSchoolLogoHtml expects raw),
+  // H-suffix variants for HTML interpolation. Was a single pre-escaped
+  // pair before, which silently broke buildSchoolLogoHtml's URL lookup
+  // for school names containing `'` once escHtml was strengthened. The
+  // split makes the contract at every callsite explicit.
+  var nameRaw   = splitName(p.name || '')[0];
+  var schoolRaw = p.school || '';
+  var name      = escHtml(nameRaw);
+  var school    = escHtml(schoolRaw);
 
   // ── Metric ───────────────────────────────────────────────────────────
   var gm      = gradStyle(p.metric, 'metric');
@@ -8124,11 +8241,16 @@ function buildPlayerCard(p, tierKey, _metricsSorted) {
   }
 
   // ── School logo ──────────────────────────────────────────────────────
-  var logoHtml = buildSchoolLogoHtml(school);
+  var logoHtml = buildSchoolLogoHtml(schoolRaw);
 
   // ── Class abbreviation ───────────────────────────────────────────────
+  // PERF-1A: prefer p._clsAbbr precomputed at normalize time. The fallback
+  // re-derives the abbreviation only when an un-normalized object somehow
+  // makes it here (defensive — shouldn't happen with the DataService path).
   var clsAbbr = '';
-  if (p.cls) {
+  if (p._clsAbbr != null) {
+    clsAbbr = p._clsAbbr;
+  } else if (p.cls) {
     var clsLow = p.cls.toLowerCase();
     if      (clsLow === 'freshman'  || clsLow === 'fresh') clsAbbr = 'FR';
     else if (clsLow === 'sophomore')                        clsAbbr = 'SO';
@@ -8138,7 +8260,12 @@ function buildPlayerCard(p, tierKey, _metricsSorted) {
   }
 
   // ── Height display + percentile (position-group, binary search) ────
-  var htDisplay = p.ht ? (Math.floor(p.ht/12) + '\'' + (p.ht%12) + '"') : '';
+  // PERF-1A: read p._htStr (pre-formatted "6'8\"" from DataService.normalize).
+  // The bsearch percentile lookup below still runs per render because it
+  // depends on POS_HT_SORTED state which can change with the player set.
+  var htDisplay = p._htStr != null
+    ? (p._htStr === '—' ? '' : p._htStr)
+    : (p.ht ? (Math.floor(p.ht/12) + '\'' + (p.ht%12) + '"') : '');
   var htPct = null;
   if (p.ht && POS_HT_SORTED[p.position] && POS_HT_SORTED[p.position].length) {
     var htArr = POS_HT_SORTED[p.position];
@@ -8428,8 +8555,11 @@ function renderBoardTable(players) {
   html += '</tr></thead><tbody>';
 
   for (const p of sorted) {
-    const name   = escHtml(p.name);
-    const school = escHtml(p.school || '');
+    // SAFETY-1B: raw value for logo lookups + escaped for interpolation.
+    const nameRaw   = p.name || '';
+    const schoolRaw = p.school || '';
+    const name      = escHtml(nameRaw);
+    const school    = escHtml(schoolRaw);
     const elite = p.metric > 140, top10 = p.rank <= 10;
     html += (() => {
       const gMet  = gradStyle(p.metric,  'metric');
@@ -8453,7 +8583,7 @@ function renderBoardTable(players) {
       <td><div class="td-player-cell">
         ${av}
         ` + (() => {
-              const tLogo = schoolLogoHtml(school || '', '16px', '2px');
+              const tLogo = schoolLogoHtml(schoolRaw || '', '16px', '2px');
               const schoolSpan = tLogo
                 ? '<span class="school" style="display:inline-flex;align-items:center;gap:4px">' + tLogo + '<span>' + (school || '') + '</span></span>'
                 : '<span class="school">' + (school || '') + '</span>';
@@ -9238,7 +9368,11 @@ function populateCompSelect() {
         && p.stl_bl && p.stl_bl > 0 && p.ato && p.ato > 0;
   });
   sel.innerHTML = '<option value="">— Select a prospect (' + eligible.length + ' with full stats) —</option>' +
-    eligible.map(function(p){ return '<option value="' + p.rank + '">' + p.rank + '. ' + splitName(p.name)[0] + '</option>'; }).join('');
+    eligible.map(function(p){
+      // SAFETY-1B: name flows into <option> innerText. value attr is the
+      // integer rank so it's safe; the displayed name needs escaping.
+      return '<option value="' + p.rank + '">' + p.rank + '. ' + escHtml(splitName(p.name)[0]) + '</option>';
+    }).join('');
 }
 
 // ── COMP EXPLORER — STATISTICAL SIMILARITY MODEL ─────────────────────────────
@@ -9992,7 +10126,7 @@ function renderHistory() {
     const ftaV = p.ftar    ? parseFloat(p.ftar).toFixed(3)    : '—';
     const tpaV = p.tpar    ? parseFloat(p.tpar).toFixed(3)    : '—';
     const av   = avatarHtml(p.name, p.position||'', '28px', '5px').replace('class="avatar-fallback"','class="td-mini-fb"');
-    const hLogo = schoolLogoHtml(school || '', '16px', '2px');
+    const hLogo = schoolLogoHtml(rawSchool || '', '16px', '2px');
     const hSchoolSpan = hLogo
       ? '<span class="school" style="display:inline-flex;align-items:center;gap:4px">' + hLogo + '<span>' + (school || '') + '</span></span>'
       : '<span class="school">' + (school || '') + '</span>';
@@ -10065,12 +10199,15 @@ function _renderFuture2027Cards(players) {
          + '<span class="future-tier-count">'+group.length+' prospects</span></div>';
     out += '<div class="future-cards-grid">';
     group.forEach(function(p) {
-      var name   = escHtml(p.name || '');
-      var school = escHtml(p.school || '');
+      // SAFETY-1B: raw + H-suffix split for logo-lookup safety.
+      var nameRaw   = p.name || '';
+      var schoolRaw = p.school || '';
+      var name      = escHtml(nameRaw);
+      var school    = escHtml(schoolRaw);
       var posCol = posColor(p.position||'');
-      var logoHtml = school && school !== 'Uncommitted' ? schoolLogoHtml(school,'18px','3px') : '';
+      var logoHtml = schoolRaw && schoolRaw !== 'Uncommitted' ? schoolLogoHtml(schoolRaw,'18px','3px') : '';
       var schoolDisplay = school || 'Uncommitted';
-      var uncommitted = school === 'Uncommitted' || !school;
+      var uncommitted = schoolRaw === 'Uncommitted' || !schoolRaw;
       var av = avatarHtml(p.name, p.position||'', '48px', '8px');
 
       // Name length scaling
@@ -10103,8 +10240,12 @@ function _renderFuture2027Cards(players) {
       // Tags row
       var posCls = (p.position||'').toLowerCase();
       out += '<div class="future-card-tags">';
-      if (p.position) out += '<span class="tag pos '+posCls+'">'+p.position+'</span>';
-      if (p.cls)      out += '<span class="tag cls">'+p.cls+'</span>';
+      // SAFETY-1B: position and cls flow into innerHTML — escape both.
+      // posCls is the LOWERCASE form used purely as a class-name suffix
+      // (.tag.pos.guard etc.); the canonical position values are HTML-safe
+      // but escHtml costs nothing and protects against bad uploads.
+      if (p.position) out += '<span class="tag pos '+escHtml(posCls)+'">'+escHtml(p.position)+'</span>';
+      if (p.cls)      out += '<span class="tag cls">'+escHtml(p.cls)+'</span>';
       if (p.age)      out += '<span class="tag age">'+parseFloat(p.age||0).toFixed(1)+' yrs</span>';
       if (p.ht)       out += '<span class="tag ht">'+Math.floor(p.ht/12)+"'"+p.ht%12+'"'+'</span>';
       if (p.wt)       out += '<span class="tag wt">'+p.wt+' lbs</span>';
@@ -10141,9 +10282,13 @@ function _renderFuture2027Table(players) {
     + '</tr></thead><tbody>';
 
   players.forEach(function(p) {
-    var name   = escHtml(p.name || ''), school = escHtml(p.school || '');
-    var uncommitted = school === 'Uncommitted' || !school;
-    var logoHtml = !uncommitted ? schoolLogoHtml(school,'16px','2px') : '';
+    // SAFETY-1B: raw + H-suffix split for logo-lookup safety.
+    var nameRaw   = p.name || '';
+    var schoolRaw = p.school || '';
+    var name      = escHtml(nameRaw);
+    var school    = escHtml(schoolRaw);
+    var uncommitted = schoolRaw === 'Uncommitted' || !schoolRaw;
+    var logoHtml = !uncommitted ? schoolLogoHtml(schoolRaw,'16px','2px') : '';
     var av = avatarHtml(p.name, p.position||'', '32px', '5px');
     var htStr = p.ht ? Math.floor(p.ht/12)+"'"+p.ht%12+'"' : '—';
     var wtStr = p.wt ? p.wt+'lb' : '—';
@@ -10357,8 +10502,25 @@ function renderResources() {
 }
 
 function escHtml(s) {
+  // SAFETY-1B: include single-quote and backtick in the escape set.
+  // Original implementation covered &<>" — sufficient for content nested
+  // inside DOUBLE-quoted attributes and element text, but unsafe when the
+  // escaped value is interpolated into a SINGLE-quoted attribute (which
+  // does happen — onclick="…removeFromCompare(2,'2026')…" uses ' as the
+  // inner JS-string quote). A name containing ' would terminate the JS
+  // string early; with this fix it becomes &#39; and the surrounding
+  // attribute structure stays intact. Backtick is escaped for parity
+  // (matters when content lands in JS template literals built elsewhere).
+  // The falsy-→-"" behavior is preserved — callers depend on
+  // escHtml(undefined) being safe to interpolate.
   if (!s) return "";
-  return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+  return String(s)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;")
+    .replace(/`/g, "&#96;");
 }
 // ── TAB SWITCHING ─────────────────────────────────────────────────────────
 // Tab click handlers wired once via _hwTabWired guard. Delegates to
@@ -11182,6 +11344,15 @@ function openGlobalSearch() {
   // FIX GS-03: On mobile the software keyboard shrinks window.innerHeight.
   // We listen for resize (which fires when keyboard opens/closes) and
   // reposition the dialog so the input + results stay visible above the keyboard.
+  //
+  // PERF-1A: original implementation ran _reposition on every resize event,
+  // which fires 60+ times per second during a desktop window drag. Each call
+  // does a getElementById + style writes + layout reads that thrash the
+  // browser's style/layout cycle. RAF-throttle coalesces multiple resize
+  // events into at most one repaint per frame — imperceptible latency for
+  // the mobile keyboard case (one event, one frame) but dramatic savings
+  // on desktop where window drags become a fluid 60fps instead of a janky
+  // backlog of pending layout work.
   function _reposition() {
     var vh = window.innerHeight;
     // On small screens with keyboard open, use the full reduced height
@@ -11196,8 +11367,19 @@ function openGlobalSearch() {
     }
   }
   _reposition();
-  modal._gsResize = _reposition;
-  window.addEventListener('resize', _reposition);
+  // _scheduled is the in-flight RAF id; resetting to 0 inside the callback
+  // lets the next resize event schedule a fresh frame. removeEventListener
+  // uses the throttled wrapper as the listener identity (not _reposition).
+  var _scheduled = 0;
+  var _repositionThrottled = function() {
+    if (_scheduled) return;
+    _scheduled = requestAnimationFrame(function() {
+      _scheduled = 0;
+      _reposition();
+    });
+  };
+  modal._gsResize = _repositionThrottled;
+  window.addEventListener('resize', _repositionThrottled);
 }
 
 function closeGlobalSearch() {
@@ -11306,39 +11488,48 @@ function runGlobalSearch(query) {
     return;
   }
 
-  // Collect all matching players across all years
+  // Collect all matching players across all years.
+  // PERF-1A: read pre-built p._search field (lowercase concatenation of
+  // name|school|role|position|comp|cls) built once at DataService.normalize()
+  // time. Was: 6 toLowerCase + 6 indexOf per player per keystroke
+  //          (4200+ string ops across the full ~700-player corpus).
+  // Now:     1 indexOf per player per keystroke (~700 string ops).
   var results = [];
 
-  // Helper: does the player match query?
-  function playerMatches(p, yr) {
-    var name   = (p.name || '').toLowerCase();
-    var school = name.indexOf(' - ') > 0 ? name.split(' - ')[1] : '';
-    var role   = (p.torvik_role || '').toLowerCase();
-    var pos    = (p.position || '').toLowerCase();
-    var comp   = (p.comp || '').toLowerCase();
-    var cls    = (p.cls || '').toLowerCase();
-    return name.indexOf(q) !== -1 || school.indexOf(q) !== -1 ||
-           role.indexOf(q) !== -1 || pos.indexOf(q) !== -1 ||
-           comp.indexOf(q) !== -1 || cls.indexOf(q) !== -1;
+  function collect(yr, source) {
+    // Read through DataService so all years get the normalized objects
+    // with _search prepopulated — historical was previously read raw from
+    // DATA.historical, which bypassed the cache AND meant no _search field.
+    var board = DataService.getBoard(yr);
+    if (!board) return;
+    for (var i = 0; i < board.length; i++) {
+      var p = board[i];
+      // Fallback expression handles defensively any record that pre-dates
+      // the PERF-1A normalize change (shouldn't happen — _cache wipes on
+      // every applyUpdate — but cheap to guard).
+      var hay = p._search != null
+        ? p._search
+        : ((p.name||'') + '|' + (p.school||'') + '|' + (p.torvik_role||'')).toLowerCase();
+      if (hay.indexOf(q) !== -1) {
+        // Object.assign here was the per-match allocation cost from the old
+        // implementation — kept the same since the caller-side code below
+        // reads the _year and _source labels off these copied records.
+        results.push(Object.assign({}, p, { _year: yr, _source: source }));
+      }
+    }
   }
 
-  // 2026 board — read through DataService for normalized, roll-forward-safe data
-  DataService.getBoard('2026').forEach(function(p) {
-    if (playerMatches(p, '2026')) results.push(Object.assign({}, p, { _year:'2026', _source:'2026 Draft Board' }));
-  });
+  collect('2026', '2026 Draft Board');
+  collect('2027', '2027 Watch');
 
-  // 2027 watch
-  DataService.getBoard('2027').forEach(function(p) {
-    if (playerMatches(p, '2027')) results.push(Object.assign({}, p, { _year:'2027', _source:'2027 Watch' }));
-  });
-
-  // Historical boards 2019-2025
+  // Historical boards 2019–2025 — DataService.getBoard supports these too,
+  // so the same normalized path runs. Sort descending so 2025 comes before
+  // 2024 etc. in the results list.
   if (DATA.historical) {
-    Object.keys(DATA.historical).sort().reverse().forEach(function(yr) {
-      (DATA.historical[yr] || []).forEach(function(p) {
-        if (playerMatches(p, yr)) results.push(Object.assign({}, p, { _year:yr, _source: yr+' Draft Board' }));
-      });
-    });
+    var years = Object.keys(DATA.historical).sort().reverse();
+    for (var yi = 0; yi < years.length; yi++) {
+      collect(years[yi], years[yi] + ' Draft Board');
+    }
   }
 
   if (!results.length) {
@@ -11685,17 +11876,33 @@ function bbWhyHere(p) {
 }
 
 function bbBuildRow(p, idx) {
-  var base   = escHtml(p.name   || '');
-  var school = escHtml(p.school || '');
+  // SAFETY-1B: keep RAW p.name and p.school in `base`/`school` for downstream
+  // helpers that need the original value for lookup (schoolLogoHtml builds
+  // a URL keyed by the raw school name). `baseH`/`schoolH` are pre-escaped
+  // for the HTML interpolations further down. The two names make intent
+  // explicit at every callsite — was a single escaped variable before, which
+  // worked only because escHtml didn't touch ' (broken for schools like
+  // "Saint Mary's"); the new escHtml is stricter, so we split the concerns.
+  var base    = p.name   || '';
+  var school  = p.school || '';
+  var baseH   = escHtml(base);
+  var schoolH = escHtml(school);
   var ht = p.ht ? (Math.floor(p.ht/12)+"'"+(p.ht%12)+'"') : '—';
   var wt = p.wt ? p.wt+'lb' : '—';
 
-  // Class abbreviation
+  // Class abbreviation.
+  // SAFETY-1B: the normalize step replaces canonical class strings
+  // ('Freshman', 'Sophomore', etc.) with 'Fr'/'So'/'Jr'/'Sr', but any other
+  // value passes through raw. A garbage cls value (e.g. from a bad Excel
+  // upload) would otherwise be interpolated unescaped into the HTML below.
+  // Escape the FINAL value once after the normalization branch — the canon
+  // abbreviations are HTML-safe anyway, this is purely defense in depth.
   var cls = (p.cls||'').trim();
   if      (cls==='Freshman'||cls==='Fresh') cls='Fr';
   else if (cls==='Sophomore') cls='So';
   else if (cls==='Junior')    cls='Jr';
   else if (cls==='Senior')    cls='Sr';
+  else                        cls = escHtml(cls);
 
   // Scouting hook (priority #2) — single phrase from p.notes, italicized under school
   var hook = bbExtractHook(p.notes);
@@ -11748,10 +11955,10 @@ function bbBuildRow(p, idx) {
     +'<div class="bb-av bb-cav">'+avHtml+'</div>'
     // 3. Player identity — name, school, and scouting hook (priority #2)
     +'<div class="bb-id bb-cid">'
-      +'<div class="bb-name">'+base+getBadgeHtml(p.name)+'</div>'
+      +'<div class="bb-name">'+baseH+getBadgeHtml(p.name)+'</div>'
       +'<div class="bb-school-line">'
         +(logoHtml||'')
-        +'<span class="bb-school">'+school+'</span>'
+        +'<span class="bb-school">'+schoolH+'</span>'
         +(cls ? '<span class="bb-cls-dot">&thinsp;·&thinsp;'+cls+'</span>' : '')
       +'</div>'
       +(hook ? '<div class="bb-hook">'+escHtml(hook)+'</div>' : '')
@@ -11979,13 +12186,18 @@ function renderBoardBigboard(players) {
     }
 
     function buildTwoColRow(p, idx) {
-      var base  = p.name || '';
-      var school = p.school || '';
+      // SAFETY-1B: keep RAW values for lookups (schoolLogoHtml etc.) and
+      // pre-escaped variants for HTML interpolation. Mirrors bbBuildRow.
+      var base    = p.name   || '';
+      var school  = p.school || '';
+      var baseH   = escHtml(base);
+      var schoolH = escHtml(school);
       var cls = (p.cls||'').trim();
       if      (cls==='Freshman'||cls==='Fresh') cls='Fr';
       else if (cls==='Sophomore') cls='So';
       else if (cls==='Junior')    cls='Jr';
       else if (cls==='Senior')    cls='Sr';
+      else                        cls = escHtml(cls);  // non-canonical fallthrough
       var rankStr = p.rank<10 ? '0'+p.rank : ''+p.rank;
       var tierCls = p.rank<=TIER_CUTS.franchise ? 'bbt1'
                   : p.rank<=TIER_CUTS.lottery   ? 'bbt2'
@@ -12011,8 +12223,8 @@ function renderBoardBigboard(players) {
         +'<div class="bb-rk bb-tc-cr">'+rankStr+'</div>'
         +'<div class="bb-av bb-tc-cav">'+avHtml+'</div>'
         +'<div class="bb-id bb-tc-cid">'
-          +'<div class="bb-name bb-tc-name">'+base+getBadgeHtml(p.name)+'</div>'
-          +(school ? '<div class="bb-school">'+school+(cls?'&thinsp;·&thinsp;'+cls:'')+'</div>' : '')
+          +'<div class="bb-name bb-tc-name">'+baseH+getBadgeHtml(p.name)+'</div>'
+          +(school ? '<div class="bb-school">'+schoolH+(cls?'&thinsp;·&thinsp;'+cls:'')+'</div>' : '')
         +'</div>'
         +'<div class="bb-met-cell bb-tc-cmet"><div class="bb-met-val bb-tc-met" style="'+metSty+'">'+metVal+'</div></div>'
         +'<div class="bb-stat-cell bb-tc-cts"  style="'+tsSty+'"><div class="bb-sv bb-sv-inherit">'+tsVal+'</div><div class="bb-sl">TS%</div></div>'
@@ -13250,8 +13462,13 @@ function renderCompare() {
 
   compareList.forEach(function(p, ci) {
     var yr     = p._year || '2026';
-    var base   = p.name;
-    var school = p.school || '';
+    // SAFETY-1B: raw values for lookups (schoolLogoHtml builds URL keyed
+    // by the unescaped school string); H-suffix variants for interpolation.
+    // The compare-card-info inner text flows into innerHTML below.
+    var base    = p.name || '';
+    var school  = p.school || '';
+    var baseH   = escHtml(base);
+    var schoolH = escHtml(school);
     var color  = COMPARE_COLORS[ci];
     var tier   = getTier(p.rank);
     var tierBg = tier.key==='franchise' ? 'linear-gradient(135deg,#B45309,#F59E0B)'
@@ -13276,9 +13493,9 @@ function renderCompare() {
          + '<div class="rn">'+p.rank+'</div><div class="rl">rank</div></div>';
     out += avatarHtml(p.name, p.position||'', '36px', '6px');
     out += '<div class="compare-card-info">'
-         + '<div class="cn">'+base+'</div>'
+         + '<div class="cn">'+baseH+'</div>'
          + '<div class="cs">'+(logo||'')
-         + '<span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:110px">'+(school||'\u2014')+'</span>'
+         + '<span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:110px">'+(schoolH||'\u2014')+'</span>'
          + '<span style="flex-shrink:0;background:rgba(37,99,235,.1);color:var(--blue);font-size:8px;font-weight:700;padding:1px 5px;border-radius:3px">'+yr+'</span>'
          + '</div></div>';
     out += '</div>'; // compare-card-id
@@ -13571,11 +13788,11 @@ function renderTweetCardModal(p) {
     : '';
 
   var clsTagHtml = p.cls
-    ? '<span style="background:#F1F5F9;color:#64748B;font-size:10px;font-weight:600;padding:2px 8px;border-radius:4px">' + p.cls + '</span>'
+    ? '<span style="background:#F1F5F9;color:#64748B;font-size:10px;font-weight:600;padding:2px 8px;border-radius:4px">' + escHtml(p.cls) + '</span>'
     : '';
 
   var posTagHtml = p.position
-    ? '<span style="background:#F1F5F9;color:#64748B;font-size:10px;font-weight:600;padding:2px 8px;border-radius:4px">' + p.position + '</span>'
+    ? '<span style="background:#F1F5F9;color:#64748B;font-size:10px;font-weight:600;padding:2px 8px;border-radius:4px">' + escHtml(p.position) + '</span>'
     : '';
 
   var cardHtml =
@@ -13879,18 +14096,30 @@ var ScatterEngine = (function() {
     // SC-MOB: use smaller bubbles on narrow screens so logos don't overlap.
     // 640px matches the main mobile breakpoint used throughout the system.
     var isMobile = (typeof window !== 'undefined' && window.innerWidth <= 640);
+    var base;
     if (isMobile) {
-      if (!rank)              return 13;
-      if (rank <= T.franchise) return 18;
-      if (rank <= T.lottery)   return 16;
-      if (rank <= T.lateFirst) return 13;
-      return 12;
+      if (!rank)              base = 13;
+      else if (rank <= T.franchise) base = 18;
+      else if (rank <= T.lottery)   base = 16;
+      else if (rank <= T.lateFirst) base = 13;
+      else                          base = 12;
+    } else {
+      if (!rank)              base = 20;
+      else if (rank <= T.franchise) base = 28;
+      else if (rank <= T.lottery)   base = 24;
+      else if (rank <= T.lateFirst) base = 20;
+      else                          base = 17;
     }
-    if (!rank)              return 20;
-    if (rank <= T.franchise) return 28;
-    if (rank <= T.lottery)   return 24;
-    if (rank <= T.lateFirst) return 20;
-    return 17;
+    // PR3: density-adaptive scaling. When the cohort is large (e.g. All
+    // Classes view at ~700 players), full-size logos overlap into illegible
+    // mush. scRender sets _state.densityScale based on pts.length BEFORE
+    // calling into the logo cache, so this read here is current. The same
+    // multiplier flows through to the spatial-index hit radii (queryNear/
+    // queryClosest also call tierSize) so click targets shrink in sync.
+    // Floor at 9px so even at extreme density the logo is still visible.
+    var scale = (typeof Scatter !== 'undefined' && Scatter._state
+                  && Scatter._state.densityScale) || 1;
+    return Math.max(9, Math.round(base * scale));
   }
 
   // ── Top / Bottom N players by axis value ─────────────────────────────────
@@ -14379,7 +14608,22 @@ var Scatter = (function() {
     //   point values pre-sorted per axis so the tooltip can compute percentile
     //   via O(log n) bisect rather than a full O(n) scan per hover. Built
     //   once per scRender() against the final filtered+jittered set.
-    percentileCache: null
+    percentileCache: null,
+
+    // ── PR3: Adaptive density / zoom ────────────────────────────────────────
+    // densityScale: multiplier (0-1) applied to tierSize() output when the
+    //   current cohort is dense enough to crowd the chart. Set in scRender
+    //   based on pts.length BEFORE the logo cache is queried, so logo
+    //   canvases get generated at the right size and the spatial-index hit
+    //   radii (which also read tierSize) stay in sync with the rendered
+    //   bubble dimensions.
+    densityScale:    1,
+
+    // zoomed: true when the user has interacted with the zoom/pan controls
+    //   (pinch, wheel, drag). Reset to false on Reset Zoom or when the chart
+    //   is re-rendered (which calls chart.resetZoom). Drives the floating
+    //   "Reset zoom" affordance in the chrome strip.
+    zoomed:          false
   };
 
   // ── Spatial index ────────────────────────────────────────────────────────
@@ -14583,7 +14827,15 @@ var Scatter = (function() {
     // they just live on the chip strip now instead of the old .sc-mods row.
     wrap.addEventListener('click', function(e) {
       var btn = e.target.closest && e.target.closest('[data-sc-action]');
-      if (!btn) return;
+      if (!btn) {
+        // PR3: Reset-zoom chip is a plain button (no data-sc-action) so it
+        // can sit physically inside .sc-canvas-wrap rather than the chip
+        // strip. Handle its click here in the same delegation hub.
+        if (e.target.closest && e.target.closest('#scResetZoom')) {
+          scResetZoom();
+        }
+        return;
+      }
       // PR2: disabled chips ignore clicks. Disabling is set on the button
       // element by scRender (Ghost when year='all', Zones when no archetype
       // lookup exists for the axis pair).
@@ -14818,6 +15070,36 @@ function scToggleGhost() {
     btn.classList.toggle('active', Scatter._state.ghost);
   }
   scRender();
+}
+
+// ══ PR3: Zoom chrome ═════════════════════════════════════════════════════════
+// Show/hide the Reset Zoom button based on Scatter._state.zoomed. Called from
+// the zoom-plugin onZoom/onPan callbacks and from scResetZoom() itself. Kept
+// as a tiny standalone fn rather than buried in ScatterShell because the zoom
+// plugin callbacks need a free-standing reference at config-build time.
+function scSyncZoomChrome() {
+  var btn = document.getElementById('scResetZoom');
+  if (!btn) return;
+  btn.hidden = !Scatter._state.zoomed;
+}
+
+// Reset the chart back to its original axes range, clear the zoomed flag,
+// and resync the chrome. Called by the Reset chip click handler.
+function scResetZoom() {
+  if (!Scatter._state.chart) return;
+  // chartjs-plugin-zoom installs resetZoom on the chart instance when loaded.
+  // Guard the call so a CDN failure doesn't error here — the chip wouldn't
+  // appear in that case anyway (zoomed flag never gets set), so this is just
+  // defensive.
+  if (typeof Scatter._state.chart.resetZoom === 'function') {
+    try { Scatter._state.chart.resetZoom('none'); } catch (e) {}
+  }
+  Scatter._state.zoomed = false;
+  // PR3: pixel positions changed when the chart returned to its original
+  // axes — invalidate the spatial index so the next hover/tap recomputes
+  // hit zones against the new layout.
+  Scatter.invalidateSpatialIndex();
+  scSyncZoomChrome();
 }
 
 // ══ PR2: Archetype lookup ════════════════════════════════════════════════════
@@ -16508,6 +16790,19 @@ function scRender() {
 
   Scatter._state.allPts = pts;
 
+  // ── PR3: Density-adaptive bubble sizing ───────────────────────────────────
+  // Determine the scale factor BEFORE any tierSize() call further down the
+  // pipeline (logo cache, spatial index, highlight system) so they all see
+  // a consistent value. Three tiers: under 150 → full size; 150-300 → 75%;
+  // over 300 → 60%. Thresholds reflect the real cohorts in this dataset
+  // (single class ≈ 70, two classes ≈ 140, three+ ≈ 200+, all classes ≈ 700).
+  // Smooth steps rather than a linear formula because logo recognition cliffs
+  // around 12px on the inner size — going below that drops them to noise.
+  Scatter._state.densityScale =
+      pts.length > 300 ? 0.60
+    : pts.length > 150 ? 0.75
+    : 1;
+
   // ── Logo rendering (ScatterLogoCache) ─────────────────────────────────────
   // Set onLoad callback — fires (debounced) when any logo arrives after initial render.
   // Captures myToken in closure: if a newer scRender() has run while logos
@@ -16695,6 +16990,52 @@ function scRender() {
       plugins: {
         legend:  { display: false },
         tooltip: { enabled: false },          // custom proximity tooltip below
+        // ── PR3: Pinch / wheel zoom + drag pan ─────────────────────────────
+        // Configured only if the zoom plugin loaded — Chart.js silently
+        // ignores unknown plugin keys, so the typeof check is belt-and-
+        // suspenders for when the CDN times out. Settings:
+        //   wheel:    desktop scroll-wheel zoom, modifier-free for muscle
+        //             memory parity with maps. Speed at default (0.1).
+        //   pinch:    mobile two-finger pinch. Hammerjs already loaded.
+        //   pan:      left-mouse drag on desktop, single-finger drag on
+        //             touch. Threshold 5px so accidental clicks don't
+        //             register as pan starts.
+        //   limits:   prevent zooming below ½× the original range — past
+        //             that the chart loses too much context. No upper
+        //             limit so users can dig into clusters arbitrarily.
+        //   onZoom/onPan: surface "zoomed" state so the Reset Zoom chip
+        //             appears in the chrome.
+        zoom: (typeof Chart !== 'undefined'
+                && Chart.registry
+                && Chart.registry.plugins.get('zoom')) ? {
+          zoom: {
+            wheel:  { enabled: true, speed: 0.08 },
+            pinch:  { enabled: true },
+            mode:   'xy',
+            onZoomComplete: function() {
+              Scatter._state.zoomed = true;
+              // PR3: zoom transforms the scales, which invalidates every
+              // cached pixel position in the spatial index. Rebuild lazily
+              // on next mousemove by clearing the index now.
+              Scatter.invalidateSpatialIndex();
+              scSyncZoomChrome();
+            }
+          },
+          pan: {
+            enabled:   true,
+            mode:      'xy',
+            threshold: 5,
+            onPanComplete: function() {
+              Scatter._state.zoomed = true;
+              Scatter.invalidateSpatialIndex();
+              scSyncZoomChrome();
+            }
+          },
+          limits: {
+            x: { minRange: undefined },
+            y: { minRange: undefined }
+          }
+        } : undefined
       },
       scales: {
         x: Object.assign({}, axisStyle, {
@@ -16757,6 +17098,12 @@ function scRender() {
     // Full recreate: first render or dataset count changed
     if (Scatter._state.chart) { Scatter._state.chart.destroy(); Scatter._state.chart = null; }
     Scatter._state.chart = new Chart(canvas, chartConfig);
+    // PR3: a fresh chart starts at its original axes range; clear any stale
+    // zoomed flag from a prior view so the Reset Zoom chip hides correctly.
+    // (canUpdate path doesn't need this — it preserves zoom across data
+    // updates, which is the right behavior when only data changes.)
+    Scatter._state.zoomed = false;
+    scSyncZoomChrome();
     // PR2: stamp current axis pair onto the chart instance for the plugins.
     // The plugins receive `chart` but not the surrounding lexical scope, so
     // we attach the keys directly. Replaces the more fragile approach of
@@ -22678,6 +23025,27 @@ window.hwRollForward = (function() {
       '</div>' +
       '<div style="display:flex;gap:8px;margin-top:8px">' +
         '<button class="sc-mf-dismiss" onclick="scDismissMobileFocus()">✕ Dismiss</button>' +
+        // PR3: Pin to comparison shelf — symmetrical with the desktop tooltip's
+        // Pin button. Toggles based on current pinned state (Pin / Unpin), with
+        // amber color matching the brand accent. After tap the focus card stays
+        // open and re-renders so the button reflects the new pinned state.
+        (function() {
+          if (typeof ScatterShell === 'undefined') return '';
+          var isPinned = ScatterShell.isPinned(p);
+          var year = pt._y || p._year || '2026';
+          var name = (p.name || '').replace(/'/g, "\\'");
+          // Inline onclick — preserves the pure-string template idiom this
+          // file uses everywhere. Calls a tiny global helper (defined below)
+          // that does the pin toggle then refreshes the focus card.
+          return '<button style="padding:8px 12px;background:rgba(212,168,48,.14);color:#92400E;border:1.5px solid rgba(212,168,48,.45);border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;touch-action:manipulation;display:flex;align-items:center;gap:5px" onclick="scMobileFocusPin(\'' + name + '\',\'' + year + '\')">' +
+                 '<svg viewBox="0 0 16 16" style="width:11px;height:11px" aria-hidden="true">' +
+                   (isPinned
+                      ? '<path d="M3 3l10 10M13 3L3 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/>'
+                      : '<path d="M8 1v9M5 6l3-5 3 5M5 13h6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" fill="none"/>') +
+                 '</svg>' +
+                 (isPinned ? 'Unpin' : 'Pin') +
+                 '</button>';
+        })() +
         '<button style="flex:1;padding:8px;background:rgba(37,99,235,.1);color:var(--blue);border:1.5px solid rgba(37,99,235,.2);border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;touch-action:manipulation" onclick="openPlayerModal(' + p.rank + ')">View Profile →</button>' +
       '</div>';
 
@@ -22690,6 +23058,35 @@ window.hwRollForward = (function() {
     _scFocusedPlayer = null;
     var el = document.getElementById('scMobileFocus');
     if (el) el.classList.remove('visible');
+  };
+
+  // PR3: Pin from mobile focus card. Inline onclick in the focus-card markup
+  // calls this with the player name + year — we look up the live player by
+  // those, pass to ScatterShell.pin, then re-render the focus card so the
+  // button label flips (Pin ↔ Unpin) without dismissing the card. The
+  // ScatterShell pin function handles the FIFO/cap-3 logic and URL state.
+  window.scMobileFocusPin = function(name, year) {
+    if (typeof ScatterShell === 'undefined' || !_scFocusedPlayer) return;
+    var p = _scFocusedPlayer._p;
+    // Build a slim player record matching what the shelf expects. The pin
+    // function will look up live values at shelf-render time so we don't
+    // need to include axis values here.
+    ScatterShell.pin({
+      _n: p.name || name,
+      _s: p.school || '',
+      _y: year || '2026',
+      rank: p.rank,
+      position: p.position
+    });
+    // Refresh the focus card so the button reflects the new pinned state.
+    // _scFocusedPlayer is the {pt, xM, yM} reference we need... actually we
+    // stashed the pt but not the metric meta. Pull them from the chart.
+    var xSel = document.getElementById('scXAxis');
+    var ySel = document.getElementById('scYAxis');
+    var xKey = xSel ? xSel.value : 'age';
+    var yKey = ySel ? ySel.value : 'ts_pct';
+    var xM = SC_AXES[xKey], yM = SC_AXES[yKey];
+    if (xM && yM) scShowMobileFocus(_scFocusedPlayer, xM, yM);
   };
 
   // scDismissMobileFocus is called directly inside scRenderDebounced() — no patch needed.
