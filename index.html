@@ -20,11 +20,35 @@
 <style>
 
 :root {
-  --navy:#0A1628;--navy-mid:#162340;--blue:#2563EB;--blue-light:#3B82F6;
-  --amber:#C9971A;--amber-light:#E8BF52;--gold:#D4A830;--green:#10B981;--red:#EF4444;
-  --purple:#7C3AED;--cyan:#0891B2;--teal:#059669;
+  /* ── DESIGN-2: Palette restraint ────────────────────────────────────────
+     Pared from 9 ad-hoc hues to a 4-color system with semantic meaning.
+     Reserved meanings:
+       NAVY   — primary structure, type, surfaces
+       AMBER  — single brand accent; reserved for "elite/franchise tier"
+       GRAYS  — chrome, borders, secondary type
+       RED/GREEN — semantic only (deltas, alerts) — never decoration
+     Tier scale is now monochromatic: amber → navy → gray-mid → gray-light.
+     One hue progression, four readable steps, no chromatic noise. */
+
+  /* Primary structural */
+  --navy:#0A1628;--navy-mid:#162340;
+
+  /* Action blue — CTAs, focus rings on form controls. Used distinct from
+     tier-late1 so action affordances don't compete with tier encoding. */
+  --blue:#2563EB;--blue-light:#3B82F6;
+
+  /* Brand accent — single hue, one role: franchise-tier signal + active
+     state indicator. amber-light retained as the soft surface tint
+     (rgba alternative is too verbose at call sites). */
+  --amber:#C9971A;--amber-light:#E8BF52;
+
+  /* Semantic — strictly for deltas and alerts */
+  --green:#10B981;--red:#EF4444;
+
+  /* Neutral scale — chrome, dividers, secondary type */
   --gray-50:#F8FAFC;--gray-100:#F1F5F9;--gray-200:#E2E8F0;--gray-300:#CBD5E1;
   --gray-400:#94A3B8;--gray-500:#64748B;--gray-600:#475569;--gray-700:#334155;
+
   --shadow-sm:0 1px 3px rgba(0,0,0,.08);
   --shadow-md:0 4px 16px rgba(0,0,0,.10),0 2px 6px rgba(0,0,0,.07);
   --shadow-xl:0 20px 60px rgba(0,0,0,.22);
@@ -48,11 +72,15 @@
   /* Brand accent (gold/amber — sort indicators, focus rings, active states) */
   --accent: #C9971A;
 
-  /* Tier colours — used for accents, rank tints, pc-accent bars */
-  --tier-franchise: #C9971A;  /* gold — top 3-5 picks */
-  --tier-lottery:   #7C3AED;  /* purple — lottery range */
-  --tier-late1:     #2563EB;  /* blue — late first */
-  --tier-second:    #0891B2;  /* cyan — second round */
+  /* ── Tier scale (DESIGN-2 monochromatic) ───────────────────────────────
+     Single-hue progression amber → dusty navy → gray. Replaces the prior
+     purple/blue/cyan rainbow which fought for attention with the brand
+     amber. Visual cliff between tier-franchise and the rest preserves
+     the "elite" signaling that the amber is reserved for. */
+  --tier-franchise: #C9971A;  /* amber — top 3-5 picks */
+  --tier-lottery:   #2C4569;  /* dusty navy — lottery range */
+  --tier-late1:     #475569;  /* gray-700 — late first */
+  --tier-second:    #94A3B8;  /* gray-400 — second round */
 
   /* UI component tokens */
   --border-med:   rgba(15,23,42,.14);  /* medium emphasis borders */
@@ -63,20 +91,71 @@
 
   /* Safe area — single source for bottom inset on notched/home-indicator phones */
   --sab: env(safe-area-inset-bottom, 0px);
+
+  /* ── DESIGN-4: Typographic scale ────────────────────────────────────────
+     Eight-step scale covering 700+ existing font-size declarations. Sizes
+     are quantized to one of these steps; new code uses tokens, existing
+     ad-hoc sizes will be migrated incrementally. The scale roughly
+     follows a 1.25–1.33 ratio (modular) so visual steps feel intentional.
+
+       --text-3xs   9px  — micro labels, axis ticks, tier-cls dots
+       --text-2xs   11px — tiny meta (column heads, kbd hint, bio labels)
+       --text-xs    12px — secondary labels, status chips, table cells
+       --text-sm    13px — body small, dense card content, button text
+       --text-base  15px — primary body, card names, table values
+       --text-md    18px — sub-section heads, modal labels
+       --text-lg    24px — section titles, big-board names
+       --text-xl    32px — page headers, hero numbers
+       --text-2xl   48px — display: hero ranks, key takeaways
+
+     Line-heights and weights are independent tokens — apply the size +
+     leading + weight you need per surface. Avoids the "must use this
+     exact combination" trap that locks designers out of fine-tuning. */
+
+  --text-3xs:  9px;   --text-2xs: 11px;
+  --text-xs:   12px;  --text-sm:  13px;
+  --text-base: 15px;  --text-md:  18px;
+  --text-lg:   24px;  --text-xl:  32px;
+  --text-2xl:  48px;
+
+  --leading-tight:   1.1;   /* display numbers, oversized rank glyphs */
+  --leading-snug:    1.25;  /* headings, card names */
+  --leading-normal:  1.5;   /* body, table cells */
+  --leading-relaxed: 1.7;   /* long-form reading (methodology, resources) */
+
+  --weight-regular: 400;
+  --weight-medium:  500;
+  --weight-semi:    600;
+  --weight-bold:    700;
+  --weight-extra:   800;
+  --weight-black:   900;
+
+  /* ── DESIGN-10: Motion tokens ───────────────────────────────────────────
+     One easing curve (Material's standard "decelerate" — appropriate for
+     ui interactions where you want the eye to land softly) and three
+     durations. Use --motion-fast for micro-interactions (hover, focus,
+     button press), --motion-base for component-scale moves (popover open,
+     tab switch), and --motion-slow for layout-scale shifts (panel slide,
+     modal enter). Consistent application across the codebase produces
+     the "premium feel" perception that's otherwise expensive. */
+  --ease-out:       cubic-bezier(.4, 0, .2, 1);
+  --motion-fast:    120ms var(--ease-out);
+  --motion-base:    200ms var(--ease-out);
+  --motion-slow:    350ms var(--ease-out);
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html,body{overflow-x:hidden}
-body{font-family:'DM Sans',sans-serif;background:var(--gray-50);color:var(--navy);min-height:100vh;line-height:1.5}
+body{font-family:'DM Sans',sans-serif;background:var(--gray-50);color:var(--navy);min-height:100vh;line-height:var(--leading-normal)}
 
 /* HEADER */
 .header{background:linear-gradient(160deg,#0d1d36 0%,#0A1628 60%,#0c1a30 100%);padding:0 12px;display:flex;align-items:center;justify-content:space-between;gap:8px;height:52px;min-height:52px;flex-wrap:nowrap;overflow:hidden;position:sticky;top:0;z-index:200;box-shadow:0 1px 0 rgba(255,255,255,.04),0 4px 24px rgba(0,0,0,.5);border-bottom:1.5px solid rgba(201,151,26,.3)}
 .header-brand{display:flex;align-items:center;gap:11px}
 .header-logo-img{width:46px;height:46px;object-fit:contain;filter:drop-shadow(0 1px 6px rgba(212,168,48,.5));flex-shrink:0}
-.header-title{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:22px;letter-spacing:.3px;line-height:1.1}
+.header-title{font-family:'Barlow Condensed',sans-serif;font-weight:var(--weight-black);font-size:22px;letter-spacing:.3px;line-height:var(--leading-tight)}
 .header-title-hoops{color:var(--amber-light)}
 .header-title-rest{color:rgba(255,255,255,.92)}
-.header-sub{font-size:10px;color:rgba(212,168,48,.6);font-weight:500;letter-spacing:.6px;text-transform:uppercase;margin-top:1px}
-.header-badge{background:rgba(212,168,48,.15);border:1px solid rgba(212,168,48,.35);color:var(--amber-light);font-size:11px;font-weight:700;padding:3px 10px;border-radius:4px;letter-spacing:.5px;text-transform:uppercase;text-shadow:0 0 8px rgba(212,168,48,.4)}
+.header-sub{font-size:var(--text-3xs);color:rgba(212,168,48,.6);font-weight:var(--weight-medium);letter-spacing:.6px;text-transform:uppercase;margin-top:1px}
+.header-badge{background:rgba(212,168,48,.15);border:1px solid rgba(212,168,48,.35);color:var(--amber-light);font-size:var(--text-2xs);font-weight:var(--weight-bold);padding:3px 10px;border-radius:4px;letter-spacing:.5px;text-transform:uppercase;text-shadow:0 0 8px rgba(212,168,48,.4)}
 
 /* NAV */
 .nav-tabs{background:white;border-bottom:1px solid var(--gray-200);padding:0 8px;display:flex;gap:0;overflow-x:auto;scrollbar-width:none;position:sticky;top:52px;z-index:199;box-shadow:0 1px 4px rgba(10,22,40,.04);scroll-snap-type:x mandatory;scroll-behavior:smooth;-webkit-mask-image:linear-gradient(to right,black calc(100% - 28px),transparent 100%);mask-image:linear-gradient(to right,black calc(100% - 28px),transparent 100%)}
@@ -87,9 +166,15 @@ body{font-family:'DM Sans',sans-serif;background:var(--gray-50);color:var(--navy
 /* Both edges clear: no fade needed */
 .nav-tabs.scrolled-end:not(.scrolled-left){-webkit-mask-image:none;mask-image:none}
 .nav-tabs::-webkit-scrollbar{display:none}
-.nav-tab{padding:10px 14px;font-size:12px;font-weight:600;color:var(--gray-500);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;white-space:nowrap;scroll-snap-align:start;touch-action:manipulation;-webkit-tap-highlight-color:transparent;transition:all .15s;display:flex;align-items:center;gap:6px;user-select:none}
+.nav-tab{padding:10px 14px;font-size:var(--text-xs);font-weight:var(--weight-semi);color:var(--gray-500);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;white-space:nowrap;scroll-snap-align:start;touch-action:manipulation;-webkit-tap-highlight-color:transparent;transition:color var(--motion-fast),border-color var(--motion-fast),background var(--motion-fast);display:flex;align-items:center;gap:7px;user-select:none;letter-spacing:.1px}
+.nav-tab svg{width:14px;height:14px;flex-shrink:0;display:block;opacity:.85;transition:opacity var(--motion-fast),color var(--motion-fast)}
 .nav-tab:hover{color:var(--gold,var(--amber))}
+.nav-tab:hover svg{opacity:1}
 .nav-tab.active{color:var(--navy);border-bottom-color:var(--amber);font-weight:700;background:linear-gradient(180deg,rgba(201,151,26,.04) 0%,transparent 100%)}
+.nav-tab.active svg{opacity:1;color:var(--amber)}
+/* Subtle group separator between intent clusters. Vertical hairline,
+   centered, doesn't participate in active/hover styling. */
+.nav-divider{display:inline-block;width:1px;height:16px;background:var(--gray-200);margin:0 2px;flex-shrink:0;align-self:center}
 
 /* MAIN */
 .main{padding:10px 10px;max-width:1440px;margin:0 auto}
@@ -121,10 +206,10 @@ body{font-family:'DM Sans',sans-serif;background:var(--gray-50);color:var(--navy
 .tier-header{display:flex;align-items:center;gap:10px;margin-bottom:14px;padding-bottom:10px;border-bottom:2px solid rgba(10,22,40,.06)}
 .tier-pill{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;padding:3px 10px;border-radius:4px;color:white}
 .tier-pill.franchise{background:var(--amber)}
-.tier-pill.lottery{background:var(--purple)}
+.tier-pill.lottery{background:var(--tier-lottery)}
 .tier-pill.late1{background:var(--blue)}
-.tier-pill.second{background:var(--cyan)}
-.tier-pill.udfa{background:var(--teal)}
+.tier-pill.second{background:var(--tier-second)}
+.tier-pill.udfa{background:var(--gray-500)}
 .tier-name{font-family:'Barlow Condensed',sans-serif;font-size:19px;font-weight:700;color:var(--navy)}
 .tier-ct{font-size:12px;color:var(--gray-400)}
 
@@ -150,11 +235,15 @@ body{font-family:'DM Sans',sans-serif;background:var(--gray-50);color:var(--navy
 }
 .player-card:active{transform:translateY(-1px) scale(1.003);transition-duration:80ms}
 .pc-tier-bar{width:5px;flex-shrink:0;align-self:stretch}
-.player-card.franchise .pc-tier-bar{background:linear-gradient(180deg,#92400E,#D97706,#F59E0B)}
-.player-card.lottery   .pc-tier-bar{background:linear-gradient(180deg,#5B21B6,#7C3AED,#A78BFA)}
-.player-card.late1     .pc-tier-bar{background:linear-gradient(180deg,#1D4ED8,#2563EB,#93C5FD)}
-.player-card.second    .pc-tier-bar{background:linear-gradient(180deg,#0E7490,#0891B2,#67E8F9)}
-.player-card.udfa      .pc-tier-bar{background:linear-gradient(180deg,#047857,#059669,#6EE7B7)}
+/* DESIGN-2: tier-bar gradients aligned to the monochromatic tier palette.
+   Each tier's gradient is now a 3-stop progression of its own hue (darker
+   → tier color → lighter) so all four tiers feel like the same visual
+   system, not a rainbow of competing themes. */
+.player-card.franchise .pc-tier-bar{background:linear-gradient(180deg,#92400E,#C9971A,#F0C94A)}
+.player-card.lottery   .pc-tier-bar{background:linear-gradient(180deg,#162340,#2C4569,#5A7AAE)}
+.player-card.late1     .pc-tier-bar{background:linear-gradient(180deg,#334155,#475569,#94A3B8)}
+.player-card.second    .pc-tier-bar{background:linear-gradient(180deg,#64748B,#94A3B8,#CBD5E1)}
+.player-card.udfa      .pc-tier-bar{background:linear-gradient(180deg,#047857,#10B981,#6EE7B7)}
 .pc-accent{display:none}
 .pc-inner{flex:1;min-width:0;display:flex;flex-direction:column}
 .card-header{display:flex;flex-direction:row;align-items:stretch;gap:0;padding:0}
@@ -389,7 +478,18 @@ body{font-family:'DM Sans',sans-serif;background:var(--gray-50);color:var(--navy
 .compare-card{background:white;border:2px solid var(--gray-200);border-radius:12px;overflow:hidden;position:relative;transition:box-shadow .15s}
 .compare-card:hover{box-shadow:var(--shadow-md)}
 .compare-card-header{padding:10px 14px 8px;display:flex;align-items:center;gap:8px}
-.compare-card-remove{position:absolute;top:6px;right:6px;background:rgba(0,0,0,.06);border:none;border-radius:50%;width:20px;height:20px;cursor:pointer;font-size:11px;display:flex;align-items:center;justify-content:center;color:var(--gray-500);transition:all .15s}
+/* MOBILE FIX (review P2): 44×44 tap zone via box-sizing+padding while
+   keeping the visible circle the same 20×20 size. Position is unchanged
+   because top/right shift to compensate for the padding. */
+.compare-card-remove{
+  position:absolute;top:-12px;right:-12px;
+  background:rgba(0,0,0,.06);border:none;border-radius:50%;
+  width:44px;height:44px;cursor:pointer;
+  background-clip:content-box;
+  padding:12px;
+  font-size:11px;display:flex;align-items:center;justify-content:center;
+  color:var(--gray-500);transition:all .15s
+}
 .compare-card-remove:hover{background:var(--red);color:white}
 .compare-card-rank{width:34px;height:34px;border-radius:7px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-weight:900;color:white;flex-shrink:0}
 .compare-card-rank .rn{font-size:16px;line-height:1}
@@ -488,10 +588,10 @@ body{font-family:'DM Sans',sans-serif;background:var(--gray-50);color:var(--navy
 .rank-badge{width:38px;height:38px;border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0}
 .rank-badge .rank-num{font-family:'Barlow Condensed',sans-serif;font-weight:900;color:white;line-height:1}
 .rank-badge .rank-label{font-size:8px;color:rgba(255,255,255,.7);font-weight:700;letter-spacing:.4px;text-transform:uppercase;line-height:1;margin-top:1px}
-.rank-badge.lottery{background:var(--purple)}
+.rank-badge.lottery{background:var(--tier-lottery)}
 .rank-badge.late1{background:var(--blue)}
-.rank-badge.second{background:var(--cyan)}
-.rank-badge.udfa{background:var(--teal)}
+.rank-badge.second{background:var(--tier-second)}
+.rank-badge.udfa{background:var(--gray-500)}
 .rank-badge.top3{background:linear-gradient(135deg,#B45309,#F59E0B)}
 /* TABLE */
 .table-wrap{overflow-x:auto;background:white;border:1.5px solid var(--gray-200);border-radius:12px;box-shadow:var(--shadow-sm)}
@@ -588,7 +688,7 @@ tr:hover td{background:var(--gray-50)}
 .sw-list li{font-size:12.5px;color:var(--gray-700);line-height:1.5;padding-left:14px;position:relative}
 .sw-list li::before{position:absolute;left:0;font-size:10px}
 .sw-list.str li::before{content:"✓";color:#16a34a}.sw-list.wkn li::before{content:"✗";color:#dc2626}.sw-list.ntr li::before{content:"→";color:#b45309}
-.role-badge{display:inline-flex;align-items:center;gap:4px;background:rgba(124,58,237,.12);color:#7c3aed;border:1px solid rgba(124,58,237,.2);border-radius:20px;font-size:11px;font-weight:700;padding:3px 10px;font-family:'Barlow Condensed',sans-serif;letter-spacing:.3px}
+.role-badge{display:inline-flex;align-items:center;gap:4px;background:rgba(44,69,105,.12);color:#7c3aed;border:1px solid rgba(44,69,105,.2);border-radius:20px;font-size:11px;font-weight:700;padding:3px 10px;font-family:'Barlow Condensed',sans-serif;letter-spacing:.3px}
 @media(max-width:700px){.sw-grid,.sw-grid.has-neutral{grid-template-columns:1fr}}
 .meas-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:7px}
 .meas-item{background:white;border:1.5px solid var(--gray-200);border-radius:8px;padding:7px 10px;text-align:center}
@@ -605,7 +705,7 @@ tr:hover td{background:var(--gray-50)}
   padding:1px 5px;border-radius:3px;
 }
 .meas-item .combine-pct.elite{background:rgba(180,140,20,.12);color:#9E7B10}
-.meas-item .combine-pct.above{background:rgba(16,185,129,.10);color:#059669}
+.meas-item .combine-pct.above{background:rgba(16,185,129,.10);color:#10B981}
 .meas-item .combine-pct.avg{background:var(--gray-100);color:var(--gray-400)}
 .meas-item .combine-pct.below{background:rgba(239,68,68,.08);color:#DC2626}
 /* Combine sub-value (raw inches) */
@@ -635,7 +735,7 @@ tr:hover td{background:var(--gray-50)}
   font-family:'Barlow Condensed',sans-serif;
   font-size:14px;font-weight:900;line-height:1;
 }
-.meas-derived-val.pos{color:#059669}
+.meas-derived-val.pos{color:#10B981}
 .meas-derived-val.neg{color:#DC2626}
 .meas-derived-val.neu{color:var(--gray-400)}
 .meas-derived-lbl{
@@ -647,8 +747,8 @@ tr:hover td{background:var(--gray-50)}
 .comps-list{display:flex;flex-wrap:wrap;gap:7px}
 .comp-chip{background:var(--gray-100);border-radius:6px;padding:5px 11px;font-size:12px;font-weight:600;color:var(--gray-700);border:1px solid var(--gray-200)}
 .draft-chip{display:inline-block;color:white;font-size:10px;font-weight:700;padding:2px 6px;border-radius:4px;font-family:'Barlow Condensed',sans-serif;background:var(--navy)}
-.draft-chip.top{background:var(--purple)}
-.draft-chip.udfa{background:var(--teal)}
+.draft-chip.top{background:var(--tier-lottery)}
+.draft-chip.udfa{background:var(--gray-500)}
 
 /* ANALYTICS */
 .analytics-card{background:white;border:1.5px solid var(--gray-200);border-radius:12px;padding:20px;margin-bottom:18px;content-visibility:auto;contain-intrinsic-size:0 400px}
@@ -717,8 +817,8 @@ tr:hover td{background:var(--gray-50)}
 
 /* Draft pick chips */
 .draft-chip{display:inline-flex;align-items:center;justify-content:center;color:white;font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px;font-family:'Barlow Condensed',sans-serif;background:var(--navy);white-space:nowrap}
-.draft-chip.top{background:linear-gradient(135deg,#7C3AED,#A855F7)}
-.draft-chip.udfa{background:var(--teal)}
+.draft-chip.top{background:linear-gradient(135deg,#2C4569,#A855F7)}
+.draft-chip.udfa{background:var(--gray-500)}
 
 /* ── Table wrapper ── */
 .comp-tbl-wrap{background:white;border:1.5px solid var(--gray-200);border-radius:12px;overflow:hidden;box-shadow:var(--shadow-sm)}
@@ -972,21 +1072,29 @@ tr:hover td{background:var(--gray-50)}
   }
   .bb-ch.left{justify-content:flex-start;padding-left:8px}
   .bb-col-hdr{min-height:40px;padding-right:2px}
-  /* BB-MOB: board width determined by visible columns (no fixed min-width) */
-  /* P5: Drop min-width to match actual visible column sum — eliminates phantom
-     horizontal scroll when nothing is clipped. Visible: rank+compare+avatar+
-     name+metric+4 stats ≈ 340px. Board fills phone naturally; scroll still
-     available when user rotates or sorts extra columns into view. */
-  .bb-board{min-width:340px}
-  /* Redistribute freed space: metric and stat cols wider for legibility */
+  /* BB-MOB / MOBILE-READ: board fits the phone with ZERO horizontal scroll.
+     Previous state had a latent bug: base .bb-cid{min-width:260px} was never
+     overridden on mobile, forcing the board to ~612px on a 360px phone
+     (44+56+260+60+48×4) — the user had to swipe to see any stats, on the
+     view that exists to be screenshotted and presented.
+
+     New arithmetic at 360px viewport:
+       rank 34 + avatar 40 + metric 60 + TS 48 + P+A 48 = 230 fixed
+       → identity column flexes into the remaining ~130px (≈16 chars at 13px)
+     Stl+Bl and A/TO join Profile/FTAr/3PAr in the hidden set — TS% and
+     P+A/USG are the two most-cited stats and survive. Rotating to
+     landscape brings the rest back (641px+ uses desktop widths). */
+  .bb-cr{width:34px;flex-shrink:0}
+  .bb-cav{width:40px;flex-shrink:0}
+  .bb-cid{flex:1;min-width:0;max-width:none}
   .bb-cmet{width:60px;flex-shrink:0}
   .bb-cts{width:48px;flex-shrink:0}
   .bb-cpa{width:48px;flex-shrink:0}
-  .bb-csb{width:48px;flex-shrink:0}
-  .bb-cato{width:48px;flex-shrink:0}
   /* Hide columns that do not fit a phone screen.
      bb-cprofile (Ht/Wt + Pos/Role merged column) replaces former bb-cht+bb-ctag. */
-  .bb-cprofile,.bb-cftar,.bb-ctpar{display:none !important}
+  .bb-cprofile,.bb-cftar,.bb-ctpar,.bb-csb,.bb-cato{display:none !important}
+  /* Zero phantom scroll: the column sum IS the board width now. */
+  .bb-board{min-width:0}
 
   /* BB-03: Header — compact but still premium on mobile */
   .bb-header{padding:12px 14px 8px}
@@ -1001,20 +1109,26 @@ tr:hover td{background:var(--gray-50)}
   .bb-row{height:48px;contain-intrinsic-size:0 48px}
 
   /* BB-04: Stat values — up 1px for legibility; labels slightly brighter */
-  .bb-sv{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:800;}
+  .bb-sv{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:800;}
+  /* MOBILE-READ: 7.5px at 70% opacity was below the practical legibility
+     floor on a phone held at arm's length. 8.5px + 85% opacity keeps the
+     label subordinate to the value while making it actually readable.
+     letter-spacing trimmed to compensate for the size increase. */
   .bb-sl{
-    font-size:7.5px;
-    letter-spacing:.3px;
-    color:rgba(148,163,184,.7);
+    font-size:8.5px;
+    letter-spacing:.2px;
+    color:rgba(148,163,184,.85);
     margin-top:1px
   }
   /* BB-04: Metric cell — large enough to read at a glance */
   .bb-met-val{font-size:15px;min-width:44px;padding:2px 4px}
   .bb-met-cell{padding:0 1px}
 
-  /* BB-04: Name + school — tighter but never truncated badly */
+  /* BB-04: Name + school — tighter but never truncated badly.
+     MOBILE-READ: school up 9 → 10px and brighter; it's the second
+     identity line and was disappearing against the dark navy theme. */
   .bb-name{font-size:13px;letter-spacing:-.1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .bb-school{font-size:9px;color:var(--gray-400)}
+  .bb-school{font-size:10px;color:var(--gray-400)}
   .bb-rk{font-size:15px;width:30px}
   .bb-av{width:28px}
 
@@ -1448,8 +1562,12 @@ tr:hover td{background:var(--gray-50)}
     -webkit-tap-highlight-color:transparent;
     padding:8px 11px;
     font-size:11px;
-    gap:4px;
+    gap:5px;
   }
+  /* DESIGN-1: shrink icons + dividers on mobile to keep the strip dense
+     and reduce horizontal scrolling. Icons at 12px stay legible. */
+  .nav-tab svg{width:12px;height:12px}
+  .nav-divider{height:13px;margin:0 1px}
   /* P1: Stronger right-fade to signal scrollability — wider and more opaque */
   .nav-tabs{
     -webkit-mask-image:linear-gradient(to right,black calc(100% - 40px),transparent 100%);
@@ -1524,7 +1642,12 @@ tr:hover td{background:var(--gray-50)}
   .analytics-sub{font-size:11px;margin-bottom:8px}
 
   /* ──────────── [61879] ──────────── */
+  /* MOBILE-READ: dvh (dynamic viewport height) tracks the real visible
+     area as mobile browser toolbars expand/collapse — 72vh alone leaves
+     the board partially under the toolbar on scroll-down in Safari/Chrome
+     mobile. vh declaration first as fallback for older WebViews. */
   .ff2-viewport{height:72vh !important;min-height:340px}
+  .ff2-viewport{height:72dvh !important}
   /* Freeform board: mobile label scaling.
      Rail width is now driven by --ff-rail-w on the shell — set in the
      more-comprehensive max-width:767px block. Only label/font tweaks here. */
@@ -1655,20 +1778,12 @@ tr:hover td{background:var(--gray-50)}
   /* Bio text: better line-height on mobile */
 
   /* ──────────── [173122] ──────────── */
-  /* Cards must be large enough to tap */
-  /* L3: 72px is too narrow for 11px Barlow names — raises truncation threshold
-     from ~7 chars to ~11 chars, covering most two-word NBA prospect names. */
-  .ff2-card { min-width: 88px; }
-  /* Density buttons: 44px touch target */
-  .ff2-density-btn {
-    min-width: 36px;
-    min-height: 36px;
-    font-size: 13px;
-  }
-  .ff2-reset-btn {
-    min-height: 36px;
-    padding: 4px 12px;
-  }
+  /* MOBILE-READ: the old .ff2-card{min-width:88px} hard override was
+     removed — card width is owned by the --ff-card-w variable system
+     (see the 767px block), which the density buttons drive. A hard
+     min-width here silently broke the compact density mode on phones. */
+  /* Density buttons: tap sizes consolidated in the 767px block (which
+     wins the cascade at this width) — no duplicate rules here. */
 
   /* ──────────── [173777] ──────────── */
   /* iOS sets min font-size to 16px for inputs to prevent zoom — match it */
@@ -1865,34 +1980,11 @@ tr:hover td{background:var(--gray-50)}
   .ccs-val { font-size: 12px; }
   .ccs-lbl { font-size: 7px; }
 
-  /* ── Scatter controls — mobile layout ─────────────────────────────────
-     On narrow screens, hide the Color-By segmented control (rarely changed,
-     hardest to fit) and the Position filter. Trend + Quadrants remain
-     visible — they're the tap-friendliest analysis affordances. The two
-     control rows wrap naturally. */
-  .sc-grp-colorby,
-  .sc-grp-position {
-    display: none !important;
-  }
-  /* Primary row: still axes side-by-side, but tighter padding + iOS 16px
-     font on selects to suppress auto-zoom on focus. */
-  .sc-controls-primary{padding:10px 12px 8px;gap:10px;flex-wrap:wrap}
-  .sc-axis-select{font-size:16px;min-width:130px;flex:1}
-  .sc-axis-letter{font-size:14px}
-  /* Secondary row: compact, with mods pushed right */
-  .sc-controls-secondary{padding:8px 12px 10px;gap:10px}
-  .sc-filter-select{font-size:13px;padding:6px 22px 6px 9px;min-height:32px}
-  .sc-mod-btn{padding:7px 12px;font-size:12px;min-height:36px}
-  .sc-mod-icon{width:12px;height:12px}
-
-  /* Hero title scales down on mobile */
-  .sc-plot-title{font-size:18px}
-  .sc-plot-scope{font-size:10px}
-  .sc-plot-count{font-size:10px;padding:3px 7px}
-  .sc-plot-header{padding:2px 2px 9px}
-
-  /* P7: Scatter — taller canvas + trimmed panels on mobile */
-  .sc-canvas-wrap{height:360px;min-height:280px}
+  /* ── Scatter mobile — Top/Bot ranking rows ─────────────────────────────
+     The canvas-first restructure (.sc-pills / .sc-chips / .sc-canvas-wrap)
+     has its own .sc-wrap-v2 mobile rules further down. What remains here
+     is just the Top-5/Bottom-5 row styling shared with the .sc-rankings
+     panels, which keep their .sc-top5-* class names regardless of layout. */
 
   /* Trim top/bottom panels to 3 rows on mobile — rows 4 & 5 hidden */
   #scTop5 .sc-top5-row:nth-child(n+4),
@@ -1900,8 +1992,7 @@ tr:hover td{background:var(--gray-50)}
     display:none;
   }
 
-  /* Panels strip: tighter rows */
-  .sc-panel-hdr{padding:5px 10px 4px}
+  /* Tighter rows on mobile */
   .sc-top5-row{padding:4px 8px;gap:4px}
   .sc-top5-logo{display:none}
   .sc-top5-name{font-size:10px}
@@ -1944,16 +2035,6 @@ tr:hover td{background:var(--gray-50)}
     cursor: pointer; touch-action: manipulation;
   }
   .sc-mf-dismiss:active { background: var(--gray-50); }
-
-  /* Instruction hint below canvas (dismisses on first tap) */
-  #scTapHint {
-    text-align: center;
-    font-size: 11px; color: var(--gray-400);
-    padding: 5px 0 2px;
-    font-style: italic;
-    transition: opacity .3s;
-  }
-  #scTapHint.hidden { opacity: 0; pointer-events: none; }
 
   /* ──────────── [185475] ──────────── */
   /* Archive mode: hidden on mobile */
@@ -2064,8 +2145,17 @@ tr:hover td{background:var(--gray-50)}
   .board-table td:nth-child(1){
     width:32px; min-width:32px;
     padding-left:6px; padding-right:4px;
-    font-size:12px;
   }
+  /* MOBILE-READ: rank is the anchor glyph of each row — keep it bigger
+     than cell text (14px Barlow vs 12px body), gray-400 so it doesn't
+     compete with the name for attention but is instantly scannable. */
+  .board-table td:nth-child(1){
+    font-size:14px;
+    font-family:'Barlow Condensed',sans-serif;
+    font-weight:800;
+    color:var(--gray-400);
+  }
+  .board-table th:nth-child(1){font-size:10px}
   .board-table th:nth-child(2),
   .board-table td:nth-child(2){
     width:26px; min-width:26px; max-width:26px;
@@ -2082,13 +2172,23 @@ tr:hover td{background:var(--gray-50)}
     max-width:160px;
   }
   .board-table thead th:nth-child(3){ background:var(--navy) !important; z-index:4; }
+  /* MOBILE-READ: at this density the school logo (16px) costs more
+     horizontal space than it adds in identification value — the school
+     NAME is the identifier; the logo is decoration. Hide it and let
+     the school text breathe. The avatar (an anonymous inline-styled
+     wrapper div, first child of .td-player-cell) goes too: name +
+     school text is the identity at this width; the avatar consumed
+     32px + 10px gap of a 90-160px column. */
+  .td-player-cell > div:first-child:not(.td-name-wrap){display:none !important}
+  .td-name-wrap .school img{display:none !important}
+  .td-player-cell{gap:0}
   .td-name-wrap .name{
     white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
-    max-width:120px; display:block; font-size:12px;
+    max-width:150px; display:block; font-size:13px; font-weight:700;
   }
   .td-name-wrap .school{
     white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
-    max-width:120px; font-size:10px;
+    max-width:150px; font-size:10px;
   }
   .board-table th:nth-child(5),
   .board-table td:nth-child(5){
@@ -2111,9 +2211,8 @@ tr:hover td{background:var(--gray-50)}
     min-width:36px; max-width:44px;
     text-align:center;
   }
-  .td-mini-avatar,.td-mini-fb{
-    width:24px !important; height:24px !important; flex-shrink:0;
-  }
+  /* MOBILE-READ: .td-mini-avatar/.td-mini-fb sizing removed — avatars are
+     hidden entirely in the mobile table (see Player column rules above). */
 
   /* ── OVERRIDES (consolidated from Block 4) ── */
   /* These rules come last to win specificity ties within the same MQ */
@@ -2143,6 +2242,15 @@ tr:hover td{background:var(--gray-50)}
 
   /* Controls bar — font sizing for iOS zoom prevention */
   .search-input{font-size:16px;padding:8px 10px 8px 32px;letter-spacing:.01em;min-height:38px;border-radius:8px}
+  /* MOBILE FIX (review P3): every input below 16px triggers an iOS focus
+     zoom that disrupts the modal layout. Bring all remaining text inputs
+     up to 16px on mobile. The `!important` on #simPoolSearch is required
+     because that input ships with inline `style="font-size:12px"` (sim
+     controls panel — built before the input style guidelines). */
+  .mdc-pool-search{font-size:16px !important}
+  .mdc-modal-input{font-size:16px}
+  .sc-popover-search{font-size:16px}
+  #simPoolSearch{font-size:16px !important}
   /* Scatter selects already use font-size:16px in the .sc-controls-secondary
      mobile rules above — no separate override needed here. */
   .modal-search-input{font-size:16px}
@@ -2538,7 +2646,7 @@ tr:hover td{background:var(--gray-50)}
 }
 
 .global-search-btn{background:rgba(255,255,255,.08);border:1.5px solid rgba(255,255,255,.15);color:rgba(255,255,255,.9);border-radius:8px;padding:6px 14px;font-size:12px;font-weight:700;font-family:'Barlow Condensed',sans-serif;letter-spacing:.5px;cursor:pointer;transition:all .15s;white-space:nowrap}
-.share-btn:hover{background:rgba(212,168,48,.18);border-color:rgba(212,168,48,.5);color:var(--amber-light,#E8BF52)}.global-search-btn:hover{background:rgba(212,168,48,.18);border-color:var(--gold);color:var(--gold)}
+.share-btn:hover{background:rgba(212,168,48,.18);border-color:rgba(212,168,48,.5);color:var(--amber-light,#E8BF52)}.global-search-btn:hover{background:rgba(212,168,48,.18);border-color:var(--amber);color:var(--amber)}
 .gs-result{display:flex;align-items:flex-start;gap:12px;padding:12px 20px;cursor:pointer;border-bottom:1px solid #F8FAFC;transition:background .1s;min-height:44px}
 .gs-result:hover{background:#F8FAFC}
 .gs-result:last-child{border-bottom:none}
@@ -2792,8 +2900,8 @@ tr:hover td{background:var(--gray-50)}
   background:rgba(245,158,11,.03);
 }
 .bb-row.bbt2{
-  --bb-accent: linear-gradient(180deg,#A78BFA,#7C3AED);
-  background:rgba(124,58,237,.02);
+  --bb-accent: linear-gradient(180deg,#A78BFA,#2C4569);
+  background:rgba(44,69,105,.02);
 }
 .bb-row.alt{background:#FAFBFC}
 
@@ -2808,7 +2916,7 @@ tr:hover td{background:var(--gray-50)}
 /* Franchise tier rank — amber */
 .bb-row.bbt1 .bb-rk{color:rgba(217,119,6,.55)}
 /* Lottery tier rank — purple */
-.bb-row.bbt2 .bb-rk{color:rgba(124,58,237,.4)}
+.bb-row.bbt2 .bb-rk{color:rgba(44,69,105,.4)}
 
 /* ── Avatar — WHITE THEME ───────────────────────────────────────────── */
 .bb-av{flex-shrink:0;display:flex;align-items:center;justify-content:center}
@@ -2818,7 +2926,7 @@ tr:hover td{background:var(--gray-50)}
   box-shadow:0 0 0 2px rgba(245,158,11,.4),0 0 8px rgba(245,158,11,.12) !important;
 }
 .bb-row.bbt2 .bb-av > div{
-  box-shadow:0 0 0 2px rgba(124,58,237,.3),0 0 8px rgba(124,58,237,.1) !important;
+  box-shadow:0 0 0 2px rgba(44,69,105,.3),0 0 8px rgba(44,69,105,.1) !important;
 }
 
 /* ── Identity — WHITE THEME ──────────────────────────────────────────── */
@@ -3476,10 +3584,14 @@ tr:hover td{background:var(--gray-50)}
 }
 .mct-chip-remove {
   background: none; border: none; color: rgba(255,255,255,.5);
-  cursor: pointer; font-size: 12px; padding: 0 0 0 2px;
+  cursor: pointer; font-size: 12px;
   touch-action: manipulation; line-height: 1;
-  /* 44px min tap target for mobile accessibility */
-  min-width: 28px; min-height: 28px;
+  /* MOBILE FIX (review P2): 44×44 tap zone via padding while keeping the
+     visible ✕ glyph small. The chip itself stays compact because the
+     button uses a negative margin to compensate. */
+  min-width: 44px; min-height: 44px;
+  padding: 14px 12px 14px 10px;
+  margin: -14px -12px -14px -10px;
   display: inline-flex; align-items: center; justify-content: center;
 }
 .mct-go-btn {
@@ -3503,11 +3615,6 @@ body.mct-open .tab-panel.active {
 #scMobileFocus {
   display: none;
   position: relative;
-}
-
-/* Scatter: tap hint */
-#scTapHint {
-  transition: opacity .4s;
 }
 
 
@@ -3579,7 +3686,7 @@ ap{
 }
 .mdc-prog-fill{
   height:100%;
-  background:linear-gradient(90deg,#3B82F6,#D4A830);
+  background:linear-gradient(90deg,#3B82F6,#C9971A);
   border-radius:2px;transition:width .4s ease;
 }
 .mdc-prog-text{
@@ -4693,9 +4800,14 @@ ap{
   .ff2-meta{ font-size:10px; line-height:1.2 }
   .ff2-head-controls{ width:100%; justify-content:space-between; gap:6px; flex-wrap:wrap }
   .ff2-density-bar,.ff2-zoom-bar{ padding:2px }
-  .ff2-density-btn{ min-width:32px; min-height:28px; padding:4px 6px; font-size:12px }
-  .ff2-zoom-btn{ min-width:32px; min-height:28px; padding:4px 8px; font-size:15px }
-  .ff2-reset-btn{ padding:5px 10px; font-size:11px }
+  /* MOBILE-READ: these rules WIN the cascade at ≤640px too (same
+     specificity as the 640-block rules but later in the file), so the
+     sizes here are the ones real phones get. 36px minimum keeps every
+     control in the comfortable-tap zone; the previous 28px regressed
+     the earlier 640-block fix without anyone noticing. */
+  .ff2-density-btn{ min-width:36px; min-height:36px; padding:4px 8px; font-size:12px }
+  .ff2-zoom-btn{ min-width:36px; min-height:36px; padding:4px 10px; font-size:15px }
+  .ff2-reset-btn{ min-height:36px; padding:5px 12px; font-size:11px }
   .ff2-legend{ width:100%; gap:4px; order:10 }
   .ff2-leg-item{ flex:1; justify-content:center; padding:6px 4px }
   .ff2-leg-name{ font-size:10px; letter-spacing:.2px }
@@ -4715,17 +4827,21 @@ ap{
   .ff2-axis-y{ left:48px; font-size:9px; letter-spacing:2px; padding:3px 8px }
   .ff2-axis-x{ font-size:9px; letter-spacing:2px; padding:4px 10px; bottom:6px }
 
-  /* Cards — compact density by default. The .ff-card-w variable
-     is overridden by .ff2-density-compact on the shell, this is just
-     additional safety: cap at 88px and shrink fonts. */
+  /* Cards — density via the --ff-card-w variable system (single source
+     of truth; the old hard .ff2-card{min-width:88px} override in the
+     640px block fought these variables and made density modes behave
+     unpredictably on phones).
+     MOBILE-READ: name floor raised to 10.5px — 9.5px Barlow Condensed
+     at arm's length was below the legibility line. Compact keeps role
+     hidden (fs 0) per the shared density rule. */
   .ff2-shell.ff2-density-compact{
-    --ff-card-w:        72px;
-    --ff-card-fs-name:  9.5px;
-    --ff-card-fs-rank:  10px;
+    --ff-card-w:        88px;
+    --ff-card-fs-name:  10.5px;
+    --ff-card-fs-rank:  11px;
   }
   .ff2-shell.ff2-density-standard{
-    --ff-card-w:        92px;
-    --ff-card-fs-name:  10.5px;
+    --ff-card-w:        96px;
+    --ff-card-fs-name:  11px;
   }
 
   /* Expanded card — fill more of viewport on tap */
@@ -4824,140 +4940,25 @@ ap{
    aria-hidden because they aren't semantically labels. */
 .sc-vh{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 
-/* ── Controls: two-row stack ──────────────────────────────────────────────
-   The control surface is a single .sc-controls block with internal rows.
-   Row 1 (primary) gives the axis pair visual prominence; row 2 (secondary)
-   holds filters and display modifiers in a lighter weight. */
-.sc-controls{display:flex;flex-direction:column;background:white;border-bottom:1px solid var(--gray-100)}
+/* QUALITY-1C: the .sc-controls / .sc-axis-* / .sc-segctrl / .sc-mods rule
+   blocks that lived here were the original two-row control bar deleted by
+   the canvas-first restructure. Their floating-chrome replacements live
+   in the .sc-pills / .sc-chips / .sc-chip-toggle rules further down.
 
-/* Row 1: axes — generous padding, white background, gold-tinted border on
-   the selects to signal that these are the headline choice. */
-.sc-controls-primary{display:flex;align-items:center;gap:18px;padding:14px 18px 12px;border-bottom:1px solid var(--gray-100)}
-.sc-axis-control{display:flex;align-items:center;gap:10px;flex:0 1 auto;min-width:0}
-.sc-axis-letter{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;color:var(--amber);letter-spacing:.05em;line-height:1;width:14px;text-align:center;flex-shrink:0}
-.sc-axis-select{
-  padding:8px 30px 8px 12px;
-  border:1.5px solid rgba(212,168,48,.35);
-  border-radius:8px;
-  font-family:'Barlow Condensed',sans-serif;
-  font-size:15px;font-weight:700;letter-spacing:.2px;
-  color:var(--navy);
-  background:white;
-  cursor:pointer;
-  min-width:160px;max-width:220px;
-  transition:border-color .15s,box-shadow .15s;
-  appearance:none;-webkit-appearance:none;
-  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path d='M1 1l4 4 4-4' stroke='%23C9971A' stroke-width='1.5' fill='none' stroke-linecap='round'/></svg>");
-  background-repeat:no-repeat;background-position:right 10px center;
-}
-.sc-axis-select:hover{border-color:var(--amber)}
-.sc-axis-select:focus{outline:none;border-color:var(--amber);box-shadow:0 0 0 3px rgba(212,168,48,.18)}
+   The .sc-plot-header / .sc-plot-title / .sc-plot-titlerow / .sc-plot-scope /
+   .sc-plot-count base rules were the old breadcrumb + hero title row,
+   replaced by the floating pills + bottom-bar count chip.
 
-/* Row 2: filters + color seg control + modifiers (right-aligned) */
-.sc-controls-secondary{display:flex;align-items:center;gap:14px;padding:9px 18px 11px;background:var(--gray-50);flex-wrap:wrap}
-.sc-filter-grp{display:flex;align-items:center;gap:7px;flex-shrink:0}
-.sc-filter-label{font-size:9.5px;font-weight:800;color:var(--gray-400);text-transform:uppercase;letter-spacing:.7px;white-space:nowrap;line-height:1}
-.sc-filter-select{
-  padding:5px 24px 5px 9px;
-  border:1.5px solid var(--gray-200);
-  border-radius:6px;
-  font-family:'Barlow Condensed',sans-serif;
-  font-size:12px;font-weight:700;
-  color:var(--navy);background:white;cursor:pointer;
-  appearance:none;-webkit-appearance:none;
-  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='9' height='6' viewBox='0 0 10 6'><path d='M1 1l4 4 4-4' stroke='%2364748B' stroke-width='1.5' fill='none' stroke-linecap='round'/></svg>");
-  background-repeat:no-repeat;background-position:right 8px center;
-  transition:border-color .15s;
-}
-.sc-filter-select:hover{border-color:var(--gray-300)}
-.sc-filter-select:focus{outline:none;border-color:var(--amber);box-shadow:0 0 0 2px rgba(212,168,48,.15)}
-
-/* Segmented color-by control — three buttons with stacked color swatches.
-   Active state uses the brand amber tint to match the primary axes. */
-.sc-segctrl{display:flex;align-items:center;gap:0;background:white;border:1px solid var(--gray-200);border-radius:8px;padding:2px;flex-shrink:0}
-.sc-segctrl-label{padding:0 8px 0 4px;color:var(--gray-400);flex-shrink:0}
-.sc-seg-btn{
-  display:inline-flex;align-items:center;gap:6px;
-  padding:5px 9px;
-  border:none;background:transparent;cursor:pointer;
-  font-family:'Barlow Condensed',sans-serif;
-  font-size:11.5px;font-weight:700;color:var(--gray-500);letter-spacing:.2px;
-  border-radius:6px;
-  transition:all .15s;
-  white-space:nowrap;
-}
-.sc-seg-btn:hover{color:var(--navy);background:var(--gray-50)}
-.sc-seg-btn.active{background:rgba(212,168,48,.14);color:var(--navy)}
-.sc-seg-btn.active:hover{background:rgba(212,168,48,.2)}
-.sc-seg-swatches{display:inline-flex;gap:1px}
-.sc-seg-swatches i{width:7px;height:7px;border-radius:50%;display:inline-block;box-shadow:0 0 0 1px rgba(15,23,42,.08)}
-
-/* Display modifiers (Trend, Quadrants) — pushed right by margin-left:auto */
-.sc-mods{display:flex;align-items:center;gap:6px;margin-left:auto;flex-shrink:0}
-.sc-mod-btn{
-  display:inline-flex;align-items:center;gap:6px;
-  padding:5px 11px;
-  background:white;
-  border:1.5px solid var(--gray-200);
-  border-radius:7px;
-  font-family:'Barlow Condensed',sans-serif;
-  font-size:11.5px;font-weight:700;letter-spacing:.3px;
-  color:var(--gray-500);
-  cursor:pointer;transition:all .15s;
-  white-space:nowrap;
-}
-.sc-mod-btn:hover{border-color:var(--gray-300);color:var(--navy)}
-.sc-mod-btn[aria-pressed="true"]{
-  background:rgba(212,168,48,.12);
-  border-color:rgba(212,168,48,.5);
-  color:var(--amber);
-}
-.sc-mod-icon{width:13px;height:13px;flex-shrink:0;display:block}
-.sc-mod-text{line-height:1}
-
-/* ── Body: chart on left, leaderboard rail on right (desktop) ───────────
-   The chart wants vertical space; the Top/Bot leaderboards want a stable
-   side rail. CSS Grid gives us this with one rule, falls back to a single
-   column on mobile via media query in the responsive block. */
-.sc-body{display:grid;grid-template-columns:minmax(0,1fr) 280px;align-items:stretch;min-height:0}
-.sc-plot-wrap{min-width:0;display:flex;flex-direction:column;padding:14px 18px 12px;gap:0}
-
-/* ── Plot header: breadcrumb scope row + hero title row ─────────────────
-   Scope row is small and subordinate — establishes context.
-   Title row is the dominant element — axis pair as the analytical question.
-   Count and legend ride alongside the title, right-aligned. */
-.sc-plot-header{display:flex;flex-direction:column;gap:4px;padding:2px 2px 12px}
-.sc-plot-scope{
-  font-family:'Barlow Condensed',sans-serif;
-  font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;
-  color:var(--gray-400);line-height:1;
-  min-height:11px; /* reserves space so the title row doesn't jump on first render */
-}
-.sc-plot-titlerow{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
-.sc-plot-title{
-  font-family:'Barlow Condensed',sans-serif;
-  font-size:24px;font-weight:900;letter-spacing:-.2px;
-  color:var(--navy);line-height:1.05;margin:0;
-  min-width:0; /* allow flex shrink rather than overflow */
-}
-.sc-plot-count{
-  font-size:11px;font-weight:700;color:var(--gray-500);letter-spacing:.4px;
-  text-transform:uppercase;line-height:1;
-  padding:4px 9px;
-  background:var(--surface-inset);border-radius:12px;
-  white-space:nowrap;
-  flex-shrink:0;
-}
+   Removed in a routine code-quality pass once no markup references them. */
 
 /* Legend: right-aligned chip strip. Each chip is a swatch + label pair,
-   designed to read at a glance without stealing focus from the chart. */
+   designed to read at a glance without stealing focus from the chart.
+   Still live — overridden by .sc-wrap-v2 .sc-legend further down for
+   the floating-bottom-bar placement; the base rule supplies the inner
+   chip-row layout that v2 inherits. */
 .sc-legend{display:flex;align-items:center;gap:11px;margin-left:auto;flex-wrap:wrap;justify-content:flex-end}
 .sc-legend-item{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:var(--gray-600);letter-spacing:.01em;line-height:1;white-space:nowrap}
 .sc-legend-swatch{width:9px;height:9px;border-radius:50%;flex-shrink:0;box-shadow:0 0 0 1px rgba(15,23,42,.06)}
-
-/* Canvas wrap: chart is the dominant element */
-.sc-canvas-wrap{position:relative;width:100%;height:560px;min-height:320px}
-.sc-canvas{position:absolute;inset:0;width:100%;height:100%}
 
 /* ── Empty state: shown when no points are computable for current axes ──
    Replaces the dead-blank chart canvas with a guided redirect. Sits inside
@@ -5003,18 +5004,16 @@ ap{
 .sc-empty-action:hover{background:rgba(212,168,48,.1);border-color:var(--amber)}
 .sc-canvas-wrap.is-empty canvas{visibility:hidden}
 
-/* ── Dual-panel strip: Top 5 ABOVE Bottom 5 in the right rail (desktop).
-   On mobile the .sc-body grid collapses to one column and we restore the
-   side-by-side strip layout via the media query below ~640px. */
-.sc-panels-strip{display:flex;flex-direction:column;border-left:1px solid var(--gray-100);background:var(--gray-50);min-width:0}
-.sc-panel{display:flex;flex-direction:column;min-width:0}
-.sc-panel-top{border-bottom:1px solid var(--gray-100);flex:1 1 0;min-height:0}
-.sc-panel-bot{flex:1 1 0;min-height:0}
-.sc-panel-hdr{display:flex;align-items:center;gap:8px;padding:8px 14px 7px;border-bottom:1px solid var(--gray-100);background:white}
-.sc-panel-hdr-badge{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:1px;padding:2px 7px;border-radius:20px;flex-shrink:0}
-.sc-panel-hdr-badge-top{background:rgba(34,197,94,.12);color:#15803d}
-.sc-panel-hdr-badge-bot{background:rgba(239,68,68,.1);color:#dc2626}
-.sc-panel-hdr-axis{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:900;color:var(--navy);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1}
+/* ── Top 5 / Bottom 5 player-row styling ─────────────────────────────────
+   The old .sc-panels-strip side-rail container was deleted by the canvas-
+   first restructure; the rows themselves are now rendered inside the new
+   .sc-rankings layout (defined further down) by ScatterTopPanel /
+   ScatterBotPanel. The row + cell rules below are shared by both layouts —
+   that's why they live here rather than scoped to .sc-rankings.
+
+   Removed in 1C: .sc-panels-strip, .sc-panel, .sc-panel-top/bot,
+   .sc-panel-hdr / .sc-panel-hdr-badge / .sc-panel-hdr-axis,
+   .sc-bot5-* legacy aliases. None referenced by markup after PR1. */
 .sc-top5-empty{padding:10px 14px;font-size:11px;color:var(--gray-300);font-style:italic}
 
 /* Player rows inside panels */
@@ -5034,13 +5033,6 @@ ap{
 .sc-top5-school{font-size:9px;color:var(--gray-400);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .sc-top5-val{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:900;flex-shrink:0}
 
-/* Legacy sidebar hide (replaced by strip) */
-.sc-top5-wrap{display:none}
-.sc-bot5-hdr{display:none}
-.sc-bot5-label{color:#EF4444}
-.sc-bot5-idx{color:rgba(239,68,68,.55)}
-.sc-bot5-row{}
-
 /* Stat bar + misc */
 .sc-stat-chip{display:inline-block;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:700;border:1px solid transparent}
 .sc-mf-name{font-family:'Barlow Condensed',sans-serif;font-size:19px;font-weight:900;color:var(--navy);line-height:1}
@@ -5049,12 +5041,13 @@ ap{
 .sc-stat-bar{overflow-x:auto;-webkit-overflow-scrolling:touch;border-top:1px solid var(--gray-100);padding:8px 2px 2px;margin-top:6px}
 #scStatBar{overflow-x:auto}
 
-/* ── PR1: Canvas-first restructure ─────────────────────────────────────────
-   Floating chrome over a full-bleed canvas. Pills (top-left axes), chips
-   (top-right filters/toggles), floatbar (bottom-left count + legend),
-   comparison shelf (below canvas), and a shared picker popover.
-   The old .sc-controls / .sc-plot-header / .sc-panels-strip rules above are
-   left in place but unreachable — no markup uses them after PR1.
+/* ── Canvas-first scatter chrome ──────────────────────────────────────────
+   Full-bleed canvas with floating chrome: pills (top-left axes), chips
+   (top-right filters/toggles), floatbar (bottom-left count + legend), a
+   collapsible comparison shelf below, and a shared picker popover. The
+   sc-wrap-v2 selector scopes the v2 layout so it can coexist with any
+   legacy patterns above (none remain after the 1C cleanup, but the v2
+   namespace stays as a marker of the canvas-first model).
    ────────────────────────────────────────────────────────────────────────── */
 
 .sc-wrap-v2 .sc-body-v2{display:block}              /* override the old 2-col grid */
@@ -5141,17 +5134,15 @@ ap{
   white-space:nowrap;max-width:120px;overflow:hidden;text-overflow:ellipsis;
 }
 .sc-chip-divider{width:1px;height:18px;background:var(--gray-200);margin:0 2px;flex-shrink:0}
-.sc-chip-icon{width:30px;padding:0;justify-content:center}
-.sc-chip-icon svg{width:13px;height:13px;display:block;color:var(--gray-500)}
-.sc-chip-icon:hover svg{color:var(--navy)}
-.sc-chip-icon[aria-pressed="true"]{
-  background:rgba(212,168,48,.14);border-color:rgba(212,168,48,.5);
-}
-.sc-chip-icon[aria-pressed="true"] svg{color:#92400E}
-/* PR3: Labeled toggle chips — icon + visible label so users can identify
+/* QUALITY-1C: dropped .sc-chip-icon rules that were superseded by
+   .sc-chip-toggle in the labeled-toggle redesign. No markup uses
+   .sc-chip-icon anymore — Ghost / Trend / Quadrants all use the labeled
+   toggle class. */
+
+/* Labeled toggle chips — icon + visible label so users can identify
    functions without hovering for a title. Mobile collapses to icon-only
-   via a media-query rule below; the title attribute on each button still
-   carries the long-form description for both. */
+   via a media-query override below; the title attribute on each button
+   still carries the long-form description for both desktop and mobile. */
 .sc-chip-toggle{gap:6px;padding:0 10px 0 9px}
 .sc-chip-toggle svg{width:13px;height:13px;display:block;color:var(--gray-500);flex-shrink:0}
 .sc-chip-toggle:hover svg{color:var(--navy)}
@@ -5166,7 +5157,10 @@ ap{
   white-space:nowrap;
 }
 
-/* PR3: Reset-zoom floating chip. Appears on canvas only when the user has
+.sc-chip-swatches{display:inline-flex;gap:2px;align-items:center;line-height:0}
+.sc-chip-swatches i{width:7px;height:7px;border-radius:50%;display:inline-block;box-shadow:0 0 0 1px rgba(15,23,42,.08)}
+
+/* Reset-zoom floating chip. Appears on canvas only when the user has
    zoomed or panned (Scatter._state.zoomed → JS sets [hidden] accordingly).
    Sits above the floatbar so it doesn't overlap the count chip; on mobile
    it shifts to the bottom-left for thumb reach. */
@@ -5448,19 +5442,36 @@ ap{
 
 /* ── Mobile shell adaptations ───────────────────────────────────────────── */
 @media (max-width:640px){
-  .sc-wrap-v2 .sc-canvas-wrap{height:480px;padding:52px 8px 32px}
-  .sc-wrap-v2 .sc-canvas-wrap canvas{inset:52px 8px 32px}
-  .sc-pills{top:8px;left:8px;padding:4px;gap:4px}
+  /* DESIGN-9: Mobile-native scatter — chrome positions flipped vertically.
+     The primary interaction (axis pair swap) was previously at the TOP
+     of the chart, requiring the user to stretch their thumb across the
+     viewport. It now lives at the BOTTOM in the natural thumb-reach
+     zone, with the chart canvas above it. Filter chips and the reset-
+     zoom control move to the TOP since they're less-frequent actions.
+     This matches the conventional chart-axis layout (Y on left, X on
+     bottom) and reduces the muscle-memory friction with the rest of
+     the mobile app patterns the user already knows. */
+  .sc-wrap-v2 .sc-canvas-wrap{height:480px;padding:48px 8px 60px}
+  .sc-wrap-v2 .sc-canvas-wrap canvas{inset:48px 8px 60px}
+  /* Axis pills → bottom of canvas, thumb reach */
+  .sc-pills{top:auto;bottom:10px;left:8px;padding:4px;gap:4px}
   .sc-pill{height:32px;padding:0 9px 0 8px;gap:6px}
   .sc-pill-value{font-size:13.5px;max-width:90px}
-  .sc-pill-swap{width:26px;height:26px}
+  /* MOBILE FIX (review P2): 44×44 hit zone via padding; the SVG icon
+     stays 13px so the visible swap button is unchanged. */
+  .sc-pill-swap{width:44px;height:44px;padding:9px}
   .sc-pill-swap svg{width:13px;height:13px}
+  /* Filter chips stay top-right (less-frequent actions) */
   .sc-chips{top:8px;right:8px;padding:4px;gap:3px}
-  .sc-chip{height:28px;padding:0 7px;gap:4px}
+  /* MOBILE FIX (review P4): chips are 32px tall on mobile (was 28).
+     The 4px bump moves all chips above the borderline tap-target zone
+     without disturbing the floating-chrome layout — the chip strip is
+     still under the 44px floor of the canvas-wrap, well clear of the
+     pills above. */
+  .sc-chip{height:32px;padding:0 7px;gap:4px}
   .sc-chip-key{font-size:8.5px}
   .sc-chip-val{font-size:12px;max-width:64px}
   .sc-chip-divider{display:none}
-  .sc-chip-icon{width:28px}
   .sc-chip-color .sc-chip-key{display:none}
   /* PR3: collapse toggle labels to icon-only on mobile — desktop has the
      room to show "History/Zones/Trend/Quadrants" alongside each icon, but
@@ -5469,10 +5480,12 @@ ap{
      name on long-press. */
   .sc-chip-toggle{padding:0;width:30px;justify-content:center}
   .sc-chip-toggle-label{display:none}
-  /* PR3: reset-zoom chip moves to top-left below the pills on mobile so
-     it sits within thumb reach and doesn't crowd the count chip. */
-  .sc-zoom-reset{top:auto;bottom:42px;right:auto;left:8px}
-  .sc-floatbar{left:8px;right:8px;bottom:4px;gap:8px}
+  /* DESIGN-9: reset-zoom chip moves to TOP-LEFT on mobile (was bottom-
+     left) so the new bottom strip stays uncluttered for the axis pills.
+     Still 44px hit zone per accessibility fix. */
+  .sc-zoom-reset{top:8px;left:8px;bottom:auto;right:auto;height:44px;padding:0 14px}
+  /* Count + legend floatbar — keep at bottom but tuck above the pills */
+  .sc-floatbar{left:8px;right:8px;bottom:50px;gap:8px}
   .sc-count{font-size:10.5px;padding:2px 7px}
   .sc-wrap-v2 .sc-legend{font-size:10px;padding:2px 7px;gap:7px;max-width:62%}
   .sc-shelf-rows{grid-template-columns:1fr;gap:6px;padding:0 10px 10px}
@@ -5498,7 +5511,7 @@ ap{
 /* §§ /BLOCK:SC §§ */
 
 /* §§ BLOCK:FUTURE §§ */
-027 Watch Board CSS — dark navy card theme ─────────────────────── */
+/* 2027 Watch Board CSS — dark navy card theme ─────────────────────────── */
 .future-view-bar{display:flex;align-items:center;gap:8px;margin-bottom:16px}
 .future-view-btn{
   background:rgba(10,22,40,.06);border:1.5px solid rgba(10,22,40,.15);
@@ -5598,8 +5611,8 @@ ap{
   text-transform:uppercase;
 }
 .future-card .tag.pos.guard  {color:#2563EB}
-.future-card .tag.pos.forward{color:#7C3AED}
-.future-card .tag.pos.center {color:#0891B2}
+.future-card .tag.pos.forward{color:#2C4569}
+.future-card .tag.pos.center {color:#94A3B8}
 .future-card .tag{font-size:9.5px;padding:2px 6px}
 
 /* White body: tags + notes + comp */
@@ -5678,7 +5691,7 @@ ock Drafts table CSS ───────────────────�
       <div class="header-sub">Analytics Model · 2019–2027</div>
     </div>
   </div>
-  <div id="lotteryCountdown" style="display:flex;flex-direction:column;align-items:center;background:rgba(124,58,237,.1);border:1px solid rgba(124,58,237,.28);border-radius:8px;padding:4px 12px;cursor:default;flex-shrink:0" title="2026 NBA Draft Lottery — May 10, 2026">
+  <div id="lotteryCountdown" style="display:flex;flex-direction:column;align-items:center;background:rgba(44,69,105,.1);border:1px solid rgba(44,69,105,.28);border-radius:8px;padding:4px 12px;cursor:default;flex-shrink:0" title="2026 NBA Draft Lottery — May 10, 2026">
     <div id="lotLabel" style="font-size:8px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:rgba(167,139,250,.75);line-height:1;margin-bottom:2px">Lottery</div>
     <div id="lotDisplay" style="font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900;color:#A78BFA;line-height:1;letter-spacing:.5px">—</div>
   </div>
@@ -5701,16 +5714,70 @@ ock Drafts table CSS ───────────────────�
 </header>
 
 <nav class="nav-tabs" id="navTabs">
-  <div class="nav-tab active" data-tab="board2026" id="navTabDraftBoard">🏀 <span id="navDraftYear">2026</span> Draft Board</div>
-  <div class="nav-tab" data-tab="methodology">🔬 The Metric</div>
-  <div class="nav-tab" data-tab="mocks">📋 Mock Drafts</div>
-  <div class="nav-tab" data-tab="compare">⚖️ Compare</div>
-  <div class="nav-tab" data-tab="scatter">📈 Scatter</div>
-  <div class="nav-tab" data-tab="comps">🔍 Comp Explorer</div>
-  <div class="nav-tab" data-tab="future" id="navTabFuture">🔭 <span id="navFutureYear">2027</span> Watch</div>
-  <div class="nav-tab" data-tab="history">📅 Past Boards</div>
-  <div class="nav-tab" data-tab="analytics">📊 Class Compare</div>
-  <div class="nav-tab" data-tab="resources">📚 Resources</div>
+  <!-- DESIGN-1: emoji prefixes replaced with a tight inline-SVG icon set;
+       tabs reordered by intent (RANK · EXPLORE · COMPARE · WORKFLOW · REF)
+       with thin dividers between groups. data-tab values unchanged so the
+       existing routing keeps working. All icons use viewBox="0 0 16 16",
+       currentColor, 1.5 stroke for visual consistency. -->
+
+  <!-- ─── RANK ───────────────────────────────────────────────────────── -->
+  <div class="nav-tab active" data-tab="board2026" id="navTabDraftBoard">
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="M3 4h10M3 8h10M3 12h6"/></svg>
+    <span><span id="navDraftYear">2026</span> Draft Board</span>
+  </div>
+  <div class="nav-tab" data-tab="future" id="navTabFuture">
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="8" r="2.5"/><path d="M1.5 8C3 5 5.5 3.5 8 3.5s5 1.5 6.5 4.5c-1.5 3-4 4.5-6.5 4.5S3 11 1.5 8z"/></svg>
+    <span><span id="navFutureYear">2027</span> Watch</span>
+  </div>
+
+  <span class="nav-divider" aria-hidden="true"></span>
+
+  <!-- ─── EXPLORE ────────────────────────────────────────────────────── -->
+  <div class="nav-tab" data-tab="scatter">
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="M2 13V2.5M2 13h11.5"/><circle cx="5.5" cy="9" r=".9" fill="currentColor" stroke="none"/><circle cx="8" cy="6" r=".9" fill="currentColor" stroke="none"/><circle cx="11" cy="4" r=".9" fill="currentColor" stroke="none"/><circle cx="9.5" cy="10" r=".9" fill="currentColor" stroke="none"/></svg>
+    <span>Scatter</span>
+  </div>
+  <div class="nav-tab" data-tab="analytics">
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="M2 13V2.5M2 13h11.5"/><rect x="4" y="8.5" width="2" height="4.5" fill="currentColor" stroke="none" rx=".3"/><rect x="7.5" y="5.5" width="2" height="7.5" fill="currentColor" stroke="none" rx=".3"/><rect x="11" y="9.5" width="2" height="3.5" fill="currentColor" stroke="none" rx=".3"/></svg>
+    <span>Class Compare</span>
+  </div>
+
+  <span class="nav-divider" aria-hidden="true"></span>
+
+  <!-- ─── COMPARE ────────────────────────────────────────────────────── -->
+  <div class="nav-tab" data-tab="compare">
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2v12M3 4.5h10"/><path d="M5.5 4.5L3 9h5L5.5 4.5zm5 0L8 9h5l-2.5-4.5z"/></svg>
+    <span>Compare</span>
+  </div>
+  <div class="nav-tab" data-tab="comps">
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5L14 14"/></svg>
+    <span>Comp Explorer</span>
+  </div>
+
+  <span class="nav-divider" aria-hidden="true"></span>
+
+  <!-- ─── WORKFLOW ───────────────────────────────────────────────────── -->
+  <div class="nav-tab" data-tab="mocks">
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 3h6c.55 0 1 .45 1 1v10c0 .55-.45 1-1 1H5c-.55 0-1-.45-1-1V4c0-.55.45-1 1-1z"/><path d="M6 3V2.2c0-.4.3-.7.7-.7h2.6c.4 0 .7.3.7.7V3"/><path d="M6 9l1.5 1.5L10 8"/></svg>
+    <span>Mock Drafts</span>
+  </div>
+
+  <span class="nav-divider" aria-hidden="true"></span>
+
+  <!-- ─── REFERENCE ──────────────────────────────────────────────────── -->
+  <div class="nav-tab" data-tab="methodology">
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2v4.5L3 13c-.4.7.1 1.5.9 1.5h8.2c.8 0 1.3-.8.9-1.5L10 6.5V2"/><path d="M5 2h6"/><path d="M4.5 10.5h7"/></svg>
+    <span>The Metric</span>
+  </div>
+  <div class="nav-tab" data-tab="history">
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="3.5" width="12" height="11" rx="1.5"/><path d="M2 6.5h12M5 2v3M11 2v3"/></svg>
+    <span>Past Boards</span>
+  </div>
+  <div class="nav-tab" data-tab="resources">
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 3C2.5 2.5 2.9 2 3.5 2H7c.8 0 1.5.7 1.5 1.5v10c0-.8-.7-1.5-1.5-1.5H3.5c-.6 0-1-.4-1-1V3z"/><path d="M13.5 3c0-.5-.4-1-1-1H9c-.8 0-1.5.7-1.5 1.5v10c0-.8.7-1.5 1.5-1.5h3.5c.6 0 1-.4 1-1V3z"/></svg>
+    <span>Resources</span>
+  </div>
+
   <div id="navScrollHint">›</div>
 </nav>
 
@@ -5769,7 +5836,7 @@ ock Drafts table CSS ───────────────────�
           <span class="tier-ed-label" style="color:rgba(255,255,255,.5)">Tier Cutoffs</span>
           <div class="tier-ed-group"><span class="tier-ed-name" style="color:#D97706">Franchise ends</span><input class="tier-ed-input" id="cutFranchise" type="number" min="1" max="10" onchange="updateTierCuts()"></div>
           <div class="tier-ed-sep"></div>
-          <div class="tier-ed-group"><span class="tier-ed-name" style="color:#7C3AED">Lottery ends</span><input class="tier-ed-input" id="cutLottery" type="number" min="2" max="20" onchange="updateTierCuts()"></div>
+          <div class="tier-ed-group"><span class="tier-ed-name" style="color:#2C4569">Lottery ends</span><input class="tier-ed-input" id="cutLottery" type="number" min="2" max="20" onchange="updateTierCuts()"></div>
           <div class="tier-ed-sep"></div>
           <div class="tier-ed-group"><span class="tier-ed-name" style="color:#2563EB">Late 1st ends</span><input class="tier-ed-input" id="cutLateFirst" type="number" min="15" max="30" onchange="updateTierCuts()"></div>
           <div class="tier-ed-sep"></div>
@@ -5952,7 +6019,7 @@ ock Drafts table CSS ───────────────────�
     <div id="mdcPriorSidebar" class="prior-picks-sidebar" style="border-radius:0;align-self:stretch"></div>
     <div class="mdc-pool" id="mdcWrapPool">
       <div class="mdc-pool-header">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px"><div class="mdc-pool-title">Player Pool <span id="mdcPoolCount" style="font-weight:500;opacity:.5;font-size:12px"></span></div><button onclick="mdcClosePoolDrawer()" style="display:none;background:rgba(255,255,255,.1);border:none;border-radius:50%;width:26px;height:26px;color:white;font-size:14px;cursor:pointer;align-items:center;justify-content:center;flex-shrink:0" id="mdcPoolCloseBtn">✕</button></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px"><div class="mdc-pool-title">Player Pool <span id="mdcPoolCount" style="font-weight:500;opacity:.5;font-size:12px"></span></div><button onclick="mdcClosePoolDrawer()" style="display:none;background:rgba(255,255,255,.1);border:none;border-radius:50%;width:44px;height:44px;color:white;font-size:16px;cursor:pointer;align-items:center;justify-content:center;flex-shrink:0;touch-action:manipulation" id="mdcPoolCloseBtn">✕</button></div>
         <div id="mdcTeamInfo"></div>
         <div class="mdc-pool-filters">
           <input class="mdc-pool-search" id="mdcSearch" type="text" placeholder="Search player…" oninput="mdcDebouncedFilter(this.value)">
@@ -6188,7 +6255,7 @@ ock Drafts table CSS ───────────────────�
     </div>
     <div class="watch-badge" id="watchBadge">Preliminary</div>
     <div id="rollForwardBtnWrap" style="margin-left:auto">
-      <button id="rollForwardBtn" onclick="hwRollForward.showPanel()" style="background:rgba(124,58,237,.18);border:1.5px solid rgba(124,58,237,.4);color:#C4B5FD;font-size:11px;font-weight:700;padding:6px 14px;border-radius:7px;cursor:pointer;font-family:'Barlow Condensed',sans-serif;letter-spacing:.3px;transition:all .15s" onmouseover="this.style.background='rgba(124,58,237,.32)'" onmouseout="this.style.background='rgba(124,58,237,.18)'" title="Transition 2027 board to primary after draft night">⚡ Roll Forward to 2027</button>
+      <button id="rollForwardBtn" onclick="hwRollForward.showPanel()" style="background:rgba(44,69,105,.18);border:1.5px solid rgba(44,69,105,.4);color:#C4B5FD;font-size:11px;font-weight:700;padding:6px 14px;border-radius:7px;cursor:pointer;font-family:'Barlow Condensed',sans-serif;letter-spacing:.3px;transition:all .15s" onmouseover="this.style.background='rgba(44,69,105,.32)'" onmouseout="this.style.background='rgba(44,69,105,.18)'" title="Transition 2027 board to primary after draft night">⚡ Roll Forward to 2027</button>
     </div>
   </div>
   <div id="futureContent"></div>
@@ -6999,7 +7066,7 @@ function schoolInitialsBadge(school, size, borderRadius) {
   size = size || '20px'; borderRadius = borderRadius || '3px';
   var initials = schoolInitials(school);
   var fs = Math.max(8, Math.round(parseInt(size) * 0.42)) + 'px';
-  var palette = ['#1D4ED8','#7C3AED','#0D9488','#C2410C','#0369A1','#6D28D9','#065F46'];
+  var palette = ['#1D4ED8','#2C4569','#0D9488','#C2410C','#0369A1','#6D28D9','#065F46'];
   var cidx = 0;
   for (var i=0;i<school.length;i++) cidx = (cidx + school.charCodeAt(i)) % palette.length;
   return '<div style="width:'+size+';height:'+size+';border-radius:'+borderRadius
@@ -7052,7 +7119,7 @@ function posColor(pos) {
   const p = (pos||'').toLowerCase();
   if (p.includes('guard') || p.includes('pg') || p.includes('sg')) return '#2563EB';
   if (p.includes('center') || p === 'c' || p.includes('pf/c')) return '#D97706';
-  return '#059669';
+  return '#10B981';
 }
 function getInitials(name) {
   const parts = splitName(name)[0].split(' ');
@@ -9711,7 +9778,7 @@ function addCardToCompare(rank) {
   var navTab = document.querySelector('.nav-tab[data-tab="compare"]');
   if (navTab) {
     navTab.style.background = '#DCFCE7';
-    navTab.style.color = '#059669';
+    navTab.style.color = '#10B981';
     setTimeout(function(){ navTab.style.background = ''; navTab.style.color = ''; }, 600);
   }
 }
@@ -9940,7 +10007,7 @@ function openTrendModal(normName, year, displayName) {
   var trendBoardEl = document.getElementById('trendBoardRank');
   if (trendBoardEl) {
     if (boardEntry) {
-      var draftBg = (typeof boardEntry.draft_no === 'number' && boardEntry.draft_no <= 14) ? 'var(--purple)' : 'var(--navy)';
+      var draftBg = (typeof boardEntry.draft_no === 'number' && boardEntry.draft_no <= 14) ? 'var(--tier-lottery)' : 'var(--navy)';
       var draftStr = boardEntry.draft_no ? '<span style="background:' + draftBg + ';color:white;font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;font-family:Barlow Condensed,sans-serif">Drafted #' + boardEntry.draft_no + '</span>' : '';
       var metricStr = boardEntry.metric ? '<div style="text-align:center"><div style="font-family:Barlow Condensed,sans-serif;font-size:18px;font-weight:800;color:var(--blue)">' + Number(boardEntry.metric).toFixed(2) + '</div><div style="font-size:9px;color:var(--gray-400);text-transform:uppercase;letter-spacing:.4px">Metric</div></div>' : '';
       var bName = (boardEntry.name || '').indexOf(' - ') > 0 ? boardEntry.name.slice(0, boardEntry.name.indexOf(' - ')) : (boardEntry.name || '');
@@ -9997,7 +10064,7 @@ function openTrendModal(normName, year, displayName) {
         data: dataPoints,
         borderColor: '#2563EB',
         backgroundColor: 'rgba(37,99,235,.08)',
-        pointBackgroundColor: dataPoints.map(v => v && v<=14 ? '#7C3AED' : '#2563EB'),
+        pointBackgroundColor: dataPoints.map(v => v && v<=14 ? '#2C4569' : '#2563EB'),
         pointRadius: 7,
         pointHoverRadius: 10,
         borderWidth: 2.5,
@@ -10078,7 +10145,7 @@ function renderHistory() {
   function sortTh(key, label) {
     const active = _histSortKey===key;
     const arrow = active?(_histSortDir==='desc'?' ↓':' ↑'):'';
-    const style = active?'cursor:pointer;color:#D4A830;background:rgba(212,168,48,.08)':'cursor:pointer;opacity:.75;white-space:nowrap';
+    const style = active?'cursor:pointer;color:#C9971A;background:rgba(212,168,48,.08)':'cursor:pointer;opacity:.75;white-space:nowrap';
     return `<th style="${style}" onclick="histSetSort('${key}')">${label}${arrow}</th>`;
   }
   let html = `<div class="table-wrap"><table><thead><tr>
@@ -10214,10 +10281,10 @@ function _renderFuture2027Cards(players) {
       var nameFontSize = name.length <= 12 ? '17px' : name.length <= 15 ? '15px' : '13px';
 
       // Tier color for rank badge
-      var tierColor = tier.key==='top5'    ? '#7C3AED'
+      var tierColor = tier.key==='top5'    ? '#2C4569'
                     : tier.key==='top15'   ? '#6D28D9'
                     : tier.key==='top30'   ? '#2563EB'
-                    : '#0891B2';
+                    : '#94A3B8';
       out += '<div class="future-card future-card-'+tier.key+'" onclick="openFutureModal('+p.rank+')">';
       out += '<div class="future-card-header">';
       // Rank badge — tier-colored rounded square
@@ -10430,7 +10497,7 @@ function openFutureModal(rank) {
   }
 
   // ── Early watch banner ──────────────────────────────────────────────────────
-  body += '<div style="margin-top:16px;padding:10px 14px;background:rgba(124,58,237,.07);border-radius:8px;border:1px solid rgba(124,58,237,.15);font-size:11px;color:var(--purple);font-weight:600">'
+  body += '<div style="margin-top:16px;padding:10px 14px;background:rgba(44,69,105,.07);border-radius:8px;border:1px solid rgba(44,69,105,.15);font-size:11px;color:var(--tier-lottery);font-weight:600">'
        + '\u26a0\ufe0f 2027 Preliminary Watch \u2014 rankings will evolve as players complete their freshman seasons'
        + '</div>';
 
@@ -10453,7 +10520,7 @@ function renderResources() {
   var out = "";
   var catLabels = { NBA: "NBA", College: "College Basketball", Other: "Other / Dev" };
   var catIcons  = { NBA: "&#127936;", College: "&#127891;", Other: "&#128187;" };
-  var catColors = { NBA: "#2563EB", College: "#7C3AED", Other: "#059669" };
+  var catColors = { NBA: "#2563EB", College: "#2C4569", Other: "#10B981" };
   for (var si = 0; si < sections.length; si++) {
     var sec = sections[si];
     if (catF && sec.section !== catF) continue;
@@ -12140,7 +12207,7 @@ function renderBoardBigboard(players) {
   // Header (always full-width — shared across both columns)
   out += '<div class="bb-header">'
     + '<div class="bb-header-row">'
-      + '<div class="bb-logo-box" style="background:none;border:none;padding:0">'+ (BB_LOGO_SRC ? '<img src="' + BB_LOGO_SRC + '" style="width:34px;height:34px;object-fit:contain;display:block;" alt="HoopsWill">' : '<div style="font-family:Barlow Condensed,sans-serif;font-size:11px;font-weight:900;color:#D4A830;line-height:1">HW</div>')+ '</div>'
+      + '<div class="bb-logo-box" style="background:none;border:none;padding:0">'+ (BB_LOGO_SRC ? '<img src="' + BB_LOGO_SRC + '" style="width:34px;height:34px;object-fit:contain;display:block;" alt="HoopsWill">' : '<div style="font-family:Barlow Condensed,sans-serif;font-size:11px;font-weight:900;color:#C9971A;line-height:1">HW</div>')+ '</div>'
       + '<div class="bb-htitles">'
         + '<div class="bb-brand">HoopsWill Analytics</div>'
         + '<div class="bb-title">2026 NBA Draft Big Board</div>'
@@ -13257,7 +13324,7 @@ function mcExportCSV(){
 // ── COMPARE MODE ───────────────────────────────────────────────────────────
 var compareList = [];   // array of player objects
 var COMPARE_MAX = 4;
-var COMPARE_COLORS = ['#2563EB','#7C3AED','#059669','#D97706'];
+var COMPARE_COLORS = ['#2563EB','#2C4569','#10B981','#D97706'];
 
 function populateCompareSelect() {
   var sel = document.getElementById('compareSelect');
@@ -13472,10 +13539,10 @@ function renderCompare() {
     var color  = COMPARE_COLORS[ci];
     var tier   = getTier(p.rank);
     var tierBg = tier.key==='franchise' ? 'linear-gradient(135deg,#B45309,#F59E0B)'
-               : tier.key==='lottery'   ? 'var(--purple)'
+               : tier.key==='lottery'   ? 'var(--tier-lottery)'
                : tier.key==='late1'     ? 'var(--blue)'
-               : tier.key==='second'    ? 'var(--cyan)'
-               : 'var(--teal)';
+               : tier.key==='second'    ? 'var(--tier-second)'
+               : 'var(--gray-500)';
     var gm     = crossGradStyle(p.metric,'metric',yr);
     var logo   = schoolLogoHtml(school, '14px', '3px');
     var isLdr  = wins[ci]===maxWins && compareList.length>1;
@@ -13739,7 +13806,7 @@ function renderTweetCardModal(p) {
   var base   = p.name.indexOf(' - ') > 0 ? p.name.slice(0, p.name.indexOf(' - ')) : p.name;
   var school = p.name.indexOf(' - ') > 0 ? p.name.slice(p.name.indexOf(' - ') + 3) : '';
   var tier   = getTier(p.rank);
-  var tierColor = tier.key === 'lottery' ? '#7C3AED' : tier.key === 'late1' ? '#2563EB' : tier.key === 'second' ? '#0891B2' : '#059669';
+  var tierColor = tier.key === 'lottery' ? '#2C4569' : tier.key === 'late1' ? '#2563EB' : tier.key === 'second' ? '#94A3B8' : '#10B981';
   if (p.rank <= 3) tierColor = '#C9971A';
 
   var photoUrl = getPhotoUrl(p.name);
@@ -14154,7 +14221,7 @@ var ScatterEngine = (function() {
   // Used for fallback circles (when logo not yet loaded) and tooltip accent.
   var POS_HEX  = { Guard:'#3B82F6', Forward:'#8B5CF6', Center:'#0D9488' };
   var YEAR_HEX = { '2026':'#D97706','2025':'#3B82F6','2024':'#8B5CF6','2023':'#0D9488',
-                   '2022':'#DC2626','2021':'#0891B2','2020':'#65A30D','2019':'#9333EA' };
+                   '2022':'#DC2626','2021':'#94A3B8','2020':'#65A30D','2019':'#9333EA' };
   var TIER_HEX = { franchise:'#D97706', lottery:'#8B5CF6', late1:'#3B82F6', second:'#0D9488' };
 
   function pointColor(pt, colorBy) {
@@ -15132,7 +15199,7 @@ var ARCHETYPE_ZONES = {
   'ftar|tpar': [
     { x:[0.0,.45],  y:[.55,1.0],  label:'Pure Shooters',     color:'#3B82F6' },
     { x:[.55,1.0],  y:[0.0,.45],  label:'Slashers',          color:'#D97706' },
-    { x:[.55,1.0],  y:[.55,1.0],  label:'Three-Level',       color:'#7C3AED' },
+    { x:[.55,1.0],  y:[.55,1.0],  label:'Three-Level',       color:'#2C4569' },
     { x:[0.0,.45],  y:[0.0,.45],  label:'Mid-Range',         color:'#94A3B8' }
   ],
   // Defense × Playmaking-care → two-way / connector axis
@@ -15144,7 +15211,7 @@ var ARCHETYPE_ZONES = {
   ],
   // Physical-tools map
   'ht|wt': [
-    { x:[.55,1.0],  y:[.55,1.0],  label:'Powerful Bigs',     color:'#7C3AED' },
+    { x:[.55,1.0],  y:[.55,1.0],  label:'Powerful Bigs',     color:'#2C4569' },
     { x:[.55,1.0],  y:[0.0,.45],  label:'Lean Wings',        color:'#3B82F6' },
     { x:[0.0,.45],  y:[.55,1.0],  label:'Combo Guards',      color:'#D97706' },
     { x:[0.0,.45],  y:[0.0,.45],  label:'Quick Guards',      color:'#16A34A' }
@@ -15881,21 +15948,6 @@ function scRenderLegend(colorBy, players) {
   el.innerHTML = html;
 }
 
-// ── Segmented Color-By active-state sync ─────────────────────────────────────
-// Reflects the current colorBy value on the visible button group. The hidden
-// <select id="scColorBy"> remains the state authority; this function just
-// styles whichever button corresponds to its value. Called from scRender so
-// the buttons stay correct even when state changes from elsewhere (URL load,
-// programmatic .value assignment).
-function scSyncColorSegmented(value) {
-  var btns = document.querySelectorAll('.sc-seg-btn[data-sc-action="set-color"]');
-  for (var i = 0; i < btns.length; i++) {
-    var on = btns[i].getAttribute('data-value') === value;
-    btns[i].classList.toggle('active', on);
-    btns[i].setAttribute('aria-pressed', on ? 'true' : 'false');
-  }
-}
-
 // ── Empty state: guided redirect when the current axis pair has no data ─────
 // Composes a contextual title + message identifying the specific axes and
 // scope that produced the empty result, then proposes a fallback action
@@ -16084,7 +16136,7 @@ var ScatterShell = (function() {
   // their copy is editorial (e.g. "All Classes 2019–2026" reads better than
   // the raw "all" select value).
   var POS_SWATCH = { Guard:'#3B82F6', Forward:'#8B5CF6', Center:'#0D9488' };
-  var YEAR_SWATCH = { '2026':'#D97706', '2025':'#B45309', '2024':'#7C3AED', '2023':'#5B21B6',
+  var YEAR_SWATCH = { '2026':'#D97706', '2025':'#B45309', '2024':'#2C4569', '2023':'#5B21B6',
                       '2022':'#3B82F6', '2021':'#1D4ED8', '2020':'#0D9488', '2019':'#0F766E',
                       'all':'#475569' };
 
@@ -16899,7 +16951,7 @@ function scRender() {
 
     var ghostPts = [];
     var ghostColors = [];
-    var YEAR_COLOR = { '2026':'#D97706','2025':'#B45309','2024':'#7C3AED','2023':'#5B21B6',
+    var YEAR_COLOR = { '2026':'#D97706','2025':'#B45309','2024':'#2C4569','2023':'#5B21B6',
                        '2022':'#3B82F6','2021':'#1D4ED8','2020':'#0D9488','2019':'#0F766E' };
     ghostYears.forEach(function(yr) {
       var ghostPlayers = ScatterEngine.getPlayers(yr);
@@ -17025,6 +17077,18 @@ function scRender() {
             enabled:   true,
             mode:      'xy',
             threshold: 5,
+            // MOBILE FIX (review P1): block single-finger drag-pan on
+            // touchscreens — that gesture is what users use to scroll the
+            // page, and intercepting it traps them inside the chart. By
+            // returning false from onPanStart when the gesture is a single
+            // touch, the chart releases the gesture back to the browser and
+            // the page scrolls normally. Two-finger drag and mouse-drag
+            // still pan (the touches array is empty for mouse events, so
+            // the guard only triggers when touches.length === 1).
+            onPanStart: function(ctx) {
+              var ev = ctx && ctx.event && ctx.event.srcEvent ? ctx.event.srcEvent : (ctx && ctx.event);
+              if (ev && ev.touches && ev.touches.length === 1) return false;
+            },
             onPanComplete: function() {
               Scatter._state.zoomed = true;
               Scatter.invalidateSpatialIndex();
@@ -17210,7 +17274,7 @@ function rebuildBBTiers() {
       rationale:'High-end starters with All-Star ceilings — the talent gradient where elite skill or physical tools separate every name.',
       rationaleShort:'High-end starters with All-Star ceilings.',
       from:c.franchise+1, to:c.lottery,
-      grad:'linear-gradient(90deg,#3B0764,#5B21B6,#7C3AED)' },
+      grad:'linear-gradient(90deg,#3B0764,#5B21B6,#2C4569)' },
     { label:'Late First',  sub:'First Round Targets',
       picks:'Picks '+(c.lottery+1)+'\u2013'+c.lateFirst,
       rationale:'Starter outcomes with rotation-piece floors — guaranteed contracts justified by clear translatable skills.',
@@ -20148,8 +20212,8 @@ function simGetMetricRank(rank) {
 // ── GRADE: compare metric rank vs pick number ─────────────────────────────────
 function simGrade(availableRank, total, pickNum) {
   var ratio = (total > 1) ? ((availableRank - 1) / (total - 1)) : 0;
-  if (ratio <= 0.04) return {label:'A+', color:'#059669', bg:'#D1FAE5', tier:'elite'};
-  if (ratio <= 0.10) return {label:'A',  color:'#059669', bg:'#D1FAE5', tier:'great'};
+  if (ratio <= 0.04) return {label:'A+', color:'#10B981', bg:'#D1FAE5', tier:'elite'};
+  if (ratio <= 0.10) return {label:'A',  color:'#10B981', bg:'#D1FAE5', tier:'great'};
   if (ratio <= 0.18) return {label:'A-', color:'#16A34A', bg:'#DCFCE7', tier:'great'};
   if (ratio <= 0.28) return {label:'B+', color:'#2563EB', bg:'#DBEAFE', tier:'good'};
   if (ratio <= 0.42) return {label:'B',  color:'#2563EB', bg:'#DBEAFE', tier:'good'};
@@ -20692,7 +20756,7 @@ function simRenderPool() {
   players.forEach(function(p) {
     var base  =p.name&&p.name.indexOf(' - ')>0?p.name.slice(0,p.name.indexOf(' - ')):(p.name||'');
     var school=p.name&&p.name.indexOf(' - ')>0?p.name.slice(p.name.indexOf(' - ')+3):'';
-    var posCol=p.position==='Guard'?'#2563EB':p.position==='Center'?'#0D9488':'#7C3AED';
+    var posCol=p.position==='Guard'?'#2563EB':p.position==='Center'?'#0D9488':'#2C4569';
     var met   =p.metric&&p.metric>0?Number(p.metric).toFixed(1):'';
     var mr    =simGetMetricRank(p.rank);
     var pg    =simGrade(mr, simAvailable.length + 1, simCurrentPick);
@@ -20739,7 +20803,7 @@ function simRenderBoard() {
     if (sel) {
       var base    = sel.name&&sel.name.indexOf(' - ')>0?sel.name.slice(0,sel.name.indexOf(' - ')):(sel.name||'');
       var school  = sel.name&&sel.name.indexOf(' - ')>0?sel.name.slice(sel.name.indexOf(' - ')+3):'';
-      var posCol  = sel.pos==='Guard'?'#2563EB':sel.pos==='Center'?'#0D9488':'#7C3AED';
+      var posCol  = sel.pos==='Guard'?'#2563EB':sel.pos==='Center'?'#0D9488':'#2C4569';
       var metTxt  = sel.metric>0?'<span class="sim-board-metric">'+Number(sel.metric).toFixed(1)+'</span>':'';
       var grBadge = sel.grade?'<span class="sim-board-grade" style="color:'+sel.grade.color+';background:'+sel.grade.bg+'">'+sel.grade.label+'</span>':'';
       var fullP   = (DATA.board2026||[]).find(function(p){return p.rank===sel.rank;});
@@ -20803,7 +20867,7 @@ function simUpdateStatus() {
   var lbl  =document.getElementById('simPoolLabel');
 
   if (simCurrentPick > simMaxPicks) {
-    if (badge){badge.textContent='✅ Draft Complete';badge.style.background='#059669';}
+    if (badge){badge.textContent='✅ Draft Complete';badge.style.background='#10B981';}
     if (prog) prog.style.width='100%';
     if (txt)  txt.textContent=simMaxPicks+' / '+simMaxPicks;
     if (simRunning) {  // only fire once on transition
@@ -20861,7 +20925,7 @@ function simUpdateScorecard() {
     else                                counts.FAIR++; // good, ok, or any unrecognized tier
   });
   sc.innerHTML=Object.keys(simUserTeams).some(function(t){return simUserTeams[t];})?
-    '<span style="font-size:11px;font-weight:700;color:#059669;background:#D1FAE5;border-radius:5px;padding:3px 8px">'+counts.VALUE+' Value</span>'
+    '<span style="font-size:11px;font-weight:700;color:#10B981;background:#D1FAE5;border-radius:5px;padding:3px 8px">'+counts.VALUE+' Value</span>'
     +'<span style="font-size:11px;font-weight:700;color:#64748B;background:#F1F5F9;border-radius:5px;padding:3px 8px">'+counts.FAIR+' Fair</span>'
     +'<span style="font-size:11px;font-weight:700;color:#DC2626;background:#FEE2E2;border-radius:5px;padding:3px 8px">'+counts.REACH+' Reach</span>':'';
 }
@@ -20883,7 +20947,7 @@ function simShowResults() {
   ];
 
   function gradeColor(label) {
-    if (label==='A+'||label==='A') return {bg:'#059669',fg:'white'};
+    if (label==='A+'||label==='A') return {bg:'#10B981',fg:'white'};
     if (label==='A-'||label==='B+') return {bg:'#16A34A',fg:'white'};
     if (label==='B'||label==='B-') return {bg:'#2563EB',fg:'white'};
     if (label==='C+'||label==='C') return {bg:'#D97706',fg:'white'};
@@ -20905,7 +20969,7 @@ function simShowResults() {
     var h='';
     h+='<div style="background:white;border-radius:16px;overflow:hidden;box-shadow:0 4px 32px rgba(10,22,40,.12);margin-bottom:24px">';
     h+='<div style="background:linear-gradient(135deg,#0A1628 0%,#1a3060 55%,#0f2040 100%);padding:24px 28px;position:relative;overflow:hidden">';
-    h+='<div style="position:absolute;bottom:0;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,#D4A830,#F0C94A,#D4A830,transparent)"></div>';
+    h+='<div style="position:absolute;bottom:0;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,#C9971A,#F0C94A,#C9971A,transparent)"></div>';
     h+='<div style="position:absolute;top:-40px;right:-40px;width:180px;height:180px;border-radius:50%;border:1.5px solid rgba(212,168,48,.08)"></div>';
     h+='<div style="position:absolute;top:-20px;right:-20px;width:100px;height:100px;border-radius:50%;border:1.5px solid rgba(212,168,48,.12)"></div>';
     h+='<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;position:relative;z-index:1">';
@@ -20929,7 +20993,7 @@ function simShowResults() {
       var school=s.name&&s.name.indexOf(' - ')>0?s.name.slice(s.name.indexOf(' - ')+3):'';
       var g=s.grade||{label:'B',color:'#2563EB',bg:'#DBEAFE'};
       var gc2=gradeColor(g.label);
-      var posCol=s.pos==='Guard'?'#2563EB':s.pos==='Center'?'#0D9488':'#7C3AED';
+      var posCol=s.pos==='Guard'?'#2563EB':s.pos==='Center'?'#0D9488':'#2C4569';
       var posBg=s.pos==='Guard'?'#EFF6FF':s.pos==='Center'?'#F0FDFA':'#F5F3FF';
       var fullP=(DATA.board2026||[]).find(function(p){return p.rank===s.rank;});
       var htIn=fullP&&fullP.ht?fullP.ht:0;
@@ -20961,7 +21025,7 @@ function simShowResults() {
       h+='<div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px">';
       h+='<div style="font-family:Barlow Condensed,sans-serif;font-size:22px;font-weight:900;color:#0A1628;line-height:1;min-width:0">'+escHtml(base)+'</div>';
       if(_rMet) h+='<span style="display:flex;flex-direction:column;align-items:flex-end;flex-shrink:0">'
-        +'<span style="font-family:Barlow Condensed,sans-serif;font-size:18px;font-weight:900;color:#D4A830;line-height:1">'+_rMet+'</span>'
+        +'<span style="font-family:Barlow Condensed,sans-serif;font-size:18px;font-weight:900;color:#C9971A;line-height:1">'+_rMet+'</span>'
         +'<span style="font-size:8px;font-weight:700;color:rgba(212,168,48,.55);text-transform:uppercase;letter-spacing:.5px">Metric</span>'
         +'</span>';
       h+='</div>';
@@ -21010,7 +21074,7 @@ function simShowResults() {
         +'<td style="padding:8px 12px;font-family:Barlow Condensed,sans-serif;font-size:14px;font-weight:900;color:#94A3B8">#'+pk+'</td>'
         +'<td style="padding:8px 12px;font-weight:700;color:#0A1628;font-size:12px">'+escHtml(s.team)+'</td>'
         +'<td style="padding:8px 12px;font-family:Barlow Condensed,sans-serif;font-size:15px;font-weight:800;color:#0A1628">'+escHtml(base)+'</td>'
-        +'<td style="padding:8px 12px;font-family:Barlow Condensed,sans-serif;font-size:14px;font-weight:900;color:#D4A830">'+met+'</td>'
+        +'<td style="padding:8px 12px;font-family:Barlow Condensed,sans-serif;font-size:14px;font-weight:900;color:#C9971A">'+met+'</td>'
         +'<td style="padding:8px 12px"><span style="font-family:Barlow Condensed,sans-serif;font-size:13px;font-weight:900;color:'+gc3.fg+';background:'+gc3.bg+';border-radius:5px;padding:3px 8px">'+g.label+'</span></td>'
         +'</tr>';
     });
@@ -21850,18 +21914,18 @@ var IntelService = (function() {
         <p style="font-size:14px;line-height:1.7;margin:0;color:var(--gray-700)">This is the metric's most unusual input and probably its most important. It measures how much a player produces — points and assist-value, scaled for pace — relative to the possessions they consume. A player who scores 20 points but needs 25 possessions is less useful than one who scores 18 on 14. This stat rewards efficiency of impact rather than raw output, which is exactly what you want when evaluating players across wildly different roles and systems. It captures the dimension of basketball that matters most to winning teams: <em>what did you produce for every opportunity you were given?</em></p>
       </div>
 
-      <div style="background:white;border:1.5px solid var(--gray-200);border-radius:12px;padding:20px 24px;border-left:4px solid #059669">
+      <div style="background:white;border:1.5px solid var(--gray-200);border-radius:12px;padding:20px 24px;border-left:4px solid #10B981">
         <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:8px;flex-wrap:wrap">
           <span style="font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900;color:var(--navy)">Steals + Blocks</span>
-          <span style="font-size:11px;font-weight:700;color:#059669;background:#ECFDF5;border-radius:12px;padding:2px 9px">Stl+Bl · pace-adjusted</span>
+          <span style="font-size:11px;font-weight:700;color:#10B981;background:#ECFDF5;border-radius:12px;padding:2px 9px">Stl+Bl · pace-adjusted</span>
         </div>
         <p style="font-size:14px;line-height:1.7;margin:0;color:var(--gray-700)">Defensive impact is notoriously hard to quantify at the college level — but steals and blocks represent the two most direct ways a defense can alter possessions, and they are among the stickiest stats in basketball. A steal doesn't just stop a possession — it creates one. It eliminates the opponent's shot while generating a transition opportunity on the other end. A block reduces the opponent's shots on goal, and the best shot-blockers don't just alter attempts — they do so in ways that keep the ball in bounds and trigger quick-strike scoring on the other end. Combined and pace-adjusted, Stl+Bl identifies players who actively take possessions rather than simply contest them. That skill translates because it reflects athleticism, anticipation, and positioning — traits that don't diminish when the competition improves.</p>
       </div>
 
-      <div style="background:white;border:1.5px solid var(--gray-200);border-radius:12px;padding:20px 24px;border-left:4px solid #7C3AED">
+      <div style="background:white;border:1.5px solid var(--gray-200);border-radius:12px;padding:20px 24px;border-left:4px solid #2C4569">
         <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:8px;flex-wrap:wrap">
           <span style="font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900;color:var(--navy)">Assist-to-Turnover Ratio</span>
-          <span style="font-size:11px;font-weight:700;color:#7C3AED;background:#FAF5FF;border-radius:12px;padding:2px 9px">A/TO</span>
+          <span style="font-size:11px;font-weight:700;color:#2C4569;background:#FAF5FF;border-radius:12px;padding:2px 9px">A/TO</span>
         </div>
         <p style="font-size:14px;line-height:1.7;margin:0;color:var(--gray-700)">Ball security and decision-making. A high A/TO ratio tells you the player creates for others without giving the ball away — a signal of processing speed, court vision, and composure under pressure. It's one of the few stats that translates cleanly from college to the pros because it reflects how a player thinks, not just what they can physically do. Teams that protect the ball in the playoffs win. This is the stat that tracks the players who understand that.</p>
       </div>
@@ -21900,7 +21964,7 @@ var IntelService = (function() {
           <p style="font-size:13px;line-height:1.65;margin:0;color:var(--gray-700)">This is a recent addition to the model and one I expect to keep refining. The six core inputs are primarily skill-based — as they should be — but length and strength are always at a premium in the NBA, especially when playoff physicality demands it. A 6'8" guard running elite assist and steal numbers is rare in a way that matters. Size also affects how skills translate: a center with a high A/TO may be doing something more exceptional than a guard with the same number. I believe size deserves additional weighting in future iterations.</p>
         </div>
 
-        <div style="background:var(--gray-50);border-radius:10px;padding:16px 18px;border-top:3px solid #7C3AED">
+        <div style="background:var(--gray-50);border-radius:10px;padding:16px 18px;border-top:3px solid #2C4569">
           <div style="font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:800;color:var(--navy);margin-bottom:6px">Position</div>
           <p style="font-size:13px;line-height:1.65;margin:0;color:var(--gray-700)">A modest positional weighting reflects the reality that guards and forwards tend to produce higher raw metric inputs than traditional bigs — partly by design of the college game, partly by how possessions are structured. The adjustment is intentionally light. The goal isn't to correct for position so much as to ensure positional context is acknowledged.</p>
         </div>
@@ -22109,11 +22173,11 @@ window.hwIntel = (function() {
 
   // ── Category config ───────────────────────────────────────────────────────
   var CAT_META = {
-    workout:  { icon:'🏋️', label:'Workout / Visit',    color:'#059669', bg:'#ECFDF5' },
+    workout:  { icon:'🏋️', label:'Workout / Visit',    color:'#10B981', bg:'#ECFDF5' },
     combine:  { icon:'📏', label:'Combine / Measuring', color:'#D97706', bg:'#FEF3C7' },
     medical:  { icon:'🩺', label:'Medical / Injury',    color:'#DC2626', bg:'#FEE2E2' },
     agent:    { icon:'🤝', label:'Representation',      color:'#6B7280', bg:'#F3F4F6' },
-    movement: { icon:'📈', label:'Stock Movement',      color:'#7C3AED', bg:'#EDE9FE' },
+    movement: { icon:'📈', label:'Stock Movement',      color:'#2C4569', bg:'#EDE9FE' },
     general:  { icon:'📰', label:'News',                color:'#0284C7', bg:'#E0F2FE' },
   };
 
@@ -22626,7 +22690,7 @@ window.hoopswill = (function() {
 <!-- ROLL-FORWARD MODAL -->
 <div class="modal-overlay" id="rollForwardModal" onclick="handleOverlayClick(event,'rollForwardModal')">
   <div class="modal" style="max-width:500px">
-    <div class="modal-header" style="background:linear-gradient(135deg,#4C1D95,#7C3AED)">
+    <div class="modal-header" style="background:linear-gradient(135deg,#4C1D95,#2C4569)">
       <button class="modal-close" onclick="closeModal('rollForwardModal')">✕</button>
       <div style="flex:1">
         <div class="modal-rank-label">Draft Year Transition</div>
@@ -22669,8 +22733,8 @@ window.hwRollForward = (function() {
     if (isForward) {
       body.innerHTML = [
         '<div style="padding:6px 0 18px">',
-        '<div style="background:linear-gradient(135deg,#EDE9FE,#F5F3FF);border:1px solid rgba(124,58,237,.2);border-radius:10px;padding:16px 18px;margin-bottom:16px">',
-        '<div style="font-size:13px;font-weight:700;color:#7C3AED;margin-bottom:8px">What this does:</div>',
+        '<div style="background:linear-gradient(135deg,#EDE9FE,#F5F3FF);border:1px solid rgba(44,69,105,.2);border-radius:10px;padding:16px 18px;margin-bottom:16px">',
+        '<div style="font-size:13px;font-weight:700;color:#2C4569;margin-bottom:8px">What this does:</div>',
         '<div style="font-size:12px;color:#4C1D95;line-height:1.7">',
         '&#9654; The <strong>2027 Watch</strong> board becomes the primary draft board<br>',
         '&#9654; The <strong>2026 Draft Board</strong> is archived to Past Boards (selectable as "2026")<br>',
@@ -22684,7 +22748,7 @@ window.hwRollForward = (function() {
         '</div>',
         '<div style="display:flex;gap:10px;justify-content:flex-end">',
         '<button onclick="closeModal(\'rollForwardModal\')" style="padding:8px 20px;border-radius:7px;border:1.5px solid var(--gray-200);background:white;font-size:12px;font-weight:700;color:var(--gray-600);cursor:pointer">Cancel</button>',
-        '<button onclick="hwRollForward.execute()" style="padding:8px 20px;border-radius:7px;border:none;background:var(--purple);font-size:12px;font-weight:700;color:white;cursor:pointer">&#9889; Roll Forward to 2027</button>',
+        '<button onclick="hwRollForward.execute()" style="padding:8px 20px;border-radius:7px;border:none;background:var(--tier-lottery);font-size:12px;font-weight:700;color:white;cursor:pointer">&#9889; Roll Forward to 2027</button>',
         '</div></div>'
       ].join('');
     } else {
@@ -22814,11 +22878,11 @@ window.hwRollForward = (function() {
     if (btn) {
       btn.textContent = '⚡ Roll Forward to 2027';
       btn.title = 'Transition 2027 board to primary after draft night';
-      btn.style.background = 'rgba(124,58,237,.18)';
-      btn.style.borderColor = 'rgba(124,58,237,.4)';
+      btn.style.background = 'rgba(44,69,105,.18)';
+      btn.style.borderColor = 'rgba(44,69,105,.4)';
       btn.style.color = '#C4B5FD';
-      btn.onmouseover = function(){ this.style.background='rgba(124,58,237,.32)'; };
-      btn.onmouseout  = function(){ this.style.background='rgba(124,58,237,.18)'; };
+      btn.onmouseover = function(){ this.style.background='rgba(44,69,105,.32)'; };
+      btn.onmouseout  = function(){ this.style.background='rgba(44,69,105,.18)'; };
     }
 
     var badge = document.getElementById('watchBadge');
@@ -22928,15 +22992,10 @@ window.hwRollForward = (function() {
 // (scShowTip) is still used on desktop hover. These are separate paths.
 (function() {
   var _scFocusedPlayer = null;  // currently focused player on mobile
-  var _tapHintDismissed = false;
 
   // Called by scRender() after Chart.js is created — wire up mobile tap
   window.scBindMobileTap = function(canvas, allPts, xM, yM, chart) {
     if (!canvas || window.innerWidth > 640) return;
-
-    // Show tap hint on first render
-    var hint = document.getElementById('scTapHint');
-    if (hint && !_tapHintDismissed) hint.style.display = 'block';
 
     // Use assignment (not addEventListener) to prevent listener accumulation.
     // scRender() is called on every axis change — addEventListener would stack
@@ -22944,13 +23003,6 @@ window.hwRollForward = (function() {
     canvas._scMobileTapHandler = function(e) {
       e.preventDefault();
       if (!chart || !allPts.length) return;
-
-      // Dismiss tap hint
-      if (hint && !_tapHintDismissed) {
-        _tapHintDismissed = true;
-        hint.classList.add('hidden');
-        setTimeout(function(){ hint.style.display = 'none'; }, 400);
-      }
 
       var touch = e.changedTouches[0];
       var rect  = canvas.getBoundingClientRect();
@@ -23100,7 +23152,7 @@ window.hwRollForward = (function() {
 // updateMobileTray() is a plain global function. No function patching.
 // Driven by: 1) AppState.subscribe on COMPARE_* actions  2) renderCompare() direct call
 
-var TRAY_COLORS = ['#2563EB', '#7C3AED', '#059669', '#D97706'];
+var TRAY_COLORS = ['#2563EB', '#2C4569', '#10B981', '#D97706'];
 
 function updateMobileTray() {
   if (window.innerWidth > 640) return;
