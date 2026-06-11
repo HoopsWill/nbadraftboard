@@ -789,7 +789,7 @@ tr:hover td{background:var(--gray-50)}
 
 /* FUTURE */
 .watch-banner{background:linear-gradient(135deg,#162340,#1e3a6e);border-radius:12px;padding:18px 22px;margin-bottom:18px;display:flex;align-items:center;gap:14px}
-.watch-badge{background:rgba(245,158,11,.2);border:1px solid rgba(245,158,11,.4);color:var(--amber-light);font-size:10px;font-weight:700;padding:3px 9px;border-radius:4px;text-transform:uppercase;letter-spacing:.5px;margin-left:auto}
+.watch-badge{background:rgba(245,158,11,.2);border:1px solid rgba(245,158,11,.4);color:var(--amber-light);font-size:10px;font-weight:700;padding:3px 9px;border-radius:4px;text-transform:uppercase;letter-spacing:.5px}
 
 /* ═══════════════════════════════════════════════════════════
    COMP EXPLORER — Complete Design System
@@ -3173,6 +3173,7 @@ tr:hover td{background:var(--gray-50)}
 
 /* ── SIMULATOR BUTTONS ───────────────────────────────────────────────────── */
 .sim-team-btn{
+  display:inline-flex;align-items:center;gap:6px;
   padding:4px 9px;
   min-height:40px;  /* mobile touch target */
   border-radius:5px;border:1.5px solid var(--gray-200);
@@ -3321,6 +3322,20 @@ tr:hover td{background:var(--gray-50)}
   border-bottom:1px solid rgba(255,255,255,.08);
   background:linear-gradient(90deg,rgba(212,168,48,.12),transparent);
 }
+/* DESIGN-MOCK-5: lifted control classes — replaces per-button inline styles */
+.sim-follow-btn{border-radius:7px;padding:5px 12px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Barlow Condensed',sans-serif;white-space:nowrap;flex-shrink:0;border:1.5px solid transparent;transition:background var(--motion-fast),color var(--motion-fast),border-color var(--motion-fast)}
+.sim-follow-btn.is-on{background:rgba(37,99,235,.12);color:var(--blue);border-color:rgba(37,99,235,.3)}
+.sim-follow-btn.is-off{background:rgba(100,116,139,.12);color:var(--gray-400);border-color:rgba(100,116,139,.3)}
+.sim-status-reset{background:white;border:1.5px solid var(--gray-200);border-radius:7px;padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer;color:var(--gray-600);transition:border-color var(--motion-fast),color var(--motion-fast)}
+.sim-status-reset:hover{border-color:var(--gray-300);color:var(--navy)}
+.sim-results-share{display:flex;align-items:center;gap:6px;background:var(--blue);color:white;border:none;border-radius:8px;padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Barlow Condensed',sans-serif;letter-spacing:.4px;transition:background var(--motion-fast)}
+.sim-results-share:hover{background:#1D4ED8}
+/* BPA hint chip — best player available, one tap to draft (UX-MOCK-7) */
+.bpa-chip{display:inline-flex;align-items:center;gap:6px;max-width:100%;background:rgba(212,168,48,.10);border:1.5px solid rgba(212,168,48,.35);border-radius:7px;padding:4px 10px;font-size:11px;font-weight:700;color:#92400E;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:background var(--motion-fast)}
+.bpa-chip:hover{background:rgba(212,168,48,.18)}
+.bpa-chip b{font-family:'Barlow Condensed',sans-serif;font-weight:900;letter-spacing:.3px}
+/* Sim pool header sits on navy — brighten the chip text there for contrast */
+#simBpaHint .bpa-chip{color:var(--amber-light);background:rgba(212,168,48,.14)}
 .sim-event-panel-title{
   display:block;
   font-family:'Barlow Condensed',sans-serif;
@@ -3420,9 +3435,9 @@ tr:hover td{background:var(--gray-50)}
 }
 .mock-mode-btn:hover::before{opacity:1}
 .mock-mode-btn.active{
-  border-color:var(--blue);
-  background:linear-gradient(160deg,#F0F6FF 0%,#DBEAFE 100%);
-  box-shadow:0 1px 8px rgba(37,99,235,.12);
+  border-color:var(--amber);
+  background:linear-gradient(160deg,#FFFDF5 0%,#FBF3DC 100%);
+  box-shadow:0 1px 8px rgba(201,151,26,.14);
 }
 .mock-mode-icon{
   display:flex;align-items:center;justify-content:center;
@@ -3661,8 +3676,32 @@ ap{
 }
 
 /* ── Pick board ──────────────────────────────────────── */
+/* LAYOUT-FIX: .mdc-wrap had no base display rule on desktop, so its three
+   children (.mdc-board, .prior-picks-sidebar, .mdc-pool) stacked
+   vertically and users had to scroll past the entire board to reach the
+   player pool. Both responsive blocks (900px, 640px) override flex
+   properties that assumed flex was set in the base — but the base was
+   never declared. One line restores the intended side-by-side layout. */
+.mdc-wrap{
+  display:flex;
+  height:calc(100vh - 140px);
+  min-height:480px;
+}
+/* REDESIGN: width rebalance — the *evaluation* surface (pool) is where
+   the user lives; the *capture* surface (board) should be tight. Industry
+   pattern (ESPN/Athletic draft kits) puts the pool ≥ the board. The third
+   column (prior-picks sidebar) is folded into the pool header as a
+   horizontal strip — same information, no column cost.
+   FILL-FIX: both columns flex:1 1 0 so they SHARE the wrap equally and
+   no dead zone opens in the middle. Pool's new ~50% width unlocks the
+   richer row treatment below (larger photo, comfortable typography). */
+#mdcWrap #mdcPriorSidebar{display:none !important}
 .mdc-board{
-  flex:1;min-width:0;display:flex;flex-direction:column;
+  /* FILL-FIX: equal-flex with .mdc-pool so the wrap is fully filled
+     (no dead middle zone). min-width 300px keeps the picks ledger
+     readable when the viewport narrows. */
+  flex:1 1 0;min-width:300px;
+  display:flex;flex-direction:column;
   background:white;
 }
 .mdc-board-header{
@@ -3675,7 +3714,9 @@ ap{
 .mdc-board-title{
   font-family:'Barlow Condensed',sans-serif;
   font-size:17px;font-weight:900;
-  color:var(--navy);letter-spacing:.3px;
+  /* DEFECT FIX: was color:var(--navy) on the navy gradient header —
+     invisible. Light ink on dark band. */
+  color:rgba(255,255,255,.94);letter-spacing:.3px;
   flex-shrink:0;
 }
 .mdc-progress{display:flex;align-items:center;gap:10px;flex:1;min-width:140px}
@@ -3686,16 +3727,17 @@ ap{
 }
 .mdc-prog-fill{
   height:100%;
-  background:linear-gradient(90deg,#3B82F6,#C9971A);
-  border-radius:2px;transition:width .4s ease;
+  background:var(--amber);
+  border-radius:2px;transition:width .4s var(--ease-out);
 }
 .mdc-prog-text{
   font-family:'Barlow Condensed',sans-serif;
   font-size:12px;font-weight:700;
-  color:var(--gray-500);white-space:nowrap;
+  color:rgba(255,255,255,.55);white-space:nowrap;
 }
 .mdc-actions{display:flex;align-items:center;gap:5px;flex-wrap:wrap}
 .mdc-act-btn{
+  display:inline-flex;align-items:center;gap:5px;
   background:var(--gray-50);
   border:1.5px solid var(--gray-200);
   border-radius:6px;padding:4px 10px;
@@ -3722,27 +3764,46 @@ ap{
 
 /* ── Round header ────────────────────────────────────── */
 .mdc-picks-scroll{flex:1;overflow-y:auto;padding:0;scrollbar-width:thin;scrollbar-color:var(--gray-200) transparent;overscroll-behavior:contain}
+/* POLISH: 6px custom scrollbars — the cheapest "expensive" signal in UI */
+.mdc-picks-scroll::-webkit-scrollbar{width:6px}
+.mdc-picks-scroll::-webkit-scrollbar-thumb{background:rgba(10,22,40,.14);border-radius:3px}
+.mdc-picks-scroll::-webkit-scrollbar-thumb:hover{background:rgba(10,22,40,.25)}
+.mdc-picks-scroll::-webkit-scrollbar-track{background:transparent}
+.mdc-pool-list::-webkit-scrollbar{width:6px}
+.mdc-pool-list::-webkit-scrollbar-thumb{background:rgba(255,255,255,.10);border-radius:3px}
+.mdc-pool-list::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,.20)}
+.mdc-pool-list::-webkit-scrollbar-track{background:transparent}
 .mdc-round-hdr{
-  padding:5px 18px;
+  /* POLISH: sticky editorial section break — label rides a hairline rule,
+     pick-range hint right-aligned, stays pinned while its round scrolls. */
+  position:sticky;top:0;z-index:5;
+  display:flex;align-items:center;gap:12px;
+  padding:9px 18px;
   font-family:'Barlow Condensed',sans-serif;
-  font-size:9px;font-weight:900;
-  text-transform:uppercase;letter-spacing:2.5px;
-  color:var(--gray-400);
+  /* SCALE-UP: 9px caps were whisper-quiet; 12px reads as real structure. */
+  font-size:12px;font-weight:900;
+  text-transform:uppercase;letter-spacing:2.2px;
+  color:var(--gray-500);
   background:var(--gray-50);
   border-top:1px solid var(--gray-100);
   border-bottom:1px solid var(--gray-100);
-  position:sticky;top:0;z-index:5;
 }
+.mdc-round-hdr > span:first-child{flex-shrink:0}
+.mdc-round-hdr::after{content:'';flex:1;height:1px;background:var(--gray-200);order:1}
+.mdc-round-range{order:2;flex-shrink:0;font-size:10px;letter-spacing:1.4px;color:var(--gray-400);font-weight:700}
 
 /* ── Pick rows ───────────────────────────────────────── */
 .mdc-pick-row{
   display:flex;align-items:center;gap:0;
-  padding:0 12px 0 0;
+  padding:0 10px 0 0;
   border-bottom:1px solid var(--gray-100);
   cursor:pointer;
-  min-height:52px;
+  /* SCALE-UP (user review): 38px read as cramped with the larger column.
+     50px gives the picked-player chip and team identity real presence;
+     empty rows stay visually light because their content is sparse. */
+  min-height:50px;
   position:relative;
-  transition:background .12s;
+  transition:background var(--motion-fast);
 }
 /* Left tier accent line */
 .mdc-pick-row::before{
@@ -3754,32 +3815,180 @@ ap{
 .mdc-pick-row:hover{background:var(--gray-50)}
 .mdc-pick-row:hover::before{background:rgba(255,255,255,.15)}
 .mdc-pick-row.active{
+  /* SCALE-UP: active stays a step taller than the new 50px baseline. */
   background:#FFFBEB;
   box-shadow:inset 3px 0 0 var(--amber);
+  min-height:58px;
 }
 .mdc-pick-row.active::before{background:var(--amber)}
 .mdc-pick-row.filled{background:rgba(239,246,255,.4)}
 .mdc-pick-row.filled::before{background:rgba(59,130,246,.3)}
-/* Lottery — subtle purple tint when filled */
-.mdc-pick-row.lotto-row.filled{background:rgba(139,92,246,.04)}
-.mdc-pick-row.lotto-row.filled::before{background:rgba(139,92,246,.4)}
+/* Lottery — subtle tier tint when filled (palette: navy-tint, post-DESIGN-2) */
+.mdc-pick-row.lotto-row.filled{background:rgba(44,69,105,.05)}
+.mdc-pick-row.lotto-row.filled::before{background:rgba(44,69,105,.4)}
 .mdc-pick-row.lotto-row.active{background:rgba(212,168,48,.07)}
+
+/* ── REDESIGN: rich 2-line pool row + prior-picks strip ─────────────────── */
+/* PREMIUM row treatment — calibrated for the wider pool (~50% of wrap).
+   The 40px photo is the visual anchor, name typography breathes (16px),
+   meta line gets real space. Hover lifts subtly via background only — no
+   border or shadow churn that would compete with the active-pick amber.
+   "High-end" here = generous whitespace, clear hierarchy, no decoration. */
+/* CASCADE FIX: rows carry BOTH classes (mdc-pool-row mdc-pool-item) and
+   the legacy .mdc-pool-item{display:flex} base — defined later in the
+   file — was overriding this grid, collapsing everything onto one flex
+   line (the misaligned-columns bug). The compound selector wins on
+   specificity regardless of source order. */
+.mdc-pool-row.mdc-pool-item{
+  display:grid;
+  grid-template-columns: 28px 44px 1fr 32px 64px;
+  grid-template-rows: auto auto;
+  column-gap:12px;row-gap:2px;
+  padding:12px 16px;
+  border-bottom:1px solid rgba(255,255,255,.04);
+  cursor:pointer;transition:background var(--motion-fast);
+  align-items:center;
+}
+.mdc-pool-row.mdc-pool-item:hover{background:rgba(255,255,255,.05)}
+.mdc-pool-row.mdc-pool-item:active{background:rgba(212,168,48,.08)}
+/* Rank — left column, spans both lines, vertically centered */
+.mpr-rank{
+  grid-column:1;grid-row:1 / span 2;
+  align-self:center;
+  font-family:'Barlow Condensed',sans-serif;
+  /* TABULAR: rank promoted to a real anchor — bigger, brighter, fixed-width
+     numerals so 9 and 41 occupy identical space and the column never shifts. */
+  font-size:17px;font-weight:900;
+  color:rgba(255,255,255,.62);
+  text-align:right;
+  font-variant-numeric:tabular-nums;
+  letter-spacing:.3px;
+}
+/* Photo — 40px, spans both lines, the real visual anchor */
+.mpr-photo{
+  grid-column:2;grid-row:1 / span 2;
+  align-self:center;
+  width:40px;height:40px;
+}
+.mpr-photo img,.mpr-photo .avatar-fallback{
+  width:40px;height:40px;border-radius:6px;font-size:12px;
+}
+/* Identity (line 1) */
+.mpr-name-wrap{
+  grid-column:3;grid-row:1;
+  min-width:0;display:flex;align-items:baseline;gap:8px;flex-wrap:nowrap;
+}
+.mpr-name{
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:16px;font-weight:800;
+  color:rgba(255,255,255,.94);
+  line-height:1.15;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  flex:1;min-width:0;
+}
+.mpr-school{
+  font-size:11px;color:rgba(255,255,255,.56);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  font-weight:500;flex-shrink:0;max-width:40%;
+}
+/* Position pill — slot 4, line 1 */
+.mpr-pos-pill{
+  grid-column:4;grid-row:1;
+  display:inline-flex;align-items:center;justify-content:center;
+  font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:900;
+  letter-spacing:.6px;text-transform:uppercase;
+  padding:2px 7px;border-radius:3px;
+  border:1px solid currentColor;
+  min-width:22px;
+}
+.mpr-pos-pill.guard  {color:#60A5FA}
+.mpr-pos-pill.forward{color:#94A3B8}
+.mpr-pos-pill.center {color:#CBD5E1}
+/* Metric — slot 5, spans both lines as a stacked stat (value + label) */
+.mpr-stat{
+  grid-column:5;grid-row:1 / span 2;
+  align-self:center;
+  display:flex;flex-direction:column;align-items:center;
+  min-width:58px;
+}
+.mpr-met{
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:18px;font-weight:900;line-height:1;
+  border-radius:5px;padding:4px 9px;min-width:48px;text-align:center;
+}
+.mpr-met-lbl{
+  font-size:8px;font-weight:700;
+  color:rgba(255,255,255,.46);
+  text-transform:uppercase;letter-spacing:.8px;
+  margin-top:3px;
+}
+/* Scouting meta (line 2) — TABULAR: a fixed-column grid so class, age,
+   measurements, role and BPM sit directly beneath each other on every row,
+   independent of name/school length above. Missing values render as a dim
+   em-dash to hold the column open. tabular-nums keeps digits monospaced. */
+.mpr-line2{
+  grid-column:3 / span 2;grid-row:2;
+  min-width:0;
+  display:grid;
+  grid-template-columns:64px 38px 96px minmax(0,1fr) 62px;
+  column-gap:10px;align-items:baseline;
+  font-family:'DM Sans',system-ui,sans-serif;font-size:11px;
+  color:rgba(255,255,255,.66);font-weight:500;
+  letter-spacing:.1px;
+  font-variant-numeric:tabular-nums;
+}
+.m2-cell{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.m2-role{color:rgba(232,191,82,.8);font-weight:600}
+.m2-bpm{text-align:right}
+.m2-empty{color:rgba(255,255,255,.18)}
+
+/* Prior-picks strip — replaces the 220px sidebar column. Renders inline
+   in the pool header when the on-clock team has earlier picks. */
+.mdc-prior-strip{
+  display:flex;align-items:center;gap:6px;
+  padding:7px 10px;margin:8px 0 0;
+  background:rgba(212,168,48,.07);
+  border:1px solid rgba(212,168,48,.18);
+  border-radius:7px;
+  overflow-x:auto;scrollbar-width:none;
+}
+.mdc-prior-strip::-webkit-scrollbar{display:none}
+.mdc-prior-strip-lbl{
+  font-family:'Barlow Condensed',sans-serif;font-size:9.5px;font-weight:800;
+  color:rgba(212,168,48,.7);text-transform:uppercase;letter-spacing:.7px;
+  flex-shrink:0;white-space:nowrap;
+}
+.mdc-prior-chip{
+  display:inline-flex;align-items:center;gap:5px;
+  background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:5px;padding:3px 7px;
+  flex-shrink:0;
+  font-family:'DM Sans',system-ui,sans-serif;
+}
+.mdc-prior-chip-rank{font-size:9px;color:rgba(212,168,48,.75);font-weight:700}
+.mdc-prior-chip-name{font-size:10.5px;color:rgba(255,255,255,.85);font-weight:700;
+  font-family:'Barlow Condensed',sans-serif}
+.mdc-prior-chip-pos{font-size:8.5px;color:rgba(255,255,255,.4);font-weight:600;
+  text-transform:uppercase;letter-spacing:.4px}
 
 /* ── Pick number ─────────────────────────────────────── */
 .mdc-pick-num{
   font-family:'Barlow Condensed',sans-serif;
-  font-size:15px;font-weight:900;
-  color:rgba(10,22,40,.2);
-  min-width:44px;text-align:center;flex-shrink:0;
-  padding-left:4px;
+  /* SCALE-UP: pick# as a readable anchor for the taller rows. */
+  font-size:17px;font-weight:900;
+  color:rgba(10,22,40,.28);
+  min-width:40px;text-align:center;flex-shrink:0;
+  padding-left:2px;
+  font-variant-numeric:tabular-nums;
 }
-.mdc-pick-num.lotto{color:rgba(109,40,217,.45)}
-.mdc-pick-row.active .mdc-pick-num{color:rgba(212,168,48,.9)}
+.mdc-pick-num.lotto{color:rgba(44,69,105,.5)}
+.mdc-pick-row.active .mdc-pick-num{color:rgba(212,168,48,.95);font-size:19px}
 .mdc-pick-row.lotto-row{background:rgba(139,92,246,.03)}
 
 /* ── Team logo in pick row ───────────────────────────── */
 .mdc-pick-team-logo{
-  width:28px;height:28px;flex-shrink:0;
+  width:34px;height:34px;flex-shrink:0;
   display:flex;align-items:center;justify-content:center;
 }
 .mdc-team-info{
@@ -3789,8 +3998,8 @@ ap{
 }
 .mdc-team-name{
   font-family:'Barlow Condensed',sans-serif;
-  font-size:10px;font-weight:700;
-  color:var(--gray-400);
+  font-size:12px;font-weight:800;
+  color:var(--gray-500);
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
   letter-spacing:.1px;
 }
@@ -3804,20 +4013,20 @@ ap{
 }
 .mdc-picked-name{
   font-family:'Barlow Condensed',sans-serif;
-  font-size:15px;font-weight:900;
+  font-size:17px;font-weight:900;
   color:var(--navy);
   line-height:1.1;let
   letter-spacing:.05px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
 }
 .mdc-picked-meta{
   font-family:'DM Sans',system-ui,sans-serif;
-  font-size:9px;color:var(--gray-400);
+  font-size:11px;color:var(--gray-500);
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
   letter-spacing:.1px;
 }
 .mdc-empty-slot{
   font-family:'DM Sans',system-ui,sans-serif;
-  font-size:11px;color:var(--gray-300);
+  font-size:12.5px;color:var(--gray-300);
   font-style:italic;padding-left:4px;
 }
 .mdc-pick-row.active .mdc-empty-slot{
@@ -3853,13 +4062,28 @@ ap{
 /* ── Metric pill on pick row ─────────────────────────── */
 .mdc-row-metric{
   font-family:'Barlow Condensed',sans-serif;
-  font-size:13px;font-weight:900;
-  border-radius:4px;padding:2px 7px;
+  /* SCALE-UP: sized to the 50px rows; stays slightly muted vs the pool's
+     full-strength stat lockup (confirmation, not decision data). */
+  font-size:13px;font-weight:800;
+  border-radius:4px;padding:3px 8px;
   flex-shrink:0;margin-right:4px;
+  opacity:.88;
   /* color/bg from bbMetStyle() */
 }
 
+/* POLISH: pick-moment ceremony — a 450ms amber stamp on the freshly
+   filled row. Class is added by mdcPickPlayer after render; removing it
+   isn't necessary (animation runs once, end-state transparent). */
+@keyframes mdcPickFlash{
+  0%{background:rgba(212,168,48,.35)}
+  100%{background:rgba(239,246,255,.4)}
+}
+.mdc-pick-row.just-picked{animation:mdcPickFlash 450ms var(--ease-out)}
+
 /* ── Unpick button ───────────────────────────────────── */
+/* CALM: hidden until row hover on desktop — sixteen always-on red ✕ boxes
+   were the loudest element on the screen, and they're a destructive
+   action. The ≤640px override keeps them always-visible for touch. */
 .mdc-unpick-btn{
   background:transparent;
   border:1px solid rgba(239,68,68,.2);
@@ -3867,8 +4091,12 @@ ap{
   font-size:10px;font-weight:700;
   color:rgba(239,68,68,.45);
   cursor:pointer;flex-shrink:0;
-  transition:all .12s;margin-left:4px;
+  transition:opacity var(--motion-fast),background .12s,color .12s;
+  margin-left:4px;
+  opacity:0;
 }
+.mdc-pick-row:hover .mdc-unpick-btn,
+.mdc-unpick-btn:focus-visible{opacity:1}
 .mdc-unpick-btn:hover{
   background:rgba(239,68,68,.12);
   color:#EF4444;border-color:rgba(239,68,68,.45);
@@ -3876,8 +4104,8 @@ ap{
 
 /* ── Complete banner ─────────────────────────────────── */
 .mdc-complete-banner{
-  background:linear-gradient(135deg,rgba(212,168,48,.08),rgba(59,130,246,.05));
-  border-top:1px solid rgba(212,168,48,.2);
+  background:rgba(212,168,48,.08);
+  border-top:1px solid rgba(212,168,48,.25);
   padding:12px 20px;
   display:flex;align-items:center;gap:12px;
   flex-shrink:0;
@@ -3894,12 +4122,15 @@ ap{
 
 /* ── Player pool (right panel) ───────────────────────── */
 .mdc-pool{
-  width:272px;flex-shrink:0;display:flex;flex-direction:column;
+  /* FILL-FIX: equal-flex with .mdc-board. The pool's new ~50% width
+     hosts the rich row treatment (larger photo, breathing typography). */
+  flex:1 1 0;min-width:420px;
+  display:flex;flex-direction:column;
   border-left:1px solid rgba(255,255,255,.06);
   background:#060D1A;
 }
 .mdc-pool-header{
-  padding:12px 14px 10px;
+  padding:10px 14px 9px;
   border-bottom:1px solid rgba(255,255,255,.06);
   flex-shrink:0;
   background:#080F1C;
@@ -3944,13 +4175,10 @@ ap{
   scrollbar-color:rgba(255,255,255,.08) transparent;
   overscroll-behavior:contain;
 }
-.mdc-pool-item{
-  display:flex;align-items:center;gap:8px;
-  padding:6px 12px;
-  border-bottom:1px solid rgba(255,255,255,.03);
-  cursor:pointer;transition:background .1s;
-}
-.mdc-pool-item:hover{background:rgba(255,255,255,.05)}
+/* Legacy .mdc-pool-item{display:flex} block removed (CASCADE FIX): rows
+   render as .mdc-pool-row.mdc-pool-item and the grid rule owns layout.
+   The class remains as a selector hook only (Enter-to-pick helper,
+   mobile min-height/touch rules — all grid-compatible). */
 .mdc-pool-rank{
   font-family:'Barlow Condensed',sans-serif;
   font-size:12px;font-weight:900;
@@ -5511,57 +5739,93 @@ ap{
 /* §§ /BLOCK:SC §§ */
 
 /* §§ BLOCK:FUTURE §§ */
-/* 2027 Watch Board CSS — dark navy card theme ─────────────────────────── */
-.future-view-bar{display:flex;align-items:center;gap:8px;margin-bottom:16px}
+/* 2027 Watch Board CSS — white-surface cards, tier left-border (DESIGN-2027) */
+/* View toggle — segmented control treatment (matches the product's other
+   mode switchers): a single gray track holding both options, active one
+   lifted on white. Reads as one control with two states, not two loose
+   buttons. */
+.future-view-bar{display:inline-flex;align-items:center;gap:2px;margin-bottom:16px;background:var(--gray-100);border-radius:9px;padding:3px}
 .future-view-btn{
-  background:rgba(10,22,40,.06);border:1.5px solid rgba(10,22,40,.15);
+  background:transparent;border:none;
   border-radius:7px;padding:5px 14px;font-size:12px;font-weight:700;
   font-family:'Barlow Condensed',sans-serif;color:var(--gray-500);
-  cursor:pointer;letter-spacing:.5px;text-transform:uppercase;transition:all .12s;
+  cursor:pointer;letter-spacing:.5px;text-transform:uppercase;
+  transition:background var(--motion-fast),color var(--motion-fast),box-shadow var(--motion-fast);
 }
 .future-view-btn.active{
-  background:var(--navy);color:white;border-color:var(--navy);
-  box-shadow:0 2px 8px rgba(10,22,40,.18);
+  background:white;color:var(--navy);
+  box-shadow:0 1px 3px rgba(10,22,40,.12),0 0 0 1px rgba(10,22,40,.05);
 }
-.future-view-btn:hover:not(.active){background:rgba(10,22,40,.09);border-color:rgba(10,22,40,.22)}
+.future-view-btn:hover:not(.active){color:var(--gray-700)}
 
 /* Tier sections */
 .future-cards-wrap{display:flex;flex-direction:column;gap:28px}
 .future-tier-section{display:flex;flex-direction:column;gap:14px;content-visibility:auto;contain-intrinsic-size:0 600px}
 .future-tier-header{display:flex;align-items:center;gap:10px;padding-bottom:10px;border-bottom:2px solid rgba(10,22,40,.1)}
+/* DESIGN-2027: emoji icons replaced with a tier-colored dot — same hue the
+   rank badges use, so the header keys the color system for its section. */
+.future-tier-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;box-shadow:0 0 0 3px color-mix(in srgb, currentColor 18%, transparent)}
 .future-tier-label{font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900;color:var(--navy);letter-spacing:.2px}
 .future-tier-count{font-size:11px;color:var(--gray-400);font-weight:500;padding-left:2px}
 
-/* Grid */
+/* Grid — Top 5 gets its own 5-across hero band at desktop width so the
+   marquee tier never renders 4 + 1 orphan. Other tiers keep auto-fill. */
 .future-cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:14px}
+.future-grid-top5{grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}
+@media (min-width:1200px){
+  .future-grid-top5{grid-template-columns:repeat(5,1fr)}
+}
 
-/* Card shell — dark navy */
+/* ── Card shell — DESIGN-2027 redesign ──────────────────────────────────
+   Was: dark navy slab header + white body (two-tone split; 15 cards read
+   as a wall of dark rectangles). Now: single white surface with a 3px
+   tier-colored left border — the same encoding the 2026 player cards use
+   (pc-tier-bar), making the two boards visual siblings. Tier color rides
+   in on --ft-color (set inline per card by the renderer). Equal-height
+   rows: body is a flex column, notes clamp to 2 lines, comp pins to the
+   bottom with margin-top:auto. */
 .future-card{
-  background:#0B1830;
+  background:white;
   border-radius:12px;padding:0;
-  box-shadow:0 2px 12px rgba(0,0,0,.3),0 0 0 1px rgba(255,255,255,.06);
+  border-left:3px solid var(--ft-color, var(--gray-300));
+  box-shadow:0 0 0 1px rgba(10,22,40,.08),0 2px 8px rgba(10,22,40,.05);
   overflow:hidden;cursor:pointer;
   display:flex;flex-direction:column;
-  transition:box-shadow .18s ease,transform .18s ease;
-  content-visibility:auto;contain-intrinsic-size:0 220px;
+  position:relative;
+  transition:box-shadow var(--motion-base),transform var(--motion-base);
+  content-visibility:auto;contain-intrinsic-size:0 200px;
 }
 .future-card:hover{
-  box-shadow:0 6px 24px rgba(0,0,0,.4),0 0 0 1px rgba(255,255,255,.1);
+  box-shadow:0 0 0 1px rgba(10,22,40,.10),0 6px 20px rgba(10,22,40,.12);
   transform:translateY(-3px);
 }
+/* Hover affordance: a quiet ↗ appears top-right, signalling the card
+   opens a profile. Hidden by default, fades in on hover; never rendered
+   on coarse pointers (the whole card is already the obvious tap target). */
+.future-card::after{
+  content:'↗';
+  position:absolute;top:8px;right:11px;
+  font-size:13px;font-weight:700;color:var(--gray-300);
+  opacity:0;transition:opacity var(--motion-fast);
+  pointer-events:none;
+}
+@media (hover:hover){ .future-card:hover::after{opacity:1} }
 
 /* Card header — rank + avatar + name/school */
 .future-card-header{
   display:flex;align-items:center;gap:11px;
-  padding:14px 14px 10px;
+  padding:13px 14px 9px;
 }
 
-/* Rank badge: large number over small "RANK" label */
+/* Rank badge: solid tier-colored square, white numeral. Tier colors come
+   from the monochromatic scale (amber / dusty navy / gray-700 / gray-400)
+   so the only saturated badge on the board is the Top-5 amber — exactly
+   the "amber means elite" rule from the palette system. */
 .future-rank-badge{
   display:flex;flex-direction:column;align-items:center;justify-content:center;
   flex-shrink:0;width:42px;height:42px;
   border-radius:9px;
-  /* background set inline per tier */
+  background:var(--ft-color, var(--gray-400));
 }
 .future-rank-badge .rn{
   font-family:'Barlow Condensed',sans-serif;
@@ -5572,73 +5836,101 @@ ap{
   font-family:'Barlow Condensed',sans-serif;
   font-size:7.5px;font-weight:700;
   text-transform:uppercase;letter-spacing:1.2px;
-  color:rgba(255,255,255,.55);
+  color:rgba(255,255,255,.6);
+}
+
+/* Avatar fallback (initials block): desaturated on this board. The raw
+   posColor() backgrounds (saturated blue/green/teal) out-shouted the
+   names when several no-photo cards sat in a row. Navy-mid block, soft
+   white initials — position is already encoded in the pos tag below. */
+.future-card .avatar-fallback{
+  background:var(--navy-mid) !important;
+  color:rgba(255,255,255,.85) !important;
 }
 
 /* Identity: name + school */
-.future-card-identity{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px;padding-left:4px}
+.future-card-identity{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px;padding-left:2px}
 .future-card-name{
   font-family:'Barlow Condensed',sans-serif;
-  font-size:17px;font-weight:900;
-  color:rgba(255,255,255,.94);
+  font-size:16px;font-weight:900;
+  color:var(--navy);
   line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
 }
 .future-card-school{
   display:flex;align-items:center;gap:5px;
-  font-size:11px;color:rgba(255,255,255,.45);
+  font-size:11px;color:var(--gray-500);
   font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
 }
 .future-uncommitted-tag{
   font-family:'Barlow Condensed',sans-serif;
   font-size:9px;font-weight:900;letter-spacing:1.2px;
   text-transform:uppercase;
-  color:rgba(212,168,48,.85);
-  background:rgba(212,168,48,.1);
-  border:1px solid rgba(212,168,48,.25);
+  color:#92400E;
+  background:rgba(212,168,48,.12);
+  border:1px solid rgba(212,168,48,.3);
   border-radius:3px;padding:1px 5px;
 }
 
-/* Tags row — light bg treatment inside white body */
+/* Meta row — DESIGN-2027: one quiet dot-separated line replaces the old
+   mixed pill+bold-text cluster. Position keeps its outlined pill (the one
+   categorical item); class/age/height/weight read as a single meta line. */
 .future-card-tags{
   display:flex;flex-wrap:wrap;align-items:center;
-  gap:5px;padding:8px 14px 10px;
+  gap:7px;padding:9px 14px 0;
 }
-/* Tags use standard light-bg colors in white body */
 .future-card .tag.pos{
   background:transparent;
   border:1.5px solid currentColor;
   font-weight:800;font-size:9.5px;letter-spacing:.5px;
   text-transform:uppercase;
+  padding:2px 7px;border-radius:4px;
 }
 .future-card .tag.pos.guard  {color:#2563EB}
 .future-card .tag.pos.forward{color:#2C4569}
-.future-card .tag.pos.center {color:#94A3B8}
-.future-card .tag{font-size:9.5px;padding:2px 6px}
+.future-card .tag.pos.center {color:#64748B}
+.future-meta{
+  font-size:11px;color:var(--gray-500);font-weight:500;
+  letter-spacing:.1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  min-width:0;
+}
+.future-meta b{font-weight:600;color:var(--gray-600)}
 
-/* White body: tags + notes + comp */
+/* Body: meta + notes + comp. Flex column so the comp line can pin to the
+   bottom and every card in a row lands at the same height. */
 .future-card-body{
-  background:white;
-  border-top:1px solid rgba(255,255,255,.08);
+  background:transparent;
+  border-top:none;
   flex:1;
   min-height:0;
+  display:flex;flex-direction:column;
 }
 
-/* Notes preview */
+/* Notes preview — CSS line-clamp replaces the old JS 90-char slice, so
+   truncation lands on a clean line break and the full text stays in the
+   DOM (visible in the modal, searchable, copyable). */
 .future-card-notes{
-  padding:8px 14px;
+  padding:8px 14px 0;
   font-size:11px;color:#475569;
   line-height:1.55;
-  border-top:1px solid var(--gray-100);
+  display:-webkit-box;
+  -webkit-line-clamp:2;
+  -webkit-box-orient:vertical;
+  overflow:hidden;
+  border-top:none;
 }
 
-/* Comp */
+/* Comp — pinned to the card bottom; restyled gray (it isn't a link, the
+   old --blue strong promised navigation it didn't deliver). */
 .future-card-comp{
-  padding:4px 14px 11px;
+  margin-top:auto;
+  padding:8px 14px 12px;
   font-size:10px;color:var(--gray-400);
 }
 .future-card-comp strong{
-  color:var(--blue);font-weight:700;
+  color:var(--gray-600);font-weight:700;
 }
+/* Cards without a comp still need bottom padding on the notes */
+.future-card-notes:last-child{padding-bottom:12px}
 
 /* Table view */
 .future-table{width:100%;border-collapse:collapse;font-size:12px}
@@ -6001,16 +6293,16 @@ ock Drafts table CSS ───────────────────�
     <!-- Left: pick board -->
     <div class="mdc-board">
       <div class="mdc-board-header">
-        <span class="mdc-board-title">🏆 Build Your Mock Draft</span>
+        <span class="mdc-board-title">Build Your Mock Draft</span>
         <div class="mdc-progress">
           <div class="mdc-prog-bar"><div class="mdc-prog-fill" id="mdcProgFill" style="width:0%"></div></div>
           <span class="mdc-prog-text" id="mdcProgText">0 / 60 picks</span>
         </div>
         <div class="mdc-actions">
-          <button class="mdc-act-btn" onclick="mdcUndo()">↩ Undo</button>
-          <button class="mdc-act-btn" onclick="mdcReset()">✕ Reset</button>
-          <button class="mdc-act-btn gold" onclick="mdcSave()">💾 Save Snapshot</button>
-          <button class="mdc-act-btn" onclick="mdcScreenshot()">📷 Screenshot</button>
+          <button class="mdc-act-btn" onclick="mdcUndo()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:12px;height:12px;flex-shrink:0"><path d="M3 7h7a3.5 3.5 0 0 1 0 7H6"/><path d="M6 4L3 7l3 3"/></svg>Undo</button>
+          <button class="mdc-act-btn" onclick="mdcReset()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:12px;height:12px;flex-shrink:0"><path d="M4 4l8 8M12 4l-8 8"/></svg>Reset</button>
+          <button class="mdc-act-btn gold" onclick="mdcSave()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:12px;height:12px;flex-shrink:0"><path d="M8 2v8M5 7l3 3 3-3M3 13h10"/></svg>Save Snapshot</button>
+          <button class="mdc-act-btn" onclick="mdcScreenshot()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:12px;height:12px;flex-shrink:0"><rect x="2" y="4.5" width="12" height="9" rx="1.5"/><circle cx="8" cy="9" r="2.5"/><path d="M6 4.5l1-2h2l1 2"/></svg>Screenshot</button>
         </div>
       </div>
       <div class="mdc-picks-scroll" id="mdcPicksScroll"></div>
@@ -6022,11 +6314,15 @@ ock Drafts table CSS ───────────────────�
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px"><div class="mdc-pool-title">Player Pool <span id="mdcPoolCount" style="font-weight:500;opacity:.5;font-size:12px"></span></div><button onclick="mdcClosePoolDrawer()" style="display:none;background:rgba(255,255,255,.1);border:none;border-radius:50%;width:44px;height:44px;color:white;font-size:16px;cursor:pointer;align-items:center;justify-content:center;flex-shrink:0;touch-action:manipulation" id="mdcPoolCloseBtn">✕</button></div>
         <div id="mdcTeamInfo"></div>
         <div class="mdc-pool-filters">
-          <input class="mdc-pool-search" id="mdcSearch" type="text" placeholder="Search player…" oninput="mdcDebouncedFilter(this.value)">
+          <input class="mdc-pool-search" id="mdcSearch" type="text" placeholder="Search player… (Enter drafts a lone match)" oninput="mdcDebouncedFilter(this.value)" onkeydown="hwEnterPicksSingle(event,'mdcPoolList','.mdc-pool-item')">
           <button class="mdc-pos-filter active" onclick="mdcSetPos('ALL',this)">All</button>
           <button class="mdc-pos-filter" onclick="mdcSetPos('Guard',this)">G</button>
           <button class="mdc-pos-filter" onclick="mdcSetPos('Forward',this)">F</button>
           <button class="mdc-pos-filter" onclick="mdcSetPos('Center',this)">C</button>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;margin-top:8px;min-width:0">
+          <div id="mdcBpaHint" style="flex-shrink:0"></div>
+          <div id="mdcPriorStrip" class="mdc-prior-strip" style="display:none;flex:1;min-width:0;margin:0"></div>
         </div>
       </div>
       <div class="mdc-pool-list" id="mdcPoolList"></div>
@@ -6078,7 +6374,7 @@ ock Drafts table CSS ───────────────────�
     <!-- SETUP SCREEN -->
     <div id="simSetup">
       <div class="sim-setup-banner">
-        <div class="sim-setup-banner-title">🎮 Draft Day Simulator</div>
+        <div class="sim-setup-banner-title">Draft Day Simulator</div>
         <div class="sim-setup-banner-sub">Pick for every team — or just the ones you want to own. Every selection is scored live against the HoopsWill Metric: value picks, fair value, and reaches all tracked in real time.</div>
       </div>
 
@@ -6126,13 +6422,13 @@ ock Drafts table CSS ───────────────────�
       <!-- Status bar -->
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap">
         <div id="simOnClock" style="background:var(--navy);color:white;border-radius:8px;padding:8px 16px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:800;min-width:180px"></div>
-        <button id="simFollowBtn" onclick="simToggleFollow()" style="background:rgba(37,99,235,.12);color:var(--blue);border:1.5px solid rgba(37,99,235,.3);border-radius:7px;padding:5px 12px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Barlow Condensed',sans-serif;white-space:nowrap;flex-shrink:0">📍 Follow Picks</button>
+        <button id="simFollowBtn" class="sim-follow-btn is-on" onclick="simToggleFollow()">Follow Picks</button>
         <div style="flex:1;background:var(--gray-100);border-radius:6px;height:8px;overflow:hidden;min-width:80px">
           <div id="simProgBar" style="height:100%;background:var(--blue);border-radius:6px;width:0%;transition:width .25s"></div>
         </div>
         <span id="simProgText" style="font-size:12px;font-weight:700;color:var(--gray-400);white-space:nowrap"></span>
         <div id="simScorecard" style="display:flex;gap:8px"></div>
-        <button onclick="simReset()" style="background:white;border:1.5px solid var(--gray-200);border-radius:7px;padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer;color:var(--gray-600)">✕ Reset</button>
+        <button class="sim-status-reset" onclick="simReset()">Reset</button>
       </div>
 
       <div style="display:flex;gap:14px;align-items:flex-start">
@@ -6142,12 +6438,12 @@ ock Drafts table CSS ───────────────────�
         <div id="simPicksBoardWrap" style="flex:1;min-width:0">
           <div id="simMobilePicks" style="display:none"></div>
           <div id="simMobilePicksList"></div>
-          <div id="simPicksBoard" style="background:white;border:1.5px solid var(--gray-200);border-radius:12px;overflow:hidden;max-height:680px;overflow-y:auto"></div>
+          <div id="simPicksBoard" style="position:relative;background:white;border:1.5px solid var(--gray-200);border-radius:12px;overflow:hidden;max-height:680px;overflow-y:auto"></div>
         </div>
         <!-- Event log (Tier 1 narrative) -->
         <div id="simEventPanel" class="sim-event-panel">
           <div class="sim-event-panel-header">
-            <span class="sim-event-panel-title">📡 War Room</span>
+            <span class="sim-event-panel-title"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true" style="width:13px;height:13px;margin-right:5px;vertical-align:-2px"><circle cx="8" cy="8" r="1.4" fill="currentColor" stroke="none"/><path d="M5.2 10.8a4 4 0 0 1 0-5.6M10.8 5.2a4 4 0 0 1 0 5.6"/><path d="M3.2 12.8a6.8 6.8 0 0 1 0-9.6M12.8 3.2a6.8 6.8 0 0 1 0 9.6"/></svg>War Room</span>
             <span class="sim-event-panel-sub">Live picks & moments</span>
           </div>
           <div id="simEventLog" class="sim-event-log"></div>
@@ -6158,7 +6454,8 @@ ock Drafts table CSS ───────────────────�
             <div id="simTeamInfo"></div>
             <div style="padding:8px 14px 10px">
             <div id="simPoolLabel" style="font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:800;color:white;margin-bottom:6px">Select Player</div>
-            <input id="simPoolSearch" type="text" placeholder="Search name..." oninput="simFilterPool(this.value)"
+            <div id="simBpaHint" style="margin-bottom:7px"></div>
+            <input id="simPoolSearch" type="text" placeholder="Search name..." oninput="simFilterPool(this.value)" onkeydown="hwEnterPicksSingle(event,'simPoolList','.sim-pool-row')"
               style="width:100%;padding:6px 10px;border-radius:6px;border:none;font-size:12px;background:rgba(255,255,255,.12);color:white;outline:none">
             <div style="display:flex;gap:5px;margin-top:7px;flex-wrap:wrap" id="simPosFilter">
               <button class="sim-pos-btn active" data-pos="">All</button>
@@ -6183,12 +6480,12 @@ ock Drafts table CSS ───────────────────�
           </div>
           <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
             <button onclick="simExportCard()" id="simShareBtn"
-              style="display:none;background:linear-gradient(135deg,#2563EB,#1D4ED8);color:white;border:none;border-radius:8px;padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Barlow Condensed',sans-serif;letter-spacing:.4px;display:flex;align-items:center;gap:6px">
-              📸 Save as Image
+              class="sim-results-share" style="display:none">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:13px;height:13px"><rect x="2" y="4.5" width="12" height="9" rx="1.5"/><circle cx="8" cy="9" r="2.5"/><path d="M6 4.5l1-2h2l1 2"/></svg> Save as Image
             </button>
             <button onclick="simReset()"
               style="background:white;border:1.5px solid var(--gray-200);border-radius:8px;padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;color:var(--gray-600);font-family:'Barlow Condensed',sans-serif">
-              🔄 New Simulation
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:12px;height:12px;vertical-align:-1px"><path d="M2 8a6 6 0 1 0 1.76-4.24M2 3v3h3"/></svg> New Simulation
             </button>
           </div>
         </div>
@@ -6248,14 +6545,16 @@ ock Drafts table CSS ───────────────────�
 <section class="tab-panel" id="tab-future">
   <div class="print-header"><div class="print-header-title">HoopsWill NBA Draft Board — 2027 Watch</div><div class="print-header-sub">Analytics Model · 2019–2027 · hoopswill.com</div></div>
   <div class="watch-banner">
-    <div style="font-size:30px">🔭</div>
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:26px;height:26px;color:var(--amber-light);flex-shrink:0"><circle cx="8" cy="8" r="2.5"/><path d="M1.5 8C3 5 5.5 3.5 8 3.5s5 1.5 6.5 4.5c-1.5 3-4 4.5-6.5 4.5S3 11 1.5 8z"/></svg>
     <div>
-      <div style="font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:800;color:white">2027 Draft — Early Watch List</div>
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+        <span style="font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:800;color:white">2027 Draft — Early Watch List</span>
+        <span class="watch-badge" id="watchBadge">Preliminary</span>
+      </div>
       <div style="font-size:12px;color:rgba(255,255,255,.55);margin-top:2px">Preliminary rankings — pre-draft season evaluation only</div>
     </div>
-    <div class="watch-badge" id="watchBadge">Preliminary</div>
     <div id="rollForwardBtnWrap" style="margin-left:auto">
-      <button id="rollForwardBtn" onclick="hwRollForward.showPanel()" style="background:rgba(44,69,105,.18);border:1.5px solid rgba(44,69,105,.4);color:#C4B5FD;font-size:11px;font-weight:700;padding:6px 14px;border-radius:7px;cursor:pointer;font-family:'Barlow Condensed',sans-serif;letter-spacing:.3px;transition:all .15s" onmouseover="this.style.background='rgba(44,69,105,.32)'" onmouseout="this.style.background='rgba(44,69,105,.18)'" title="Transition 2027 board to primary after draft night">⚡ Roll Forward to 2027</button>
+      <button id="rollForwardBtn" onclick="hwRollForward.showPanel()" style="background:rgba(212,168,48,.12);border:1.5px solid rgba(212,168,48,.35);color:var(--amber-light);font-size:11px;font-weight:700;padding:6px 14px;border-radius:7px;cursor:pointer;font-family:'Barlow Condensed',sans-serif;letter-spacing:.3px;transition:all .15s" onmouseover="this.style.background='rgba(212,168,48,.22)'" onmouseout="this.style.background='rgba(212,168,48,.12)'" title="Transition 2027 board to primary after draft night">⚡ Roll Forward to 2027</button>
     </div>
   </div>
   <div id="futureContent"></div>
@@ -7066,7 +7365,10 @@ function schoolInitialsBadge(school, size, borderRadius) {
   size = size || '20px'; borderRadius = borderRadius || '3px';
   var initials = schoolInitials(school);
   var fs = Math.max(8, Math.round(parseInt(size) * 0.42)) + 'px';
-  var palette = ['#1D4ED8','#2C4569','#0D9488','#C2410C','#0369A1','#6D28D9','#065F46'];
+  // DESIGN-2: hash palette retoned to a single cool family (navy/slate/blue
+  // weights). Still 7 entries so the per-school hash mapping distribution
+  // is unchanged; differentiation comes from value steps, not hue clashes.
+  var palette = ['#1D4ED8','#2C4569','#475569','#0F2A4A','#2563EB','#334155','#64748B'];
   var cidx = 0;
   for (var i=0;i<school.length;i++) cidx = (cidx + school.charCodeAt(i)) % palette.length;
   return '<div style="width:'+size+';height:'+size+';border-radius:'+borderRadius
@@ -7930,7 +8232,7 @@ var DataService = (function() {
     if (typeof schoolLogoUrl === 'function') schoolLogoUrl._cache = null;
     if (typeof _schoolLogoUrlMemo !== 'undefined') _schoolLogoUrlMemo = {};
     // _statRankCache is rebuilt via rebuildStatRanges() at the end of this function.
-    if (parsed.board2026)  DATA.board2026  = parsed.board2026;
+    if (parsed.board2026)  { DATA.board2026  = parsed.board2026; hwInvalidateRankMap(); }
     if (parsed.board2027)  DATA.board2027  = parsed.board2027;
     if (parsed.historical) DATA.historical = parsed.historical;
     if (parsed.yoy)        DATA.yoy        = parsed.yoy;
@@ -10250,11 +10552,15 @@ var _future2027View = 'cards';
 function setFutureView(v) { _future2027View = v; renderFuture(); }
 
 function _renderFuture2027Cards(players) {
+  // DESIGN-2027: tier colors follow the monochromatic scale — amber is
+  // reserved for the elite tier; everything else steps down through navy
+  // and grays. The same color drives the section-header dot, the rank
+  // badge, and the card's left border (via --ft-color custom property).
   var tiers = [
-    { key:'top5',    label:'🌟 Top 5',        min:1,  max:5  },
-    { key:'top15',   label:'🏆 Lottery Watch', min:6,  max:15 },
-    { key:'top30',   label:'📈 First Round Watch', min:16, max:30 },
-    { key:'deeper',  label:'🔍 Deeper Watch',  min:31, max:999 },
+    { key:'top5',    label:'Top 5',             min:1,  max:5,   color:'#C9971A' },
+    { key:'top15',   label:'Lottery Watch',     min:6,  max:15,  color:'#2C4569' },
+    { key:'top30',   label:'First Round Watch', min:16, max:30,  color:'#475569' },
+    { key:'deeper',  label:'Deeper Watch',      min:31, max:999, color:'#94A3B8' },
   ];
 
   var out = '<div class="future-cards-wrap">';
@@ -10262,36 +10568,32 @@ function _renderFuture2027Cards(players) {
     var group = players.filter(function(p){ return p.rank >= tier.min && p.rank <= tier.max; });
     if (!group.length) return;
     out += '<div class="future-tier-section">';
-    out += '<div class="future-tier-header"><span class="future-tier-label">'+tier.label+'</span>'
+    out += '<div class="future-tier-header">'
+         + '<span class="future-tier-dot" style="background:'+tier.color+';color:'+tier.color+'"></span>'
+         + '<span class="future-tier-label">'+tier.label+'</span>'
          + '<span class="future-tier-count">'+group.length+' prospects</span></div>';
-    out += '<div class="future-cards-grid">';
+    out += '<div class="future-cards-grid future-grid-'+tier.key+'">';
     group.forEach(function(p) {
       // SAFETY-1B: raw + H-suffix split for logo-lookup safety.
       var nameRaw   = p.name || '';
       var schoolRaw = p.school || '';
       var name      = escHtml(nameRaw);
       var school    = escHtml(schoolRaw);
-      var posCol = posColor(p.position||'');
       var logoHtml = schoolRaw && schoolRaw !== 'Uncommitted' ? schoolLogoHtml(schoolRaw,'18px','3px') : '';
       var schoolDisplay = school || 'Uncommitted';
       var uncommitted = schoolRaw === 'Uncommitted' || !schoolRaw;
       var av = avatarHtml(p.name, p.position||'', '48px', '8px');
 
-      // Name length scaling
-      var nameFontSize = name.length <= 12 ? '17px' : name.length <= 15 ? '15px' : '13px';
-
-      // Tier color for rank badge
-      var tierColor = tier.key==='top5'    ? '#2C4569'
-                    : tier.key==='top15'   ? '#6D28D9'
-                    : tier.key==='top30'   ? '#2563EB'
-                    : '#94A3B8';
-      out += '<div class="future-card future-card-'+tier.key+'" onclick="openFutureModal('+p.rank+')">';
+      // --ft-color drives left border + rank badge via CSS — one source.
+      out += '<div class="future-card future-card-'+tier.key+'" style="--ft-color:'+tier.color+'" onclick="openFutureModal('+p.rank+')">';
       out += '<div class="future-card-header">';
-      // Rank badge — tier-colored rounded square
-      out += '<div class="future-rank-badge" style="background:'+tierColor+'"><div class="rn">'+p.rank+'</div><div class="rl">rank</div></div>';
+      out += '<div class="future-rank-badge"><div class="rn">'+p.rank+'</div><div class="rl">rank</div></div>';
       out += av;
       out += '<div class="future-card-identity">';
-      out += '<div class="future-card-name" style="font-size:'+nameFontSize+'">'+name+'</div>';
+      // DESIGN-2027: single name size + ellipsis. The old per-length font
+      // scaling (17/15/13px) made adjacent names render at visibly
+      // different sizes — ragged. Ellipsis handles the long tail.
+      out += '<div class="future-card-name">'+name+'</div>';
       out += '<div class="future-card-school">';
       if (uncommitted) {
         out += '<span class="future-uncommitted-tag">Uncommitted</span>';
@@ -10301,29 +10603,29 @@ function _renderFuture2027Cards(players) {
       out += '</div></div>';
       out += '</div>'; // card-header
 
-      // White body section
       out += '<div class="future-card-body">';
 
-      // Tags row
+      // Meta row — pos pill + one dot-separated meta line.
+      // DESIGN-2027: replaces the old per-stat tag cluster (mixed pill and
+      // bold-text languages at 5px gaps) with a single quiet line.
       var posCls = (p.position||'').toLowerCase();
       out += '<div class="future-card-tags">';
-      // SAFETY-1B: position and cls flow into innerHTML — escape both.
-      // posCls is the LOWERCASE form used purely as a class-name suffix
-      // (.tag.pos.guard etc.); the canonical position values are HTML-safe
-      // but escHtml costs nothing and protects against bad uploads.
       if (p.position) out += '<span class="tag pos '+escHtml(posCls)+'">'+escHtml(p.position)+'</span>';
-      if (p.cls)      out += '<span class="tag cls">'+escHtml(p.cls)+'</span>';
-      if (p.age)      out += '<span class="tag age">'+parseFloat(p.age||0).toFixed(1)+' yrs</span>';
-      if (p.ht)       out += '<span class="tag ht">'+Math.floor(p.ht/12)+"'"+p.ht%12+'"'+'</span>';
-      if (p.wt)       out += '<span class="tag wt">'+p.wt+' lbs</span>';
+      var metaBits = [];
+      if (p.cls) metaBits.push('<b>'+escHtml(p.cls)+'</b>');
+      if (p.age) metaBits.push(parseFloat(p.age||0).toFixed(1)+' yrs');
+      if (p.ht)  metaBits.push(Math.floor(p.ht/12)+'&#8242;'+(p.ht%12)+'&#8243;');
+      if (p.wt)  metaBits.push(p.wt+' lbs');
+      if (metaBits.length) out += '<span class="future-meta">'+metaBits.join(' · ')+'</span>';
       out += '</div>';
 
-      // Notes preview
+      // Notes preview — full text in DOM; CSS line-clamp does the
+      // truncation on a clean line break (was a hard JS slice at 90
+      // chars that cut mid-word).
       if (p.notes) {
-        var preview = p.notes.length > 90 ? p.notes.slice(0,90)+'…' : p.notes;
-        out += '<div class="future-card-notes">'+escHtml(preview)+'</div>';
+        out += '<div class="future-card-notes">'+escHtml(p.notes)+'</div>';
       }
-      // Comp
+      // Comp — pinned to card bottom by CSS margin-top:auto
       if (p.comp) {
         out += '<div class="future-card-comp">Comp: <strong>'+escHtml(p.comp)+'</strong></div>';
       }
@@ -10683,6 +10985,24 @@ var HW_PERSIST_KEY = 'hw_session_v1';
 function hwPersistSave() {
   try {
     var activeTab = document.querySelector('.nav-tab.active');
+    // PERSIST-MOCK-1: serialize an in-progress Simulator run. Selections
+    // carry everything needed to resume (player refs by rank, grades,
+    // cpu/user flags); availability is reconstructed at resume time as
+    // board2026 minus drafted ranks. Cleared automatically when not
+    // running (simReset path saves with running:false → empty string).
+    var simPayload = '';
+    if (typeof simRunning !== 'undefined' && simRunning
+        && typeof simSelections !== 'undefined'
+        && Object.keys(simSelections).length > 0) {
+      simPayload = JSON.stringify({
+        sel:   simSelections,
+        cur:   simCurrentPick,
+        teams: simUserTeams,
+        max:   simMaxPicks,
+        speed: simCpuSpeed,
+        vari:  simVariance
+      });
+    }
     var state = {
       tab:    activeTab ? activeTab.dataset.tab : 'board2026',
       view:   typeof currentView !== 'undefined' ? currentView : 'cards',
@@ -10690,6 +11010,8 @@ function hwPersistSave() {
       cls:    (document.getElementById('clsFilter')||{}).value || '',
       search: (document.getElementById('search2026')||{}).value || '',
       mdc:    Object.keys(mdcSelections).length > 0 ? JSON.stringify(mdcSelections) : '',
+      mdcAp:  typeof mdcActivePick !== 'undefined' ? mdcActivePick : 1,
+      sim:    simPayload,
       ts:     Date.now()
     };
     StorageService.set(HW_PERSIST_KEY, state);
@@ -10722,7 +11044,16 @@ function hwPersistApply(state) {
         mdcSelections[parseInt(k)] = rank;
         if (typeof mdcDrafted !== 'undefined') mdcDrafted.add(rank);
       });
+      // PERSIST-MOCK-1: restore the active pick slot so the user lands
+      // exactly where they left off, not back at pick 1.
+      if (state.mdcAp) mdcActivePick = parseInt(state.mdcAp) || 1;
     } catch(e) {}
+  }
+  // PERSIST-MOCK-1: a saved Simulator run isn't applied immediately (the
+  // sim tab may never be opened this session) — stash it; setMockMode('sim')
+  // offers a Resume/Discard bar when the user actually arrives.
+  if (state.sim) {
+    try { window._simResumeState = JSON.parse(state.sim); } catch(e) {}
   }
 }
 
@@ -12590,6 +12921,20 @@ var mdcActivePick  = 1;    // currently highlighted pick slot
 var mdcPosFilter   = 'ALL';
 var mdcSearchTerm  = '';
 var mdcRankMap     = {};   // rank → player object (built once at init, O(1) lookup)
+
+// ── PERF-MOCK-3: shared O(1) player-by-rank lookup ───────────────────────────
+// Both Build Mock and the Simulator previously ran DATA.board2026.find() per
+// row inside render loops — O(n) per row, O(n²) per render, executed up to
+// 10×/sec during Fast CPU autopick. This helper lazily builds the map on
+// first use and is invalidated wherever DATA.board2026 is reassigned
+// (Excel upload, roll-forward, history restore).
+function hwPlayerByRank(rank) {
+  if (!Object.keys(mdcRankMap).length) {
+    (DATA.board2026||[]).forEach(function(p) { mdcRankMap[p.rank] = p; });
+  }
+  return mdcRankMap[rank] || null;
+}
+function hwInvalidateRankMap() { mdcRankMap = {}; }
 var mdcDrafted     = new Set(); // set of drafted ranks (O(1) membership test)
 var _mdcSearchTimer = null; // debounce handle for pool search
 
@@ -12638,9 +12983,9 @@ function mdcRenderPicks() {
   function valueBadge(pickNum, playerRank) {
     if (!playerRank) return '';
     var diff = playerRank - pickNum;  // positive = player ranked lower = good value
-    if (diff >= 5)  return '<span class="mdc-val-badge value">VALUE</span>';
-    if (diff <= -6) return '<span class="mdc-val-badge reach">REACH</span>';
-    return '<span class="mdc-val-badge fair">FAIR</span>';
+    if (diff >= 5)  return '<span class="mdc-val-badge value" title="Board rank 5+ spots below this pick — strong value">VALUE</span>';
+    if (diff <= -6) return '<span class="mdc-val-badge reach" title="Board rank 6+ spots above this pick — a reach">REACH</span>';
+    return '<span class="mdc-val-badge fair" title="Board rank within ±5 of this pick slot">FAIR</span>';
   }
 
   // ── Team abbreviation ─────────────────────────────────────────────────────
@@ -12663,17 +13008,20 @@ function mdcRenderPicks() {
   DRAFT_ORDER_2026.forEach(function(slot) {
     var round = slot.pick <= 30 ? 1 : 2;
     if (round !== lastRound) {
-      html += '<div class="mdc-round-hdr">Round ' + round + '</div>';
+      html += '<div class="mdc-round-hdr"><span>Round ' + round + '</span>'
+            + '<span class="mdc-round-range">Picks ' + (round===1?'1–30':'31–60') + '</span></div>';
       lastRound = round;
     }
     var isActive  = (slot.pick === mdcActivePick);
     var pickData  = mdcSelections[slot.pick];
     // O(1) lookup via pre-built rank map
-    var player    = pickData ? mdcRankMap[pickData] : null;
+    var player    = pickData ? hwPlayerByRank(pickData) : null;
     var pickNum   = slot.pick < 10 ? '0'+slot.pick : ''+slot.pick;
     var isLotto   = slot.pick <= 14;
+    // SCALE-UP: 34px avatar matches the 50px rows — the player photo
+    // becomes a real identity anchor on the captured side too.
     var avHtml    = player
-      ? avatarHtml(player.name, player.position||'', '32px', '5px')
+      ? avatarHtml(player.name, player.position||'', '34px', '5px')
           .replace('class="avatar-fallback"','class="avatar-fallback" style="font-size:11px"')
       : '';
     var filledCls  = player ? ' filled' : '';
@@ -12687,13 +13035,16 @@ function mdcRenderPicks() {
     // Pick number
     html += '<span class="mdc-pick-num' + (isLotto?' lotto':'') + '">' + pickNum + '</span>';
 
-    // Team logo
-    html += '<div class="mdc-pick-team-logo">' + mdcTeamLogoHtml(slot.team, '24px') + '</div>';
+    // SCALE-UP: 30px logo in a 34px box — team identity readable at a glance.
+    html += '<div class="mdc-pick-team-logo">' + mdcTeamLogoHtml(slot.team, '30px') + '</div>';
 
     // Team name
     html += '<div class="mdc-team-info"><span class="mdc-team-name">' + shortName + '</span></div>';
 
-    // Selection area
+    // Selection area — REDESIGN: value badge removed per direction; metric pill
+    // (the grade signal) retained. Player meta condensed to a single inline line.
+    // FILL-FIX: with the board column now ~50% wide, the meta line has room
+    // to carry school again — gives each filled pick proper context.
     html += '<div class="mdc-selection">';
     if (player) {
       var pBase   = player.name.indexOf(' - ')>0 ? player.name.slice(0,player.name.indexOf(' - ')) : player.name;
@@ -12702,18 +13053,18 @@ function mdcRenderPicks() {
       var metVal  = player.metric > 0 ? Number(player.metric).toFixed(1) : null;
       html += '<div class="mdc-pick-av">' + avHtml + '</div>';
       html += '<div class="mdc-pick-identity">';
-      html += '  <div class="mdc-picked-name">' + pBase + '</div>';
-      html += '  <div class="mdc-picked-meta">' + (pSchool || '')
-            + (player.position ? ' · ' + player.position : '')
-            + (player.torvik_role ? ' · ' + escHtml(player.torvik_role) : '') + '</div>';
+      html += '  <div class="mdc-picked-name">' + escHtml(pBase) + '</div>';
+      html += '  <div class="mdc-picked-meta">'
+            + (pSchool ? escHtml(pSchool) : '')
+            + (player.position ? (pSchool ? ' · ' : '') + escHtml(player.position) : '')
+            + (player.torvik_role ? ' · ' + escHtml(player.torvik_role) : '')
+            + '</div>';
       html += '</div>';
-      // Value badge + metric pill
-      html += valueBadge(slot.pick, player.rank);
       if (metVal) {
         html += '<div class="mdc-row-metric" style="' + metSty + '">' + metVal + '</div>';
       }
     } else {
-      var emptyText = isActive ? '← Select from pool' : '';
+      var emptyText = isActive ? 'Select from pool →' : '';
       html += '<span class="mdc-empty-slot">' + emptyText + '</span>';
     }
     html += '</div>'; // .mdc-selection
@@ -12757,7 +13108,7 @@ function mdcRenderPoolHeader() {
     })
     .sort(function(a,b){return a-b;})
     .map(function(pk){
-      var p=(DATA.board2026||[]).find(function(x){return x.rank===mdcSelections[parseInt(pk)];});
+      var p=hwPlayerByRank(mdcSelections[parseInt(pk)]);
       return {pick:parseInt(pk),name:p?p.name:('Pick #'+pk),pos:p?p.position:'',rank:p?p.rank:0,metric:p?p.metric:0,stats:p||null};
     });
   showPriorPicksSidebar('mdcPriorSidebar', activeSlot.team, priorPicks, mdcActivePick);
@@ -12768,34 +13119,49 @@ function mdcRenderPool() {
   var ct = document.getElementById('mdcPoolCount');
   if (!el) return;
 
-  // Update pool header (needs + BBRef) and prior picks sidebar
-  var teamInfoEl = document.getElementById('mdcTeamInfo');
+  // Update pool header (needs + BBRef) and prior-picks strip (folded from
+  // the removed sidebar column — same data, one horizontal line inside the
+  // pool itself, no longer a third panel)
+  var teamInfoEl  = document.getElementById('mdcTeamInfo');
+  var priorStripEl= document.getElementById('mdcPriorStrip');
   if (mdcActivePick) {
     var activeSlot = (DRAFT_ORDER_2026||[]).find(function(s){ return s.pick===mdcActivePick; });
     if (activeSlot) {
-      // Pool header: needs + BBRef
       if (teamInfoEl) teamInfoEl.innerHTML = teamNeedsHtml(activeSlot.team, []);
-      // Sidebar: prior picks by this team
+      // Prior picks by this team — gather, render as a chip strip
       var priorPicks = Object.keys(mdcSelections)
         .filter(function(pk){ return pk!=mdcActivePick; })
         .filter(function(pk){
           var slot2=(DRAFT_ORDER_2026||[]).find(function(s){return s.pick===parseInt(pk);});
           return slot2&&slot2.team===activeSlot.team;
         })
-        .sort(function(a,b){return a-b;})
-        .map(function(pk){
-          var p=(DATA.board2026||[]).find(function(x){return x.rank===mdcSelections[parseInt(pk)];});
-          return {pick:parseInt(pk), name:p?p.name:('Pick #'+pk),
-            pos:p?p.position:'', rank:p?p.rank:0,
-            metric:p?p.metric:0, stats:p||null};
-        });
-      showPriorPicksSidebar('mdcPriorSidebar', activeSlot.team, priorPicks, mdcActivePick);
+        .sort(function(a,b){return a-b;});
+      if (priorStripEl) {
+        if (priorPicks.length) {
+          var stripH = '<span class="mdc-prior-strip-lbl">Prior picks ('+activeSlot.team+')</span>';
+          priorPicks.forEach(function(pk) {
+            var pp = hwPlayerByRank(mdcSelections[parseInt(pk)]);
+            if (!pp) return;
+            var ppBase = pp.name.indexOf(' - ')>0 ? pp.name.slice(0,pp.name.indexOf(' - ')) : pp.name;
+            stripH += '<span class="mdc-prior-chip">'
+                  +    '<span class="mdc-prior-chip-rank">#'+pk+'</span>'
+                  +    '<span class="mdc-prior-chip-name">'+escHtml(ppBase)+'</span>'
+                  +    (pp.position?'<span class="mdc-prior-chip-pos">'+escHtml(pp.position[0])+'</span>':'')
+                  +  '</span>';
+          });
+          priorStripEl.innerHTML = stripH;
+          priorStripEl.style.display = 'flex';
+        } else {
+          priorStripEl.innerHTML = '';
+          priorStripEl.style.display = 'none';
+        }
+      }
     } else {
       if (teamInfoEl) teamInfoEl.innerHTML = '';
-      hidePriorPicksSidebar('mdcPriorSidebar');
+      if (priorStripEl) { priorStripEl.innerHTML=''; priorStripEl.style.display='none'; }
     }
   } else {
-    hidePriorPicksSidebar('mdcPriorSidebar');
+    if (priorStripEl) { priorStripEl.innerHTML=''; priorStripEl.style.display='none'; }
   }
 
   // O(1) availability check via mdcDrafted Set
@@ -12810,41 +13176,95 @@ function mdcRenderPool() {
   });
   if (ct) ct.textContent = available.length + ' left';
 
+  // UX-MOCK-7: Best Player Available — one-tap draft. Computed against ALL
+  // undrafted players (ignores search/pos filters) so the answer to "who's
+  // the value here?" doesn't shift while the user types. diff>0 means the
+  // board ranks them below this pick slot — i.e. they fell to you.
+  var bpaEl = document.getElementById('mdcBpaHint');
+  if (bpaEl) {
+    var bpa = null;
+    for (var bi = 0; bi < (DATA.board2026||[]).length; bi++) {
+      if (!mdcDrafted.has(DATA.board2026[bi].rank)) { bpa = DATA.board2026[bi]; break; }
+    }
+    if (bpa && mdcActivePick) {
+      var bpaBase = bpa.name.indexOf(' - ')>0 ? bpa.name.slice(0,bpa.name.indexOf(' - ')) : bpa.name;
+      var bpaDiff = bpa.rank - mdcActivePick;
+      var bpaTag  = bpaDiff >= 5 ? ' · +' + bpaDiff + ' value' : '';
+      bpaEl.innerHTML = '<button class="bpa-chip" onclick="mdcPickPlayer(' + bpa.rank + ')" '
+        + 'title="Draft the highest-ranked player still on the board">'
+        + 'BPA <b>#' + bpa.rank + ' ' + escHtml(bpaBase) + '</b>' + escHtml(bpaTag) + '</button>';
+    } else { bpaEl.innerHTML = ''; }
+  }
+
   if (!available.length) {
     el.innerHTML = '<div class="mdc-pool-empty">All players drafted!</div>';
     return;
   }
 
-  // Position color tokens for pool items
-  var posColors = { Guard:'rgba(59,130,246,.5)', Forward:'rgba(139,92,246,.5)', Center:'rgba(20,184,166,.5)' };
-
+  // REDESIGN: 2-line rich rows. Line 1 = identity (rank, avatar, name, metric).
+  // Line 2 = scouting context (position, class, age, ht/wt, role, BPM). The
+  // 2-line format is the established sports-draft idiom (Athletic, NBA.com)
+  // and gives ~7-8 evaluation-ready rows visible at once vs the old 10-12
+  // sparse rows. Position dot is now a real outlined pill — a categorical
+  // signal deserves a real shape, not a 6px dot.
+  // PREMIUM (rev 2): wider pool unlocks 40px photo + 16px name + stacked
+  // metric (value + "METRIC" label). Each row is a CSS grid so columns
+  // align across rows — gives the pool a real "tabular" feel.
   var html = '';
   available.forEach(function(p) {
     var base   = escHtml(p.name.indexOf(' - ')>0 ? p.name.slice(0,p.name.indexOf(' - ')) : p.name);
     var school = escHtml(p.name.indexOf(' - ')>0 ? p.name.slice(p.name.indexOf(' - ')+3) : '');
     var metSty = bbMetStyle(p.metric);
     var metVal = p.metric > 0 ? Number(p.metric).toFixed(1) : null;
-    var posClr = posColors[p.position] || 'rgba(255,255,255,.2)';
-    html += '<div class="mdc-pool-item" onclick="mdcPickPlayer(' + p.rank + ')">';
-    // Rank
-    html += '<span class="mdc-pool-rank">' + p.rank + '</span>';
-    // Position dot
-    html += '<div style="width:6px;height:6px;border-radius:50%;background:' + posClr + ';flex-shrink:0"></div>';
-    // Avatar
-    html += avatarHtml(p.name, p.position||'', '26px', '4px')
-              .replace('class="avatar-fallback"','class="avatar-fallback" style="font-size:9px"');
-    // Name + school
-    html += '<div class="mdc-pool-name">';
-    html += '  <div class="mdc-pool-pname">' + base + '</div>';
-    var meta = (school ? school : '') + (p.torvik_role ? (school ? ' · ' : '') + escHtml(p.torvik_role) : '');
-    html += '  <div class="mdc-pool-school">' + meta + '</div>';
-    html += '</div>';
-    // Metric pill
-    if (metVal) {
-      html += '<div class="mdc-pool-met" style="' + metSty + '">' + metVal + '</div>';
+    var posCls = (p.position||'').toLowerCase();
+    var htStr  = (p.ht && p.ht > 0) ? (Math.floor(p.ht/12) + "'" + (p.ht%12) + '"') : '';
+    var wtStr  = (p.wt && p.wt > 0) ? (p.wt + ' lb') : '';
+    var ageStr = (p.age && p.age > 0) ? (parseFloat(p.age).toFixed(1) + 'y') : '';
+    var clsStr = p.cls ? escHtml(p.cls) : '';
+    var role   = p.torvik_role ? escHtml(p.torvik_role) : '';
+    var bpm    = (p.bpm !== undefined && p.bpm !== null && p.bpm !== '')
+                  ? 'BPM ' + Number(p.bpm).toFixed(1) : '';
+
+    // TABULAR line 2: five fixed cells (class | age | ht/wt | role | bpm).
+    // Empty values render a dim em-dash so the column grid never collapses
+    // and every row's data sits directly beneath the row above.
+    var physStr = htStr ? (htStr + (wtStr ? ' / ' + wtStr : '')) : wtStr;
+    function m2cell(v, cls) {
+      return '<span class="m2-cell ' + cls + (v ? '' : ' m2-empty') + '">' + (v || '—') + '</span>';
     }
-    // Pick button
-    html += '<button class="mdc-select-btn" onclick="event.stopPropagation();mdcPickPlayer(' + p.rank + ')">Draft</button>';
+    var anyMeta   = !!(clsStr || ageStr || physStr || role || bpm);
+    var line2html = anyMeta
+      ? m2cell(clsStr,'m2-cls') + m2cell(ageStr,'m2-age') + m2cell(physStr,'m2-phys')
+        + m2cell(role,'m2-role') + m2cell(bpm,'m2-bpm')
+      : '';
+
+    // PREMIUM: 40px photo as the visual anchor. avatarHtml's size param
+    // sets both <img> and fallback; the .mpr-photo wrapper hosts grid
+    // placement so rows align cleanly across the pool.
+    var photoHtml = avatarHtml(p.name, p.position||'', '40px', '6px')
+                      .replace('class="avatar-fallback"','class="avatar-fallback" style="font-size:12px"');
+
+    html += '<div class="mdc-pool-row mdc-pool-item" onclick="mdcPickPlayer(' + p.rank + ')">';
+    html +=   '<span class="mpr-rank">' + p.rank + '</span>';
+    html +=   '<div class="mpr-photo">' + photoHtml + '</div>';
+    html +=   '<div class="mpr-name-wrap">';
+    html +=     '<span class="mpr-name">' + base + '</span>';
+    if (school) html += '<span class="mpr-school">' + school + '</span>';
+    html +=   '</div>';
+    if (p.position) {
+      html += '<span class="mpr-pos-pill ' + escHtml(posCls) + '">' + escHtml(p.position[0]) + '</span>';
+    } else {
+      html += '<span></span>'; // grid placeholder so columns stay aligned
+    }
+    if (metVal) {
+      html += '<div class="mpr-stat">'
+            +   '<div class="mpr-met" style="' + metSty + '">' + metVal + '</div>'
+            +   '<div class="mpr-met-lbl">Metric</div>'
+            + '</div>';
+    } else {
+      html += '<span></span>';
+    }
+    if (line2html) html += '<div class="mpr-line2">' + line2html + '</div>';
     html += '</div>';
   });
   el.innerHTML = html;
@@ -12901,6 +13321,7 @@ function mdcPickRowClick(pickNum) {
 }
 
 function mdcPickPlayer(rank) {
+  var _flashPick = mdcActivePick;  // POLISH 3c: row to stamp after render
   // U-1: auto-save after each pick
   setTimeout(hwPersistSave, 50);
 
@@ -12918,10 +13339,21 @@ function mdcPickPlayer(rank) {
   }
   mdcRenderPicks();
   mdcRenderPool();
+  // POLISH 3c: pick-moment ceremony — amber stamp on the row just filled.
+  var flashedRow = document.getElementById('mdcRow' + _flashPick);
+  if (flashedRow) {
+    flashedRow.classList.add('just-picked');
+    flashedRow.addEventListener('animationend', function() {
+      flashedRow.classList.remove('just-picked');
+    }, { once: true });
+  }
 }
 
 function mdcUnpick(pickNum) {
   if (!mdcSelections[pickNum]) return;
+  // PERSIST-MOCK-1: undo/unpick/reset previously never saved — a refresh
+  // after undoing restored the stale (pre-undo) state from storage.
+  setTimeout(hwPersistSave, 50);
   delete mdcSelections[pickNum];
   mdcActivePick = pickNum;
   mdcRenderPicks();
@@ -12936,6 +13368,7 @@ function mdcUndo() {
   delete mdcSelections[last.pick];
   if (rank) mdcDrafted.delete(rank);
   mdcActivePick = last.pick;
+  setTimeout(hwPersistSave, 50);  // PERSIST-MOCK-1
   mdcRenderPicks();
   mdcRenderPool();
 }
@@ -12948,6 +13381,7 @@ function mdcReset() {
     body:  '<p>This will clear all of your picks. This action cannot be undone.</p>' +
            '<div class="mdc-modal-meta"><strong>' + pickCount + '</strong> pick' + (pickCount===1?'':'s') + ' will be discarded.</div>',
     primary:   { label: 'Reset Draft', danger: true, onConfirm: function() {
+      setTimeout(hwPersistSave, 80);  // PERSIST-MOCK-1: clears stored mdc state
       mdcSelections = {};
       mdcHistory    = [];
       mdcDrafted    = new Set();
@@ -12975,7 +13409,28 @@ function mdcFilterPool(val) {
 // mdcDebouncedFilter: pool search handler — delegates to mdcFilterPool which
 // internally debounces via _mdcSearchTimer (120ms). Kept as named function
 // so HTML oninput="mdcDebouncedFilter(this.value)" wiring stays intact.
-function mdcDebouncedFilter(val) { mdcFilterPool(val); }
+// PERF-MOCK-4: real debounce (the old body was a direct pass-through — a
+// full 60-row pool rebuild with avatars fired on every keystroke). 120ms
+// matches the global-search debounce elsewhere in the file: instant on
+// pause, coalesces rapid typing bursts.
+// UX-MOCK-7: Enter drafts when the filter has narrowed the pool to exactly
+// one player — the power-user flow becomes type-a-few-letters → Enter.
+// Exactly-one is deliberate: Enter on an ambiguous list must never pick.
+function hwEnterPicksSingle(event, listId, rowSel) {
+  if (event.key !== 'Enter') return;
+  var list = document.getElementById(listId);
+  if (!list) return;
+  var rows = list.querySelectorAll(rowSel);
+  if (rows.length === 1) { event.preventDefault(); rows[0].click(); }
+}
+var _mdcFilterTimer = null;
+function mdcDebouncedFilter(val) {
+  if (_mdcFilterTimer) clearTimeout(_mdcFilterTimer);
+  _mdcFilterTimer = setTimeout(function() {
+    _mdcFilterTimer = null;
+    mdcFilterPool(val);
+  }, 120);
+}
 
 function mdcSave() {
   var filled = Object.keys(mdcSelections).length;
@@ -13006,7 +13461,7 @@ function mdcSave() {
       if (!label) return false; // keep modal open
       var snapshot = DRAFT_ORDER_2026.map(function(slot) {
         var rank = mdcSelections[slot.pick];
-        var player = rank ? (DATA.board2026||[]).find(function(p){ return p.rank === rank; }) : null;
+        var player = rank ? hwPlayerByRank(rank) : null;
         return {
           pick:   slot.pick,
           team:   slot.team + (slot.via ? ' (' + slot.via + ')' : ''),
@@ -20013,7 +20468,7 @@ function setMockMode(mode) {
   });
   if (mode === 'build')   mdcInit();
   if (mode === 'archive') renderMocks();
-  if (mode === 'sim')     simBuildTeamGrid();
+  if (mode === 'sim')     { simBuildTeamGrid(); simMaybeOfferResume(); }
 }
 
 // ── DRAFT DAY SIMULATOR ──────────────────────────────────────────────────────
@@ -20242,11 +20697,96 @@ function simBuildTeamGrid() {
     var btn = document.createElement('button');
     btn.className   = 'sim-team-btn';
     btn.id          = 'simTeamBtn_' + slot.team;
-    btn.textContent = slot.team;
+    // DESIGN-MOCK-6: logo + code — the board rows already use team logos
+    // via mdcTeamLogoHtml; the setup grid (the feature's front door) was
+    // the only text-only surface left.
+    btn.innerHTML   = (typeof mdcTeamLogoHtml==='function' ? mdcTeamLogoHtml(slot.team,'18px') : '')
+                    + '<span>' + escHtml(slot.team) + '</span>';
     btn.title       = slot.name;
     btn.onclick     = function(){ simToggleTeam(slot.team); };
     grid.appendChild(btn);
   });
+}
+
+// ── PERSIST-MOCK-1: resume an interrupted simulation ─────────────────────────
+// A refresh mid-run previously destroyed the entire draft. hwPersistApply
+// stashes the saved run on window._simResumeState; when the user opens the
+// Simulator we offer Resume/Discard rather than silently auto-restoring
+// (they may genuinely want a fresh draft).
+function simMaybeOfferResume() {
+  var saved = window._simResumeState;
+  var setup = document.getElementById('simSetup');
+  if (!saved || !saved.sel || !setup || simRunning) return;
+  if (document.getElementById('simResumeBar')) return;  // already offered
+  var n = Object.keys(saved.sel).length;
+  if (!n) return;
+  var bar = document.createElement('div');
+  bar.id = 'simResumeBar';
+  bar.style.cssText = 'display:flex;align-items:center;gap:12px;flex-wrap:wrap;'
+    + 'background:rgba(212,168,48,.08);border:1.5px solid rgba(212,168,48,.35);'
+    + 'border-radius:10px;padding:12px 16px;margin-bottom:14px';
+  bar.innerHTML =
+    '<span style="font-family:\'Barlow Condensed\',sans-serif;font-size:14px;font-weight:800;color:var(--navy)">'
+      + 'Unfinished draft found — ' + n + ' / ' + (saved.max||60) + ' picks made</span>'
+    + '<div style="display:flex;gap:8px;margin-left:auto">'
+    + '<button onclick="simResumeFromState()" style="background:var(--navy);color:white;border:none;border-radius:7px;padding:7px 16px;font-size:12px;font-weight:700;cursor:pointer;font-family:\'Barlow Condensed\',sans-serif;letter-spacing:.3px">Resume Draft</button>'
+    + '<button onclick="simDiscardResume()" style="background:white;color:var(--gray-500);border:1.5px solid var(--gray-200);border-radius:7px;padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer">Discard</button>'
+    + '</div>';
+  setup.insertBefore(bar, setup.firstChild);
+}
+
+function simDiscardResume() {
+  window._simResumeState = null;
+  var bar = document.getElementById('simResumeBar');
+  if (bar) bar.remove();
+  setTimeout(hwPersistSave, 50);  // running=false → clears stored sim
+}
+
+function simResumeFromState() {
+  var saved = window._simResumeState;
+  if (!saved || !saved.sel) return;
+  window._simResumeState = null;
+  var bar = document.getElementById('simResumeBar');
+  if (bar) bar.remove();
+
+  // Rebuild engine state. Selections carry grades/flags; availability is
+  // board2026 minus already-drafted ranks, rank-sorted (same order simStart
+  // produces). Generation bump invalidates any stray timers.
+  simStop();
+  Sim.state.selections  = {};
+  var drafted = {};
+  Object.keys(saved.sel).forEach(function(pk) {
+    Sim.state.selections[parseInt(pk)] = saved.sel[pk];
+    drafted[saved.sel[pk].rank] = true;
+  });
+  Sim.state.userTeams   = saved.teams || {};
+  Sim.state.maxPicks    = saved.max   || 60;
+  Sim.state.currentPick = saved.cur   || 1;
+  Sim.state.cpuSpeed    = saved.speed || 350;
+  Sim.state.variance    = saved.vari  || 0.10;
+  Sim.state.available   = (DATA.board2026||[])
+    .filter(function(p){ return !drafted[p.rank]; })
+    .slice().sort(function(a,b){ return (a.rank||999)-(b.rank||999); });
+  simInvalidateMetricIndex();
+  Sim.state.events = [];
+  simAddEvent({ pick:Sim.state.currentPick, type:'pick', tone:'navy', team:'',
+                text:'Draft resumed — ' + Object.keys(Sim.state.selections).length + ' picks restored' });
+  Sim.state.running = true;
+
+  // Reflect owned teams on the (already-built) setup grid for next time.
+  Object.keys(Sim.state.userTeams).forEach(function(code) {
+    var b = document.getElementById('simTeamBtn_' + code);
+    if (b && Sim.state.userTeams[code]) b.classList.add('on');
+  });
+
+  // Swap setup → live board and pick up exactly where the run stopped.
+  var setup = document.getElementById('simSetup');
+  var board = document.getElementById('simBoard');
+  if (setup) setup.style.display = 'none';
+  if (board) board.style.display = '';
+  simRenderBoard();
+  simUpdateScorecard();
+  simProcessNext();
 }
 
 function simToggleTeam(code) {
@@ -20267,16 +20807,13 @@ function simToggleFollow() {
   simFollowPicks = !simFollowPicks;
   var btn = document.getElementById('simFollowBtn');
   if (!btn) return;
+  // DESIGN-MOCK-5: state via classes, not four inline style writes.
   if (simFollowPicks) {
-    btn.textContent = '📍 Follow Picks';
-    btn.style.background = 'rgba(37,99,235,.12)';
-    btn.style.color      = 'var(--blue)';
-    btn.style.borderColor= 'rgba(37,99,235,.3)';
+    btn.textContent = 'Follow Picks';
+    btn.classList.add('is-on'); btn.classList.remove('is-off');
   } else {
-    btn.textContent = '🔓 Free Scroll';
-    btn.style.background = 'rgba(100,116,139,.12)';
-    btn.style.color      = 'var(--gray-400)';
-    btn.style.borderColor= 'var(--gray-300)';
+    btn.textContent = 'Free Scroll';
+    btn.classList.add('is-off'); btn.classList.remove('is-on');
   }
 }
 
@@ -20309,7 +20846,7 @@ function simStart() {
   simEvents      = [];
   simSlideMemo   = {};
   var fb = document.getElementById('simFollowBtn');
-  if (fb) { fb.textContent='📍 Follow Picks'; fb.style.background='rgba(37,99,235,.12)'; fb.style.color='var(--blue)'; fb.style.borderColor='rgba(37,99,235,.3)'; }
+  if (fb) { fb.textContent='Follow Picks'; fb.classList.add('is-on'); fb.classList.remove('is-off'); }
 
   document.getElementById('simSetup').style.display  = 'none';
   document.getElementById('simBoard').style.display   = '';
@@ -20355,6 +20892,10 @@ function simProcessNext() {
   if (!slot) { simCurrentPick++; simProcessNext(); return; }
 
   simUpdateStatus();
+  // PERF-MOCK-2: keep the board's on-clock row in sync here too — this also
+  // fixes a latent bug where a user-turn row never showed its "← Your pick"
+  // placeholder (the old code only repainted the board during CPU picks).
+  simSyncCurrentHighlight();
 
   if (simUserTeams[slot.team]) {
     // USER's pick — show pool and wait. No timer scheduled.
@@ -20381,6 +20922,8 @@ function simProcessNext() {
 
     simDoCpuPick(s2);
     simCurrentPick++;
+    simSyncCurrentHighlight();     // PERF-MOCK-2: move highlight + follow-scroll
+    setTimeout(hwPersistSave, 0);  // PERSIST-MOCK-1: survive refresh mid-run
     simRenderPool();
     simProcessNext(); // recurse — bumps gen again, schedules next or halts
   }, simCpuSpeed);
@@ -20538,7 +21081,9 @@ function simDoCpuPick(slot) {
 
   simAvailable = simAvailable.filter(function(p){ return p.rank !== chosen.rank; });
   simInvalidateMetricIndex();
-  simRenderBoard();
+  // PERF-MOCK-2: patch only the picked row — the on-clock highlight moves
+  // in simSyncCurrentHighlight() after the caller advances currentPick.
+  simPatchBoardRow(simCurrentPick);
 }
 
 // ── SOFTMAX SAMPLER ──────────────────────────────────────────────────────────
@@ -20667,7 +21212,11 @@ Sim.on('userPicked', function(data) {
   var srch = document.getElementById('simPoolSearch');
   if (srch) srch.value = '';
   Sim.state.poolQuery = '';
-  simRenderBoard();
+  // PERF-MOCK-2: single-row patch (currentPick already advanced past
+  // data.pick in recordUserPick) + highlight sync; was a full 60-row rebuild.
+  simPatchBoardRow(data.pick);
+  simSyncCurrentHighlight();
+  setTimeout(hwPersistSave, 0);  // PERSIST-MOCK-1
 
   // Prior-picks sidebar — if this team had earlier picks, show them and delay
   // the next CPU tick so the user sees the context.
@@ -20678,7 +21227,7 @@ Sim.on('userPicked', function(data) {
       .sort(function(a, b){ return a - b; })
       .map(function(pk) {
         var sel = Sim.state.selections[pk];
-        var full = (DATA.board2026||[]).find(function(x){ return x.rank === sel.rank; });
+        var full = hwPlayerByRank(sel.rank);
         return { pick:parseInt(pk), name:sel.name, pos:sel.pos, rank:sel.rank,
                  metric:sel.metric, stats: full || null };
       });
@@ -20717,7 +21266,7 @@ function simShowPool() {
       .sort(function(a,b){return a-b;})
       .map(function(pk){
         var s=simSelections[pk];
-        var full=(DATA.board2026||[]).find(function(x){return x.rank===s.rank;});
+        var full=hwPlayerByRank(s.rank);
         return {pick:parseInt(pk), name:s.name, pos:s.pos, rank:s.rank,
           metric:s.metric, stats:full||null};
       });
@@ -20741,6 +21290,20 @@ function simFilterPool(q) {
 function simRenderPool() {
   var list = document.getElementById('simPoolList');
   if (!list) return;
+  // UX-MOCK-7: BPA chip — simAvailable is rank-sorted, so [0] is the best
+  // player on the board. One tap drafts them for the on-clock team.
+  var bpaEl = document.getElementById('simBpaHint');
+  if (bpaEl) {
+    var bpa = simAvailable[0];
+    if (bpa) {
+      var bpaBase = (bpa.name||'').split(' - ')[0];
+      var bpaDiff = bpa.rank - simCurrentPick;
+      var bpaTag  = bpaDiff >= 5 ? ' · +' + bpaDiff + ' value' : '';
+      bpaEl.innerHTML = '<button class="bpa-chip" onclick="simPick(' + bpa.rank + ')" '
+        + 'title="Draft the highest-ranked player still on the board">'
+        + 'BPA <b>#' + bpa.rank + ' ' + escHtml(bpaBase) + '</b>' + escHtml(bpaTag) + '</button>';
+    } else { bpaEl.innerHTML = ''; }
+  }
   // Metric ranks come from the memoized index — no resort per keystroke.
 
   var players = simAvailable.filter(function(p){
@@ -20756,7 +21319,7 @@ function simRenderPool() {
   players.forEach(function(p) {
     var base  =p.name&&p.name.indexOf(' - ')>0?p.name.slice(0,p.name.indexOf(' - ')):(p.name||'');
     var school=p.name&&p.name.indexOf(' - ')>0?p.name.slice(p.name.indexOf(' - ')+3):'';
-    var posCol=p.position==='Guard'?'#2563EB':p.position==='Center'?'#0D9488':'#2C4569';
+    var posCol=p.position==='Guard'?'#2563EB':p.position==='Center'?'#64748B':'#2C4569';
     var met   =p.metric&&p.metric>0?Number(p.metric).toFixed(1):'';
     var mr    =simGetMetricRank(p.rank);
     var pg    =simGrade(mr, simAvailable.length + 1, simCurrentPick);
@@ -20776,6 +21339,106 @@ function simRenderPool() {
 }
 
 // ── BOARD RENDER ──────────────────────────────────────────────────────────────
+// ── PERF-MOCK-2: per-row board rendering ─────────────────────────────────────
+// The board previously rebuilt all 60 rows' innerHTML on EVERY pick — at
+// Fast speed that's 10 full rebuilds/sec, each row paying avatarHtml() +
+// a player lookup. Now: simRenderBoard() does the one-time full paint
+// (start/reset); per-pick updates go through simPatchBoardRow() (replaces
+// a single row in place) + simSyncCurrentHighlight() (moves the on-clock
+// highlight and follow-scroll). Both share simBuildBoardRowHtml so the
+// markup can never drift between paths.
+function simBuildBoardRowHtml(slot) {
+  var sel     = simSelections[slot.pick];
+  var isCur   = slot.pick===simCurrentPick;
+  var isOwned = simUserTeams[slot.team];
+  var isLotto = slot.pick<=14;
+  var logoHtml= (typeof mdcTeamLogoHtml==='function')?mdcTeamLogoHtml(slot.team,'32px'):escHtml(slot.team);
+
+  // Row state modifier — order matters: owned-current beats current beats owned.
+  var rowMod = '';
+  if (isCur && isOwned)      rowMod = ' is-owned-current';
+  else if (isCur)            rowMod = ' is-current';
+  else if (isOwned && sel)   rowMod = ' is-owned';
+
+  var playerInner='';
+  if (sel) {
+    var base    = sel.name&&sel.name.indexOf(' - ')>0?sel.name.slice(0,sel.name.indexOf(' - ')):(sel.name||'');
+    var school  = sel.name&&sel.name.indexOf(' - ')>0?sel.name.slice(sel.name.indexOf(' - ')+3):'';
+    var posCol  = sel.pos==='Guard'?'#2563EB':sel.pos==='Center'?'#64748B':'#2C4569';
+    var metTxt  = sel.metric>0?'<span class="sim-board-metric">'+Number(sel.metric).toFixed(1)+'</span>':'';
+    var grBadge = sel.grade?'<span class="sim-board-grade" style="color:'+sel.grade.color+';background:'+sel.grade.bg+'">'+sel.grade.label+'</span>':'';
+    var fullP   = hwPlayerByRank(sel.rank);
+    var htIn    = fullP&&fullP.ht?fullP.ht:0;
+    var wtLb    = fullP&&fullP.wt?fullP.wt:0;
+    var htStr   = htIn?(Math.floor(htIn/12)+"'"+(htIn%12)+'"'):'';
+    var wtStr   = wtLb?wtLb+'lb':'';
+    var physStr = [htStr,wtStr].filter(Boolean).join(' / ');
+    var roleStr = fullP&&fullP.torvik_role?fullP.torvik_role:'';
+
+    playerInner=
+      '<div class="sim-board-name-row">'
+        +avatarHtml(sel.name, sel.pos||'', '36px', '5px')
+        +'<span class="sim-board-name">'+escHtml(base)+'</span>'
+        +(sel.cpu?'<span class="sim-board-tag-cpu">cpu</span>':'<span class="sim-board-tag-you">★ you</span>')
+        +'<span class="sim-board-name-meta">'+metTxt+grBadge+'</span>'
+      +'</div>'
+      +'<div class="sim-board-meta-row">'
+        +(school?'<span class="sim-board-school">'+escHtml(school)+'</span>':'')
+        +(sel.pos?'<span class="sim-board-pos" style="color:'+posCol+'">'+escHtml(sel.pos)+'</span>':'')
+        +(roleStr?'<span class="sim-board-role">'+escHtml(roleStr)+'</span>':'')
+        +(physStr?'<span class="sim-board-physical">'+physStr+'</span>':'')
+      +'</div>';
+  } else if (isCur&&simRunning) {
+    var cls = simUserTeams[slot.team] ? 'sim-board-placeholder-user' : 'sim-board-placeholder-cpu';
+    var txt = simUserTeams[slot.team] ? '← Your pick' : 'CPU selecting…';
+    playerInner='<span class="'+cls+'">'+txt+'</span>';
+  } else {
+    playerInner='<span class="sim-board-empty">—</span>';
+  }
+
+  return '<div class="sim-board-row'+rowMod+'" data-pick="'+slot.pick+'">'
+    +'<span class="sim-board-pick-num'+(isLotto?' is-lotto':'')+'">'+(slot.pick<10?'0'+slot.pick:''+slot.pick)+'</span>'
+    +'<span class="sim-board-logo">'+logoHtml+'</span>'
+    +'<span class="sim-board-team-code">'+escHtml(slot.team)+'</span>'
+    +'<div class="sim-board-player">'+playerInner+'</div>'
+    +'</div>';
+}
+
+// Replace one row in place. Cost: one row's HTML, not sixty.
+function simPatchBoardRow(pickNum) {
+  var el = document.getElementById('simPicksBoard');
+  if (!el) return false;
+  var row = el.querySelector('[data-pick="'+pickNum+'"]');
+  if (!row) return false;
+  var slot = (DRAFT_ORDER_2026||[]).find(function(s){ return s.pick===pickNum; });
+  if (!slot) return false;
+  row.outerHTML = simBuildBoardRowHtml(slot);
+  return true;
+}
+
+// Move the on-clock highlight to simCurrentPick: rebuild any row currently
+// carrying a current-state class plus the new current row, then follow-
+// scroll using the row's TRUE offsetTop (the old scrollHeight/rowCount math
+// assumed uniform row heights, which the Round dividers break — the follow
+// position drifted several rows off by pick 40).
+function simSyncCurrentHighlight() {
+  var el = document.getElementById('simPicksBoard');
+  if (!el) return;
+  var stale = el.querySelectorAll('.is-current, .is-owned-current');
+  for (var i=0; i<stale.length; i++) {
+    var pk = parseInt(stale[i].getAttribute('data-pick'));
+    if (pk !== simCurrentPick) simPatchBoardRow(pk);
+  }
+  simPatchBoardRow(simCurrentPick);
+  if (simFollowPicks) {
+    var cur = el.querySelector('[data-pick="'+simCurrentPick+'"]');
+    if (cur) {
+      el.scrollTop = Math.max(0, cur.offsetTop - el.clientHeight * 0.25);
+    }
+  }
+  simUpdateMobilePicks();
+}
+
 function simRenderBoard() {
   var el = document.getElementById('simPicksBoard');
   if (!el) return;
@@ -20787,74 +21450,13 @@ function simRenderBoard() {
       h+='<div class="sim-board-divider">Round '+round+'</div>';
       lastRound=round;
     }
-    var sel     = simSelections[slot.pick];
-    var isCur   = slot.pick===simCurrentPick;
-    var isOwned = simUserTeams[slot.team];
-    var isLotto = slot.pick<=14;
-    var logoHtml= (typeof mdcTeamLogoHtml==='function')?mdcTeamLogoHtml(slot.team,'32px'):escHtml(slot.team);
-
-    // Row state modifier — order matters: owned-current beats current beats owned.
-    var rowMod = '';
-    if (isCur && isOwned)      rowMod = ' is-owned-current';
-    else if (isCur)            rowMod = ' is-current';
-    else if (isOwned && sel)   rowMod = ' is-owned';
-
-    var playerInner='';
-    if (sel) {
-      var base    = sel.name&&sel.name.indexOf(' - ')>0?sel.name.slice(0,sel.name.indexOf(' - ')):(sel.name||'');
-      var school  = sel.name&&sel.name.indexOf(' - ')>0?sel.name.slice(sel.name.indexOf(' - ')+3):'';
-      var posCol  = sel.pos==='Guard'?'#2563EB':sel.pos==='Center'?'#0D9488':'#2C4569';
-      var metTxt  = sel.metric>0?'<span class="sim-board-metric">'+Number(sel.metric).toFixed(1)+'</span>':'';
-      var grBadge = sel.grade?'<span class="sim-board-grade" style="color:'+sel.grade.color+';background:'+sel.grade.bg+'">'+sel.grade.label+'</span>':'';
-      var fullP   = (DATA.board2026||[]).find(function(p){return p.rank===sel.rank;});
-      var htIn    = fullP&&fullP.ht?fullP.ht:0;
-      var wtLb    = fullP&&fullP.wt?fullP.wt:0;
-      var htStr   = htIn?(Math.floor(htIn/12)+"'"+(htIn%12)+'"'):'';
-      var wtStr   = wtLb?wtLb+'lb':'';
-      var physStr = [htStr,wtStr].filter(Boolean).join(' / ');
-      var roleStr = fullP&&fullP.torvik_role?fullP.torvik_role:'';
-
-      playerInner=
-        '<div class="sim-board-name-row">'
-          +avatarHtml(sel.name, sel.pos||'', '36px', '5px')
-          +'<span class="sim-board-name">'+escHtml(base)+'</span>'
-          +(sel.cpu?'<span class="sim-board-tag-cpu">cpu</span>':'<span class="sim-board-tag-you">★ you</span>')
-          +'<span class="sim-board-name-meta">'+metTxt+grBadge+'</span>'
-        +'</div>'
-        +'<div class="sim-board-meta-row">'
-          +(school?'<span class="sim-board-school">'+escHtml(school)+'</span>':'')
-          +(sel.pos?'<span class="sim-board-pos" style="color:'+posCol+'">'+escHtml(sel.pos)+'</span>':'')
-          +(roleStr?'<span class="sim-board-role">'+escHtml(roleStr)+'</span>':'')
-          +(physStr?'<span class="sim-board-physical">'+physStr+'</span>':'')
-        +'</div>';
-    } else if (isCur&&simRunning) {
-      var cls = simUserTeams[slot.team] ? 'sim-board-placeholder-user' : 'sim-board-placeholder-cpu';
-      var txt = simUserTeams[slot.team] ? '← Your pick' : '⚙ CPU selecting...';
-      playerInner='<span class="'+cls+'">'+txt+'</span>';
-    } else {
-      playerInner='<span class="sim-board-empty">—</span>';
-    }
-
-    h+='<div class="sim-board-row'+rowMod+'" data-pick="'+slot.pick+'">'
-      +'<span class="sim-board-pick-num'+(isLotto?' is-lotto':'')+'">'+(slot.pick<10?'0'+slot.pick:''+slot.pick)+'</span>'
-      +'<span class="sim-board-logo">'+logoHtml+'</span>'
-      +'<span class="sim-board-team-code">'+escHtml(slot.team)+'</span>'
-      +'<div class="sim-board-player">'+playerInner+'</div>'
-      +'</div>';
+    h+=simBuildBoardRowHtml(slot);
   });
   el.innerHTML=h;
-  // Scroll: position active row ~25% from top of the container
+  // Scroll: position active row ~25% from top (true offset, divider-safe)
   if (simFollowPicks) {
-    var rows = el.querySelectorAll('[data-pick]');
-    var activeIdx = -1;
-    for (var ri=0; ri<rows.length; ri++) {
-      if (parseInt(rows[ri].getAttribute('data-pick'))===simCurrentPick) { activeIdx=ri; break; }
-    }
-    if (activeIdx >= 0 && rows.length > 0) {
-      var rowH  = el.scrollHeight / Math.max(rows.length, 1);
-      var target = Math.max(0, activeIdx * rowH - el.clientHeight * 0.25);
-      el.scrollTop = target;
-    }
+    var cur = el.querySelector('[data-pick="'+simCurrentPick+'"]');
+    if (cur) el.scrollTop = Math.max(0, cur.offsetTop - el.clientHeight * 0.25);
   }
   simUpdateMobilePicks();
 }
@@ -20995,7 +21597,7 @@ function simShowResults() {
       var gc2=gradeColor(g.label);
       var posCol=s.pos==='Guard'?'#2563EB':s.pos==='Center'?'#0D9488':'#2C4569';
       var posBg=s.pos==='Guard'?'#EFF6FF':s.pos==='Center'?'#F0FDFA':'#F5F3FF';
-      var fullP=(DATA.board2026||[]).find(function(p){return p.rank===s.rank;});
+      var fullP=hwPlayerByRank(s.rank);
       var htIn=fullP&&fullP.ht?fullP.ht:0;
       var wtLb=fullP&&fullP.wt?fullP.wt:0;
       var htStr=htIn?Math.floor(htIn/12)+"'"+(htIn%12)+'"':'';
@@ -21125,6 +21727,7 @@ function simShowResults() {
 
 // ── RESET ─────────────────────────────────────────────────────────────────────
 function simReset() {
+  setTimeout(hwPersistSave, 80);  // PERSIST-MOCK-1: running=false -> clears stored sim
   simStop();                          // bumps generation, kills pending tick
   simRunning=false;
   simSelections={};
@@ -21336,29 +21939,33 @@ function teamNeedsHtml(teamCode, picksAlready) {
   var slot = (DRAFT_ORDER_2026||[]).find(function(s){ return s.pick && s.team===teamCode; });
   var teamName = slot ? slot.name : teamCode;
 
-  var h = '<div style="padding:8px 12px 6px;border-bottom:1px solid rgba(255,255,255,.1)">';
-  h += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px">';
-  h += '<span style="font-family:Barlow Condensed,sans-serif;font-size:13px;font-weight:800;color:white">' + teamName + '</span>';
+  // COMPRESS (review #2): one dense line — team · needs · roster link.
+  // The scouting note rides as a title tooltip on the team name instead of
+  // consuming its own row; vertical cost ~52px → ~26px, which is one extra
+  // player row visible in the pool at all times.
+  var h = '<div style="padding:7px 12px;border-bottom:1px solid rgba(255,255,255,.1);'
+    + 'display:flex;align-items:center;gap:7px;min-width:0">';
+  h += '<span style="font-family:Barlow Condensed,sans-serif;font-size:13px;font-weight:800;color:white;'
+    + 'white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;cursor:default"'
+    + (info.note ? ' title="' + info.note.replace(/"/g,'&quot;') + '"' : '') + '>'
+    + teamName + '</span>';
+  if (info.needs.length) {
+    h += '<span style="font-size:8.5px;color:rgba(255,255,255,.4);font-weight:600;letter-spacing:.4px;text-transform:uppercase;flex-shrink:0">Need</span>';
+    info.needs.forEach(function(n) {
+      // DESIGN-2 compliance: same family as the pool's position pills.
+      var col = n==='PG'||n==='SG'||n==='G'?'#60A5FA': n==='C'?'#CBD5E1':'#94A3B8';
+      h += '<span style="background:rgba(255,255,255,.08);border:1px solid '+col+';color:'+col
+        + ';font-family:Barlow Condensed,sans-serif;font-size:9.5px;font-weight:800;'
+        + 'border-radius:4px;padding:1px 5px;flex-shrink:0">' + n + '</span>';
+    });
+  }
   h += '<a href="' + teamRosterUrl(teamCode) + '" target="_blank" rel="noopener" '
     + 'style="font-size:9px;font-weight:700;color:rgba(212,168,48,.8);text-decoration:none;'
     + 'border:1px solid rgba(212,168,48,.3);border-radius:4px;padding:2px 6px;'
-    + 'font-family:Barlow Condensed,sans-serif;letter-spacing:.3px;white-space:nowrap">'
-    + '📋 Roster &amp; Cap ↗</a>';
-  h += '</div>';
-  if (info.needs.length) {
-    h += '<div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap">';
-    h += '<span style="font-size:9px;color:rgba(255,255,255,.45);font-weight:600;letter-spacing:.4px;text-transform:uppercase">Need:</span>';
-    info.needs.forEach(function(n) {
-      var col = n==='PG'||n==='SG'||n==='G'?'#60A5FA': n==='C'?'#34D399':'#C084FC';
-      h += '<span style="background:rgba(255,255,255,.1);border:1px solid '+col+';color:'+col
-        + ';font-family:Barlow Condensed,sans-serif;font-size:10px;font-weight:800;'
-        + 'border-radius:4px;padding:1px 6px">' + n + '</span>';
-    });
-    if (info.note) {
-      h += '<span style="font-size:9px;color:rgba(255,255,255,.3);margin-left:2px;flex-basis:100%">' + info.note + '</span>';
-    }
-    h += '</div>';
-  }
+    + 'font-family:Barlow Condensed,sans-serif;letter-spacing:.3px;white-space:nowrap;'
+    + 'display:inline-flex;align-items:center;gap:4px;margin-left:auto;flex-shrink:0">'
+    + '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:10px;height:10px"><path d="M5 3h6c.55 0 1 .45 1 1v9c0 .55-.45 1-1 1H5c-.55 0-1-.45-1-1V4c0-.55.45-1 1-1z"/><path d="M6 6h4M6 9h4M6 12h2"/></svg>'
+    + 'Roster &amp; Cap ↗</a>';
   h += '</div>';
   return h;
 }
@@ -22576,7 +23183,7 @@ window.hoopswill = (function() {
     }
 
     // 2. Promote board2027 → board2026
-    DATA.board2026 = DATA.board2027 || [];
+    DATA.board2026 = DATA.board2027 || []; hwInvalidateRankMap();
 
     // 2a. Flush DataService cache — DATA.board2026 changed, stale cache
     // would cause openPlayerModal to find wrong players or return null.
@@ -22622,7 +23229,7 @@ window.hoopswill = (function() {
 
     // Restore: move historical 2026 back to board2026, restore board2027
     if (DATA.historical['2026']) {
-      DATA.board2026 = DATA.historical['2026'];
+      DATA.board2026 = DATA.historical['2026']; hwInvalidateRankMap();
       delete DATA.historical['2026'];
     }
 
@@ -22817,6 +23424,7 @@ window.hwRollForward = (function() {
           comp_tool: null, metric: null
         }, p);
       });
+      hwInvalidateRankMap();
     }
 
     // 2a. Flush DataService cache — DATA.board2026 has changed, stale normalized
@@ -22858,7 +23466,7 @@ window.hwRollForward = (function() {
     if (DATA._orig2026) {
       DATA.board2026 = DATA._orig2026;
     } else if (DATA.historical && DATA.historical['2026']) {
-      DATA.board2026 = DATA.historical['2026'];
+      DATA.board2026 = DATA.historical['2026']; hwInvalidateRankMap();
     }
     // Restore board2027
     if (DATA._orig2027) DATA.board2027 = DATA._orig2027;
