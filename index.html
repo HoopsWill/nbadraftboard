@@ -281,19 +281,19 @@ body{font-family:'DM Sans',sans-serif;background:var(--gray-50);color:var(--navy
 .card-metric-chip{display:none}
 .card-metric{font-family:'Barlow Condensed',sans-serif;font-size:34px;font-weight:900;line-height:1;color:inherit;letter-spacing:-1px}
 .card-metric.elite{color:inherit}
-.card-metric-label{font-size:7px;font-weight:800;text-transform:uppercase;letter-spacing:1.2px;opacity:.6;color:inherit;margin-top:4px}
+.card-metric-label{font-size:8.5px;font-weight:800;text-transform:uppercase;letter-spacing:1.2px;opacity:.75;color:inherit;margin-top:4px}
 .card-elite-pip{font-family:'Barlow Condensed',sans-serif;font-size:8px;font-weight:900;letter-spacing:.8px;text-transform:uppercase;background:currentColor;border-radius:3px;padding:1px 6px;margin-bottom:3px;display:inline-block;min-height:14px;line-height:14px}
 .card-elite-pip-inner{color:white;mix-blend-mode:difference}
 .card-elite-pip-spacer{min-height:14px;margin-bottom:3px}
-.card-metric-pct{font-size:10px;font-weight:700;color:inherit;margin-top:6px;opacity:.7;line-height:1.3;text-align:center}
+.card-metric-pct{font-size:11px;font-weight:700;color:inherit;margin-top:6px;opacity:.82;line-height:1.3;text-align:center}
 .card-metric-pct sup{font-size:7px;vertical-align:super;line-height:0}
 .card-measurables{display:flex;align-items:stretch;padding:0;background:#F8FAFC;border-top:1px solid rgba(10,22,40,.06);border-bottom:1px solid rgba(10,22,40,.06)}
 .card-bio-item{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;min-width:0;padding:7px 4px;position:relative;text-align:center}
 .card-bio-item+.card-bio-item::before{content:'';position:absolute;left:0;top:20%;bottom:20%;width:1px;background:rgba(10,22,40,.07)}
 .card-bio-icon{font-size:10px;flex-shrink:0;opacity:.4;margin-bottom:1px}
 .card-bio-val{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:800;color:var(--navy);white-space:nowrap;line-height:1}
-.card-bio-pct{font-size:8px;font-weight:700;color:var(--gray-400);vertical-align:super;line-height:0;margin-left:1px}
-.card-bio-lbl{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--gray-400);margin-top:2px}
+.card-bio-pct{font-size:9.5px;font-weight:800;color:var(--gray-500);vertical-align:super;line-height:0;margin-left:2px}
+.card-bio-lbl{font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;color:var(--gray-500);margin-top:2px}
 .card-bio-left{display:flex;align-items:center;gap:5px;flex-wrap:nowrap;min-width:0;overflow:hidden}
 .card-bio-right{display:flex;align-items:center;gap:4px;flex-shrink:0}
 .bio-pill{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:.01em;white-space:nowrap;background:white;border:1px solid rgba(10,22,40,.09);border-radius:5px;padding:2px 8px;color:#334155;flex-shrink:0;line-height:1.4}
@@ -309,18 +309,23 @@ body{font-family:'DM Sans',sans-serif;background:var(--gray-50);color:var(--navy
 .meas-pos{font-size:9.5px;font-weight:500;color:rgba(10,22,40,.35);letter-spacing:.01em;flex-shrink:0}
 .card-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;padding:10px 12px 11px}
 .stat-cell{position:relative;text-align:center;background:rgba(10,22,40,.03);border-radius:9px;padding:9px 4px 7px}
+/* BPM row: same gradient cells, one size down — keeps the card height
+   reasonable while the box-score row reads clearly. */
+.stat-cell--bpm{padding:6px 4px 5px}
+.stat-cell--bpm .stat-val{font-size:15px}
+.stat-cell--bpm .stat-lbl{margin-top:3px}
 .pos-ring{position:absolute;top:3px;right:3px;width:13px;height:13px;pointer-events:none;flex-shrink:0}
 .pos-ring circle{fill:none;stroke-width:2;stroke-linecap:round}
 .pos-ring .ring-track{stroke:rgba(10,22,40,.08)}
 .pos-ring .ring-fill{transition:stroke-dashoffset 400ms cubic-bezier(.22,1,.36,1)}
 .stat-val{font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:900;color:inherit;line-height:1}
 .stat-bar{height:2px;border-radius:1px;margin:4px auto 0;opacity:.35;min-width:3px}
-.stat-lbl{font-size:8.5px;color:inherit;opacity:.65;text-transform:uppercase;letter-spacing:.4px;font-weight:600;display:block;margin-top:4px}
+.stat-lbl{font-size:10px;color:inherit;opacity:.8;text-transform:uppercase;letter-spacing:.5px;font-weight:700;display:block;margin-top:4px}
 .card-comp{display:flex;align-items:center;gap:4px;flex-wrap:wrap;padding:6px 12px 9px;border-top:1px solid rgba(10,22,40,.06);margin-top:auto}
-.card-comp-label{font-size:7.5px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--gray-400);flex-shrink:0}
+.card-comp-label{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.09em;color:var(--gray-500);flex-shrink:0}
 .card-comp-pill{display:inline-flex;align-items:center;gap:4px;background:#F8FAFC;border:1px solid rgba(10,22,40,.08);border-radius:20px;padding:2px 7px 2px 3px}
 .card-comp-avatar{width:16px;height:16px;border-radius:50%;overflow:hidden;flex-shrink:0;background:var(--gray-200);display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-size:7px;font-weight:800;color:var(--gray-500)}
-.card-comp-name{font-size:10px;font-weight:700;color:var(--gray-700);white-space:nowrap}
+.card-comp-name{font-size:11px;font-weight:700;color:var(--gray-700);white-space:nowrap}
 .card-comp strong{color:var(--blue);font-weight:600}
 
 
@@ -620,17 +625,23 @@ tr:hover td{background:var(--gray-50)}
 .modal-overlay.open{opacity:1;pointer-events:all}
 .modal{background:white;border-radius:16px 16px 0 0;width:100%;max-width:100%;max-height:88vh;box-shadow:var(--shadow-xl);transform:translateY(40px);transition:transform .2s;margin:0;display:flex;flex-direction:column;overflow:hidden}
 .modal-overlay.open .modal{transform:translateY(0)}
-.modal-header{background:var(--navy);color:white;padding:20px 20px 16px;border-radius:16px 16px 0 0;position:relative;display:flex;flex-direction:column;align-items:center;text-align:center;gap:8px;flex-shrink:0}
+/* PROFILE-4: scouting masthead — left-aligned row (photo · identity · stat),
+   replacing the centered poster stack. Mobile block below re-stacks it. */
+.modal-header{background:var(--navy);color:white;padding:18px 56px 16px 22px;border-radius:16px 16px 0 0;position:relative;display:flex;flex-direction:row;align-items:center;text-align:left;gap:16px;flex-shrink:0}
+.modal-head-stat{margin-left:auto;flex-shrink:0;text-align:right;padding-right:30px}
+.mhs-val{font-family:'Barlow Condensed',sans-serif;font-size:34px;font-weight:900;line-height:1;color:var(--amber-light)}
+.mhs-lbl{font-size:8.5px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;color:rgba(255,255,255,.4);margin-top:3px}
+.modal-nav-counter{display:none !important} /* PROFILE-4: counter → arrow tooltips */
 .modal-close{position:absolute;top:10px;right:10px;background:rgba(255,255,255,.1);border:none;color:white;width:44px;height:44px;min-width:44px;min-height:44px;border-radius:8px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;touch-action:manipulation}
 .modal-close:hover{background:rgba(255,255,255,.2)}
 /* Mobile close bar — sticky at bottom of sheet, easier thumb reach */
 .modal-close-bar{display:none}
-.modal-avatar{width:96px;height:96px;border-radius:14px;overflow:hidden;flex-shrink:0;border:2px solid rgba(255,255,255,.2);box-shadow:0 4px 20px rgba(0,0,0,.4)}
+.modal-avatar{width:76px;height:76px;border-radius:12px;overflow:hidden;flex-shrink:0;border:2px solid rgba(255,255,255,.22);box-shadow:0 4px 20px rgba(0,0,0,.4)}
 .modal-avatar img{width:100%;height:100%;object-fit:cover;object-position:50% 15%}
-.modal-player-info{display:flex;flex-direction:column;align-items:center;gap:2px;min-width:0;width:100%}
-.modal-rank-label{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;opacity:.55;margin-bottom:2px;text-align:center}
-.modal-name{font-family:'Barlow Condensed',sans-serif;font-size:30px;font-weight:900;letter-spacing:.3px;line-height:1.1;text-align:center}
-.modal-meta{font-size:12px;opacity:.65;margin-top:4px;text-align:center}
+.modal-player-info{display:flex;flex-direction:column;align-items:flex-start;gap:2px;min-width:0;flex:1}
+.modal-rank-label{font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--amber-light);opacity:.9;margin-bottom:2px;text-align:left}
+.modal-name{font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:900;letter-spacing:.3px;line-height:1.05;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.modal-meta{font-size:12px;opacity:.65;margin-top:3px;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
 .modal-body{padding:22px 26px}
 .modal-metrics-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(90px,1fr));gap:10px;margin-bottom:18px}
 .metric-box{background:var(--gray-50);border:1px solid var(--gray-100);border-radius:10px;padding:11px 14px;text-align:center;transition:background .2s}
@@ -639,7 +650,9 @@ tr:hover td{background:var(--gray-50)}
 .metric-box .lbl{font-size:11px;color:inherit;opacity:.75;text-transform:uppercase;letter-spacing:.4px;font-weight:700;margin-top:3px}
 .metric-box .rank-ctx{font-size:9px;color:inherit;opacity:.55;margin-top:4px;letter-spacing:.2px;font-weight:500;line-height:1.3}
 .modal-section{margin-bottom:14px}
-.modal-section-label{font-size:12.5px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:var(--gray-400);margin-bottom:10px;margin-top:4px}
+.modal-section-label{font-size:11px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:var(--gray-500);margin-bottom:10px;margin-top:4px;display:flex;align-items:center;gap:8px}
+.modal-section-label::after{content:'';flex:1;height:1px;background:var(--gray-200)}
+.modal-section-label svg{color:var(--gray-400)}
 .modal-section-label--bpm{margin-top:16px;color:var(--blue);opacity:.7}
 .modal-bpm-row{grid-template-columns:repeat(3,1fr) !important;max-width:320px}
 /* ── MODAL TAB BAR ── */
@@ -650,23 +663,108 @@ tr:hover td{background:var(--gray-50)}
 .modal-tab:not(.active):hover{background:#e2e8f0;color:#334155}
 /* ── SHOT CHART PANEL ── */
 .shot-panel-wrap{display:flex;gap:18px;align-items:flex-start}
-.shot-court-col{flex:0 0 auto;width:56%}
-.shot-court-col svg{width:100%;height:auto;border-radius:8px;display:block}
+.shot-court-col{flex:0 0 auto;width:52%}
+.shot-court-col svg{width:100%;height:auto;border-radius:10px;display:block;box-shadow:0 0 0 1px rgba(10,22,40,.07),0 2px 10px rgba(10,22,40,.05)}
+/* SHOT-3: verdict strip — editorial synthesis line above the chart */
+.shot-verdict{
+  display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;
+  background:rgba(212,168,48,.07);
+  border:1px solid rgba(212,168,48,.22);
+  border-left:3px solid var(--amber);
+  border-radius:8px;
+  padding:9px 14px;margin-bottom:12px;
+}
+.shot-verdict-tag{
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:10px;font-weight:900;letter-spacing:1.4px;text-transform:uppercase;
+  color:rgba(146,64,14,.8);flex-shrink:0;
+}
+.shot-verdict-head{
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:16px;font-weight:900;color:var(--navy);letter-spacing:.2px;
+}
+.shot-verdict-detail{font-size:12.5px;color:var(--gray-600);font-weight:500}
 .shot-legend-col{flex:1;min-width:0}
-.shot-legend-title{font-size:9px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:1.2px;margin-bottom:10px}
-.shot-zone-row{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:8px 10px;padding:9px 0;border-bottom:1px solid #f1f5f9}
-.shot-zone-row:last-child{border-bottom:none}
-.shot-zone-dot{width:10px;height:10px;border-radius:3px;flex-shrink:0}
-.shot-zone-name{font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.8px}
-.shot-zone-pct{font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:900;line-height:1;grid-column:1/-1;padding-top:2px}
-.shot-zone-sub{font-size:10px;color:#94a3b8;grid-column:1/-1;display:flex;gap:10px;flex-wrap:wrap;padding-bottom:2px}
-.shot-zone-sub span{display:inline-flex;align-items:center;gap:3px}
-.shot-pctile-pill{display:inline-block;font-size:12px;font-weight:700;padding:2px 7px;border-radius:4px;letter-spacing:.3px;vertical-align:middle;margin-left:6px;font-family:'DM Sans',sans-serif}
-.shot-ua-badge{display:inline-block;font-size:13px;font-weight:700;color:#1e3a5f;background:#dbeafe;border-radius:4px;padding:3px 9px;letter-spacing:.2px;font-family:'DM Sans',sans-serif}
-.shot-source-row{font-size:9px;color:#cbd5e1;margin-top:14px;text-align:right;letter-spacing:.4px}
+.shot-legend-title{font-size:11px;font-weight:800;color:var(--gray-500);text-transform:uppercase;letter-spacing:1.4px;margin-bottom:9px}
+/* SHOT-REDESIGN: tabular zone table — fixed columns, tabular numerals.
+   [zone 52][fg 56][pctl bar 1fr][vol 44][unast 44] */
+/* READABILITY: column widths re-balanced so UNAST never clips; gaps
+   tightened to pay for the larger type. */
+.sct-head,.sct-row{
+  display:grid;
+  grid-template-columns:46px 56px minmax(56px,1fr) 42px 44px;
+  column-gap:8px;align-items:center;
+  font-variant-numeric:tabular-nums;
+}
+.sct-head{
+  padding:0 0 7px;
+  border-bottom:1.5px solid var(--gray-200);
+  font-size:10px;font-weight:800;color:var(--gray-500);
+  text-transform:uppercase;letter-spacing:.8px;
+}
+.sct-head i{font-style:normal;font-weight:600;color:var(--gray-300);text-transform:none;letter-spacing:0}
+.sct-head span:nth-child(n+2){text-align:right}
+.sct-head span:nth-child(3){text-align:left;padding-left:2px}
+.sct-row{
+  padding:10px 0;
+  border-bottom:1px solid var(--gray-100);
+}
+.sct-row:last-of-type{border-bottom:none}
+.sct-zone{
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:11.5px;font-weight:800;color:var(--gray-700);
+  text-transform:uppercase;letter-spacing:.7px;
+}
+.sct-dot{width:8px;height:8px;border-radius:2.5px;flex-shrink:0}
+.sct-fg{
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:22px;font-weight:900;color:var(--navy);
+  text-align:right;line-height:1;
+}
+.sct-fg i{font-style:normal;font-size:12px;font-weight:800;color:var(--gray-400);margin-left:1px}
+.sct-pctl{display:flex;align-items:center;gap:7px;min-width:0}
+.sct-bar{flex:1;height:6px;background:var(--gray-100);border-radius:3px;overflow:hidden;min-width:30px}
+.sct-bar-fill{display:block;height:100%;border-radius:3px}
+.sct-pctl-num{font-size:11.5px;font-weight:800;flex-shrink:0;min-width:32px;text-align:right}
+.sct-vol{font-size:13px;font-weight:600;color:var(--gray-600);text-align:right}
+.sct-ua{font-size:13px;font-weight:700;color:var(--gray-700);text-align:right}
+.sct-ua i{font-style:normal;color:var(--gray-200);font-weight:400}
+.shot-source-row{font-size:10.5px;color:var(--gray-400);margin-top:12px;text-align:right;letter-spacing:.3px}
+/* ── Scouting Resources: templated external link cards ───────────────────── */
+.rsrc-group{display:flex;align-items:flex-start;gap:12px;margin-bottom:10px}
+.rsrc-group:last-child{margin-bottom:0}
+.rsrc-group-lbl{
+  flex:0 0 104px;padding-top:7px;
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:10px;font-weight:800;color:var(--gray-500);
+  text-transform:uppercase;letter-spacing:1px;
+}
+.rsrc-links{display:flex;flex-wrap:wrap;gap:7px;flex:1;min-width:0}
+.rsrc-card{
+  display:flex;flex-direction:column;gap:1px;
+  background:white;border:1px solid var(--gray-200);border-radius:8px;
+  padding:7px 12px;text-decoration:none;
+  transition:border-color var(--motion-fast),box-shadow var(--motion-fast),transform var(--motion-fast);
+}
+.rsrc-card:hover{border-color:var(--gray-300);box-shadow:0 2px 8px rgba(10,22,40,.07);transform:translateY(-1px)}
+.rsrc-name{
+  display:inline-flex;align-items:center;gap:5px;
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:13px;font-weight:800;color:var(--navy);letter-spacing:.2px;
+}
+.rsrc-dom{font-size:9.5px;color:var(--gray-400);font-weight:500}
+@media (max-width:640px){
+  .rsrc-group{flex-direction:column;gap:6px}
+  .rsrc-group-lbl{flex:none;padding-top:0}
+  .rsrc-card{flex:1 1 calc(50% - 7px)}
+}
 .shot-source-row a{color:#4b6080}
 @media(max-width:600px){.shot-panel-wrap{flex-direction:column}.shot-court-col{width:100%}}
-.modal-sec-title{font-size:12.5px;font-weight:800;color:var(--gray-500);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+/* PROFILE-5: one section idiom — caps label · hairline rule. Matches the
+   editorial round-divider system used across the product. */
+.modal-sec-title{font-size:11px;font-weight:800;color:var(--gray-500);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.modal-sec-title::after{content:'';flex:1;height:1px;background:var(--gray-200)}
+.modal-sec-title svg{color:var(--gray-400)}
 .notes-text{font-size:13px;color:var(--gray-700);line-height:1.65;background:var(--gray-50);padding:12px 14px;border-radius:8px;border:1px solid var(--gray-100)}
 /* Why Here — editorial positioning blurb (priority #1).
    Distinctive amber accent + serif-leaning weight signals this is editorial
@@ -690,26 +788,49 @@ tr:hover td{background:var(--gray-50)}
 .sw-list.str li::before{content:"✓";color:#16a34a}.sw-list.wkn li::before{content:"✗";color:#dc2626}.sw-list.ntr li::before{content:"→";color:#b45309}
 .role-badge{display:inline-flex;align-items:center;gap:4px;background:rgba(44,69,105,.12);color:#7c3aed;border:1px solid rgba(44,69,105,.2);border-radius:20px;font-size:11px;font-weight:700;padding:3px 10px;font-family:'Barlow Condensed',sans-serif;letter-spacing:.3px}
 @media(max-width:700px){.sw-grid,.sw-grid.has-neutral{grid-template-columns:1fr}}
-.meas-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:7px}
-.meas-item{background:white;border:1.5px solid var(--gray-200);border-radius:8px;padding:7px 10px;text-align:center}
-.meas-item .val{font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:800;color:var(--navy)}
-.meas-item .lbl{font-size:9px;color:var(--gray-400);text-transform:uppercase;letter-spacing:.3px}
+/* MEAS-REDESIGN: scouting stat card — label on TOP (the Bloomberg/Stripe
+   stat-card convention), value row beneath with the raw measurement inline,
+   percentile bar anchored at the bottom. Left-aligned throughout: centered
+   stacks read as filler; left-aligned lockups read as instrumentation. */
+.meas-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:10px}
+.meas-item{
+  background:white;border:1px solid var(--gray-200);border-radius:10px;
+  padding:11px 14px 12px;text-align:left;
+  display:flex;flex-direction:column;
+  transition:border-color var(--motion-fast),box-shadow var(--motion-fast);
+}
+.meas-item:hover{border-color:var(--gray-300);box-shadow:0 2px 8px rgba(10,22,40,.06)}
+.meas-item .lbl{
+  font-size:10px;color:var(--gray-500);text-transform:uppercase;
+  letter-spacing:1px;font-weight:800;order:-1;margin-bottom:4px;
+}
+.meas-item .val{
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:26px;font-weight:900;color:var(--navy);line-height:1;
+}
+.meas-val-row{display:flex;align-items:baseline;gap:7px;min-width:0}
+.meas-val-row .combine-sub{margin-top:0}
 .meas-item .pct{font-size:8.5px;color:var(--gray-400);margin-top:2px;letter-spacing:.1px}
+/* PROFILE-5: measurable percentile micro-bar lockup */
+.meas-bar-wrap{display:flex;align-items:center;gap:7px;margin-top:9px}
+.meas-bar{flex:1;height:5px;background:var(--gray-100);border-radius:3px;overflow:hidden;min-width:26px}
+.meas-bar-fill{display:block;height:100%;border-radius:3px}
+.meas-bar-num{font-size:11px;font-weight:800;flex-shrink:0}
 
 /* ── Combine percentile pills (light theme, inside meas-grid) ─────────── */
 .meas-item .combine-pct{
   font-family:'Barlow Condensed',sans-serif;
-  font-size:8px;font-weight:700;
-  margin-top:3px;letter-spacing:.15px;
+  font-size:10.5px;font-weight:800;
+  margin-top:4px;letter-spacing:.3px;
   display:inline-block;
-  padding:1px 5px;border-radius:3px;
+  padding:2px 7px;border-radius:4px;
 }
-.meas-item .combine-pct.elite{background:rgba(180,140,20,.12);color:#9E7B10}
-.meas-item .combine-pct.above{background:rgba(16,185,129,.10);color:#10B981}
-.meas-item .combine-pct.avg{background:var(--gray-100);color:var(--gray-400)}
-.meas-item .combine-pct.below{background:rgba(239,68,68,.08);color:#DC2626}
+.meas-item .combine-pct.elite{background:rgba(21,128,61,.13);color:#15803D}
+.meas-item .combine-pct.above{background:rgba(22,163,74,.10);color:#16A34A}
+.meas-item .combine-pct.avg{background:rgba(202,138,4,.10);color:#B45309}
+.meas-item .combine-pct.below{background:rgba(220,38,38,.09);color:#DC2626}
 /* Combine sub-value (raw inches) */
-.meas-item .combine-sub{font-size:9px;color:var(--gray-400);margin-top:0;font-weight:500}
+.meas-item .combine-sub{font-size:11.5px;color:var(--gray-400);font-weight:600;font-variant-numeric:tabular-nums}
 /* Section divider label within meas-grid */
 .meas-divider{
   grid-column:1/-1;
@@ -719,29 +840,33 @@ tr:hover td{background:var(--gray-50)}
 .meas-divider-line{flex:1;height:1px;background:var(--gray-200)}
 .meas-divider-text{
   font-family:'Barlow Condensed',sans-serif;
-  font-size:9px;font-weight:700;
-  color:var(--gray-400);
+  font-size:11px;font-weight:800;
+  color:var(--gray-500);
   letter-spacing:.8px;text-transform:uppercase;
   white-space:nowrap;
 }
 /* Derived metrics row (ws diff / ratio) — light theme */
+/* MEAS-REDESIGN: derived strip — the scouting numbers (length delta, ratio)
+   get real presence: hairline-topped row, 18px values, readable labels. */
 .meas-derived{
   grid-column:1/-1;
-  display:flex;align-items:center;justify-content:center;gap:16px;
-  padding:4px 0 0;
+  display:flex;align-items:center;gap:26px;
+  padding:9px 4px 0;margin-top:2px;
+  border-top:1px solid var(--gray-100);
 }
-.meas-derived-item{display:flex;align-items:center;gap:5px}
+.meas-derived-item{display:flex;align-items:baseline;gap:7px}
 .meas-derived-val{
   font-family:'Barlow Condensed',sans-serif;
-  font-size:14px;font-weight:900;line-height:1;
+  font-size:18px;font-weight:900;line-height:1;
+  font-variant-numeric:tabular-nums;
 }
-.meas-derived-val.pos{color:#10B981}
+.meas-derived-val.pos{color:#16A34A}
 .meas-derived-val.neg{color:#DC2626}
 .meas-derived-val.neu{color:var(--gray-400)}
 .meas-derived-lbl{
-  font-size:8px;color:var(--gray-400);
-  font-weight:600;letter-spacing:.15px;
-  line-height:1.25;
+  font-size:10px;color:var(--gray-500);
+  font-weight:700;letter-spacing:.4px;
+  line-height:1.2;text-transform:uppercase;
 }
 
 .comps-list{display:flex;flex-wrap:wrap;gap:7px}
@@ -1378,7 +1503,7 @@ tr:hover td{background:var(--gray-50)}
   .meas-item .lbl{font-size:8px;letter-spacing:.1px;white-space:normal;line-height:1.2}
   .meas-item .val{font-size:16px}
   .meas-item .combine-sub{font-size:8px}
-  .meas-item .combine-pct{font-size:7.5px;padding:1px 4px}
+  .meas-item .combine-pct{font-size:9.5px;padding:1px 5px}
 
   /* S+W grid: single column */
   .sw-grid,.sw-grid.has-neutral{grid-template-columns:1fr}
@@ -1725,19 +1850,17 @@ tr:hover td{background:var(--gray-50)}
   /* ──────────── [170918] ──────────── */
   /* Team select grid: 5-per-row at 360px+ */
   #simTeamGrid {
-    display: flex !important;
-    flex-wrap: wrap;
-    gap: 5px;
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr);  /* 4-up logo tiles */
+    gap: 7px;
   }
   .sim-team-btn {
-    flex: 0 0 calc(20% - 4px);  /* 5-col grid */
     min-width: 0;
-    min-height: 40px;
     font-size: 10px;
-    padding: 3px 4px;
-    text-align: center;
+    padding: 9px 4px 7px;
     touch-action: manipulation;
   }
+  .sim-team-btn img, .sim-team-btn .mdc-team-logo-fb { width: 34px !important; height: 34px !important; }
   /* Pick rows: tap-friendly height */
   .mdc-pick-row { min-height: 48px; }
   .mdc-pool-item { min-height: 48px; }
@@ -3172,16 +3295,26 @@ tr:hover td{background:var(--gray-50)}
 #simPoolList .sim-pool-row:hover{background:var(--gray-50)}
 
 /* ── SIMULATOR BUTTONS ───────────────────────────────────────────────────── */
+/* SIM-SETUP: logo-forward team tiles — the logo IS the button (reference:
+   classic NBA logo-sheet). 44px mark stacked over the code; selection reads
+   as an amber ring + tint rather than a color-inverted chip. */
 .sim-team-btn{
-  display:inline-flex;align-items:center;gap:6px;
-  padding:4px 9px;
-  min-height:40px;  /* mobile touch target */
-  border-radius:5px;border:1.5px solid var(--gray-200);
-  background:white;color:var(--gray-600);font-size:11px;font-weight:700;cursor:pointer;
-  font-family:'Barlow Condensed',sans-serif;transition:all .12s;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;
+  padding:12px 6px 9px;
+  border-radius:10px;border:1.5px solid var(--gray-200);
+  background:white;color:var(--gray-600);font-size:11.5px;font-weight:800;cursor:pointer;
+  font-family:'Barlow Condensed',sans-serif;letter-spacing:.4px;
+  transition:border-color var(--motion-fast),box-shadow var(--motion-fast),transform var(--motion-fast),background var(--motion-fast);
   touch-action:manipulation; /* no 300ms tap delay */
 }
-.sim-team-btn.on{background:var(--navy);color:white;border-color:var(--navy)}
+.sim-team-btn img,.sim-team-btn .mdc-team-logo-fb{width:44px;height:44px;object-fit:contain}
+.sim-team-btn:hover{border-color:var(--gray-300);box-shadow:0 2px 10px rgba(10,22,40,.08);transform:translateY(-1px)}
+.sim-team-btn.on{
+  background:rgba(212,168,48,.08);
+  border-color:var(--amber);
+  color:var(--navy);
+  box-shadow:0 0 0 1px var(--amber),0 2px 10px rgba(201,151,26,.18);
+}
 .sim-pos-btn{padding:3px 8px;border-radius:5px;border:1px solid rgba(255,255,255,.25);
   background:rgba(255,255,255,.08);color:rgba(255,255,255,.7);font-size:11px;
   font-weight:700;cursor:pointer;font-family:'Barlow Condensed',sans-serif;transition:all .12s}
@@ -3189,78 +3322,149 @@ tr:hover td{background:var(--gray-50)}
 
 /* ── SIMULATOR POOL ROW (Tier 2 — extracted from inline) ─────────────────── */
 .sim-pool-row{
-  display:flex;align-items:center;gap:7px;
-  padding:7px 12px;
+  display:grid;
+  grid-template-columns:26px 32px minmax(0,1fr) 46px 34px;
+  column-gap:9px;align-items:center;
+  padding:8px 12px;
   border-bottom:1px solid var(--gray-100);
   cursor:pointer;
   background:white;
-  transition:background .12s;
+  transition:background var(--motion-fast);
+}
+.spr-rank{
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:13px;font-weight:900;color:rgba(10,22,40,.38);
+  text-align:right;font-variant-numeric:tabular-nums;
+}
+.spr-photo{display:flex;align-items:center;justify-content:center}
+.spr-photo img,.spr-photo .avatar-fallback{box-shadow:0 0 0 1px rgba(10,22,40,.08)}
+.spr-id{min-width:0}
+.spr-name{
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:14px;font-weight:800;color:var(--navy);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.15;
+}
+.spr-school{font-size:10px;color:var(--gray-500);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
+.spr-met{
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:13px;font-weight:900;color:var(--amber);
+  text-align:right;font-variant-numeric:tabular-nums;
+}
+.spr-grade{
+  font-size:8.5px;font-weight:800;border-radius:4px;
+  padding:2px 0;text-align:center;white-space:nowrap;
+  justify-self:stretch;
 }
 .sim-pool-row:hover{background:#F8FAFC}
 .sim-pool-row:active{background:#EFF6FF}
 
 /* ── SIMULATOR PICKS BOARD ROWS (Tier 2 — extracted from inline) ──────────── */
+/* ── SIM-REDESIGN: editorial round divider — matches the Build Mock system.
+   Sticky, light, hairline rule, range hint. One idiom across the product. */
 .sim-board-divider{
-  background:linear-gradient(90deg,#0A1628,#1a2f52);
-  padding:6px 16px;
+  position:sticky;top:0;z-index:5;
+  display:flex;align-items:center;gap:12px;
+  background:var(--gray-50);
+  padding:9px 16px;
   font-family:'Barlow Condensed',sans-serif;
-  font-size:11px;font-weight:900;
-  color:rgba(255,255,255,.5);
-  text-transform:uppercase;letter-spacing:1.2px;
+  font-size:12px;font-weight:900;
+  color:var(--gray-500);
+  text-transform:uppercase;letter-spacing:2.2px;
+  border-top:1px solid var(--gray-100);
+  border-bottom:1px solid var(--gray-100);
 }
+.sim-board-divider::after{content:'';flex:1;height:1px;background:var(--gray-200);order:1}
+.sim-board-div-range{order:2;flex-shrink:0;font-size:10px;letter-spacing:1.4px;color:var(--gray-400);font-weight:700}
+
+/* ── SIM-REDESIGN: tabular board row. Fixed columns mean every metric and
+   grade stacks vertically down the board — the grade column becomes a
+   scannable rail of A/B/C chips. */
 .sim-board-row{
-  display:flex;align-items:center;gap:10px;
-  padding:10px 14px;
-  border-bottom:1px solid #F8FAFC;
+  display:grid;
+  grid-template-columns:40px 34px 32px minmax(0,1fr) 60px 42px;
+  column-gap:10px;align-items:center;
+  min-height:56px;
+  padding:8px 14px 8px 0;
+  border-bottom:1px solid var(--gray-100);
   background:white;
   border-left:3px solid transparent;
-  transition:background .15s,border-left-color .15s;
+  transition:background var(--motion-fast),border-left-color var(--motion-fast);
 }
 .sim-board-row.is-current        {background:#EFF6FF;border-left-color:#2563EB}
-.sim-board-row.is-owned          {background:#F0F9FF;border-left-color:#D97706}
-.sim-board-row.is-owned-current  {background:#FFFBEB;border-left-color:#D97706}
+.sim-board-row.is-owned          {background:rgba(212,168,48,.05);border-left-color:rgba(212,168,48,.55)}
+.sim-board-row.is-owned-current  {background:#FFFBEB;border-left-color:var(--amber)}
+/* WOW: the on-clock row breathes — a soft amber/blue pulse on the accent
+   edge so the live pick is findable from across the room. */
+@keyframes simOnClockPulse{
+  0%,100%{box-shadow:inset 4px 0 0 -1px currentColor}
+  50%    {box-shadow:inset 7px 0 0 -1px currentColor}
+}
+.sim-board-row.is-current{color:#2563EB;animation:simOnClockPulse 1.6s ease-in-out infinite}
+.sim-board-row.is-owned-current{color:var(--amber);animation:simOnClockPulse 1.1s ease-in-out infinite}
+/* WOW: pick-stamp — freshly filled row flashes amber (ported from Build Mock) */
+@keyframes simPickStamp{0%{background:rgba(212,168,48,.32)}100%{background:white}}
+.sim-board-row.just-picked{animation:simPickStamp 500ms var(--ease-out)}
+
 .sim-board-pick-num{
   font-family:'Barlow Condensed',sans-serif;
-  font-size:18px;font-weight:900;
-  color:#94A3B8;
-  width:28px;flex-shrink:0;
+  font-size:17px;font-weight:900;
+  color:rgba(10,22,40,.30);
   text-align:right;
-  opacity:.45;
+  font-variant-numeric:tabular-nums;
 }
-.sim-board-pick-num.is-lotto{color:#D97706;opacity:.85}
-.sim-board-logo{flex-shrink:0;display:flex;align-items:center}
+.sim-board-pick-num.is-lotto{color:rgba(212,168,48,.75)}
+.sim-board-logo{display:flex;align-items:center;justify-content:center}
 .sim-board-team-code{
   font-family:'Barlow Condensed',sans-serif;
-  font-size:10px;color:var(--gray-400);
-  width:28px;flex-shrink:0;font-weight:700;
+  font-size:11px;color:var(--gray-500);
+  font-weight:800;letter-spacing:.2px;
 }
-.sim-board-player{flex:1;min-width:0}
-.sim-board-name-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+/* Identity: 36px ringed photo + two text lines */
+.sim-board-identity{display:flex;align-items:center;gap:10px;min-width:0}
+.sim-board-identity img,
+.sim-board-identity .avatar-fallback{box-shadow:0 0 0 1px rgba(10,22,40,.10)}
+.sim-board-id-text{min-width:0;flex:1}
+.sim-board-name-row{display:flex;align-items:center;gap:7px;min-width:0}
 .sim-board-name{
   font-family:'Barlow Condensed',sans-serif;
   font-size:16px;font-weight:900;color:var(--navy);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
 }
-.sim-board-tag-cpu{font-size:9px;color:var(--gray-300)}
-.sim-board-tag-you{font-size:9px;color:#D97706;font-weight:700}
-.sim-board-name-meta{margin-left:auto;display:flex;align-items:center;gap:5px}
+.sim-board-chip-cpu,.sim-board-chip-you{
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:8.5px;font-weight:900;letter-spacing:.8px;
+  border-radius:3px;padding:1px 5px;flex-shrink:0;line-height:1.3;
+}
+.sim-board-chip-cpu{color:var(--gray-400);background:var(--gray-100)}
+.sim-board-chip-you{color:#92400E;background:rgba(212,168,48,.18)}
+/* Meta line: fixed sub-columns so school/pos/role/phys align across rows */
+.sim-board-meta-row{
+  display:grid;
+  grid-template-columns:minmax(0,1.1fr) 18px minmax(0,1fr) 86px;
+  column-gap:8px;align-items:baseline;
+  margin-top:2px;
+  font-variant-numeric:tabular-nums;
+}
+.sim-board-school{font-size:11px;color:var(--gray-500);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sim-board-pos{
+  font-size:9.5px;font-weight:800;text-align:center;
+  border-radius:3px;padding:0 3px;
+  border:1px solid currentColor;line-height:1.5;
+}
+.sim-board-role{font-size:10.5px;color:var(--gray-400);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sim-board-physical{font-size:10.5px;color:var(--gray-400);text-align:right;white-space:nowrap}
+/* Metric + grade rails */
 .sim-board-metric{
   font-family:'Barlow Condensed',sans-serif;
-  font-size:13px;font-weight:900;color:var(--amber);
+  font-size:15px;font-weight:900;color:var(--amber);
+  text-align:right;display:block;
+  font-variant-numeric:tabular-nums;
 }
-.sim-board-meta-row{display:flex;align-items:center;gap:8px;margin-top:2px;flex-wrap:wrap}
-.sim-board-school{font-size:10px;color:var(--gray-500);font-weight:600}
-.sim-board-pos{
-  font-size:9px;font-weight:700;
-  background:rgba(37,99,235,.06);
-  border-radius:3px;padding:1px 5px;
-  border:1px solid currentColor;
-}
-.sim-board-role{font-size:9px;color:var(--gray-400)}
-.sim-board-physical{font-size:9px;color:var(--gray-400);margin-left:auto}
-.sim-board-placeholder-user{font-size:12px;color:#D97706;font-weight:600;font-style:italic}
+
+.sim-board-placeholder-user{font-size:13px;color:#92400E;font-weight:700}
 .sim-board-placeholder-cpu {font-size:12px;color:var(--blue);font-weight:600;font-style:italic}
 .sim-board-empty{font-size:11px;color:var(--gray-200)}
-.sim-board-grade{
+.sim-board-grade{justify-self:center;
   font-size:9px;font-weight:700;
   border-radius:4px;padding:2px 6px;
   white-space:nowrap;
@@ -3306,8 +3510,86 @@ tr:hover td{background:var(--gray-50)}
 .sim-setup-start:active{transform:scale(.97)}
 
 /* ── SIMULATOR EVENT LOG (Tier 1) ─────────────────────────────────────────── */
+/* ── SIM-REDESIGN: status instrument cluster ─────────────────────────────── */
+.sim-status-cluster{
+  display:flex;align-items:center;gap:14px;
+  margin-bottom:10px;flex-wrap:wrap;
+}
+.sim-onclock{
+  background:var(--navy);color:white;border-radius:9px;
+  padding:9px 16px;
+  font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:800;
+  min-width:200px;letter-spacing:.2px;
+  transition:background var(--motion-base),box-shadow var(--motion-base);
+}
+/* WOW: your turn floods the banner amber with a soft breathing glow */
+@keyframes simYourTurnGlow{
+  0%,100%{box-shadow:0 0 0 0 rgba(212,168,48,.0)}
+  50%    {box-shadow:0 0 0 5px rgba(212,168,48,.18)}
+}
+.sim-onclock.is-user{
+  background:linear-gradient(135deg,#B8860B,#C9971A);
+  animation:simYourTurnGlow 1.6s ease-in-out infinite;
+}
+.sim-status-mid{display:flex;align-items:center;gap:10px;flex:1;min-width:220px}
+.sim-prog-track{flex:1;background:var(--gray-100);border-radius:4px;height:4px;overflow:hidden;min-width:80px}
+.sim-prog-fill{height:100%;background:var(--amber);border-radius:4px;transition:width .3s var(--ease-out)}
+.sim-prog-count{
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:13px;font-weight:800;color:var(--gray-500);
+  white-space:nowrap;font-variant-numeric:tabular-nums;
+}
+/* YOURPICKS-V2: prominent card band — your haul, front and center. */
+.sim-yourpicks{
+  padding:10px 14px 12px;margin-bottom:12px;
+  background:rgba(212,168,48,.06);
+  border:1px solid rgba(212,168,48,.25);
+  border-left:3px solid var(--amber);
+  border-radius:10px;
+}
+.sim-yp-head{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.sim-yp-lbl{
+  font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:900;
+  color:#92400E;text-transform:uppercase;letter-spacing:1.4px;
+}
+.sim-yp-count{
+  font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:900;
+  background:rgba(212,168,48,.2);color:#92400E;
+  border-radius:9px;padding:1px 8px;line-height:1.5;
+}
+.sim-yp-row{
+  display:flex;gap:9px;overflow-x:auto;
+  scrollbar-width:thin;scrollbar-color:rgba(146,64,14,.25) transparent;
+  padding-bottom:2px;
+}
+.sim-yp-row::-webkit-scrollbar{height:6px}
+.sim-yp-row::-webkit-scrollbar-thumb{background:rgba(146,64,14,.2);border-radius:3px}
+.sim-yp-card{
+  display:grid;
+  grid-template-columns:auto 42px minmax(150px,1fr) auto;
+  column-gap:10px;align-items:center;
+  background:white;border:1px solid rgba(10,22,40,.10);
+  border-radius:9px;padding:9px 12px;flex-shrink:0;
+  box-shadow:0 1px 3px rgba(10,22,40,.06);
+  min-width:280px;
+}
+.sim-yp-pickcol{display:flex;flex-direction:column;align-items:center;gap:3px}
+.sim-yp-picknum{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:900;color:var(--gray-400);font-variant-numeric:tabular-nums}
+.sim-yp-photo img,.sim-yp-photo .avatar-fallback{box-shadow:0 0 0 1px rgba(10,22,40,.10)}
+.sim-yp-id{min-width:0}
+.sim-yp-nrow{display:flex;align-items:center;gap:6px;min-width:0}
+.sim-yp-name{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:900;color:var(--navy);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sim-yp-grade{font-size:9px;font-weight:800;border-radius:3px;padding:1.5px 5px;flex-shrink:0}
+.sim-yp-meta{font-size:10.5px;color:var(--gray-500);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
+.sim-yp-meta2{font-size:10px;color:var(--gray-400);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px;font-variant-numeric:tabular-nums}
+.sim-yp-role{color:#A16207;font-weight:700}
+.sim-yp-sep{color:var(--gray-200)}
+.sim-yp-stat{display:flex;flex-direction:column;align-items:center;min-width:50px}
+.sim-yp-met{font-family:'Barlow Condensed',sans-serif;font-size:19px;font-weight:900;color:var(--amber);line-height:1;font-variant-numeric:tabular-nums}
+.sim-yp-met-lbl{font-size:7.5px;font-weight:800;color:var(--gray-400);text-transform:uppercase;letter-spacing:.9px;margin-top:2px}
+
 .sim-event-panel{
-  width:240px;flex-shrink:0;
+  width:264px;flex-shrink:0;
   background:linear-gradient(180deg,#0A1628 0%,#0F1F38 100%);
   border-radius:12px;
   border:1px solid rgba(212,168,48,.15);
@@ -3356,31 +3638,38 @@ tr:hover td{background:var(--gray-50)}
 .sim-event-log::-webkit-scrollbar{width:6px}
 .sim-event-log::-webkit-scrollbar-thumb{background:rgba(255,255,255,.18);border-radius:3px}
 .sim-event{
-  display:flex;align-items:flex-start;gap:8px;
-  padding:7px 10px;margin-bottom:5px;
-  border-radius:7px;
-  background:rgba(255,255,255,.04);
-  border-left:3px solid rgba(255,255,255,.15);
-  font-size:11px;line-height:1.35;
-  color:rgba(255,255,255,.85);
-  transition:background .2s;
+  display:flex;align-items:flex-start;gap:7px;
+  padding:8px 10px 8px 8px;
+  border-bottom:1px solid rgba(255,255,255,.05);
+  border-left:2px solid rgba(255,255,255,.12);
+  font-size:11px;line-height:1.4;
+  color:rgba(255,255,255,.82);
 }
+.sim-event:last-child{border-bottom:none}
 .sim-event-pick{
   font-family:'Barlow Condensed',sans-serif;
   font-size:11px;font-weight:900;
-  color:rgba(255,255,255,.45);
-  flex-shrink:0;min-width:22px;
+  color:rgba(255,255,255,.4);
+  flex-shrink:0;min-width:24px;text-align:right;
+  font-variant-numeric:tabular-nums;
+}
+.sim-event-tag{
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:8px;font-weight:900;letter-spacing:.8px;
+  border-radius:3px;padding:1.5px 4px;flex-shrink:0;
+  margin-top:.5px;
+  background:rgba(255,255,255,.08);color:rgba(255,255,255,.5);
 }
 .sim-event-text{flex:1;min-width:0;word-wrap:break-word}
-/* Tone-based accents */
-.sim-event-gold {border-left-color:#F0C94A;background:rgba(240,201,74,.08)}
-.sim-event-gold .sim-event-pick{color:#F0C94A}
-.sim-event-green{border-left-color:#10B981;background:rgba(16,185,129,.08)}
-.sim-event-green .sim-event-pick{color:#34D399}
-.sim-event-red  {border-left-color:#EF4444;background:rgba(239,68,68,.10)}
-.sim-event-red .sim-event-pick{color:#FCA5A5}
-.sim-event-navy {border-left-color:rgba(96,165,250,.5);background:rgba(37,99,235,.08)}
-.sim-event-navy .sim-event-pick{color:#93C5FD}
+/* Tone accents — tick + chip only; row background stays quiet */
+.sim-event-gold {border-left-color:#F0C94A}
+.sim-event-gold .sim-event-tag{background:rgba(240,201,74,.16);color:#F0C94A}
+.sim-event-green{border-left-color:#10B981}
+.sim-event-green .sim-event-tag{background:rgba(16,185,129,.15);color:#34D399}
+.sim-event-red  {border-left-color:#EF4444}
+.sim-event-red .sim-event-tag{background:rgba(239,68,68,.16);color:#FCA5A5}
+.sim-event-navy {border-left-color:rgba(96,165,250,.45)}
+.sim-event-navy .sim-event-tag{background:rgba(37,99,235,.18);color:#93C5FD}
 /* Newest event — subtle slide-in pulse */
 .sim-event-new{
   animation:simEventSlideIn .35s ease-out;
@@ -6385,7 +6674,7 @@ ock Drafts table CSS ───────────────────�
           <button class="sim-setup-btn-mini" onclick="simSelectAllTeams()">All</button>
           <button class="sim-setup-btn-mini" onclick="simClearAllTeams()">None</button>
         </div>
-        <div id="simTeamGrid" style="display:flex;flex-wrap:wrap;gap:6px"></div>
+        <div id="simTeamGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(84px,1fr));gap:8px"></div>
       </div>
 
       <!-- Controls row: rounds + speed + variance + start -->
@@ -6419,21 +6708,24 @@ ock Drafts table CSS ───────────────────�
 
     <!-- LIVE BOARD -->
     <div id="simBoard" style="display:none">
-      <!-- Status bar -->
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap">
-        <div id="simOnClock" style="background:var(--navy);color:white;border-radius:8px;padding:8px 16px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:800;min-width:180px"></div>
-        <button id="simFollowBtn" class="sim-follow-btn is-on" onclick="simToggleFollow()">Follow Picks</button>
-        <div style="flex:1;background:var(--gray-100);border-radius:6px;height:8px;overflow:hidden;min-width:80px">
-          <div id="simProgBar" style="height:100%;background:var(--blue);border-radius:6px;width:0%;transition:width .25s"></div>
+      <!-- SIM-REDESIGN: instrument cluster — [on the clock] [progress + tallies] [controls] -->
+      <div class="sim-status-cluster">
+        <div id="simOnClock" class="sim-onclock"></div>
+        <div class="sim-status-mid">
+          <div class="sim-prog-track"><div id="simProgBar" class="sim-prog-fill" style="width:0%"></div></div>
+          <span id="simProgText" class="sim-prog-count"></span>
+          <div id="simScorecard" style="display:flex;gap:6px"></div>
         </div>
-        <span id="simProgText" style="font-size:12px;font-weight:700;color:var(--gray-400);white-space:nowrap"></span>
-        <div id="simScorecard" style="display:flex;gap:8px"></div>
-        <button class="sim-status-reset" onclick="simReset()">Reset</button>
+        <div style="display:flex;gap:8px;flex-shrink:0">
+          <button id="simFollowBtn" class="sim-follow-btn is-on" onclick="simToggleFollow()">Follow Picks</button>
+          <button class="sim-status-reset" onclick="simReset()">Reset</button>
+        </div>
       </div>
+      <!-- Your-picks strip — replaces the old left sidebar column. Chips appear
+           as you draft; the board reclaims the column's width. -->
+      <div id="simYourPicks" class="sim-yourpicks" style="display:none"></div>
 
       <div style="display:flex;gap:14px;align-items:flex-start">
-        <!-- Prior picks sidebar -->
-        <div id="simPriorSidebar" class="prior-picks-sidebar" style="border-radius:10px;align-self:stretch"></div>
         <!-- Pick board left -->
         <div id="simPicksBoardWrap" style="flex:1;min-width:0">
           <div id="simMobilePicks" style="display:none"></div>
@@ -6449,7 +6741,7 @@ ock Drafts table CSS ───────────────────�
           <div id="simEventLog" class="sim-event-log"></div>
         </div>
         <!-- Player pool right -->
-        <div id="simPoolPanel" style="width:264px;flex-shrink:0">
+        <div id="simPoolPanel" style="width:300px;flex-shrink:0">
           <div style="background:var(--navy);border-radius:12px 12px 0 0">
             <div id="simTeamInfo"></div>
             <div style="padding:8px 14px 10px">
@@ -6847,6 +7139,9 @@ ock Drafts table CSS ───────────────────�
         <div class="modal-name" id="modalName"></div>
         <div class="modal-meta" id="modalMeta"></div>
       </div>
+      <!-- PROFILE-4: headline stat lockup — the player's metric anchors the
+           masthead's right edge -->
+      <div class="modal-head-stat" id="modalHeadStat"></div>
     </div>
     <div class="modal-body" id="modalBody"></div>
     <!-- Mobile close bar: sticky footer, thumb-reachable at bottom of sheet -->
@@ -7499,19 +7794,21 @@ function buildShotChart(playerName) {
     if (d[_reqFields[_fi]] == null || isNaN(d[_reqFields[_fi]])) return { hasShotData: false, html: '' };
   }
 
-  // ── Color helpers ────────────────────────────────────────────
-  function effColor(v, lo, mid, hi) {
-    // lo=poor threshold, mid=average, hi=good threshold
-    if (v <= lo)  return { hex:'#ef4444', label:'Below Avg' };
-    if (v <= mid) return { hex:'#f97316', label:'Average' };
-    if (v <= hi)  return { hex:'#22c55e', label:'Good' };
-    return { hex:'#06b6d4', label:'Elite' };
-  }
-  function pctileColor(p) {
-    if (p < 25) return '#ef4444';
-    if (p < 50) return '#f97316';
-    if (p < 75) return '#22c55e';
-    return '#06b6d4';
+  // ── SHOT-REDESIGN: one heat language ─────────────────────────
+  // Percentile drives a single sequential scale: red reserved for
+  // genuinely poor (<25th, per the product's semantic-red rule), cool
+  // slate for below-average, and the brand amber deepening with quality.
+  // Returns {tint} for court zone fills and {ink} for numbers/bars.
+  // Diverging scouting gradient: red (poor) → orange → gold → green →
+  // deep green (elite). Tints stay translucent so court lines and plates
+  // read through; inks are darkened steps of the same hue for text/bars.
+  function heat(p) {
+    if (p == null || isNaN(p)) return { tint:'rgba(148,163,184,.10)', ink:'#94A3B8' };
+    if (p < 25) return { tint:'rgba(220,38,38,.13)',  ink:'#DC2626' };   // poor
+    if (p < 45) return { tint:'rgba(234,88,12,.12)',  ink:'#EA580C' };   // below avg
+    if (p < 65) return { tint:'rgba(202,138,4,.13)',  ink:'#B45309' };   // average
+    if (p < 85) return { tint:'rgba(22,163,74,.15)',  ink:'#16A34A' };   // good
+    return       { tint:'rgba(21,128,61,.26)',  ink:'#15803D' };   // elite
   }
   function pctileLabel(p) {
     if (p === undefined || p === null) return '';
@@ -7520,10 +7817,7 @@ function buildShotChart(playerName) {
     return s;
   }
 
-  var rimC  = effColor(d.rp, 55, 63, 70);
-  var midC  = effColor(d.mp, 33, 41, 47);
-  var tptC  = effColor(d.tp, 31, 36, 41);
-  var ftC   = effColor(d.fp, 65, 74, 82);
+  var rimH = heat(d.rc), midH = heat(d.mc), tptH = heat(d.tc), ftH = heat(d.fc);
 
   // ── SVG Court (viewBox 360×230, baseline at top) ─────────────
   var W=360, H=230;
@@ -7534,105 +7828,167 @@ function buildShotChart(playerName) {
   var arcX1 = Math.round(bx - Math.sqrt(r3*r3 - by*by));
   var arcX2 = Math.round(bx + Math.sqrt(r3*r3 - by*by));
 
-  // Volume opacity helpers
-  function volOp(att, maxAtt) {
-    return (0.30 + 0.42 * Math.min(att / maxAtt, 1)).toFixed(2);
-  }
-  var rimOp = volOp(d.ra, 18);
-  var midOp = volOp(d.ma, 14);
-  var tptOp = volOp(d.ta, 17);
-
-  // Text with drop-shadow filter for readability inside zones
-  function zoneLabel(x, y, pct, att, color) {
-    return '<text x="' + x + '" y="' + y + '" text-anchor="middle" '
-      + 'fill="white" font-family="\'Barlow Condensed\',sans-serif" '
-      + 'font-weight="900" font-size="22" paint-order="stroke" '
-      + 'stroke="#000a18" stroke-width="5" stroke-linejoin="round">'
-      + pct.toFixed(1) + '%</text>'
-      + '<text x="' + x + '" y="' + (y+15) + '" text-anchor="middle" '
-      + 'fill="rgba(255,255,255,0.55)" font-size="9" paint-order="stroke" '
-      + 'stroke="#000a18" stroke-width="3">'
-      + att.toFixed(1) + '/100</text>';
+  // SHOT-REDESIGN: label PLATE — a small white card anchored on the zone,
+  // replacing the stroke-outlined HUD text. Zone tag (caps) · FG% (Barlow
+  // 900 navy) · att + percentile microline in the zone's heat ink.
+  function zonePlate(x, y, tag, pct, att, pc, ink) {
+    // READABILITY: larger plate + type so the lockup reads at thumbnail size.
+    var w = 90, h = 52;
+    var px = x - w/2, py = y - h/2;
+    var pLbl = (pc!=null && !isNaN(pc)) ? pctileLabel(pc) : '\u2014';
+    return '<g filter="url(#' + uid + '_plate)">'
+      + '<rect x="' + px + '" y="' + py + '" width="' + w + '" height="' + h + '" rx="8" fill="white"/>'
+      + '</g>'
+      + '<text x="' + x + '" y="' + (py+12) + '" text-anchor="middle" fill="#64748B" '
+      +   'font-family="\'Barlow Condensed\',sans-serif" font-weight="800" font-size="9" letter-spacing="1.8">' + tag + '</text>'
+      + '<text x="' + x + '" y="' + (py+31) + '" text-anchor="middle" fill="#0A1628" '
+      +   'font-family="\'Barlow Condensed\',sans-serif" font-weight="900" font-size="21">' + pct.toFixed(1) + '%</text>'
+      + '<text x="' + x + '" y="' + (py+44) + '" text-anchor="middle" fill="' + ink + '" '
+      +   'font-family="\'DM Sans\',sans-serif" font-weight="700" font-size="9">'
+      +   att.toFixed(1) + ' /100 \u00B7 ' + pLbl + ' pctl</text>';
   }
 
   var uid = 'sc' + Date.now().toString(36);
 
-  var svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" xmlns="http://www.w3.org/2000/svg">'
+  // SHOT-REDESIGN: the court is an architectural drawing — pale surface,
+  // hairline ink, the basket as the only fixture. Zones carry a single
+  // percentile-keyed tint (slate→amber, red only for <25th). All HUD-style
+  // stroke-outlined text, ghost duplicate labels, and watermarks removed;
+  // each zone gets one white label plate.
+  var svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" xmlns="http://www.w3.org/2000/svg" '
+    + 'shape-rendering="geometricPrecision" text-rendering="optimizeLegibility">'
 
-    // Defs
     + '<defs>'
     + '<clipPath id="' + uid + '_arc"><circle cx="' + bx + '" cy="' + by + '" r="' + r3 + '"/></clipPath>'
+    + '<filter id="' + uid + '_plate" x="-20%" y="-20%" width="140%" height="140%">'
+    +   '<feDropShadow dx="0" dy="1.5" stdDeviation="2.5" flood-color="#0A1628" flood-opacity="0.16"/>'
+    + '</filter>'
     + '</defs>'
 
-    // Court background
-    + '<rect width="' + W + '" height="' + H + '" fill="#0d1521" rx="8"/>'
+    // Surface
+    + '<rect width="' + W + '" height="' + H + '" fill="#F7F9FB" rx="10"/>'
 
-    // === ZONE FILLS ===
-    // 3PT (full court bg)
-    + '<rect x="2" y="2" width="' + (W-4) + '" height="' + (H-4) + '" fill="' + tptC.hex + '" opacity="' + tptOp + '" rx="6"/>'
-    // Mid (inside 3PT arc)
-    + '<rect x="2" y="2" width="' + (W-4) + '" height="' + (H-4) + '" fill="' + midC.hex + '" opacity="' + midOp + '" clip-path="url(#' + uid + '_arc)"/>'
-    // Rim (paint)
-    + '<rect x="' + pX + '" y="2" width="' + pW + '" height="' + pH + '" fill="' + rimC.hex + '" opacity="' + rimOp + '"/>'
+    // === ZONE TINTS (percentile-keyed, painted far→near) ===
+    + '<rect x="1.5" y="1.5" width="' + (W-3) + '" height="' + (H-3) + '" fill="' + tptH.tint + '" rx="9"/>'
+    + '<rect x="1.5" y="1.5" width="' + (W-3) + '" height="' + (H-3) + '" fill="#F7F9FB" clip-path="url(#' + uid + '_arc)"/>'
+    + '<rect x="1.5" y="1.5" width="' + (W-3) + '" height="' + (H-3) + '" fill="' + midH.tint + '" clip-path="url(#' + uid + '_arc)"/>'
+    + '<rect x="' + pX + '" y="1.5" width="' + pW + '" height="' + pH + '" fill="#F7F9FB"/>'
+    + '<rect x="' + pX + '" y="1.5" width="' + pW + '" height="' + pH + '" fill="' + rimH.tint + '"/>'
 
     // === COURT LINES ===
-    + '<rect x="2" y="2" width="' + (W-4) + '" height="' + (H-4) + '" fill="none" stroke="#1e3150" stroke-width="1.5" rx="6"/>'
-    // Paint box
-    + '<rect x="' + pX + '" y="2" width="' + pW + '" height="' + pH + '" fill="none" stroke="#253d5e" stroke-width="1.5"/>'
-    // FT arc (bottom of paint)
-    + '<path d="M ' + pX + ',' + pH + ' A ' + (pW/2) + ',' + (pW/2) + ' 0 0 0 ' + (pX+pW) + ',' + pH + '" fill="none" stroke="#253d5e" stroke-width="1.5"/>'
-    // 3PT arc
-    + '<path d="M ' + arcX1 + ',2 A ' + r3 + ',' + r3 + ' 0 1 1 ' + arcX2 + ',2" fill="none" stroke="#253d5e" stroke-width="1.5"/>'
-    // Restricted area circle (r≈4ft = ~27px)
-    + '<circle cx="' + bx + '" cy="' + by + '" r="28" fill="none" stroke="#253d5e" stroke-width="1"/>'
-    // Basket
-    + '<circle cx="' + bx + '" cy="' + by + '" r="8" fill="none" stroke="#d97706" stroke-width="2.5"/>'
-    + '<line x1="' + (bx-20) + '" y1="' + (by-10) + '" x2="' + (bx+20) + '" y2="' + (by-10) + '" stroke="#d97706" stroke-width="3" stroke-linecap="round"/>'
+    // CONTRAST FIX: the 1.2px #B9C6D4 hairlines disappeared on players whose
+    // adjacent zone tints were both mid-strength (e.g. orange mid · gold 3PT)
+    // — the line had no contrast against either side of the boundary it sat
+    // on, so charts "lost" the 3PT arc per-player. Cartography-standard fix:
+    // each structural line gets a white CASING stroke beneath a stronger ink
+    // stroke. The casing guarantees separation against any tint pairing; the
+    // geometry itself is identical for every player.
+    + '<rect x="1.5" y="1.5" width="' + (W-3) + '" height="' + (H-3) + '" fill="none" stroke="#C7D2DE" stroke-width="1.5" rx="9"/>'
+    // Paint box — casing + ink
+    + '<rect x="' + pX + '" y="1.5" width="' + pW + '" height="' + pH + '" fill="none" stroke="white" stroke-width="3.4" opacity=".85"/>'
+    + '<rect x="' + pX + '" y="1.5" width="' + pW + '" height="' + pH + '" fill="none" stroke="#8FA3B8" stroke-width="1.4"/>'
+    // FT arc — casing + ink
+    + '<path d="M ' + pX + ',' + pH + ' A ' + (pW/2) + ',' + (pW/2) + ' 0 0 0 ' + (pX+pW) + ',' + pH + '" fill="none" stroke="white" stroke-width="3.4" opacity=".85"/>'
+    + '<path d="M ' + pX + ',' + pH + ' A ' + (pW/2) + ',' + (pW/2) + ' 0 0 0 ' + (pX+pW) + ',' + pH + '" fill="none" stroke="#8FA3B8" stroke-width="1.4"/>'
+    // 3PT arc — the court's defining line: widest casing, strongest ink
+    + '<path d="M ' + arcX1 + ',2 A ' + r3 + ',' + r3 + ' 0 1 1 ' + arcX2 + ',2" fill="none" stroke="white" stroke-width="4" opacity=".9"/>'
+    + '<path d="M ' + arcX1 + ',2 A ' + r3 + ',' + r3 + ' 0 1 1 ' + arcX2 + ',2" fill="none" stroke="#7E94AB" stroke-width="1.8"/>'
+    // Restricted area
+    + '<circle cx="' + bx + '" cy="' + by + '" r="28" fill="none" stroke="white" stroke-width="2.6" opacity=".7"/>'
+    + '<circle cx="' + bx + '" cy="' + by + '" r="28" fill="none" stroke="#A5B6C7" stroke-width="1.1"/>'
 
-    // === ZONE LABELS (inside court) ===
-    // RIM — centered in paint
-    + zoneLabel(bx, by + 58, d.rp, d.ra, rimC.hex)
-    // MID — left elbow
-    + zoneLabel(75, 108, d.mp, d.ma, midC.hex)
-    // 3PT — lower left
-    + zoneLabel(50, 178, d.tp, d.ta, tptC.hex)
+    // Basket — the one warm fixture
+    + '<line x1="' + (bx-19) + '" y1="' + (by-11) + '" x2="' + (bx+19) + '" y2="' + (by-11) + '" stroke="#C9971A" stroke-width="3" stroke-linecap="round"/>'
+    + '<circle cx="' + bx + '" cy="' + by + '" r="7.5" fill="none" stroke="#C9971A" stroke-width="2.2"/>'
 
-    // Tiny corner indicators for MID (right elbow) and 3PT (right)
-    + '<text x="' + (W-75) + '" y="108" text-anchor="middle" fill="rgba(255,255,255,0.22)" font-size="11" font-family="\'Barlow Condensed\',sans-serif" font-weight="700" paint-order="stroke" stroke="#000a18" stroke-width="3">' + d.mp.toFixed(1) + '%</text>'
-    + '<text x="' + (W-50) + '" y="178" text-anchor="middle" fill="rgba(255,255,255,0.22)" font-size="11" font-family="\'Barlow Condensed\',sans-serif" font-weight="700" paint-order="stroke" stroke="#000a18" stroke-width="3">' + d.tp.toFixed(1) + '%</text>'
-
-    // Zone name watermarks
-    + '<text x="' + bx + '" y="' + (pH-8) + '" text-anchor="middle" fill="rgba(255,255,255,0.12)" font-size="8" font-weight="700" letter-spacing="2" text-transform="uppercase">RIM</text>'
-    + '<text x="' + bx + '" y="' + (H-8) + '" text-anchor="middle" fill="rgba(255,255,255,0.08)" font-size="8" font-weight="700" letter-spacing="2">3PT TERRITORY</text>'
+    // === LABEL PLATES — one per zone ===
+    + zonePlate(bx, by + 62,  'RIM', d.rp, d.ra, d.rc, rimH.ink)
+    + zonePlate(72, 124,      'MID', d.mp, d.ma, d.mc, midH.ink)
+    + zonePlate(W-72, 186,    '3PT', d.tp, d.ta, d.tc, tptH.ink)
 
   + '</svg>';
 
-  // ── Legend panel (HTML) ──────────────────────────────────────
-  function legendRow(zone, color, pct, att, pctile, ua) {
-    var pc = pctile !== undefined ? pctileColor(pctile) : '#64748b';
-    var pL = pctile !== undefined ? pctileLabel(pctile) : '—';
-    return '<div class="shot-zone-row">'
-      + '<span class="shot-zone-dot" style="background:' + color + ';margin-top:2px"></span>'
-      + '<span class="shot-zone-name">' + zone + '</span>'
-      + '<span></span>'
-      + '<span class="shot-zone-pct" style="color:' + color + '">' + pct.toFixed(1) + '%'
-      + '<span class="shot-pctile-pill" style="background:' + pc + '22;color:' + pc + '">' + pL + ' Pctile</span>'
+  // ── SHOT-REDESIGN: scouting stat table ───────────────────────
+  // Fixed-column grid (ZONE | FG% | PCTL | VOL | UNAST) so every value sits
+  // directly under its header. Percentile renders as a comparable micro-bar;
+  // the emoji line and badge zoo are gone. Numbers are tabular.
+  function tableRow(zone, h, pct, att, pctile, ua) {
+    var hasP = (pctile !== undefined && pctile !== null && !isNaN(pctile));
+    var barW = hasP ? Math.max(3, Math.min(100, pctile)) : 0;
+    return '<div class="sct-row">'
+      + '<span class="sct-zone"><i class="sct-dot" style="background:' + h.ink + '"></i>' + zone + '</span>'
+      + '<span class="sct-fg">' + pct.toFixed(1) + '<i>%</i></span>'
+      + '<span class="sct-pctl">'
+      +   '<span class="sct-bar"><span class="sct-bar-fill" style="width:' + barW + '%;background:' + h.ink + '"></span></span>'
+      +   '<span class="sct-pctl-num" style="color:' + h.ink + '">' + (hasP ? pctileLabel(pctile) : '\u2014') + '</span>'
       + '</span>'
-      + '<div class="shot-zone-sub">'
-      + '<span>📍 ' + att.toFixed(1) + ' att/100</span>'
-      + (ua !== undefined ? '<span><span class="shot-ua-badge">' + ua + '% UNASSTD</span></span>' : '')
-      + '</div>'
+      + '<span class="sct-vol">' + att.toFixed(1) + '</span>'
+      + '<span class="sct-ua">' + (ua !== undefined ? ua + '%' : '<i>\u2014</i>') + '</span>'
       + '</div>';
   }
 
   var legend = '<div class="shot-legend-title">Shot Zone Breakdown</div>'
-    + legendRow('Rim', rimC.hex, d.rp, d.ra, d.rc, d.ru)
-    + legendRow('Mid', midC.hex, d.mp, d.ma, d.mc, undefined)
-    + legendRow('3PT', tptC.hex, d.tp, d.ta, d.tc, d.tu)
-    + legendRow('Free Throw', ftC.hex, d.fp, d.fa, d.fc, undefined)
-    + '<div class="shot-source-row">via draftballr.com · per 100 poss</div>';
+    + '<div class="sct-head">'
+    +   '<span>Zone</span><span>FG%</span><span>Pctl</span>'
+    +   '<span title="Attempts per 100 possessions">Att<i>/100</i></span>'
+    +   '<span title="Share of makes that were unassisted \u2014 self-creation indicator">Unast</span>'
+    + '</div>'
+    + tableRow('Rim',  rimH, d.rp, d.ra, d.rc, d.ru)
+    + tableRow('Mid',  midH, d.mp, d.ma, d.mc, undefined)
+    + tableRow('3PT',  tptH, d.tp, d.ta, d.tc, d.tu)
+    + tableRow('FT',   ftH,  d.fp, d.fa, d.fc, undefined)
+    + '<div class="shot-source-row">Data: draftballr.com \u00B7 per-100 possessions</div>';
 
-  var html = '<div class="shot-panel-wrap">'
+  // ── SHOT-3: derived verdict — the chart concludes, not just displays.
+  // Archetype from percentile/volume shape; creation style from unassisted
+  // rates; one caveat from the weakest zone. Pure derivation of fields
+  // already on screen.
+  var verdict = (function() {
+    var uVals = [];
+    if (d.ru != null && !isNaN(d.ru)) uVals.push(d.ru);
+    if (d.tu != null && !isNaN(d.tu)) uVals.push(d.tu);
+    var uAvg = uVals.length ? uVals.reduce(function(a,b){return a+b;},0)/uVals.length : null;
+    var creation = uAvg == null ? '' : (uAvg >= 60 ? 'Self-created ' : uAvg <= 30 ? 'Play-finishing ' : '');
+
+    var arch;
+    if (d.rc >= 60 && d.mc >= 60 && d.tc >= 60)      arch = 'three-level scorer';
+    else if (d.tc >= 70 && d.ta >= 8)                arch = 'high-volume shooter';
+    else if (d.rc >= 70 && d.ra >= 10)               arch = 'rim-pressure finisher';
+    else if (d.tc >= 70)                             arch = 'efficient spot shooter';
+    else if (d.mc >= 80)                             arch = 'mid-range operator';
+    else if (d.rc < 35 && d.tc < 35)                 arch = 'developing scorer';
+    else if (d.rc >= 55 && d.tc < 45)                arch = 'interior-leaning scorer';
+    else if (d.tc >= 55 && d.rc < 45)                arch = 'perimeter-leaning scorer';
+    else                                             arch = 'balanced scorer';
+
+    var zones = [
+      {tag:'rim', pc:d.rc, txt:(d.rc>=75?'elite':'strong')+' at the rim'},
+      {tag:'mid', pc:d.mc, txt:(d.mc>=75?'elite':'strong')+' from mid-range'},
+      {tag:'3pt', pc:d.tc, txt:(d.tc>=75?'elite':'strong')+' from three'},
+      {tag:'ft',  pc:d.fc, txt:(d.fc>=75?'elite':'reliable')+' at the line'}
+    ].filter(function(z){return z.pc!=null && !isNaN(z.pc);});
+    zones.sort(function(a,b){return b.pc-a.pc;});
+    var bits = [];
+    if (zones.length && zones[0].pc >= 60) bits.push(zones[0].txt + ' (' + pctileLabel(zones[0].pc) + ' pctl)');
+    var worst = zones.length ? zones[zones.length-1] : null;
+    if (worst && worst.pc < 30 && worst !== zones[0]) {
+      var caveat = { rim:'rim finishing', mid:'the mid-range', '3pt':'the three ball', ft:'the FT line' }[worst.tag];
+      bits.push(caveat + ' lags (' + pctileLabel(worst.pc) + ')');
+    }
+    if (uAvg != null && uAvg >= 60) bits.push(Math.round(uAvg) + '% of makes unassisted');
+    var head = (creation + arch);
+    head = head.charAt(0).toUpperCase() + head.slice(1);
+    return { head: head, detail: bits.join(' \u00B7 ') };
+  })();
+
+  var verdictHtml = '<div class="shot-verdict">'
+    + '<span class="shot-verdict-tag">Shot Profile</span>'
+    + '<span class="shot-verdict-head">' + verdict.head + '</span>'
+    + (verdict.detail ? '<span class="shot-verdict-detail">' + verdict.detail + '</span>' : '')
+    + '</div>';
+
+  var html = verdictHtml
+    + '<div class="shot-panel-wrap">'
     + '<div class="shot-court-col">' + svg + '</div>'
     + '<div class="shot-legend-col">' + legend + '</div>'
     + '</div>';
@@ -8059,7 +8415,6 @@ function setView(v) {
   if (reducedMotion) {
     try { renderBoard2026(); }
     catch (err) { console.error('[setView] render failed:', err); }
-    try { if (window.hwIntel) hwIntel.refreshBadges(); } catch (_) {}
     return;
   }
 
@@ -8085,8 +8440,7 @@ function setView(v) {
       el.classList.add('view-enter');
       requestAnimationFrame(function() {
         el.classList.remove('view-enter');
-        try { if (window.hwIntel) hwIntel.refreshBadges(); } catch (_) {}
-      });
+          });
     }
   });
 }
@@ -8763,6 +9117,33 @@ function buildPlayerCard(p, tierKey, _metricsSorted) {
       + posRingHtml(p.ato,     'ato',     p.position)
     + '</div>';
 
+  // ── BPM row (OBPM / DBPM / BPM) — same gradient system; compact cells
+  // keep the card height in check. fmtBpm: signed one-decimal.
+  function fmtBpm(v) {
+    if (v === null || v === undefined || v === '') return '\u2014';
+    var n = parseFloat(v); if (isNaN(n)) return '\u2014';
+    return (n > 0 ? '+' : '') + n.toFixed(1);
+  }
+  if (p.obpm != null || p.dbpm != null || p.bpm != null) {
+    var gsO = gradStyle(p.obpm, 'obpm'), gsD = gradStyle(p.dbpm, 'dbpm'), gsB = gradStyle(p.bpm, 'bpm');
+    statsHtml +=
+      '<div class="stat-cell stat-cell--bpm" style="' + gsO + '">'
+        + '<div class="stat-val">' + fmtBpm(p.obpm) + '</div>'
+        + statBarHtml(p.obpm, 'obpm') + '<div class="stat-lbl">OBPM</div>'
+        + posRingHtml(p.obpm, 'obpm', p.position)
+      + '</div>'
+      + '<div class="stat-cell stat-cell--bpm" style="' + gsD + '">'
+        + '<div class="stat-val">' + fmtBpm(p.dbpm) + '</div>'
+        + statBarHtml(p.dbpm, 'dbpm') + '<div class="stat-lbl">DBPM</div>'
+        + posRingHtml(p.dbpm, 'dbpm', p.position)
+      + '</div>'
+      + '<div class="stat-cell stat-cell--bpm" style="' + gsB + '">'
+        + '<div class="stat-val">' + fmtBpm(p.bpm) + '</div>'
+        + statBarHtml(p.bpm, 'bpm') + '<div class="stat-lbl">BPM</div>'
+        + posRingHtml(p.bpm, 'bpm', p.position)
+      + '</div>';
+  }
+
   // ── Comp pills with avatar initials ─────────────────────────────────
   var compHtml = '';
   if (p.comp || p.comp_tool) {
@@ -9309,6 +9690,21 @@ function openPlayerModal(rank, year) {
   document.getElementById('modalName').textContent = name;
   document.getElementById('modalMeta').textContent = [school, cls, torvik_role, position].filter(Boolean).join(' · ');
   document.getElementById('modalAvatar').innerHTML = avatarHtml(player.name, player.position, '100%', '12px');
+  // PROFILE-4: headline stat lockup
+  var _hs = document.getElementById('modalHeadStat');
+  if (_hs) {
+    _hs.innerHTML = player.metric
+      ? '<div class="mhs-val">' + parseFloat(player.metric).toFixed(1) + '</div><div class="mhs-lbl">Metric</div>'
+      : '';
+  }
+  // Position counter rides the nav-arrow tooltips
+  (function(){
+    var idx = _modalNav.list.indexOf(player.rank);
+    if (idx < 0) return;
+    var prevB = document.getElementById('modalNavPrev'), nextB = document.getElementById('modalNavNext');
+    if (prevB) prevB.title = 'Previous prospect (' + (idx===0?_modalNav.list.length:idx) + ' / ' + _modalNav.list.length + ')';
+    if (nextB) nextB.title = 'Next prospect (' + (idx+2>_modalNav.list.length?1:idx+2) + ' / ' + _modalNav.list.length + ')';
+  })();
 
   // Pre-compute gradient styles for each stat
   const mgMet = gradStyle(player.metric,  'metric');
@@ -9336,7 +9732,7 @@ function openPlayerModal(rank, year) {
   // ── Build metrics row HTML string ─────────────────────────────────────────
   // ── Performance Stats row (Metric + shooting/usage/defensive rates) ──────
   var metricsRowHtml =
-    '<div class="modal-section-label">📊 Performance Stats</div>' +
+    '<div class="modal-section-label"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:12px;height:12px;flex-shrink:0"><path d="M2 13V2.5M2 13h11.5"/><rect x="4" y="8.5" width="2" height="4.5" fill="currentColor" stroke="none" rx=".3"/><rect x="7.5" y="5.5" width="2" height="7.5" fill="currentColor" stroke="none" rx=".3"/><rect x="11" y="9.5" width="2" height="3.5" fill="currentColor" stroke="none" rx=".3"/></svg><span>Performance Stats</span></div>' +
     '<div class="modal-metrics-row">' +
       `<div class="metric-box" style="${mgMet}"><div class="val">${player.metric ? parseFloat(player.metric).toFixed(2) : '—'}</div><div class="lbl">Model Metric</div>${rcDiv('metric', player.metric)}</div>` +
       `<div class="metric-box" style="${mgTs}"><div class="val">${pct(player.ts_pct)}</div><div class="lbl">TS%</div>${rcDiv('ts_pct', player.ts_pct)}</div>` +
@@ -9347,7 +9743,7 @@ function openPlayerModal(rank, year) {
       `<div class="metric-box" style="${mgTp}"><div class="val">${player.tpar ? parseFloat(player.tpar).toFixed(3) : '—'}</div><div class="lbl">3PAr</div>${rcDiv('tpar', player.tpar)}</div>` +
     '</div>' +
     // ── BPM Stats row (box-plus-minus breakdown) ─────────────────────────
-    '<div class="modal-section-label modal-section-label--bpm">📈 BPM Stats</div>' +
+    '<div class="modal-section-label modal-section-label--bpm"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:12px;height:12px;flex-shrink:0"><path d="M2 12l4-4 3 2.5L14 4"/><path d="M10.5 4H14v3.5"/></svg><span>BPM Stats</span></div>' +
     '<div class="modal-metrics-row modal-bpm-row">' +
       `<div class="metric-box" style="${mgObpm}"><div class="val">${player.obpm != null ? parseFloat(player.obpm).toFixed(1) : '—'}</div><div class="lbl">OBPM</div>${rcDiv('obpm', player.obpm)}</div>` +
       `<div class="metric-box" style="${mgDbpm}"><div class="val">${player.dbpm != null ? parseFloat(player.dbpm).toFixed(1) : '—'}</div><div class="lbl">DBPM</div>${rcDiv('dbpm', player.dbpm)}</div>` +
@@ -9363,7 +9759,7 @@ function openPlayerModal(rank, year) {
   if (hasShotData) {
     tabBar = '<div class="modal-tab-bar" id="modalTabBar">'
       + '<button class="modal-tab active" id="modal-tab-stats" onclick="switchModalTab(\'stats\')">'
-      + '<span class="tab-icon">📊</span>Stats</button>'
+      + '<span class="tab-icon" style="display:inline-flex"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:12px;height:12px;flex-shrink:0"><path d="M2 13V2.5M2 13h11.5"/><rect x="4" y="8.5" width="2" height="4.5" fill="currentColor" stroke="none" rx=".3"/><rect x="7.5" y="5.5" width="2" height="7.5" fill="currentColor" stroke="none" rx=".3"/><rect x="11" y="9.5" width="2" height="3.5" fill="currentColor" stroke="none" rx=".3"/></svg></span>Stats</button>'
       + '<button class="modal-tab" id="modal-tab-shot" onclick="switchModalTab(\'shot\')">'
       + '<span class="tab-icon">🎯</span>Shot Chart</button>'
       + '</div>';
@@ -9387,53 +9783,68 @@ function openPlayerModal(rank, year) {
     var htPct = pctileInArr(player.ht, htArr);
     var wtPct = pctileInArr(player.wt, wtArr);
     var posLbl = pos ? pos + 's' : 'class';
-    var htPctHtml = (htPct !== null) ? '<div class="pct">' + toOrdinal(htPct) + ' pct. among ' + posLbl + '</div>' : '';
-    var wtPctHtml = (wtPct !== null) ? '<div class="pct">' + toOrdinal(wtPct) + ' pct. among ' + posLbl + '</div>' : '';
+    // PROFILE-5: percentile as a comparable micro-bar (same idiom as the
+    // shot table) instead of a 8.5px text line.
+    function measPctBar(pctVal, lbl) {
+      var w = Math.max(3, Math.min(100, pctVal));
+      var ink = pctVal >= 85 ? '#15803D' : pctVal >= 65 ? '#16A34A' : pctVal >= 45 ? '#B45309' : pctVal >= 25 ? '#EA580C' : '#DC2626';
+      return '<div class="meas-bar-wrap" title="' + toOrdinal(pctVal) + ' percentile among ' + lbl + '">'
+        + '<span class="meas-bar"><span class="meas-bar-fill" style="width:' + w + '%;background:' + ink + '"></span></span>'
+        + '<span class="meas-bar-num" style="color:' + ink + '">' + toOrdinal(pctVal) + '</span>'
+        + '</div>';
+    }
+    var htPctHtml = (htPct !== null) ? measPctBar(htPct, posLbl) : '';
+    var wtPctHtml = (wtPct !== null) ? measPctBar(wtPct, posLbl) : '';
 
     // Combine percentile arrays
     var bfArr = posPlayers.map(function(p){ return p.barefoot; }).filter(function(v){ return v && v > 0; });
     var wsArr = posPlayers.map(function(p){ return p.wingspan; }).filter(function(v){ return v && v > 0; });
     var srArr = posPlayers.map(function(p){ return p.standing_reach; }).filter(function(v){ return v && v > 0; });
 
+    // MEAS-REDESIGN: combine percentiles render through the same micro-bar
+    // idiom as height/weight — one comparable system across the section.
     function combinePctHtml(val, arr) {
       if (!val || !arr.length) return '';
       var pct = pctileInArr(val, arr);
       if (pct === null) return '';
-      var cls = pct >= 85 ? 'elite' : pct >= 65 ? 'above' : pct >= 35 ? 'avg' : 'below';
-      return '<div class="combine-pct ' + cls + '">' + toOrdinal(pct) + ' pct.</div>';
+      return measPctBar(pct, posLbl + ' (combine)');
     }
 
-    body += '<div class="modal-section"><div class="modal-sec-title">📐 Measurables</div><div class="meas-grid">';
+    body += '<div class="modal-section"><div class="modal-sec-title"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:12px;height:12px;flex-shrink:0"><path d="M2.5 10.5l8-8 3 3-8 8h-3v-3z"/><path d="M5 8l1.2 1.2M7 6l1.2 1.2M9 4l1.2 1.2"/></svg><span>Measurables</span></div><div class="meas-grid">';
 
-    // Row 1: Height, Weight, Age
-    body += '<div class="meas-item"><div class="val">' + fmtHt(player.ht) + '</div><div class="lbl">Height</div>' + htPctHtml + '</div>';
-    body += '<div class="meas-item"><div class="val">' + (player.wt || '—') + '</div><div class="lbl">Weight</div>' + wtPctHtml + '</div>';
-    body += '<div class="meas-item"><div class="val">' + (player.age ? parseFloat(player.age).toFixed(1) : '—') + '</div><div class="lbl">Age (8/1)</div></div>';
+    // Row 1: Height, Weight, Age — label-first card anatomy
+    body += '<div class="meas-item"><div class="lbl">Height</div><div class="meas-val-row"><div class="val">' + fmtHt(player.ht) + '</div></div>' + htPctHtml + '</div>';
+    body += '<div class="meas-item"><div class="lbl">Weight</div><div class="meas-val-row"><div class="val">' + (player.wt || '\u2014') + '</div><span class="combine-sub">lb</span></div>' + wtPctHtml + '</div>';
+    body += '<div class="meas-item"><div class="lbl">Age</div><div class="meas-val-row"><div class="val">' + (player.age ? parseFloat(player.age).toFixed(1) : '\u2014') + '</div><span class="combine-sub">as of Aug 1</span></div></div>';
 
     // Combine divider + cells (only if any combine data exists)
     if (player.barefoot || player.wingspan || player.standing_reach) {
       body += '<div class="meas-divider"><div class="meas-divider-line"></div><div class="meas-divider-text">Combine</div><div class="meas-divider-line"></div></div>';
 
       if (player.barefoot) {
-        body += '<div class="meas-item"><div class="val">' + fmtHt(player.barefoot) + '</div><div class="combine-sub">' + player.barefoot.toFixed(2) + '"</div><div class="lbl">Barefoot Ht</div>' + combinePctHtml(player.barefoot, bfArr) + '</div>';
+        body += '<div class="meas-item"><div class="lbl">Barefoot Ht</div><div class="meas-val-row"><div class="val">' + fmtHt(player.barefoot) + '</div><span class="combine-sub">' + player.barefoot.toFixed(2) + '"</span></div>' + combinePctHtml(player.barefoot, bfArr) + '</div>';
       }
       if (player.wingspan) {
-        body += '<div class="meas-item"><div class="val">' + fmtHt(player.wingspan) + '</div><div class="combine-sub">' + player.wingspan.toFixed(2) + '"</div><div class="lbl">Wingspan</div>' + combinePctHtml(player.wingspan, wsArr) + '</div>';
+        body += '<div class="meas-item"><div class="lbl">Wingspan</div><div class="meas-val-row"><div class="val">' + fmtHt(player.wingspan) + '</div><span class="combine-sub">' + player.wingspan.toFixed(2) + '"</span></div>' + combinePctHtml(player.wingspan, wsArr) + '</div>';
       }
       if (player.standing_reach) {
-        body += '<div class="meas-item"><div class="val">' + fmtHt(player.standing_reach) + '</div><div class="combine-sub">' + player.standing_reach.toFixed(1) + '"</div><div class="lbl">Standing Reach</div>' + combinePctHtml(player.standing_reach, srArr) + '</div>';
+        body += '<div class="meas-item"><div class="lbl">Standing Reach</div><div class="meas-val-row"><div class="val">' + fmtHt(player.standing_reach) + '</div><span class="combine-sub">' + player.standing_reach.toFixed(1) + '"</span></div>' + combinePctHtml(player.standing_reach, srArr) + '</div>';
       }
 
-      // Derived metrics row (wingspan diff + ratio)
-      var wsDiff = (player.wingspan && player.barefoot) ? (player.wingspan - player.barefoot) : null;
-      var wsRatio = (player.wingspan && player.barefoot) ? (player.wingspan / player.barefoot) : null;
+      // Derived metrics row (wingspan diff + ratio). MEAS-REDESIGN: falls
+      // back to listed height when barefoot is missing — the length delta is
+      // THE scouting number and was silently absent for most players.
+      var _wsBase = player.barefoot || player.ht || null;
+      var _wsBaseLbl = player.barefoot ? 'vs barefoot' : 'vs listed ht';
+      var wsDiff = (player.wingspan && _wsBase) ? (player.wingspan - _wsBase) : null;
+      var wsRatio = (player.wingspan && _wsBase) ? (player.wingspan / _wsBase) : null;
       if (wsDiff !== null) {
         var diffSign = wsDiff > 0 ? '+' : '';
         var diffCls = wsDiff > 0 ? 'pos' : wsDiff < 0 ? 'neg' : 'neu';
         body += '<div class="meas-derived">';
-        body += '<div class="meas-derived-item"><div class="meas-derived-val ' + diffCls + '">' + diffSign + wsDiff.toFixed(2) + '"</div><div class="meas-derived-lbl">WS<br>Diff</div></div>';
+        body += '<div class="meas-derived-item"><div class="meas-derived-val ' + diffCls + '">' + diffSign + wsDiff.toFixed(2) + '"</div><div class="meas-derived-lbl">Length ' + _wsBaseLbl + '</div></div>';
         if (wsRatio !== null) {
-          body += '<div class="meas-derived-item"><div class="meas-derived-val" style="color:var(--gray-500)">' + wsRatio.toFixed(3) + '</div><div class="meas-derived-lbl">WS/Ht<br>Ratio</div></div>';
+          body += '<div class="meas-derived-item"><div class="meas-derived-val neu">' + wsRatio.toFixed(3) + '</div><div class="meas-derived-lbl">WS / Ht ratio</div></div>';
         }
         body += '</div>';
       }
@@ -9449,7 +9860,7 @@ function openPlayerModal(rank, year) {
     var whyText = bbWhyHere(player);
     if (whyText) {
       body += '<div class="modal-section">'
-        + '<div class="modal-sec-title">📍 Why #' + player.rank + '</div>'
+        + '<div class="modal-sec-title"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:12px;height:12px;flex-shrink:0"><circle cx="8" cy="8" r="5.5"/><circle cx="8" cy="8" r="1.6" fill="currentColor" stroke="none"/></svg><span>Why #' + player.rank + '</span></div>'
         + '<div class="why-here-text">' + escHtml(whyText) + '</div>'
         + '</div>';
     }
@@ -9495,7 +9906,7 @@ function openPlayerModal(rank, year) {
       // Neutral / Developing column (only shown when there's content)
       if (hasNeutral) {
         body += '<div class="sw-col">';
-        body += '<div class="sw-col-title ntr">🔄 Developing</div>';
+        body += '<div class="sw-col-title ntr"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:11px;height:11px;flex-shrink:0"><path d="M2 8a6 6 0 1 0 1.76-4.24M2 3v3h3"/></svg> Developing</div>';
         body += '<ul class="sw-list ntr">';
         swl.neutral.forEach(function(n) { body += '<li>' + escHtml(n) + '</li>'; });
         body += '</ul>';
@@ -9528,7 +9939,7 @@ function openPlayerModal(rank, year) {
   }
 
   if (yr !== '2026' && (player.team || player.draft_no)) {
-    body += `<div class="modal-section"><div class="modal-sec-title">📊 Draft Outcome</div>
+    body += `<div class="modal-section"><div class="modal-sec-title"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:12px;height:12px;flex-shrink:0"><path d="M8 2v7M5 6.5L8 9l3-2.5"/><path d="M3 13h10"/></svg><span>Draft Outcome</span></div>
       <div class="meas-grid">
         ${player.team?`<div class="meas-item" style="min-width:120px"><div class="val" style="font-size:14px">${escHtml(player.team)}</div><div class="lbl">Team</div></div>`:''}
         ${player.draft_no?`<div class="meas-item"><div class="val">${escHtml(String(player.draft_no))}</div><div class="lbl">Drafted #</div></div>`:''}
@@ -9536,38 +9947,55 @@ function openPlayerModal(rank, year) {
       </div></div>`;
   }
 
-  // ── Intel Feed + Video sections (injected at end of modal body) ──
-  body += '<div class="intel-section">'
-    + '<div class="intel-header">'
-    + '<div class="intel-title">&#x1F4E1; Pre-Draft Intelligence</div>'
-    + '<button class="intel-refresh-btn" id="intelRefreshBtn" onclick="hwIntel.refresh(\''+escHtml(name).replace(/'/g,"\\'")+'\',\''+escHtml(school||'').replace(/'/g,"\\'")+'\')">'
-    + '&#x21BB; Refresh</button>'
-    + '</div>'
-    + '<div id="intelFeedBody"></div>'
-    + '</div>'
-    + '<div class="video-section">'
-    + '<div class="video-header">'
-    + '<div class="video-title">&#x1F3AC; Highlights &amp; Scouting Videos</div>'
-    + '</div>'
-    + '<div id="videoFeedBody"></div>'
-    + '</div>';
+  // ── RESOURCES (replaces the dead Pre-Draft Intelligence + video feeds).
+  // The old sections depended on a runtime Anthropic API call that cannot
+  // function in this deployment (permanent empty state) and on guessed YT
+  // embed IDs (broken thumbnails). This is the deterministic version of
+  // the same job: curated, templated deep links that work for EVERY player
+  // with zero network dependency — the pages a scout actually opens.
+  body += buildScoutingResources(name, school);
 
   document.getElementById('modalBody').innerHTML = body;
   openModal('playerModal');
+}
 
-  // Trigger intel + video render (70ms delay so modal paint completes first)
-  var _pData = {
-    name: name, school: school||'', position: player.position||'',
-    rank: player.rank, cls: player.cls||'', age: player.age||null,
-    metric: player.metric||null, ts_pct: player.ts_pct||null,
-    pa2_usg: player.pa2_usg||null, stl_bl: player.stl_bl||null,
-    ato: player.ato||null, ftar: player.ftar||null, tpar: player.tpar||null,
-    bpm: player.bpm||null, obpm: player.obpm||null, dbpm: player.dbpm||null,
-    ht: player.ht||null, wt: player.wt||null,
-    wingspan: player.wingspan||null, notes: player.notes||'',
-    comp: player.comp||player.comp_tool||'', prior_teams: player.prior_teams||''
-  };
-  setTimeout(function() { hwIntel.open(_pData); }, 70);
+// ── Scouting Resources: templated external links (film / reports / data) ──
+function buildScoutingResources(name, school) {
+  var q  = encodeURIComponent((name + ' ' + (school||'')).trim());
+  var qn = encodeURIComponent(name);
+  var LINK_SVG = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:10px;height:10px;flex-shrink:0;opacity:.55"><path d="M6.5 9.5l5-5M8 3.5h4.5V8"/><path d="M12 9.5V12a1.5 1.5 0 0 1-1.5 1.5H4A1.5 1.5 0 0 1 2.5 12V5.5A1.5 1.5 0 0 1 4 4h2.5"/></svg>';
+
+  var groups = [
+    { lbl: 'Film', links: [
+      { name: 'Highlights',      dom: 'youtube.com',  url: 'https://www.youtube.com/results?search_query=' + q + '+highlights+2026' },
+      { name: 'Full games',      dom: 'youtube.com',  url: 'https://www.youtube.com/results?search_query=' + q + '+full+game' },
+      { name: 'Draft breakdowns',dom: 'youtube.com',  url: 'https://www.youtube.com/results?search_query=' + qn + '+nba+draft+scouting+report' }
+    ]},
+    // (Reports & Analysis group removed — this product provides its own
+    // scouting analysis; external links are film + raw data/news only.)
+    { lbl: 'Data & News', links: [
+      { name: 'Barttorvik',       dom: 'barttorvik.com', url: 'https://barttorvik.com/playersearch.php?search=' + qn },
+      { name: 'Sports Reference', dom: 'sports-reference.com', url: 'https://www.sports-reference.com/cbb/search/search.fcgi?search=' + qn },
+      { name: 'RealGM',           dom: 'realgm.com',     url: 'https://basketball.realgm.com/search?q=' + qn },
+      { name: 'Latest news',      dom: 'news.google.com',url: 'https://news.google.com/search?q=%22' + qn + '%22+NBA+draft' }
+    ]}
+  ];
+
+  var h = '<div class="modal-section"><div class="modal-sec-title">'
+    + '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:12px;height:12px;flex-shrink:0"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5L14 14"/></svg>'
+    + '<span>Scouting Resources</span></div>';
+  groups.forEach(function(g) {
+    h += '<div class="rsrc-group"><span class="rsrc-group-lbl">' + g.lbl + '</span><div class="rsrc-links">';
+    g.links.forEach(function(l) {
+      h += '<a class="rsrc-card" href="' + l.url + '" target="_blank" rel="noopener">'
+        +  '<span class="rsrc-name">' + l.name + LINK_SVG + '</span>'
+        +  '<span class="rsrc-dom">' + l.dom + '</span>'
+        +  '</a>';
+    });
+    h += '</div></div>';
+  });
+  h += '</div>';
+  return h;
 }
 
 // ── MODAL TAB SWITCHER ────────────────────────────────────────────────────────
@@ -9600,6 +10028,8 @@ function _modalNavUpdate() {
   var prevBtn  = document.getElementById('modalNavPrev');
   var nextBtn  = document.getElementById('modalNavNext');
   var counter  = document.getElementById('modalNavCounter');
+  // PROFILE-4: the position counter rides the arrow tooltips now; the
+  // floating "2 / 75" text is hidden via CSS (element kept as the data hook).
   if (!prevBtn || !nextBtn) return;
   var list = _modalNav.list;
   var idx  = list.indexOf(_modalNav.rank);
@@ -10706,13 +11136,13 @@ function openFutureModal(rank) {
 
   // ── Measurables ─────────────────────────────────────────────────────────────
   if (p.ht || p.wt || p.age || p.barefoot || p.wingspan || p.standing_reach) {
-    body += '<div class="modal-section"><div class="modal-sec-title">\ud83d\udcd0 Measurables</div><div class="meas-grid">';
-    if (p.ht)             body += '<div class="meas-item"><div class="val">' + Math.floor(p.ht/12) + "\'" + (p.ht%12) + '"</div><div class="lbl">Height</div></div>';
-    if (p.wt)             body += '<div class="meas-item"><div class="val">' + p.wt + '</div><div class="lbl">Weight</div></div>';
-    if (p.barefoot)       body += '<div class="meas-item"><div class="val">' + Math.floor(p.barefoot/12) + "\'" + Math.round(p.barefoot%12) + '"</div><div class="lbl">Barefoot</div></div>';
-    if (p.wingspan)       body += '<div class="meas-item"><div class="val">' + Math.floor(p.wingspan/12) + "\'" + Math.round(p.wingspan%12) + '"</div><div class="lbl">Wingspan</div></div>';
-    if (p.standing_reach) body += '<div class="meas-item"><div class="val">' + Math.floor(p.standing_reach/12) + "\'" + Math.round(p.standing_reach%12) + '"</div><div class="lbl">Standing Reach</div></div>';
-    if (p.age)            body += '<div class="meas-item"><div class="val">' + parseFloat(p.age||0).toFixed(1) + '</div><div class="lbl">Age (8/1)</div></div>';
+    body += '<div class="modal-section"><div class="modal-sec-title"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:12px;height:12px;flex-shrink:0"><path d="M2.5 10.5l8-8 3 3-8 8h-3v-3z"/><path d="M5 8l1.2 1.2M7 6l1.2 1.2M9 4l1.2 1.2"/></svg><span>Measurables</span></div><div class="meas-grid">';
+    if (p.ht)             body += '<div class="meas-item"><div class="lbl">Height</div><div class="meas-val-row"><div class="val">' + Math.floor(p.ht/12) + "\'" + (p.ht%12) + '"</div></div></div>';
+    if (p.wt)             body += '<div class="meas-item"><div class="lbl">Weight</div><div class="meas-val-row"><div class="val">' + p.wt + '</div><span class="combine-sub">lb</span></div></div>';
+    if (p.barefoot)       body += '<div class="meas-item"><div class="lbl">Barefoot</div><div class="meas-val-row"><div class="val">' + Math.floor(p.barefoot/12) + "\'" + Math.round(p.barefoot%12) + '"</div></div></div>';
+    if (p.wingspan)       body += '<div class="meas-item"><div class="lbl">Wingspan</div><div class="meas-val-row"><div class="val">' + Math.floor(p.wingspan/12) + "\'" + Math.round(p.wingspan%12) + '"</div></div></div>';
+    if (p.standing_reach) body += '<div class="meas-item"><div class="lbl">Standing Reach</div><div class="meas-val-row"><div class="val">' + Math.floor(p.standing_reach/12) + "\'" + Math.round(p.standing_reach%12) + '"</div></div></div>';
+    if (p.age)            body += '<div class="meas-item"><div class="lbl">Age</div><div class="meas-val-row"><div class="val">' + parseFloat(p.age||0).toFixed(1) + '</div><span class="combine-sub">as of Aug 1</span></div></div>';
     body += '</div></div>';
   }
 
@@ -10771,7 +11201,7 @@ function openFutureModal(rank) {
       // Neutral / Developing
       if (hasNeutral) {
         body += '<div class="sw-col">';
-        body += '<div class="sw-col-title ntr">\ud83d\udd04 Developing</div>';
+        body += '<div class="sw-col-title ntr"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:11px;height:11px;flex-shrink:0"><path d="M2 8a6 6 0 1 0 1.76-4.24M2 3v3h3"/></svg> Developing</div>';
         body += '<ul class="sw-list ntr">';
         swl.neutral.forEach(function(n){ body += '<li>' + escHtml(n) + '</li>'; });
         body += '</ul>';
@@ -20664,20 +21094,45 @@ function simGetMetricRank(rank) {
   return simMetricIndex.get(rank) || 0;
 }
 
-// ── GRADE: compare metric rank vs pick number ─────────────────────────────────
-function simGrade(availableRank, total, pickNum) {
-  var ratio = (total > 1) ? ((availableRank - 1) / (total - 1)) : 0;
-  if (ratio <= 0.04) return {label:'A+', color:'#10B981', bg:'#D1FAE5', tier:'elite'};
-  if (ratio <= 0.10) return {label:'A',  color:'#10B981', bg:'#D1FAE5', tier:'great'};
-  if (ratio <= 0.18) return {label:'A-', color:'#16A34A', bg:'#DCFCE7', tier:'great'};
-  if (ratio <= 0.28) return {label:'B+', color:'#2563EB', bg:'#DBEAFE', tier:'good'};
-  if (ratio <= 0.42) return {label:'B',  color:'#2563EB', bg:'#DBEAFE', tier:'good'};
-  if (ratio <= 0.56) return {label:'B-', color:'#3B82F6', bg:'#EFF6FF', tier:'good'};
-  if (ratio <= 0.68) return {label:'C+', color:'#D97706', bg:'#FEF3C7', tier:'ok'};
-  if (ratio <= 0.80) return {label:'C',  color:'#D97706', bg:'#FEF3C7', tier:'ok'};
-  if (ratio <= 0.90) return {label:'C-', color:'#EA580C', bg:'#FFEDD5', tier:'bad'};
-  if (ratio <= 0.97) return {label:'D',  color:'#DC2626', bg:'#FEE2E2', tier:'bad'};
-  return                    {label:'F',  color:'#991B1B', bg:'#FEE2E2', tier:'fail'};
+// ── GRADE v2: board-value-led blend ──────────────────────────────────────────
+// Rebalanced per scouting direction:
+//   • PRIMARY (≈70%): pick slot vs big-board rank. A player sliding from
+//     #25 to #45 is +20 slots of value — that's an A regardless of whether
+//     his metric pops. Reaches cost symmetrically.
+//   • SECONDARY (≈30%): metric standing within the remaining pool.
+//   • NO METRIC ≠ PENALTY: players without a metric score take a neutral 0
+//     on the metric component and are graded purely on board value. (The
+//     old formula was 100% metric AND treated a missing metric as index 0,
+//     which accidentally graded metric-less players A+.)
+function simGrade(metricRank, total, pickNum, boardRank, hasMetric) {
+  // Board component: ~2.2 pts per slot of slide/reach, capped so one pick
+  // can't blow past the scale (±25 slots saturates).
+  // Value = a better-ranked player landing at a later slot: pick − rank.
+  // (#25 board rank taken at pick 45 → +20 slots of value.)
+  var boardDiff  = (boardRank != null) ? (pickNum - boardRank) : 0;
+  boardDiff      = Math.max(-25, Math.min(25, boardDiff));
+  var boardPts   = boardDiff * 2.2;
+
+  // Metric component: pool-position ratio mapped to ±20 pts; neutral when
+  // the player has no metric or no rank in the index.
+  var metricPts = 0;
+  if (hasMetric && metricRank > 0 && total > 1) {
+    var ratio = (metricRank - 1) / (total - 1);
+    metricPts = (0.5 - ratio) * 40;
+  }
+
+  var score = 50 + boardPts + metricPts;
+  if (score >= 85) return {label:'A+', color:'#10B981', bg:'#D1FAE5', tier:'elite'};
+  if (score >= 75) return {label:'A',  color:'#10B981', bg:'#D1FAE5', tier:'great'};
+  if (score >= 66) return {label:'A-', color:'#16A34A', bg:'#DCFCE7', tier:'great'};
+  if (score >= 58) return {label:'B+', color:'#2563EB', bg:'#DBEAFE', tier:'good'};
+  if (score >= 50) return {label:'B',  color:'#2563EB', bg:'#DBEAFE', tier:'good'};
+  if (score >= 43) return {label:'B-', color:'#3B82F6', bg:'#EFF6FF', tier:'good'};
+  if (score >= 36) return {label:'C+', color:'#D97706', bg:'#FEF3C7', tier:'ok'};
+  if (score >= 29) return {label:'C',  color:'#D97706', bg:'#FEF3C7', tier:'ok'};
+  if (score >= 22) return {label:'C-', color:'#EA580C', bg:'#FFEDD5', tier:'bad'};
+  if (score >= 12) return {label:'D',  color:'#DC2626', bg:'#FEE2E2', tier:'bad'};
+  return                  {label:'F',  color:'#991B1B', bg:'#FEE2E2', tier:'fail'};
 }
 
 function simMetRank(rank) {
@@ -20687,6 +21142,57 @@ function simMetRank(rank) {
 }
 
 // ── TEAM GRID ─────────────────────────────────────────────────────────────────
+// SIM-REDESIGN: your-picks strip — the folded left-sidebar. One amber-keyed
+// chip per selection you made (photo + pick# + name + grade), horizontally
+// scrollable, hidden until you own a pick.
+// YOURPICKS-V2: prominent scouting cards, not hideaway chips. Each card
+// carries the full evaluation payload — photo, name+grade, school · pos ·
+// role, physicals, and the metric stat lockup — so your draft haul reads
+// like a roster, not a breadcrumb trail.
+function simRenderYourPicks() {
+  var el = document.getElementById('simYourPicks');
+  if (!el) return;
+  var mine = Object.keys(simSelections)
+    .filter(function(pk){ var sel=simSelections[pk]; return sel && simUserTeams[sel.team] && !sel.cpu; })
+    .sort(function(a,b){ return a-b; });
+  if (!mine.length) { el.style.display='none'; el.innerHTML=''; return; }
+  var h = '<div class="sim-yp-head"><span class="sim-yp-lbl">Your Picks</span>'
+        + '<span class="sim-yp-count">' + mine.length + '</span></div>'
+        + '<div class="sim-yp-row">';
+  mine.forEach(function(pk) {
+    var sel   = simSelections[pk];
+    var base  = sel.name && sel.name.indexOf(' - ')>0 ? sel.name.slice(0,sel.name.indexOf(' - ')) : (sel.name||'');
+    var school= sel.name && sel.name.indexOf(' - ')>0 ? sel.name.slice(sel.name.indexOf(' - ')+3) : '';
+    var fullP = hwPlayerByRank(sel.rank);
+    var role  = fullP && fullP.torvik_role ? fullP.torvik_role : '';
+    var htIn  = fullP && fullP.ht ? fullP.ht : 0;
+    var wtLb  = fullP && fullP.wt ? fullP.wt : 0;
+    var phys  = [htIn?(Math.floor(htIn/12)+"\u2032"+(htIn%12)+"\u2033"):'', wtLb?wtLb+' lb':''].filter(Boolean).join(' / ');
+    var bpm   = fullP && fullP.bpm != null && fullP.bpm !== '' ? 'BPM ' + Number(fullP.bpm).toFixed(1) : '';
+    var meta2 = [role?'<span class="sim-yp-role">'+escHtml(role)+'</span>':'', phys, bpm]
+                  .filter(Boolean).join(' <span class="sim-yp-sep">\u00B7</span> ');
+    h += '<div class="sim-yp-card">'
+       +   '<div class="sim-yp-pickcol">'
+       +     '<span class="sim-yp-picknum">#'+pk+'</span>'
+       +     (typeof mdcTeamLogoHtml==='function'?mdcTeamLogoHtml(sel.team,'20px'):'')
+       +   '</div>'
+       +   '<span class="sim-yp-photo">'+avatarHtml(sel.name, sel.pos||'', '42px', '6px')+'</span>'
+       +   '<div class="sim-yp-id">'
+       +     '<div class="sim-yp-nrow">'
+       +       '<span class="sim-yp-name">'+escHtml(base)+'</span>'
+       +       (sel.grade ? '<span class="sim-yp-grade" style="color:'+sel.grade.color+';background:'+sel.grade.bg+'">'+sel.grade.label+'</span>' : '')
+       +     '</div>'
+       +     '<div class="sim-yp-meta">'+escHtml(school)+(sel.pos?' <span class="sim-yp-sep">\u00B7</span> '+escHtml(sel.pos):'')+'</div>'
+       +     (meta2?'<div class="sim-yp-meta2">'+meta2+'</div>':'')
+       +   '</div>'
+       +   (sel.metric>0?'<div class="sim-yp-stat"><div class="sim-yp-met">'+Number(sel.metric).toFixed(1)+'</div><div class="sim-yp-met-lbl">Metric</div></div>':'')
+       + '</div>';
+  });
+  h += '</div>';
+  el.innerHTML = h;
+  el.style.display = 'block';
+}
+
 function simBuildTeamGrid() {
   var grid = document.getElementById('simTeamGrid');
   if (!grid || grid.children.length) return;
@@ -20700,7 +21206,7 @@ function simBuildTeamGrid() {
     // DESIGN-MOCK-6: logo + code — the board rows already use team logos
     // via mdcTeamLogoHtml; the setup grid (the feature's front door) was
     // the only text-only surface left.
-    btn.innerHTML   = (typeof mdcTeamLogoHtml==='function' ? mdcTeamLogoHtml(slot.team,'18px') : '')
+    btn.innerHTML   = (typeof mdcTeamLogoHtml==='function' ? mdcTeamLogoHtml(slot.team,'44px') : '')
                     + '<span>' + escHtml(slot.team) + '</span>';
     btn.title       = slot.name;
     btn.onclick     = function(){ simToggleTeam(slot.team); };
@@ -20786,6 +21292,7 @@ function simResumeFromState() {
   if (board) board.style.display = '';
   simRenderBoard();
   simUpdateScorecard();
+  simRenderYourPicks();
   simProcessNext();
 }
 
@@ -20852,14 +21359,14 @@ function simStart() {
   document.getElementById('simBoard').style.display   = '';
   document.getElementById('simResults').style.display = 'none';
   document.getElementById('simPoolPanel').style.display = 'none';
-  hidePriorPicksSidebar('simPriorSidebar');
+  simRenderYourPicks();  // SIM-REDESIGN: strip replaces the sidebar column
 
   // Kickoff event — give the log immediate substance.
   var ownedCount = Object.keys(simUserTeams).filter(function(t){ return simUserTeams[t]; }).length;
   var varianceLabel = simVariance <= 0.03 ? 'Chalk' : simVariance <= 0.15 ? 'Realistic' : 'Wild';
   simAddEvent({
     pick:0, type:'start', tone:'navy',
-    text:'🎬 Draft begins — ' + simMaxPicks + ' picks, ' + varianceLabel + ' variance' +
+    text:'Draft begins — ' + simMaxPicks + ' picks, ' + varianceLabel + ' variance' +
          (ownedCount ? ', you control ' + ownedCount + ' team' + (ownedCount>1?'s':'') : '')
   });
 
@@ -20921,8 +21428,13 @@ function simProcessNext() {
     }
 
     simDoCpuPick(s2);
+    var _stamped = simCurrentPick;
     simCurrentPick++;
     simSyncCurrentHighlight();     // PERF-MOCK-2: move highlight + follow-scroll
+    // WOW: stamp the freshly filled row
+    (function(pk){ var r=document.querySelector('#simPicksBoard [data-pick="'+pk+'"]');
+      if(r){ r.classList.add('just-picked');
+        r.addEventListener('animationend',function(){r.classList.remove('just-picked');},{once:true}); } })(_stamped);
     setTimeout(hwPersistSave, 0);  // PERSIST-MOCK-1: survive refresh mid-run
     simRenderPool();
     simProcessNext(); // recurse — bumps gen again, schedules next or halts
@@ -20955,6 +21467,22 @@ function simDoCpuPick(slot) {
   var pickNum  = simCurrentPick;
   var win      = simPickWindow(pickNum);
 
+  // ── CLASS-RULE (2026): consensus top-3 lock ──────────────────────────────
+  // This class has a settled top tier — Boozer / Dybantsa / Peterson never
+  // slide out of the first three picks in real boards. CPU picks 1-3 draft
+  // exclusively from whichever of board ranks 1-3 remain (variance and team
+  // archetype still decide the ORDER among them). User picks are never
+  // overridden, so a user taking someone else at 1-3 can still cause a
+  // slide — that's their story to tell. Flip SIM_LOCK_TOP3 off (or make it
+  // year-conditional) when a future class lacks a clean top tier.
+  var SIM_LOCK_TOP3 = true;
+  if (SIM_LOCK_TOP3 && pickNum <= 3) {
+    var top3Left = simAvailable.filter(function(p){ return p.rank <= 3; });
+    if (top3Left.length) {
+      return simFinishCpuPick(slot, pickNum, profile, weights, top3Left);
+    }
+  }
+
   // Risk-adjusted window: high-risk teams will look slightly further down for upside.
   var lowerBound = pickNum - win;
   var upperBound = pickNum + Math.round(win * (1 + profile.risk * 0.4));
@@ -20965,6 +21493,13 @@ function simDoCpuPick(slot) {
     eligible = simAvailable.filter(function(p){ return p.rank <= pickNum + win * 2; });
   }
   if (!eligible.length) eligible = simAvailable.slice(0, 5); // safety net
+
+  return simFinishCpuPick(slot, pickNum, profile, weights, eligible);
+}
+
+// Scoring + selection over a candidate set — extracted so the top-3 lock and
+// the normal window path share one code path (no scoring logic duplicated).
+function simFinishCpuPick(slot, pickNum, profile, weights, eligible) {
 
   // Metric-sorted index *within the eligible set* — for metricSub (0..1).
   var metricEligible = eligible.slice().sort(function(a, b) {
@@ -21043,7 +21578,8 @@ function simDoCpuPick(slot) {
 
   // Compute grade via shared metric index (Tier 0 — single source of truth).
   var mr    = simGetMetricRank(chosen.rank);
-  var grade = simGrade(mr, simAvailable.length + 1, simCurrentPick);
+  var grade = simGrade(mr, simAvailable.length + 1, simCurrentPick,
+                       chosen.rank, !!(chosen.player.metric && chosen.player.metric > 0));
 
   simSelections[simCurrentPick] = {
     rank:chosen.rank, name:chosen.player.name, team:slot.team,
@@ -21056,7 +21592,7 @@ function simDoCpuPick(slot) {
   if (chosen.rank + 5 <= pickNum && !simSlideMemo[chosen.rank]) {
     simAddEvent({
       pick:pickNum, type:'slide', tone:'gold', team:slot.team,
-      text:'📉 SLIDE STOPS HERE — ' + simPlayerBase(chosen.player.name) +
+      text:simPlayerBase(chosen.player.name) +
            ' (proj. #' + chosen.rank + ') goes to ' + slot.team + ' at #' + pickNum
     });
     simSlideMemo[chosen.rank] = pickNum;
@@ -21065,7 +21601,7 @@ function simDoCpuPick(slot) {
   else if (chosen.rank - 8 >= pickNum) {
     simAddEvent({
       pick:pickNum, type:'reach', tone:'red', team:slot.team,
-      text:'📢 SHOCKER — ' + slot.team + ' reaches for ' +
+      text:slot.team + ' reaches for ' +
            simPlayerBase(chosen.player.name) + ' (proj. #' + chosen.rank +
            ', taken at #' + pickNum + ')'
     });
@@ -21074,7 +21610,7 @@ function simDoCpuPick(slot) {
   else if (grade.tier === 'elite' || (grade.tier === 'great' && Math.random() < 0.5)) {
     simAddEvent({
       pick:pickNum, type:'value', tone:'green', team:slot.team,
-      text:'✨ VALUE — ' + slot.team + ' takes ' + simPlayerBase(chosen.player.name) +
+      text:slot.team + ' takes ' + simPlayerBase(chosen.player.name) +
            ' (' + grade.label + ' grade)'
     });
   }
@@ -21130,12 +21666,19 @@ function simRenderEvents() {
     el.innerHTML = '<div class="sim-event-empty">No events yet — picks will report in here</div>';
     return;
   }
+  // SIM-REDESIGN: feed, not card stack. Semantics live in a typed chip
+  // (VALUE / SLIDE / REACH / PICK …) instead of emoji baked into strings;
+  // rows separate with hairlines + a 2px tone tick, halving visual weight.
+  var TAGS = { value:'VALUE', slide:'SLIDE', reach:'REACH', pick:'PICK',
+               start:'START', end:'DONE', resume:'RESUME' };
   var h = '';
   for (var i = 0; i < simEvents.length; i++) {
     var ev = simEvents[i];
     var newCls = (i === 0) ? ' sim-event-new' : '';
+    var tag = TAGS[ev.type] || 'PICK';
     h += '<div class="sim-event sim-event-' + ev.tone + newCls + '">' +
-         '<span class="sim-event-pick">#' + ev.pick + '</span>' +
+         '<span class="sim-event-pick">' + (ev.pick ? '#' + ev.pick : '\u2022') + '</span>' +
+         '<span class="sim-event-tag">' + tag + '</span>' +
          '<span class="sim-event-text">' + escHtml(ev.text) + '</span>' +
          '</div>';
   }
@@ -21155,7 +21698,8 @@ Sim.engine.recordUserPick = function(rank) {
   if (!player) return null;
 
   var mr    = simMetRank(rank);
-  var grade = simGrade(mr, s.available.length + 1, s.currentPick);
+  var grade = simGrade(mr, s.available.length + 1, s.currentPick,
+                       rank, !!(player.metric && player.metric > 0));
   var pickN = s.currentPick;
 
   s.selections[pickN] = {
@@ -21174,23 +21718,23 @@ Sim.engine.recordUserPick = function(rank) {
   if (rank + 5 <= pickN && !s.slideMemo[rank]) {
     simAddEvent({
       pick:pickN, type:'slide', tone:'gold', team:slot.team,
-      text:'📉 SLIDE STOPS — ★ You take ' + base + ' (proj. #' + rank + ') at #' + pickN
+      text:'You take ' + base + ' (proj. #' + rank + ') at #' + pickN
     });
     s.slideMemo[rank] = pickN;
   } else if (rank - 8 >= pickN) {
     simAddEvent({
       pick:pickN, type:'reach', tone:'red', team:slot.team,
-      text:'📢 REACH — ★ You take ' + base + ' (proj. #' + rank + ') at #' + pickN
+      text:'You take ' + base + ' (proj. #' + rank + ') at #' + pickN
     });
   } else if (grade.tier === 'elite' || grade.tier === 'great') {
     simAddEvent({
       pick:pickN, type:'value', tone:'green', team:slot.team,
-      text:'✨ VALUE — ★ You grab ' + base + ' (' + grade.label + ' grade)'
+      text:'You grab ' + base + ' (' + grade.label + ' grade)'
     });
   } else {
     simAddEvent({
       pick:pickN, type:'pick', tone:'navy', team:slot.team,
-      text:'★ You select ' + base + ' (' + grade.label + ')'
+      text:'You select ' + base + ' (' + grade.label + ')'
     });
   }
 
@@ -21216,6 +21760,10 @@ Sim.on('userPicked', function(data) {
   // data.pick in recordUserPick) + highlight sync; was a full 60-row rebuild.
   simPatchBoardRow(data.pick);
   simSyncCurrentHighlight();
+  // WOW: stamp your pick
+  (function(pk){ var r=document.querySelector('#simPicksBoard [data-pick="'+pk+'"]');
+    if(r){ r.classList.add('just-picked');
+      r.addEventListener('animationend',function(){r.classList.remove('just-picked');},{once:true}); } })(data.pick);
   setTimeout(hwPersistSave, 0);  // PERSIST-MOCK-1
 
   // Prior-picks sidebar — if this team had earlier picks, show them and delay
@@ -21232,7 +21780,7 @@ Sim.on('userPicked', function(data) {
                  metric:sel.metric, stats: full || null };
       });
     if (teamPrior.length > 0) {
-      showPriorPicksSidebar('simPriorSidebar', prev.team, teamPrior, data.pick);
+      simRenderYourPicks();
       var gen = Sim.state.generation;
       setTimeout(function() {
         if (gen !== Sim.state.generation) return;   // reset/restart — bail
@@ -21270,7 +21818,7 @@ function simShowPool() {
         return {pick:parseInt(pk), name:s.name, pos:s.pos, rank:s.rank,
           metric:s.metric, stats:full||null};
       });
-    showPriorPicksSidebar('simPriorSidebar', slot.team, prior, simCurrentPick);
+    simRenderYourPicks();
   }
   simRenderPool();
 }
@@ -21315,23 +21863,26 @@ function simRenderPool() {
     return true;
   });
 
+  // SIM-REDESIGN: tabular pool rows — same grid discipline as the board:
+  // [rank 26][photo 32][name+school 1fr][metric 46][grade 34]. Metric over
+  // metric, grade over grade; bright tabular ranks.
   var h='';
   players.forEach(function(p) {
     var base  =p.name&&p.name.indexOf(' - ')>0?p.name.slice(0,p.name.indexOf(' - ')):(p.name||'');
     var school=p.name&&p.name.indexOf(' - ')>0?p.name.slice(p.name.indexOf(' - ')+3):'';
-    var posCol=p.position==='Guard'?'#2563EB':p.position==='Center'?'#64748B':'#2C4569';
     var met   =p.metric&&p.metric>0?Number(p.metric).toFixed(1):'';
     var mr    =simGetMetricRank(p.rank);
-    var pg    =simGrade(mr, simAvailable.length + 1, simCurrentPick);
+    var pg    =simGrade(mr, simAvailable.length + 1, simCurrentPick,
+                        p.rank, !!(p.metric && p.metric > 0));
     h+='<div class="sim-pool-row" data-rank="'+p.rank+'">'
-      +'<span style="font-family:Barlow Condensed,sans-serif;font-size:11px;font-weight:900;color:var(--gray-300);width:20px;flex-shrink:0">#'+p.rank+'</span>'
-      +avatarHtml(p.name, p.position||'', '28px', '4px')
-      +'<div style="flex:1;min-width:0">'
-      +  '<div style="font-family:Barlow Condensed,sans-serif;font-size:13px;font-weight:800;color:var(--navy);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+escHtml(base)+'</div>'
-      +  '<div style="font-size:9px;color:var(--gray-400)">'+escHtml(school)+'</div>'
+      +'<span class="spr-rank">'+p.rank+'</span>'
+      +'<span class="spr-photo">'+avatarHtml(p.name, p.position||'', '32px', '5px')+'</span>'
+      +'<div class="spr-id">'
+      +  '<div class="spr-name">'+escHtml(base)+'</div>'
+      +  '<div class="spr-school">'+escHtml(school)+'</div>'
       +'</div>'
-      +(met?'<span style="font-family:Barlow Condensed,sans-serif;font-size:12px;font-weight:900;color:var(--amber)">'+met+'</span>':'')
-      +'<span style="font-size:9px;font-weight:700;color:'+pg.color+';background:'+pg.bg+';border-radius:4px;padding:1px 5px;white-space:nowrap">'+pg.label+'</span>'
+      +'<span class="spr-met">'+(met||'')+'</span>'
+      +'<span class="spr-grade" style="color:'+pg.color+';background:'+pg.bg+'">'+pg.label+'</span>'
       +'</div>';
   });
   if (!h) h='<div style="padding:20px;text-align:center;color:var(--gray-400);font-size:13px">No players match</div>';
@@ -21352,7 +21903,7 @@ function simBuildBoardRowHtml(slot) {
   var isCur   = slot.pick===simCurrentPick;
   var isOwned = simUserTeams[slot.team];
   var isLotto = slot.pick<=14;
-  var logoHtml= (typeof mdcTeamLogoHtml==='function')?mdcTeamLogoHtml(slot.team,'32px'):escHtml(slot.team);
+  var logoHtml= (typeof mdcTeamLogoHtml==='function')?mdcTeamLogoHtml(slot.team,'30px'):escHtml(slot.team);
 
   // Row state modifier — order matters: owned-current beats current beats owned.
   var rowMod = '';
@@ -21360,47 +21911,57 @@ function simBuildBoardRowHtml(slot) {
   else if (isCur)            rowMod = ' is-current';
   else if (isOwned && sel)   rowMod = ' is-owned';
 
-  var playerInner='';
+  // SIM-REDESIGN: tabular grid row — every column fixed so metric sits over
+  // metric and grade over grade down the whole board:
+  //   [pick 40][logo 34][team 32][identity 1fr][metric 60][grade 42]
+  var identity='', metCell='', gradeCell='';
   if (sel) {
     var base    = sel.name&&sel.name.indexOf(' - ')>0?sel.name.slice(0,sel.name.indexOf(' - ')):(sel.name||'');
     var school  = sel.name&&sel.name.indexOf(' - ')>0?sel.name.slice(sel.name.indexOf(' - ')+3):'';
     var posCol  = sel.pos==='Guard'?'#2563EB':sel.pos==='Center'?'#64748B':'#2C4569';
-    var metTxt  = sel.metric>0?'<span class="sim-board-metric">'+Number(sel.metric).toFixed(1)+'</span>':'';
-    var grBadge = sel.grade?'<span class="sim-board-grade" style="color:'+sel.grade.color+';background:'+sel.grade.bg+'">'+sel.grade.label+'</span>':'';
     var fullP   = hwPlayerByRank(sel.rank);
     var htIn    = fullP&&fullP.ht?fullP.ht:0;
     var wtLb    = fullP&&fullP.wt?fullP.wt:0;
-    var htStr   = htIn?(Math.floor(htIn/12)+"'"+(htIn%12)+'"'):'';
-    var wtStr   = wtLb?wtLb+'lb':'';
+    var htStr   = htIn?(Math.floor(htIn/12)+"\u2032"+(htIn%12)+"\u2033"):'';
+    var wtStr   = wtLb?wtLb+' lb':'';
     var physStr = [htStr,wtStr].filter(Boolean).join(' / ');
     var roleStr = fullP&&fullP.torvik_role?fullP.torvik_role:'';
 
-    playerInner=
-      '<div class="sim-board-name-row">'
-        +avatarHtml(sel.name, sel.pos||'', '36px', '5px')
-        +'<span class="sim-board-name">'+escHtml(base)+'</span>'
-        +(sel.cpu?'<span class="sim-board-tag-cpu">cpu</span>':'<span class="sim-board-tag-you">★ you</span>')
-        +'<span class="sim-board-name-meta">'+metTxt+grBadge+'</span>'
-      +'</div>'
-      +'<div class="sim-board-meta-row">'
-        +(school?'<span class="sim-board-school">'+escHtml(school)+'</span>':'')
-        +(sel.pos?'<span class="sim-board-pos" style="color:'+posCol+'">'+escHtml(sel.pos)+'</span>':'')
-        +(roleStr?'<span class="sim-board-role">'+escHtml(roleStr)+'</span>':'')
-        +(physStr?'<span class="sim-board-physical">'+physStr+'</span>':'')
+    identity=
+      '<div class="sim-board-identity">'
+      +  avatarHtml(sel.name, sel.pos||'', '36px', '6px')
+      +  '<div class="sim-board-id-text">'
+      +    '<div class="sim-board-name-row">'
+      +      '<span class="sim-board-name">'+escHtml(base)+'</span>'
+      +      (sel.cpu?'<span class="sim-board-chip-cpu">CPU</span>':'<span class="sim-board-chip-you">YOU</span>')
+      +    '</div>'
+      +    '<div class="sim-board-meta-row">'
+      +      '<span class="sim-board-school">'+escHtml(school||'\u2014')+'</span>'
+      +      (sel.pos?'<span class="sim-board-pos" style="color:'+posCol+'">'+escHtml(sel.pos[0])+'</span>':'<span></span>')
+      +      '<span class="sim-board-role">'+escHtml(roleStr||'')+'</span>'
+      +      '<span class="sim-board-physical">'+physStr+'</span>'
+      +    '</div>'
+      +  '</div>'
       +'</div>';
+    metCell  = sel.metric>0?'<span class="sim-board-metric">'+Number(sel.metric).toFixed(1)+'</span>':'<span></span>';
+    gradeCell= sel.grade?'<span class="sim-board-grade" style="color:'+sel.grade.color+';background:'+sel.grade.bg+'">'+sel.grade.label+'</span>':'<span></span>';
   } else if (isCur&&simRunning) {
     var cls = simUserTeams[slot.team] ? 'sim-board-placeholder-user' : 'sim-board-placeholder-cpu';
-    var txt = simUserTeams[slot.team] ? '← Your pick' : 'CPU selecting…';
-    playerInner='<span class="'+cls+'">'+txt+'</span>';
+    var txt = simUserTeams[slot.team] ? 'Your pick \u2014 select from the pool \u2192' : 'CPU selecting\u2026';
+    identity='<span class="'+cls+'">'+txt+'</span>';
+    metCell='<span></span>'; gradeCell='<span></span>';
   } else {
-    playerInner='<span class="sim-board-empty">—</span>';
+    identity='<span class="sim-board-empty"></span>';
+    metCell='<span></span>'; gradeCell='<span></span>';
   }
 
   return '<div class="sim-board-row'+rowMod+'" data-pick="'+slot.pick+'">'
     +'<span class="sim-board-pick-num'+(isLotto?' is-lotto':'')+'">'+(slot.pick<10?'0'+slot.pick:''+slot.pick)+'</span>'
     +'<span class="sim-board-logo">'+logoHtml+'</span>'
     +'<span class="sim-board-team-code">'+escHtml(slot.team)+'</span>'
-    +'<div class="sim-board-player">'+playerInner+'</div>'
+    +identity
+    +metCell
+    +gradeCell
     +'</div>';
 }
 
@@ -21447,7 +22008,8 @@ function simRenderBoard() {
   slots.forEach(function(slot) {
     var round=slot.pick<=30?1:2;
     if (round!==lastRound) {
-      h+='<div class="sim-board-divider">Round '+round+'</div>';
+      h+='<div class="sim-board-divider"><span>Round '+round+'</span>'
+        +'<span class="sim-board-div-range">Picks '+(round===1?'1\u201330':'31\u201360')+'</span></div>';
       lastRound=round;
     }
     h+=simBuildBoardRowHtml(slot);
@@ -21469,13 +22031,13 @@ function simUpdateStatus() {
   var lbl  =document.getElementById('simPoolLabel');
 
   if (simCurrentPick > simMaxPicks) {
-    if (badge){badge.textContent='✅ Draft Complete';badge.style.background='#10B981';}
+    if (badge){badge.textContent='Draft Complete';badge.classList.remove('is-user');badge.style.background='#10B981';}
     if (prog) prog.style.width='100%';
     if (txt)  txt.textContent=simMaxPicks+' / '+simMaxPicks;
     if (simRunning) {  // only fire once on transition
       simAddEvent({
         pick:simMaxPicks, type:'end', tone:'gold',
-        text:'🏁 Draft complete — ' + simMaxPicks + ' picks in the books'
+        text:'Draft complete — ' + simMaxPicks + ' picks in the books'
       });
     }
     simRunning=false;
@@ -21495,9 +22057,12 @@ function simUpdateStatus() {
                        : profile.archetype === 'rebuild'     ? 'upside hunting'
                        : '';
     if (badge){
-      badge.textContent=(isUser?'⭐ YOUR PICK — ':'')+slot.name+' — Pick #'+slot.pick +
-                        (isUser ? '' : '  ·  ' + archetypeLabel);
-      badge.style.background=isUser?'#D97706':'var(--navy)';
+      badge.textContent=(isUser?'YOUR PICK \u2014 ':'')+slot.name+' \u2014 Pick #'+slot.pick +
+                        (isUser ? '' : '  \u00B7  ' + archetypeLabel);
+      // SIM-REDESIGN: class-driven state — .is-user gets the amber flood +
+      // breathing glow; resting CPU state stays quiet navy.
+      badge.style.background='';
+      badge.classList.toggle('is-user', !!isUser);
     }
     // simPoolLabel is rendered via innerHTML elsewhere — set as textContent here for safety
     if (lbl) lbl.textContent='Pick #'+slot.pick+' — '+slot.name;
@@ -22311,42 +22876,10 @@ function simUpdateMobilePicks() {
   document.head.appendChild(s);
 })();
 
-// ══ ARCHITECTURE LAYER 6: IntelService ══════════════════════════════════════
-// Owns the Anthropic API call mechanism.
-// hwIntel's tryFetchWebIntel/tryFetchVideoIds delegate here.
-// Centralises: model name, max_tokens, tool config, error handling.
-var IntelService = (function() {
-  'use strict';
-
-  var API_URL = 'https://api.anthropic.com/v1/messages';
-  var MODEL   = 'claude-sonnet-4-20250514';
-
-  // Core API call — replaces hwIntel's internal callAPI function.
-  // Returns a Promise<string> with the text response.
-  function call(prompt, maxTokens) {
-    return fetch(API_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model:      MODEL,
-        max_tokens: maxTokens || 1000,
-        tools:      [{ type: 'web_search_20250305', name: 'web_search' }],
-        messages:   [{ role: 'user', content: prompt }],
-      }),
-    })
-    .then(function(r) {
-      if (!r.ok) throw new Error('API error ' + r.status);
-      return r.json();
-    })
-    .then(function(data) {
-      var text = '';
-      (data.content || []).forEach(function(b) { if (b.type === 'text') text += b.text; });
-      return text;
-    });
-  }
-
-  return { call: call };
-})();
+// (Removed: IntelService + hwIntel modules — dead runtime-API dependency.
+//  Replaced by buildScoutingResources() — deterministic templated links.)
+// RESTORED: Bootstrap layer (Layer 7) — was wrongly deleted along with the
+// modules above; it lived between them in the file. Recovered from index_72.
 
 // ══ ARCHITECTURE LAYER 7: Bootstrap ═════════════════════════════════════════
 // Wires DOM events → AppState dispatch.
@@ -22758,378 +23291,6 @@ var IntelService = (function() {
 
 
 <script>
-// ═══════════════════════════════════════════════════════════════════════════
-// hwIntel — Pre-Draft Intelligence Feed + Video Engine  v3
-// Intel = news ticker (no stats). Videos = real YT embeds, clean fallback.
-// ═══════════════════════════════════════════════════════════════════════════
-
-window.hwIntel = (function() {
-  'use strict';
-
-  var INTEL_TTL = 86400000; // 24 hours
-
-  // ── localStorage helpers (delegated to StorageService) ──────────────────
-  function lsGet(k)  { return StorageService._read(k); }
-  function lsSet(k,v){ StorageService._write(k, v); }
-  function lsDel(k)  { StorageService._delete(k); }
-  function slug(s)   { return (s||'').replace(/\s+/g,'_').toLowerCase(); }
-  function intelKey(n){ return 'hw_intel_v5_'+slug(n); }
-  function videoKey(n){ return 'hw_video_v5_'+slug(n); }
-  function removedKey(n){ return 'hw_rmvid_v3_'+slug(n); }
-  function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-
-  // ── Category config ───────────────────────────────────────────────────────
-  var CAT_META = {
-    workout:  { icon:'🏋️', label:'Workout / Visit',    color:'#10B981', bg:'#ECFDF5' },
-    combine:  { icon:'📏', label:'Combine / Measuring', color:'#D97706', bg:'#FEF3C7' },
-    medical:  { icon:'🩺', label:'Medical / Injury',    color:'#DC2626', bg:'#FEE2E2' },
-    agent:    { icon:'🤝', label:'Representation',      color:'#6B7280', bg:'#F3F4F6' },
-    movement: { icon:'📈', label:'Stock Movement',      color:'#2C4569', bg:'#EDE9FE' },
-    general:  { icon:'📰', label:'News',                color:'#0284C7', bg:'#E0F2FE' },
-  };
-
-  // ── Known YT video IDs for top 2026 prospects ─────────────────────────────
-  // Format: playerName -> [{id, title, category}]
-  var KNOWN_VIDEOS = {
-    'Cameron Boozer':  [{id:'RL60uq8a6yQ',title:'Cameron Boozer 2025-26 Season Highlights',cat:'highlights'},{id:'vBhqT5O2ECA',title:'Cameron Boozer NBA Draft Scouting Report',cat:'scouting'}],
-    'AJ Dybantsa':     [{id:'ZBpbKVhwBME',title:'AJ Dybantsa 2025-26 Highlights',cat:'highlights'},{id:'3VxJ7s2g78M',title:'AJ Dybantsa Scouting Report & Draft Profile',cat:'scouting'}],
-    'Darryn Peterson': [{id:'OsKEfGrRFTU',title:'Darryn Peterson Kansas Highlights',cat:'highlights'},{id:'9RnQm_fA6bI',title:'Darryn Peterson NBA Draft Breakdown',cat:'scouting'}],
-    'Kingston Flemings':[{id:'Ku2NKFzTq1k',title:'Kingston Flemings Houston Highlights',cat:'highlights'}],
-    'Darius Acuff Jr.':[{id:'BvG0kGFoP8E',title:'Darius Acuff Jr. Arkansas Highlights',cat:'highlights'}],
-    'Caleb Wilson':    [{id:'1RFSxYw6lXg',title:'Caleb Wilson UNC Highlights',cat:'highlights'}],
-    'Keaton Wagler':   [{id:'pDlWCUolVkA',title:'Keaton Wagler Illinois Highlights',cat:'highlights'}],
-    'Koa Peat':        [{id:'3jHGPQ8Bsq4',title:'Koa Peat Arizona Highlights',cat:'highlights'}],
-  };
-
-  var _current = null;
-
-  // ── Public: open ──────────────────────────────────────────────────────────
-  function open(pData) {
-    _current = pData.name;
-    var now = Date.now();
-
-    // Intel feed
-    var cachedIntel = lsGet(intelKey(pData.name));
-    if (cachedIntel && (now - cachedIntel.ts) < INTEL_TTL && cachedIntel.items) {
-      renderFeed(pData, cachedIntel.items, false);
-    } else {
-      renderFeedLoading();
-      tryFetchWebIntel(pData);
-    }
-
-    // Videos
-    var removed = lsGet(removedKey(pData.name)) || [];
-    var cachedVideo = lsGet(videoKey(pData.name));
-    if (cachedVideo && (now - cachedVideo.ts) < INTEL_TTL && cachedVideo.videos && cachedVideo.videos.length) {
-      renderVideoEmbeds(pData, cachedVideo.videos, removed);
-    } else {
-      // Show known videos instantly if available; also try API
-      var known = KNOWN_VIDEOS[pData.name];
-      if (known && known.length) {
-        renderVideoEmbeds(pData, known, removed);
-      } else {
-        renderVideoPlaceholder(pData, removed);
-        tryFetchVideoIds(pData, removed);
-      }
-    }
-  }
-
-  // ── Public: refresh ───────────────────────────────────────────────────────
-  function refresh(playerName, school) {
-    var pData = _buildPData(playerName, school);
-    lsDel(intelKey(playerName));
-    lsDel(videoKey(playerName));
-    var btn = document.getElementById('intelRefreshBtn');
-    if (btn) { btn.disabled=true; btn.textContent='Scanning\u2026'; }
-    renderFeedLoading();
-    tryFetchWebIntel(pData);
-    var removed = lsGet(removedKey(playerName)) || [];
-    renderVideoPlaceholder(pData, removed);
-    tryFetchVideoIds(pData, removed);
-  }
-
-  function _buildPData(playerName, school) {
-    // DataService.findByName replaces direct DATA.board2026.find()
-    // Guard: DataService may be undefined in separate script block contexts.
-    if (typeof DataService !== 'undefined' && DataService.findByName) {
-      var found = DataService.findByName(playerName);
-      if (found) return found;
-    }
-    return { name: playerName, school: school || '' };
-  }
-
-  // ── Public: refresh board badges ─────────────────────────────────────────
-  function refreshBadges() {
-    document.querySelectorAll('.intel-badge').forEach(function(b){ b.remove(); });
-    if (typeof DataService === 'undefined') return;
-    document.querySelectorAll('.player-card[data-rank]').forEach(function(card) {
-      var rank = parseInt(card.getAttribute('data-rank'),10);
-      var player = DataService.findByRank(rank); // O(n) but only on badge refresh
-      if (!player) return;
-      var cached = lsGet(intelKey(player.name));
-      if (cached && cached.items && cached.items.length > 0) {
-        var dot = document.createElement('div');
-        dot.className='intel-badge'; dot.title='Intel available';
-        card.style.position='relative'; card.appendChild(dot);
-      }
-    });
-  }
-
-  // ── Public: remove a video ────────────────────────────────────────────────
-  function removeVideo(playerName, videoId) {
-    var key = removedKey(playerName);
-    var removed = lsGet(key) || [];
-    if (removed.indexOf(videoId) < 0) removed.push(videoId);
-    lsSet(key, removed);
-    var card = document.getElementById('vc_'+videoId);
-    if (card) { card.style.opacity='0'; card.style.transition='opacity .2s'; setTimeout(function(){ card.remove(); },220); }
-  }
-
-  // ── Render: intel feed loading ────────────────────────────────────────────
-  function renderFeedLoading() {
-    var el = document.getElementById('intelFeedBody');
-    if (!el) return;
-    el.innerHTML = '<div class="intel-loading-row">'
-      + '<div class="intel-spinner"></div>'
-      + '<span class="intel-loading-text">Scanning for latest draft news\u2026</span>'
-      + '</div>';
-  }
-
-  // ── Render: intel feed — news ticker style ────────────────────────────────
-  function renderFeed(pData, items, isCached) {
-    var el = document.getElementById('intelFeedBody');
-    if (!el) return;
-
-    var btn = document.getElementById('intelRefreshBtn');
-    if (btn) { btn.disabled=false; btn.textContent='\u21BB Refresh'; }
-
-    if (!items || !items.length) {
-      el.innerHTML = '<div class="intel-no-news">'
-        + '<div class="intel-no-news-icon">📭</div>'
-        + '<div class="intel-no-news-text">No pre-draft news available yet</div>'
-        + '<div class="intel-no-news-sub">Check back as draft season approaches &mdash; '
-        + 'combine invites, workout visits and team meetings will appear here</div>'
-        + _linkBar(pData)
-        + '</div>';
-      return;
-    }
-
-    var h = '<div class="intel-news-feed">';
-    items.forEach(function(item, idx) {
-      var cm = CAT_META[item.category] || CAT_META.general;
-      h += '<div class="intel-news-item' + (idx === 0 ? ' first' : '') + '">';
-      // Category pill + source + date
-      h += '<div class="intel-news-meta">';
-      h += '<span class="intel-news-cat-pill" style="color:'+cm.color+';background:'+cm.bg+'">'
-         + cm.icon + ' ' + cm.label + '</span>';
-      if (item.source) h += '<span class="intel-news-source">'+esc(item.source)+'</span>';
-      if (item.date)   h += '<span class="intel-news-date">'+esc(item.date)+'</span>';
-      h += '</div>';
-      // Bullet text
-      h += '<div class="intel-news-text">'+esc(item.text||'')+'</div>';
-      h += '</div>';
-    });
-    h += '</div>';
-
-    // Links bar at bottom
-    h += _linkBar(pData);
-
-    // Timestamp
-    var cached = lsGet(intelKey(pData.name));
-    if (cached && cached.ts) {
-      h += '<div class="intel-timestamp">Last refreshed: '+new Date(cached.ts).toLocaleString()+'</div>';
-    }
-
-    el.innerHTML = h;
-  }
-
-  // ── Links bar (ESPN, Google News) ─────────────────────────────────────────
-  function _linkBar(pData) {
-    var q = encodeURIComponent((pData.name||'') + ' NBA draft 2026');
-    var h = '<div class="intel-links-block"><div class="intel-links-row">';
-    var espnId = (window.ESPN_IDS && ESPN_IDS[pData.name]) ? ESPN_IDS[pData.name] : null;
-    if (espnId) {
-      var espnSlug = (pData.name||'').toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'');
-      h += '<a class="intel-link-btn espn" href="https://www.espn.com/mens-college-basketball/player/_/id/'+espnId+'/'+espnSlug+'" target="_blank" rel="noopener">🏀 ESPN Profile</a>';
-    }
-    h += '<a class="intel-link-btn gnews" href="https://news.google.com/search?q='+q+'" target="_blank" rel="noopener">📰 Google News</a>';
-    h += '</div></div>';
-    return h;
-  }
-
-  // ── Render: video embeds ──────────────────────────────────────────────────
-  function renderVideoEmbeds(pData, videos, removed) {
-    var el = document.getElementById('videoFeedBody');
-    if (!el) return;
-    removed = removed || [];
-    videos = (videos||[]).filter(function(v){ return removed.indexOf(v.id||v.videoId) < 0; });
-    if (!videos.length) { renderVideoPlaceholder(pData, removed); return; }
-
-    var catCls = { highlights:'', scouting:'scouting', profile:'profile', gamefilm:'gamefilm' };
-    var h = '<div class="video-grid">';
-    videos.forEach(function(v) {
-      var vid  = v.id || v.videoId || '';
-      var cat  = v.cat || v.category || 'highlights';
-      var title = v.title || (pData.name + ' \u2014 ' + cat);
-      var safeName  = pData.name.replace(/'/g,"\\'");
-      var safeVid   = vid.replace(/'/g,"\\'");
-      var thumbUrl  = 'https://img.youtube.com/vi/' + esc(vid) + '/hqdefault.jpg';
-      var watchUrl  = 'https://www.youtube.com/watch?v=' + esc(vid);
-      h += '<div class="video-card" id="vc_' + esc(vid) + '">';
-      // Header row
-      h += '<div class="video-card-header">';
-      h += '<div class="video-card-meta">';
-      h += '<span class="video-card-tag ' + (catCls[cat]||'') + '">' + esc(cat) + '</span>';
-      h += '<span class="video-card-title" title="' + esc(title) + '">' + esc(title) + '</span>';
-      h += '</div>';
-      h += '<a class="video-yt-link" href="' + watchUrl + '" target="_blank" rel="noopener" title="Watch on YouTube">\u25BA YT</a>';
-      h += '<button class="video-remove-btn" onclick="hwIntel.removeVideo(\'' + safeName + '\',\'' + safeVid + '\')" title="Remove">&times;</button>';
-      h += '</div>';
-      // Click-to-play thumbnail — no iframe until user clicks, avoids Error 153
-      h += '<div class="video-thumb-wrap" id="vthumb_' + esc(vid) + '" onclick="hwPlayVideo(\'' + safeVid + '\')">';
-      h += '<img class="video-thumb-img" src="' + thumbUrl + '" alt="' + esc(title) + '" '
-         + 'onerror="this.style.display=\'none\'">';
-      h += '<div class="video-thumb-overlay">';
-      h += '<div class="video-play-circle"><span class="video-play-triangle">&#x25B6;</span></div>';
-      h += '<div class="video-play-hint">Click to play</div>';
-      h += '</div>';
-      h += '</div>';
-      h += '</div>';
-    });
-    h += '</div>';
-    el.innerHTML = h;
-  }
-
-  // ── Render: placeholder while videos load ─────────────────────────────────
-  function renderVideoPlaceholder(pData, removed) {
-    var el = document.getElementById('videoFeedBody');
-    if (!el) return;
-    var name = pData.name;
-    var school = pData.school || '';
-    var searches = [
-      { id:'yt_hl_'+slug(name), cat:'highlights', label:'Season Highlights',
-        q: name+' '+school+' NBA draft 2026 highlights',      icon:'🎯' },
-      { id:'yt_sc_'+slug(name), cat:'scouting',   label:'Scouting Report',
-        q: name+' NBA draft 2026 scouting breakdown profile',  icon:'🔬' },
-      { id:'yt_gf_'+slug(name), cat:'gamefilm',   label:'Game Film',
-        q: name+' '+school+' full game film 2025 2026',        icon:'🎬' },
-    ];
-    var h = '<div class="video-grid">';
-    searches.forEach(function(s) {
-      if ((removed||[]).indexOf(s.id) >= 0) return;
-      var ytUrl = 'https://www.youtube.com/results?search_query='+encodeURIComponent(s.q);
-      var safeName = name.replace(/'/g,"\\'");
-      h += '<div class="video-placeholder-card" id="vc_'+s.id+'">';
-      h += '<div class="video-card-header">';
-      h += '<div class="video-card-meta">';
-      h += '<span class="video-card-tag '+s.cat+'">'+s.cat+'</span>';
-      h += '<span class="video-card-title">'+esc(name)+' &mdash; '+esc(s.label)+'</span>';
-      h += '</div>';
-      h += '<button class="video-remove-btn" onclick="hwIntel.removeVideo(\''+safeName+'\',\''+s.id+'\')" title="Remove">&times;</button>';
-      h += '</div>';
-      h += '<a class="video-ph-body" href="'+ytUrl+'" target="_blank" rel="noopener">';
-      h += '<div class="video-ph-icon">'+s.icon+'</div>';
-      h += '<div class="video-ph-label">Search YouTube for '+esc(s.label)+'</div>';
-      h += '<div class="video-ph-cta">Click to open YouTube ↗</div>';
-      h += '</a>';
-      h += '</div>';
-    });
-    h += '</div>';
-    h += '<div class="video-api-note">&#8635; Videos are loading &mdash; or click a card to search YouTube directly</div>';
-    el.innerHTML = h;
-  }
-
-  // ── API: fetch web intel ──────────────────────────────────────────────────
-  function tryFetchWebIntel(pData) {
-    var prompt = 'You are a basketball draft analyst. Search the web NOW for the most recent '
-      + '2026 NBA Draft news about ' + pData.name
-      + (pData.school ? ' who plays for ' + pData.school : '') + '. '
-      + 'Look specifically for: (1) NBA team workout visits and private workouts, '
-      + '(2) NBA Draft Combine invitation or measurements, '
-      + '(3) formal draft declaration or agent signing, '
-      + '(4) injury news or medical reports, '
-      + '(5) draft stock rising or falling news from scouts/analysts, '
-      + '(6) notable recent game performances or accolades (past 60 days). '
-      + 'Return ONLY a valid JSON object, no markdown fences, no text before or after: '
-      + '{"items":[{"category":"workout|combine|medical|agent|movement|general",'
-      + '"text":"One factual sentence about the news item",'
-      + '"source":"Publication or website name",'
-      + '"date":"Month Year or approximate"}]}. '
-      + 'Include 3-8 items. Use category "general" for game performance news. '
-      + 'If truly no information exists return {"items":[]}.';
-
-    callAPI(prompt, 1500, function(text) {
-      var parsed = null;
-      try { var m=text.match(/\{[\s\S]*\}/); if(m) parsed=JSON.parse(m[0]); } catch(e){}
-      var items = (parsed && parsed.items) ? parsed.items : [];
-      // Cache
-      lsSet(intelKey(pData.name), { ts: Date.now(), items: items });
-      if (_current === pData.name) {
-        renderFeed(pData, items, true);
-        refreshBadges();
-      }
-    }, function() {
-      // API failed — show empty state (no error message shown to user)
-      if (_current === pData.name) renderFeed(pData, [], false);
-    });
-  }
-
-  // ── API: fetch real YouTube video IDs ─────────────────────────────────────
-  function tryFetchVideoIds(pData, removed) {
-    var prompt = 'Search YouTube right now for real videos about ' + pData.name
-      + (pData.school ? ' (' + pData.school + ')' : '')
-      + ', a 2026 NBA Draft prospect. '
-      + 'I need the exact 11-character YouTube video ID from real uploaded videos. '
-      + 'Search for: "' + pData.name + ' highlights 2025 2026" '
-      + 'and "' + pData.name + ' NBA draft scouting". '
-      + 'Return ONLY a JSON array, no markdown: '
-      + '[{"id":"EXACT_11_CHAR_VIDEO_ID","title":"Real video title","cat":"highlights|scouting|gamefilm"}]. '
-      + 'The id field must be exactly 11 characters (letters, numbers, underscore, hyphen). '
-      + 'Verify each video ID by checking the YouTube search results URL contains watch?v=<id>. '
-      + 'Return 2-4 videos. Return [] if you cannot find verified real video IDs.';
-
-    callAPI(prompt, 800, function(text) {
-      var videos = [];
-      try { var m=text.match(/\[[\s\S]*\]/); if(m) videos=JSON.parse(m[0]); } catch(e){}
-      videos = (videos||[]).filter(function(v){
-        return v && (v.id||v.videoId) && (v.id||v.videoId).length >= 10 && (v.id||v.videoId).length <= 12;
-      });
-      if (!videos.length) return; // keep placeholder
-      lsSet(videoKey(pData.name), { ts: Date.now(), videos: videos });
-      if (_current === pData.name) renderVideoEmbeds(pData, videos, removed||[]);
-    }, function() { /* silent — placeholder stays */ });
-  }
-
-  // ── API call: delegated to IntelService ──────────────────────────────────
-  // Model name, headers, tool config — all owned by IntelService now.
-  function callAPI(prompt, maxTokens, onSuccess, onError) {
-    IntelService.call(prompt, maxTokens)
-      .then(function(text) { onSuccess(text); })
-      .catch(function(e)   { if (onError) onError(e); });
-  }
-
-  // ── Click-to-play: replace thumbnail with nocookie iframe on click ─────────
-  function playVideo(vid) {
-    var wrap = document.getElementById('vthumb_' + vid);
-    if (!wrap) return;
-    var embedDiv = document.createElement('div');
-    embedDiv.className = 'video-embed-wrap';
-    var iframe = document.createElement('iframe');
-    iframe.src = 'https://www.youtube-nocookie.com/embed/' + vid
-      + '?autoplay=1&rel=0&modestbranding=1';
-    iframe.setAttribute('allowfullscreen', '');
-    iframe.setAttribute('allow', 'autoplay; accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture');
-    iframe.setAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
-    iframe.setAttribute('loading', 'lazy');
-    wrap.parentNode.replaceChild(embedDiv, wrap);
-    embedDiv.appendChild(iframe);
-  }
-
-  return { open:open, refresh:refresh, refreshBadges:refreshBadges, removeVideo:removeVideo, playVideo:playVideo };
-})();
-
-// Global shim — onclick="hwPlayVideo(...)" works from inside innerHTML strings
-function hwPlayVideo(vid) { if (window.hwIntel) hwIntel.playVideo(vid); }
 
 </script>
 
@@ -23203,7 +23364,6 @@ window.hoopswill = (function() {
 
     // 5. Re-render
     renderBoard2026();
-    if (window.hwIntel) hwIntel.refreshBadges();
     renderHistory(); // picks up 2026 in historical
 
     if (interactive) {
@@ -23457,7 +23617,6 @@ window.hwRollForward = (function() {
     // Re-render board (step numbering preserved; step 7 was removed —
     // DataService.invalidateCache() in step 2a above is the sole cache flush).
     if (window.renderBoard2026) renderBoard2026();
-    if (window.hwIntel && hwIntel.refreshBadges) hwIntel.refreshBadges();
   }
 
   // ── Apply roll-back ───────────────────────────────────────────────────────
@@ -23497,7 +23656,6 @@ window.hwRollForward = (function() {
     if (badge) badge.textContent = 'Preliminary';
 
     if (window.renderBoard2026) renderBoard2026();
-    if (window.hwIntel && hwIntel.refreshBadges) hwIntel.refreshBadges();
   }
 
   // ── Update all year labels in the UI ─────────────────────────────────────
