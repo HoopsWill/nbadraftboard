@@ -282,15 +282,11 @@ body{font-family:'DM Sans',sans-serif;background:var(--gray-50);color:var(--navy
 .card-metric{font-family:'Barlow Condensed',sans-serif;font-size:34px;font-weight:900;line-height:1;color:inherit;letter-spacing:-1px}
 .card-metric.elite{color:inherit}
 .card-metric-label{font-size:8.5px;font-weight:800;text-transform:uppercase;letter-spacing:1.2px;opacity:.75;color:inherit;margin-top:4px}
-.card-elite-pip{font-family:'Barlow Condensed',sans-serif;font-size:8px;font-weight:900;letter-spacing:.8px;text-transform:uppercase;background:currentColor;border-radius:3px;padding:1px 6px;margin-bottom:3px;display:inline-block;min-height:14px;line-height:14px}
-.card-elite-pip-inner{color:white;mix-blend-mode:difference}
-.card-elite-pip-spacer{min-height:14px;margin-bottom:3px}
 .card-metric-pct{font-size:11px;font-weight:700;color:inherit;margin-top:6px;opacity:.82;line-height:1.3;text-align:center}
 .card-metric-pct sup{font-size:7px;vertical-align:super;line-height:0}
 .card-measurables{display:flex;align-items:stretch;padding:0;background:#F8FAFC;border-top:1px solid rgba(10,22,40,.06);border-bottom:1px solid rgba(10,22,40,.06)}
 .card-bio-item{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;min-width:0;padding:7px 4px;position:relative;text-align:center}
 .card-bio-item+.card-bio-item::before{content:'';position:absolute;left:0;top:20%;bottom:20%;width:1px;background:rgba(10,22,40,.07)}
-.card-bio-icon{font-size:10px;flex-shrink:0;opacity:.4;margin-bottom:1px}
 .card-bio-val{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:800;color:var(--navy);white-space:nowrap;line-height:1}
 .card-bio-pct{font-size:9.5px;font-weight:800;color:var(--gray-500);vertical-align:super;line-height:0;margin-left:2px}
 .card-bio-lbl{font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;color:var(--gray-500);margin-top:2px}
@@ -308,23 +304,27 @@ body{font-family:'DM Sans',sans-serif;background:var(--gray-50);color:var(--navy
 .meas-pct sup{font-size:7px;font-weight:700;vertical-align:super;line-height:0;letter-spacing:0}
 .meas-pos{font-size:9.5px;font-weight:500;color:rgba(10,22,40,.35);letter-spacing:.01em;flex-shrink:0}
 .card-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;padding:10px 12px 11px}
-.stat-cell{position:relative;text-align:center;background:rgba(10,22,40,.03);border-radius:9px;padding:9px 4px 7px}
+.stat-cell{position:relative;text-align:center;background:rgba(10,22,40,.03);border-radius:10px;padding:9px 4px 7px}
+/* CONTEXT: explicit positional-percentile ordinal — replaces the corner ring */
+.stat-pos-pct{
+  position:absolute;top:4px;right:5px;
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:9.5px;font-weight:900;line-height:1;
+  font-variant-numeric:tabular-nums;
+}
+.stat-pos-pct sup{font-size:6.5px;font-weight:800}
 /* BPM row: same gradient cells, one size down — keeps the card height
    reasonable while the box-score row reads clearly. */
 .stat-cell--bpm{padding:6px 4px 5px}
 .stat-cell--bpm .stat-val{font-size:15px}
 .stat-cell--bpm .stat-lbl{margin-top:3px}
-.pos-ring{position:absolute;top:3px;right:3px;width:13px;height:13px;pointer-events:none;flex-shrink:0}
-.pos-ring circle{fill:none;stroke-width:2;stroke-linecap:round}
-.pos-ring .ring-track{stroke:rgba(10,22,40,.08)}
-.pos-ring .ring-fill{transition:stroke-dashoffset 400ms cubic-bezier(.22,1,.36,1)}
+/* (pos-ring CSS removed — ring replaced by explicit ordinal chip) */
 .stat-val{font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:900;color:inherit;line-height:1}
 .stat-bar{height:2px;border-radius:1px;margin:4px auto 0;opacity:.35;min-width:3px}
 .stat-lbl{font-size:10px;color:inherit;opacity:.8;text-transform:uppercase;letter-spacing:.5px;font-weight:700;display:block;margin-top:4px}
 .card-comp{display:flex;align-items:center;gap:4px;flex-wrap:wrap;padding:6px 12px 9px;border-top:1px solid rgba(10,22,40,.06);margin-top:auto}
 .card-comp-label{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.09em;color:var(--gray-500);flex-shrink:0}
 .card-comp-pill{display:inline-flex;align-items:center;gap:4px;background:#F8FAFC;border:1px solid rgba(10,22,40,.08);border-radius:20px;padding:2px 7px 2px 3px}
-.card-comp-avatar{width:16px;height:16px;border-radius:50%;overflow:hidden;flex-shrink:0;background:var(--gray-200);display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-size:7px;font-weight:800;color:var(--gray-500)}
 .card-comp-name{font-size:11px;font-weight:700;color:var(--gray-700);white-space:nowrap}
 .card-comp strong{color:var(--blue);font-weight:600}
 
@@ -540,6 +540,53 @@ body{font-family:'DM Sans',sans-serif;background:var(--gray-50);color:var(--navy
 
 /* ── Card mini-stats grid ── */
 .ccard-stats{display:grid;grid-template-columns:repeat(5,1fr);border-top:1px solid var(--gray-100)}
+/* ── COMPARE v2 (Verdict / True scale / Finish) ─────────────────────────── */
+.compare-edge{
+  display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+  background:rgba(212,168,48,.07);
+  border:1px solid rgba(212,168,48,.22);
+  border-left:3px solid var(--amber);
+  border-radius:9px;
+  padding:9px 14px;margin:12px 0;
+}
+.compare-edge-tag{
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:10px;font-weight:900;letter-spacing:1.4px;text-transform:uppercase;
+  color:#92400E;flex-shrink:0;
+}
+.compare-edge-items{display:flex;align-items:center;gap:16px;flex-wrap:wrap;min-width:0}
+.ce-item{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--gray-600);font-weight:500}
+.ce-item b{font-family:'Barlow Condensed',sans-serif;font-size:13.5px;font-weight:900;color:var(--navy)}
+.ce-dot{width:9px;height:9px;border-radius:3px;flex-shrink:0}
+.ce-none{color:var(--gray-300);font-style:italic}
+.compare-edge-age{
+  margin-left:auto;flex-shrink:0;
+  font-size:10.5px;font-weight:700;color:#B45309;
+  background:rgba(202,138,4,.10);border:1px solid rgba(202,138,4,.25);
+  border-radius:5px;padding:2px 8px;cursor:default;
+}
+.cqr-age{display:block;font-size:9px;font-weight:700;color:var(--gray-400);margin-top:2px;font-variant-numeric:tabular-nums}
+.ctd-bar{height:4px;background:var(--gray-100);border-radius:2px;overflow:hidden;margin-top:3px}
+.ctd-bar span{display:block;height:100%;border-radius:2px}
+.ctr-style-tag{
+  font-size:7.5px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;
+  color:var(--gray-400);background:var(--gray-100);
+  border-radius:3px;padding:1px 4px;vertical-align:1px;cursor:default;
+}
+/* Sticky player-identity header — 20 rows down you still know who's who */
+.compare-table thead th{position:sticky;top:0;z-index:5;background:white}
+.compare-table thead th:first-child{left:0;z-index:6}
+.crl-item{cursor:pointer;transition:opacity var(--motion-fast)}
+.crl-item.is-off{opacity:.35}
+.crl-item:focus-visible{outline:2px solid var(--blue);outline-offset:2px;border-radius:4px}
+.compare-depth-btn{
+  font-size:11px;font-weight:700;font-family:'Barlow Condensed',sans-serif;
+  background:none;border:1.5px solid var(--gray-200);border-radius:5px;
+  padding:4px 14px;cursor:pointer;color:var(--gray-500);
+  letter-spacing:.3px;text-transform:uppercase;
+  transition:border-color var(--motion-fast),color var(--motion-fast);
+}
+.compare-depth-btn:hover{border-color:var(--blue);color:var(--blue)}
 .ccs-cell{padding:6px 4px;text-align:center;border-right:1px solid var(--gray-100)}
 .ccs-cell:last-child{border-right:none}
 .ccs-val{display:block;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:800;color:var(--navy);line-height:1.2}
@@ -585,9 +632,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--gray-50);color:var(--navy
 .ctr-toggle:hover td{background:#EEF2FF}
 
 /* Gap visualization bars */
-.compare-gap-row td{padding:0 12px 6px;border-bottom:none}
-.cgap-track{height:4px;background:var(--gray-100);border-radius:2px;overflow:hidden}
-.cgap-fill{height:100%;border-radius:2px;transition:width .3s ease}
 
 /* RANK BADGE */
 .rank-badge{width:38px;height:38px;border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0}
@@ -1109,21 +1153,16 @@ tr:hover td{background:var(--gray-50)}
   .card-metric-panel{width:72px;padding:8px 7px 10px}
   .card-metric{font-size:26px}
   .card-metric-label{font-size:6px}
-  .card-elite-pip{font-size:7px;padding:1px 5px;margin-bottom:2px;min-height:12px;line-height:12px}
-  .card-elite-pip-spacer{min-height:12px;margin-bottom:2px}
-  .card-metric-pct{font-size:9px;margin-top:4px}
+      .card-metric-pct{font-size:9px;margin-top:4px}
   .card-bio-item{padding:6px 3px}
   .card-bio-val{font-size:13px}
-  .card-bio-icon{font-size:9px}
-  .card-bio-lbl{font-size:7px}
+    .card-bio-lbl{font-size:7px}
   .card-stats{gap:4px;padding:8px 10px 9px}
   /* .stat-cell, .stat-val, .stat-lbl — consolidated later in this MQ block */
   .stat-bar{display:block !important;opacity:.38;height:2px;margin-top:3px}
-  .pos-ring{width:11px;height:11px;top:2px;right:2px}
   .stat-cell--secondary{display:none}
   .card-comp-pill{padding:2px 6px 2px 2px;gap:3px}
-  .card-comp-avatar{width:14px;height:14px;font-size:6.5px}
-  .card-comp-name{font-size:9px}
+    .card-comp-name{font-size:9px}
 
   /* Table: sticky rank + player columns — background must track the row colour.
      Using background:inherit on sticky cells means they automatically adopt
@@ -1961,9 +2000,7 @@ tr:hover td{background:var(--gray-50)}
   .card-metric{font-size:18px;letter-spacing:-.5px}
   .card-metric.elite{font-size:19px}
   .card-metric-label{font-size:5.5px;letter-spacing:.8px}
-  .card-elite-pip{font-size:5.5px;padding:1px 3px;margin-bottom:1px;min-height:10px;line-height:10px}
-  .card-elite-pip-spacer{min-height:10px;margin-bottom:1px}
-  /* Identity: clip long content so it never pushes into metric */
+      /* Identity: clip long content so it never pushes into metric */
   .card-identity{min-width:0;overflow:hidden}
 
   /* ── 3. Filter selects: stack vertically in their own sub-grid ──────────
@@ -2595,9 +2632,7 @@ tr:hover td{background:var(--gray-50)}
   .card-metric-panel{width:86px;padding:10px 10px 12px}
   .card-metric{font-size:34px}
   .card-metric-label{font-size:7px}
-  .card-elite-pip{font-size:8px;padding:1px 6px;margin-bottom:3px;min-height:14px;line-height:14px}
-  .card-elite-pip-spacer{min-height:14px;margin-bottom:3px}
-  .card-metric-pct{font-size:10px;margin-top:6px}
+      .card-metric-pct{font-size:10px;margin-top:6px}
   .card-bio-item{padding:7px 4px}
   .card-bio-val{font-size:14px}
   .card-bio-lbl{font-size:8px}
@@ -7455,7 +7490,10 @@ const POS_STAT_RANGES = {};
         POS_STAT_RANGES[pos][k] = {
           mn:  vals[0],
           mx:  vals[vals.length - 1],
-          med: vals[Math.floor(vals.length / 2)]
+          med: vals[Math.floor(vals.length / 2)],
+          // CONTEXT: full sorted array kept for honest rank-based
+          // percentiles (min–max ratio overstates on skewed data).
+          vals: vals
         };
       }
     });
@@ -8820,6 +8858,23 @@ function renderBoard2026() {
 // ── statBarHtml: micro progress bar showing stat percentile within this class.
 // Replaces the coloured-background-only approach with an additional visual signal.
 // Width tracks the same 0-1 ratio used by gradStyle → colour and bar are in sync.
+// CONTEXT: rank-based percentile within position (1–99). Honest under
+// skew/outliers, unlike a min–max ratio.
+function posPct(value, statKey, position) {
+  if (value == null || value === '' || !position || !POS_STAT_RANGES) return null;
+  var rng = POS_STAT_RANGES[position] && POS_STAT_RANGES[position][statKey];
+  if (!rng || !rng.vals || rng.vals.length < 3) return null;
+  var v = parseFloat(value); if (isNaN(v)) return null;
+  var below = 0, arr = rng.vals;
+  for (var i = 0; i < arr.length; i++) if (arr[i] <= v) below++;
+  return Math.max(1, Math.min(99, Math.round(below / arr.length * 100)));
+}
+// Diverging ink for the ordinal chip (same scale as the shot chart)
+function posPctInk(p) {
+  return p >= 85 ? '#15803D' : p >= 65 ? '#16A34A' : p >= 45 ? '#B45309'
+       : p >= 25 ? '#EA580C' : '#DC2626';
+}
+
 function statBarHtml(value, statKey) {
   if (!value || !STAT_RANGES || !STAT_RANGES[statKey]) return '<div class="stat-bar" style="width:0;background:currentColor"></div>';
   var range = STAT_RANGES[statKey];
@@ -8829,36 +8884,11 @@ function statBarHtml(value, statKey) {
   return '<div class="stat-bar" style="width:' + width + '%;background:currentColor"></div>';
 }
 
-// ── posRingHtml: positional percentile arc ────────────────────────────────
 // Returns an 18×18 SVG showing how this value ranks within the player's
 // position group (Guard / Forward / Center).
 // pctile = 0 → empty arc; pctile = 1 → full circle.
 // Color: green >66th percentile, amber 33–66th, muted <33rd.
-function posRingHtml(value, statKey, position) {
-  if (!value || !position || !POS_STAT_RANGES) return '';
-  var posRng = POS_STAT_RANGES[position];
-  if (!posRng || !posRng[statKey]) return '';
-  var rng = posRng[statKey];
-  if (rng.mx === rng.mn) return '';
-
-  var pctile = Math.max(0, Math.min(1, (value - rng.mn) / (rng.mx - rng.mn)));
-  // Circumference of circle with r=5.5: 2π×5.5 ≈ 34.558
-  var C      = 34.558;
-  var offset = (C * (1 - pctile)).toFixed(3);
-  // Color by percentile tier
-  var color  = pctile > 0.66 ? '#22c55e'
-             : pctile > 0.33 ? '#f59e0b'
-             : 'rgba(10,22,40,.22)';
-
-  return '<svg class="pos-ring" viewBox="0 0 13 13" aria-hidden="true">'
-    + '<circle class="ring-track" cx="6.5" cy="6.5" r="5.5" stroke-dasharray="' + C + '" stroke-dashoffset="0"/>'
-    + '<circle class="ring-fill" cx="6.5" cy="6.5" r="5.5"'
-    + ' stroke="' + color + '"'
-    + ' stroke-dasharray="' + C + '"'
-    + ' stroke-dashoffset="' + offset + '"'
-    + ' transform="rotate(-90 6.5 6.5)"/>'
-    + '</svg>';
-}
+// (posRingHtml removed — replaced by posPct ordinal chips on stat cells)
 
 
 // ── buildSchoolLogoHtml: renders school logo in a circular crisp container.
@@ -9026,10 +9056,8 @@ function buildPlayerCard(p, tierKey, _metricsSorted) {
       + '</div>';
   }
 
-  // ── ELITE pip (rendered above number; spacer keeps alignment when absent)
-  var elitePipHtml = isElite
-    ? '<div class="card-elite-pip"><span class="card-elite-pip-inner">ELITE</span></div>'
-    : '<div class="card-elite-pip-spacer"></div>';
+  // CALM: ELITE pip removed — the tier bar + glow already carry tier; the
+  // metric block now states one fact (value + percentile) once, plainly.
 
   // ── Role line (torvik_role · position) ───────────────────────────────
   var roleParts = [];
@@ -9044,7 +9072,6 @@ function buildPlayerCard(p, tierKey, _metricsSorted) {
   // Class
   if (clsAbbr) {
     bioItems += '<div class="card-bio-item">'
-      + '<span class="card-bio-icon">🎓</span>'
       + '<div class="card-bio-val">' + clsAbbr + '</div>'
       + '<div class="card-bio-lbl">Class</div>'
       + '</div>';
@@ -9055,7 +9082,6 @@ function buildPlayerCard(p, tierKey, _metricsSorted) {
       ? '<span class="card-bio-pct">' + htPct + ordSfx(htPct) + '</span>'
       : '';
     bioItems += '<div class="card-bio-item">'
-      + '<span class="card-bio-icon">📏</span>'
       + '<div class="card-bio-val">' + htDisplay + htPctStr + '</div>'
       + '<div class="card-bio-lbl">Height</div>'
       + '</div>';
@@ -9063,85 +9089,71 @@ function buildPlayerCard(p, tierKey, _metricsSorted) {
   // Weight
   if (p.wt) {
     bioItems += '<div class="card-bio-item">'
-      + '<span class="card-bio-icon">⚖️</span>'
       + '<div class="card-bio-val">' + p.wt + ' lb</div>'
       + '<div class="card-bio-lbl">Weight</div>'
       + '</div>';
   }
-  // Age
+  // Age — CONTEXT: age-for-class is a top-tier draft signal and both data
+  // points were sitting uncombined. Young-for-class reads scale-green,
+  // old-for-class warning-orange; tooltip spells it out.
   if (p.age) {
-    bioItems += '<div class="card-bio-item">'
-      + '<span class="card-bio-icon">📅</span>'
-      + '<div class="card-bio-val">' + parseFloat(p.age||0).toFixed(1) + '</div>'
+    var _ageN = parseFloat(p.age) || 0;
+    var _AGE_BANDS = { FR:[19.3,20.3], SO:[20.3,21.3], JR:[21.3,22.3], SR:[22.3,23.3] };
+    var _band = _AGE_BANDS[clsAbbr] || null;
+    var _ageCol = '', _ageTip = '';
+    if (_band && _ageN > 0) {
+      if (_ageN < _band[0])      { _ageCol = 'color:#16A34A'; _ageTip = 'Young for class'; }
+      else if (_ageN > _band[1]) { _ageCol = 'color:#EA580C'; _ageTip = 'Old for class'; }
+    }
+    bioItems += '<div class="card-bio-item"' + (_ageTip ? ' title="' + _ageTip + ' (' + clsAbbr + ')"' : '') + '>'
+      + '<div class="card-bio-val" style="' + _ageCol + '">' + _ageN.toFixed(1) + '</div>'
       + '<div class="card-bio-lbl">Age</div>'
       + '</div>';
   }
 
-  // ── Stat cells ───────────────────────────────────────────────────────
-  var gs1 = gradStyle(p.ts_pct,  'ts_pct');
-  var gs2 = gradStyle(p.pa2_usg, 'pa2_usg');
-  var gs3 = gradStyle(p.stl_bl,  'stl_bl');
-  var gs4 = gradStyle(p.ftar,    'ftar');
-  var gs5 = gradStyle(p.tpar,    'tpar');
-  var gs6 = gradStyle(p.ato,     'ato');
-
-  var statsHtml =
-    '<div class="stat-cell" style="' + gs1 + '">'
-      + '<div class="stat-val">' + (p.ts_pct  ? (p.ts_pct*100).toFixed(1)+'%' : '—') + '</div>'
-      + statBarHtml(p.ts_pct, 'ts_pct') + '<div class="stat-lbl">TS%</div>'
-      + posRingHtml(p.ts_pct,  'ts_pct',  p.position)
-    + '</div>'
-    + '<div class="stat-cell" style="' + gs2 + '">'
-      + '<div class="stat-val">' + (p.pa2_usg ? Math.round(p.pa2_usg) : '—') + '</div>'
-      + statBarHtml(p.pa2_usg, 'pa2_usg') + '<div class="stat-lbl">P+A/USG</div>'
-      + posRingHtml(p.pa2_usg, 'pa2_usg', p.position)
-    + '</div>'
-    + '<div class="stat-cell" style="' + gs3 + '">'
-      + '<div class="stat-val">' + (p.stl_bl  ? parseFloat(p.stl_bl).toFixed(1) : '—') + '</div>'
-      + statBarHtml(p.stl_bl, 'stl_bl') + '<div class="stat-lbl">Stl+Bl</div>'
-      + posRingHtml(p.stl_bl,  'stl_bl',  p.position)
-    + '</div>'
-    + '<div class="stat-cell stat-cell--secondary" style="' + gs4 + '">'
-      + '<div class="stat-val">' + (p.ftar    ? parseFloat(p.ftar).toFixed(3) : '—') + '</div>'
-      + statBarHtml(p.ftar, 'ftar') + '<div class="stat-lbl">FTAr</div>'
-      + posRingHtml(p.ftar,    'ftar',    p.position)
-    + '</div>'
-    + '<div class="stat-cell stat-cell--secondary" style="' + gs5 + '">'
-      + '<div class="stat-val">' + (p.tpar    ? parseFloat(p.tpar).toFixed(3) : '—') + '</div>'
-      + statBarHtml(p.tpar, 'tpar') + '<div class="stat-lbl">3PAr</div>'
-      + posRingHtml(p.tpar,    'tpar',    p.position)
-    + '</div>'
-    + '<div class="stat-cell" style="' + gs6 + '">'
-      + '<div class="stat-val">' + (p.ato     ? parseFloat(p.ato).toFixed(2) : '—') + '</div>'
-      + statBarHtml(p.ato, 'ato') + '<div class="stat-lbl">A/TO</div>'
-      + posRingHtml(p.ato,     'ato',     p.position)
-    + '</div>';
-
-  // ── BPM row (OBPM / DBPM / BPM) — same gradient system; compact cells
-  // keep the card height in check. fmtBpm: signed one-decimal.
+  // ── Stat cells — CONTEXT refactor ────────────────────────────────────
+  // One helper builds every cell: gradient bg, value, POSITIONAL-percentile
+  // fill bar, label, and an explicit ordinal chip ("92nd") replacing the
+  // old 13px corner ring nobody could decode. Bars previously used the
+  // GLOBAL min–max range, which a single outlier skews; they now fill by
+  // rank-based percentile within the player's position.
+  function statCellHtml(value, key, disp, label, extraCls) {
+    var pp   = posPct(value, key, p.position);
+    var barW = pp != null ? Math.max(4, pp) : null;
+    var bar  = barW != null
+      ? '<div class="stat-bar" style="width:' + barW + '%;background:currentColor"></div>'
+      : statBarHtml(value, key);  // fallback: global range when no pos data
+    var chip = pp != null
+      ? '<span class="stat-pos-pct" style="color:' + posPctInk(pp) + '" title="' + pp + ordSfx(pp) + ' percentile among ' + escHtml(p.position || '') + 's">' + pp + '<sup>' + ordSfx(pp) + '</sup></span>'
+      : '';
+    return '<div class="stat-cell' + (extraCls ? ' ' + extraCls : '') + '" style="' + gradStyle(value, key) + '">'
+      + '<div class="stat-val">' + disp + '</div>'
+      + bar
+      + '<div class="stat-lbl">' + label + '</div>'
+      + chip
+      + '</div>';
+  }
+  // FLUENCY: box-score conventions — rate stats drop the leading zero.
+  function fmtRate(v) { return v ? parseFloat(v).toFixed(3).replace(/^0\./, '.') : '\u2014'; }
   function fmtBpm(v) {
     if (v === null || v === undefined || v === '') return '\u2014';
     var n = parseFloat(v); if (isNaN(n)) return '\u2014';
     return (n > 0 ? '+' : '') + n.toFixed(1);
   }
+
+  var statsHtml =
+      statCellHtml(p.ts_pct,  'ts_pct',  (p.ts_pct  ? (p.ts_pct*100).toFixed(1)+'%' : '\u2014'), 'TS%')
+    + statCellHtml(p.pa2_usg, 'pa2_usg', (p.pa2_usg ? '' + Math.round(p.pa2_usg) : '\u2014'),    'P+A/USG')
+    + statCellHtml(p.stl_bl,  'stl_bl',  (p.stl_bl  ? parseFloat(p.stl_bl).toFixed(1) : '\u2014'),'Stl+Bl')
+    + statCellHtml(p.ftar,    'ftar',    fmtRate(p.ftar), 'FTAr', 'stat-cell--secondary')
+    + statCellHtml(p.tpar,    'tpar',    fmtRate(p.tpar), '3PAr', 'stat-cell--secondary')
+    + statCellHtml(p.ato,     'ato',     (p.ato ? parseFloat(p.ato).toFixed(2) : '\u2014'),       'A/TO');
+
   if (p.obpm != null || p.dbpm != null || p.bpm != null) {
-    var gsO = gradStyle(p.obpm, 'obpm'), gsD = gradStyle(p.dbpm, 'dbpm'), gsB = gradStyle(p.bpm, 'bpm');
     statsHtml +=
-      '<div class="stat-cell stat-cell--bpm" style="' + gsO + '">'
-        + '<div class="stat-val">' + fmtBpm(p.obpm) + '</div>'
-        + statBarHtml(p.obpm, 'obpm') + '<div class="stat-lbl">OBPM</div>'
-        + posRingHtml(p.obpm, 'obpm', p.position)
-      + '</div>'
-      + '<div class="stat-cell stat-cell--bpm" style="' + gsD + '">'
-        + '<div class="stat-val">' + fmtBpm(p.dbpm) + '</div>'
-        + statBarHtml(p.dbpm, 'dbpm') + '<div class="stat-lbl">DBPM</div>'
-        + posRingHtml(p.dbpm, 'dbpm', p.position)
-      + '</div>'
-      + '<div class="stat-cell stat-cell--bpm" style="' + gsB + '">'
-        + '<div class="stat-val">' + fmtBpm(p.bpm) + '</div>'
-        + statBarHtml(p.bpm, 'bpm') + '<div class="stat-lbl">BPM</div>'
-        + posRingHtml(p.bpm, 'bpm', p.position)
-      + '</div>';
+        statCellHtml(p.obpm, 'obpm', fmtBpm(p.obpm), 'OBPM', 'stat-cell--bpm')
+      + statCellHtml(p.dbpm, 'dbpm', fmtBpm(p.dbpm), 'DBPM', 'stat-cell--bpm')
+      + statCellHtml(p.bpm,  'bpm',  fmtBpm(p.bpm),  'BPM',  'stat-cell--bpm');
   }
 
   // ── Comp pills with avatar initials ─────────────────────────────────
@@ -9149,16 +9161,15 @@ function buildPlayerCard(p, tierKey, _metricsSorted) {
   if (p.comp || p.comp_tool) {
     var compStr = p.comp || p.comp_tool;
     var compParts = compStr.split(/[\/,·+]/).map(function(s){ return s.trim(); }).filter(Boolean).slice(0,4);
+    // CALM: initials avatars dropped — they duplicated the first letter of
+    // the name beside them. Plain pills + a tooltip clarifying these are
+    // statistical archetypes, not direct player comparisons.
     var pills = compParts.map(function(n) {
-      // Generate initials from comp name (first letter of each word, max 2)
-      var initials = n.replace(/[^a-zA-Z\s]/g,'').trim().split(/\s+/)
-        .map(function(w){ return w[0]||''; }).join('').slice(0,2).toUpperCase();
       return '<span class="card-comp-pill">'
-        + '<span class="card-comp-avatar">' + initials + '</span>'
         + '<span class="card-comp-name">' + escHtml(n) + '</span>'
         + '</span>';
     }).join('');
-    compHtml = '<div class="card-comp">'
+    compHtml = '<div class="card-comp" title="Statistical archetype comps \u2014 similar production profiles, not direct player comparisons">'
       + '<span class="card-comp-label">Comp Archetypes</span>'
       + pills
       + '</div>';
@@ -9194,7 +9205,6 @@ function buildPlayerCard(p, tierKey, _metricsSorted) {
         + '</div>'
 
         + '<div class="card-metric-panel" style="' + panelStyle + '">'
-          + elitePipHtml
           + '<div class="card-metric' + (isElite ? ' elite' : '') + '">' + mv + '</div>'
           + '<div class="card-metric-label">HW Metric</div>'
           + metPctHtml
@@ -14207,6 +14217,27 @@ function mcExportCSV(){
 
 
 // ── COMPARE MODE ───────────────────────────────────────────────────────────
+// Age-for-class flag — shared by player cards' bio strip and the compare
+// quick-row. Returns {col, tip} when notable, else null.
+function hwAgeFlag(cls, age) {
+  var a = parseFloat(age); if (!a) return null;
+  var key = (cls||'').slice(0,2).toUpperCase();
+  var BANDS = { FR:[19.3,20.3], SO:[20.3,21.3], JR:[21.3,22.3], SR:[22.3,23.3] };
+  var b = BANDS[key]; if (!b) return null;
+  if (a < b[0]) return { col:'#16A34A', tip:'Young for class' };
+  if (a > b[1]) return { col:'#EA580C', tip:'Old for class' };
+  return null;
+}
+
+function compareToggleRadarDS(ci, el) {
+  var ch = window._compareRadarChart;
+  if (!ch) return;
+  var vis = ch.isDatasetVisible(ci);
+  ch.setDatasetVisibility(ci, !vis);
+  ch.update();
+  if (el) el.classList.toggle('is-off', vis);
+}
+
 var compareList = [];   // array of player objects
 var COMPARE_MAX = 4;
 var COMPARE_COLORS = ['#2563EB','#2C4569','#10B981','#D97706'];
@@ -14291,6 +14322,24 @@ function renderCompare() {
     return;
   }
 
+  // TRUE SCALE: percentile within a year's full board, memoized per
+  // (year, stat) so 4 players × 20 stats don't re-sort the board 80 times.
+  var _cbpMemo = {};
+  function compareBoardPct(yr, key, v) {
+    var mk = yr + ':' + key;
+    if (!_cbpMemo[mk]) {
+      var vals = (DataService.getBoard(yr)||[]).map(function(x){ return x[key]; })
+        .filter(function(x){ return x!=null && x!=='' && !isNaN(x); })
+        .map(Number).sort(function(a,b){ return a-b; });
+      _cbpMemo[mk] = vals;
+    }
+    var arr = _cbpMemo[mk];
+    if (arr.length < 3) return null;
+    var below = 0;
+    for (var i=0;i<arr.length;i++) if (arr[i] <= v) below++;
+    return Math.max(1, Math.min(99, Math.round(below/arr.length*100)));
+  }
+
   // ── Stat definitions — same order used in radar, table, and card mini-grid ──
   var RADAR_KEYS = [
     { k:'metric',  l:'Metric'  }, { k:'ts_pct',  l:'TS%'     },
@@ -14317,8 +14366,10 @@ function renderCompare() {
       { k:'ato',     l:'A/TO',      fmt:function(v){ return v    ? parseFloat(v).toFixed(2)  :'\u2014'; }, hb:true  },
     ]},
     { label:'Shot Profile', depth:false, stats:[
-      { k:'ftar', l:'FTAr', fmt:function(v){ return v ? parseFloat(v).toFixed(3):'\u2014'; }, hb:false },
-      { k:'tpar', l:'3PAr', fmt:function(v){ return v ? parseFloat(v).toFixed(3):'\u2014'; }, hb:false },
+      // Box-score convention: leading zero dropped (matches the cards).
+      // tag:'style' — these describe shot diet, not skill; no best/worst.
+      { k:'ftar', l:'FTAr', tag:'style', fmt:function(v){ return v ? parseFloat(v).toFixed(3).replace(/^0\./,'.') :'\u2014'; }, hb:false },
+      { k:'tpar', l:'3PAr', tag:'style', fmt:function(v){ return v ? parseFloat(v).toFixed(3).replace(/^0\./,'.') :'\u2014'; }, hb:false },
     ]},
     { label:'Advanced', depth:false, stats:[
       { k:'obpm', l:'OBPM', fmt:function(v){ return v!=null ? Number(v).toFixed(1):'\u2014'; }, hb:true },
@@ -14394,10 +14445,12 @@ function renderCompare() {
   out += '<div class="compare-radar-legend">';
   compareList.forEach(function(p,ci){
     var isLdr = wins[ci]===maxWins && compareList.length>1;
-    out += '<div class="crl-item">'
+    // FINISH: legend items toggle their radar dataset — one tap isolates a
+    // player's shape out of 3-4-way overlap. Decorative ★ retired; the
+    // leader reads through weight alone (the Edge Summary is the verdict).
+    out += '<div class="crl-item" role="button" tabindex="0" title="Click to show/hide on radar" onclick="compareToggleRadarDS('+ci+', this)">'
          + '<div class="crl-dot" style="background:'+COMPARE_COLORS[ci]+'"></div>'
          + '<span style="font-weight:'+(isLdr?'800':'600')+';color:var(--navy)">'
-         + (isLdr ? '<span style="color:#B8860F;margin-right:2px">★</span>' : '')
          + escHtml(p.name)
          + '</span>'
          + '<span style="font-size:9px;color:var(--gray-400);font-weight:500">\''+((p._year||'2026').slice(2))+'</span>'
@@ -14456,7 +14509,7 @@ function renderCompare() {
     out += '<div class="compare-card-metric" style="'+gm+'">'
          + '<div class="compare-metric-val" style="color:inherit">'+(p.metric?Number(p.metric).toFixed(1):'\u2014')+'</div>'
          + '<div style="font-size:9px;font-weight:700;color:inherit;opacity:.7">'+tier.label+'</div>'
-         + (isLdr ? '<div class="compare-card-leader-badge">\u2605 Leader</div>' : '<div style="font-size:8px;color:inherit;opacity:.45;font-weight:600">'+wins[ci]+'/'+totalStats+' leads</div>')
+         + (isLdr ? '<div class="compare-card-leader-badge">Most leads</div>' : '<div style="font-size:8px;color:inherit;opacity:.45;font-weight:600">'+wins[ci]+'/'+totalStats+' leads</div>')
          + '</div>';
 
     out += '</div>'; // compare-card-inner
@@ -14482,6 +14535,50 @@ function renderCompare() {
   out += '</div>'; // compare-cards-col
   out += '</div>'; // compare-hero
 
+  // ── VERDICT: Edge Summary — the tab concludes, not just displays ──
+  // Per skill section (style + physical excluded), the player with the
+  // most stat leads owns that edge. Ties credit everyone tied. An age-gap
+  // advisory fires when the group spans 1.5+ years — the classic raw-stat
+  // comparison trap.
+  if (compareList.length > 1) {
+    var edgeSections = SECTIONS.filter(function(sec){
+      return sec.stats.some(function(st){ return st.hb === true; });
+    });
+    var edges = compareList.map(function(){ return []; });
+    edgeSections.forEach(function(sec){
+      var leadCt = compareList.map(function(){ return 0; });
+      sec.stats.forEach(function(st){
+        if (st.hb !== true) return;
+        var vals = compareList.map(function(p){ return p[st.k]; });
+        var best = vals.reduce(function(a,b){ return (b!=null&&!isNaN(b)&&Number(b)>Number(a))?Number(b):a; }, -Infinity);
+        if (best === -Infinity) return;
+        vals.forEach(function(v,ci){ if (v!=null && !isNaN(v) && Number(v)===best) leadCt[ci]++; });
+      });
+      var mx = Math.max.apply(null, leadCt);
+      if (mx > 0) leadCt.forEach(function(c,ci){ if (c===mx) edges[ci].push(sec.label); });
+    });
+    var ages = compareList.map(function(p){ return parseFloat(p.age)||0; }).filter(function(a){ return a>0; });
+    var ageSpread = ages.length>1 ? (Math.max.apply(null,ages) - Math.min.apply(null,ages)) : 0;
+
+    out += '<div class="compare-edge">'
+        + '<span class="compare-edge-tag">Edge Summary</span>'
+        + '<div class="compare-edge-items">';
+    compareList.forEach(function(p,ci){
+      var nm = (p.name||'').split(' - ')[0].split(' ').slice(-1)[0]; // last name
+      out += '<span class="ce-item">'
+          +  '<i class="ce-dot" style="background:'+COMPARE_COLORS[ci]+'"></i>'
+          +  '<b>'+escHtml(nm)+'</b> '
+          +  (edges[ci].length ? escHtml(edges[ci].join(', ')) : '<span class="ce-none">no section edge</span>')
+          +  '</span>';
+    });
+    out += '</div>';
+    if (ageSpread >= 1.5) {
+      out += '<span class="compare-edge-age" title="Raw production comparisons favor older players — weigh trajectory, not just totals">'
+          +  ageSpread.toFixed(1) + 'y age gap \u2014 adjust expectations</span>';
+    }
+    out += '</div>';
+  }
+
   // ── 3. STATS TABLE — collapsible ─────────────────────────────
   out += '<div class="compare-table-section expanded" id="compareTableSection">';
   out += '<div class="compare-table-header" onclick="var s=document.getElementById(\'compareTableSection\');s.classList.toggle(\'expanded\');">';
@@ -14506,18 +14603,28 @@ function renderCompare() {
               + '<div style="display:flex;flex-direction:column;align-items:center;gap:3px;padding:5px 0">'
               + avatarHtml(p.name,p.position||'','28px','5px')
               + '<span style="font-family:\'Barlow Condensed\',sans-serif;font-size:13px;font-weight:800;color:var(--navy);white-space:nowrap">'
-              + (isLdr ? '\u2605 ' : '') + escHtml(p.name) + '</span>'
+              + escHtml(p.name) + '</span>'
               + '<span style="font-size:9px;color:var(--gray-400)">'+(p._year||'2026')+'</span>'
               + '</div></th>';
   });
   tableHtml += '</tr></thead><tbody>';
 
   // ── Quick-score row ─────────────────────────────────────────
-  tableHtml += '<tr class="compare-quick-row"><td style="font-size:9px;font-weight:700;letter-spacing:.6px;text-transform:uppercase">Overall Wins</td>';
+  // HONESTY: "Stat Leads", not "Overall Wins" — a count of category bests
+  // is descriptive, not a verdict (every stat weighted equally). Each cell
+  // also carries the player's class/age chip, tinted by age-for-class, so
+  // the rawest comparison trap is visible right where the score is.
+  tableHtml += '<tr class="compare-quick-row"><td style="font-size:9px;font-weight:700;letter-spacing:.6px;text-transform:uppercase">Stat Leads</td>';
   compareList.forEach(function(p,ci){
     var isLdr = wins[ci]===maxWins && compareList.length>1;
+    var ageChip = '';
+    var aF = hwAgeFlag(p.cls, p.age);
+    if (p.age) {
+      ageChip = '<span class="cqr-age"'+(aF?' style="color:'+aF.col+'" title="'+aF.tip+'"':'')+'>'
+              + escHtml((p.cls||'').slice(0,2).toUpperCase() || '\u2014') + ' \u00B7 ' + parseFloat(p.age).toFixed(1) + '</span>';
+    }
     tableHtml += '<td><span class="cqr-score'+(isLdr?' cqr-lead':'')+'">'+wins[ci]+'</span>'
-              + '<span class="cqr-wins">of '+totalStats+' stats</span></td>';
+              + '<span class="cqr-wins">of '+totalStats+' stats</span>' + ageChip + '</td>';
   });
   tableHtml += '</tr>';
 
@@ -14530,15 +14637,12 @@ function renderCompare() {
       var vals = compareList.map(function(p){ return p[st.k]; });
       var maxV = vals.reduce(function(a,b){ return (b!=null&&!isNaN(b)&&Number(b)>Number(a))?b:a; },-Infinity);
       var rowClass = 'ctr-row'+(sec.depth?' ctr-depth':'');
-
-      // gap bar: max delta as fraction of range for visualization
       var numericVals = vals.filter(function(v){ return v!=null&&!isNaN(v); }).map(Number);
-      var rangeMin = Math.min.apply(null,numericVals);
-      var rangeMax = Math.max.apply(null,numericVals);
-      var rangeSpan = rangeMax - rangeMin;
 
       tableHtml += '<tr class="'+rowClass+'">';
-      tableHtml += '<td style="font-family:\'Barlow Condensed\',sans-serif;font-size:13px;font-weight:700;color:var(--navy);position:sticky;left:0;background:white;border-right:1px solid var(--gray-100);padding:5px 18px 5px 10px">'+st.l+'</td>';
+      tableHtml += '<td style="font-family:\'Barlow Condensed\',sans-serif;font-size:13px;font-weight:700;color:var(--navy);position:sticky;left:0;background:white;border-right:1px solid var(--gray-100);padding:5px 18px 5px 10px">'+st.l
+                + (st.tag==='style' ? ' <span class="ctr-style-tag" title="Shot-diet profile \u2014 descriptive, no better/worse">style</span>' : '')
+                + '</td>';
 
       compareList.forEach(function(p,ci){
         var v = p[st.k];
@@ -14562,23 +14666,26 @@ function renderCompare() {
           }
         }
 
+        // TRUE SCALE: bar embedded in the value cell, filled by the
+        // player's percentile within HIS OWN draft board for this stat.
+        // The old separate gap-rows normalized within the compared group —
+        // with two players that's always 100% vs 0%, rendering a 64.9 vs
+        // 65.1 TS% as total domination. Board percentile = honest distance,
+        // and merging the bar into the cell halves the table's height.
+        var bar = '';
+        if (st.hb !== null && v != null && !isNaN(v)) {
+          var bp = compareBoardPct(p._year||'2026', st.k, Number(v));
+          if (bp != null) {
+            bar = '<div class="ctd-bar"><span style="width:'+Math.max(3,bp)+'%;background:'+COMPARE_COLORS[ci]+'"></span></div>';
+          }
+        }
         tableHtml += '<td class="'+(isBest?'compare-best':'')+'">'
                   + '<span class="ctd-val">'+disp+'</span>'
                   + delta
+                  + bar
                   + '</td>';
       });
       tableHtml += '</tr>';
-
-      // Gap visualization row
-      if(rangeSpan>0 && numericVals.length===compareList.length){
-        tableHtml += '<tr class="compare-gap-row"><td style="position:sticky;left:0;background:white;border-right:1px solid var(--gray-100)"></td>';
-        compareList.forEach(function(p,ci){
-          var v = Number(p[st.k]);
-          var fillPct = rangeSpan>0 ? ((v-rangeMin)/rangeSpan*100).toFixed(1) : 0;
-          tableHtml += '<td><div class="cgap-track"><div class="cgap-fill" style="width:'+fillPct+'%;background:'+COMPARE_COLORS[ci]+'"></div></div></td>';
-        });
-        tableHtml += '</tr>';
-      }
     });
   });
 
@@ -14588,10 +14695,7 @@ function renderCompare() {
 
   // Depth toggle button
   out += '<div style="padding:8px 16px;border-top:1px solid var(--gray-100);display:flex;justify-content:center">'
-       + '<button onclick="var s=document.getElementById(\'compareTableSection\');s.classList.toggle(\'expanded\');" '
-       + 'style="font-size:11px;font-weight:700;font-family:\'Barlow Condensed\',sans-serif;background:none;border:1.5px solid var(--gray-200);border-radius:5px;padding:4px 14px;cursor:pointer;color:var(--gray-500);letter-spacing:.3px;text-transform:uppercase;transition:all .12s" '
-       + 'onmouseover="this.style.borderColor=\'var(--blue)\';this.style.color=\'var(--blue)\'" '
-       + 'onmouseout="this.style.borderColor=\'\';this.style.color=\'\'">'
+       + '<button class="compare-depth-btn" onclick="var s=document.getElementById(\'compareTableSection\');s.classList.toggle(\'expanded\');">'
        + '\u25be Expand Stats</button>'
        + '</div>';
 
