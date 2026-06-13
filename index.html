@@ -173,6 +173,14 @@
   --green-dark:   #16A34A;
   --green-darker: #15803D;
 
+  /* Position-color ramps — used by scatter & cards for category color-coding */
+  --purple:        #8B5CF6;   /* Forward position */
+  --purple-dark:   #5B21B6;
+  --teal:          #0D9488;   /* Center position */
+  --teal-dark:     #0F766E;
+  --orange:        #FB923C;   /* mid-low percentile pill */
+  --green-500:     #22C55E;   /* high percentile pill (brighter than --green) */
+
   /* Deep neutrals */
   --navy-deep:    #060D1A;   /* below --navy for emphasis surfaces */
   --gray-25:      #FAFBFC;   /* between white and gray-50 */
@@ -7559,6 +7567,39 @@ var ScrollLockService = (function() {
 })();
 window.ScrollLockService = ScrollLockService;
 // ══ END ScrollLockService ═══════════════════════════════════════════════════
+// ══ ARCHITECTURE LAYER 4: Theme ═════════════════════════════════════════════
+// Resolves CSS custom properties to literal color strings for use in canvas
+// contexts (Chart.js datasets, html2canvas) that cannot consume var(--token).
+// Lookups are memoized at first use — :root token values are stable for the
+// session, so subsequent calls are O(1) Object property access.
+//
+// Usage:
+//   Theme.color('--navy')          // -> '#0A1628'  (suitable for Chart.js)
+//   Theme.color('--purple')        // -> '#8B5CF6'
+//
+// If you change :root variables at runtime (theme switch), call
+// Theme.invalidate() to flush the cache and force re-resolution.
+var Theme = (function() {
+  var cache = Object.create(null);
+  var rootEl = document.documentElement;
+  function color(name) {
+    if (cache[name] !== undefined) return cache[name];
+    var v = getComputedStyle(rootEl).getPropertyValue(name).trim();
+    // Fall back to a visible-but-noticeable color so a typo'd token
+    // doesn't silently render as transparent in Chart.js.
+    if (!v) {
+      console.warn('Theme.color: unknown token', name);
+      v = '#FF00FF';
+    }
+    cache[name] = v;
+    return v;
+  }
+  function invalidate() { cache = Object.create(null); }
+  return { color: color, invalidate: invalidate };
+})();
+window.Theme = Theme;
+// ══ END Theme ═══════════════════════════════════════════════════════════════
+
 
 
 
@@ -15458,7 +15499,14 @@ var ScatterEngine = (function() {
 
   // ── Point color ───────────────────────────────────────────────────────────
   // Used for fallback circles (when logo not yet loaded) and tooltip accent.
-  var POS_HEX  = { Guard:'#3B82F6', Forward:'#8B5CF6', Center:'#0D9488' };
+  // Position-color source: reads from --blue-light / --purple / --teal tokens.
+  // Resolved once at IIFE-init time (stylesheet is fully parsed before scripts
+  // run), so downstream lookups are plain Object property access.
+  var POS_HEX  = {
+    Guard:   Theme.color('--blue-light'),
+    Forward: Theme.color('--purple'),
+    Center:  Theme.color('--teal')
+  };
   var YEAR_HEX = { '2026':'#D97706','2025':'#3B82F6','2024':'#8B5CF6','2023':'#0D9488',
                    '2022':'#DC2626','2021':'#94A3B8','2020':'#65A30D','2019':'#9333EA' };
   var TIER_HEX = { franchise:'#D97706', lottery:'#8B5CF6', late1:'#3B82F6', second:'#0D9488' };
@@ -15736,8 +15784,8 @@ var ScatterTopPanel = (function() {
 
   function render(items, yM) {
     items = items || [];
-    var el    = document.getElementById('scTop5');
-    var lblEl = document.getElementById('scTop5AxisLabel');
+    var el    = _scEl('scTop5');
+    var lblEl = _scEl('scTop5AxisLabel');
     if (lblEl) lblEl.textContent = yM ? yM.label : '';
     if (!el) return;
 
@@ -15788,8 +15836,8 @@ var ScatterBotPanel = (function() {
 
   function render(items, yM) {
     items = items || [];
-    var el    = document.getElementById('scBot5');
-    var lblEl = document.getElementById('scBot5AxisLabel');
+    var el    = _scEl('scBot5');
+    var lblEl = _scEl('scBot5AxisLabel');
     if (lblEl) lblEl.textContent = yM ? yM.label : '';
     if (!el) return;
     if (!items.length) {
@@ -15944,16 +15992,26 @@ var Scatter = (function() {
 
   function invalidateSpatialIndex() {
     _state.spatialIndex = null;
+    // PR4: do NOT clear hoverPts here. It is rebuilt by scRender on every
+    // render and may be queried by a pending hover between invalidation and
+    // the next render. The stale list is fine — pixel coordinates get
+    // recomputed against current scales the moment buildSpatialIndex runs.
   }
 
   function buildSpatialIndex() {
-    if (!_state.chart || !_state.allPts.length) return null;
+    // PR4: hover hit-testing walks hoverPts (foreground + ghost) when
+    // ghost mode is on; falls back to allPts otherwise. Keeps the highlight
+    // system insulated from the ghost overlay (highlight still indexes
+    // foreground only via allPts), while letting hover surface tooltips
+    // for every visible dot.
+    var srcPts = _state.hoverPts && _state.hoverPts.length ? _state.hoverPts : _state.allPts;
+    if (!_state.chart || !srcPts.length) return null;
     var xScale = _state.chart.scales.x;
     var yScale = _state.chart.scales.y;
     if (!xScale || !yScale) return null;
     var grid = Object.create(null);
-    for (var i = 0; i < _state.allPts.length; i++) {
-      var pt = _state.allPts[i];
+    for (var i = 0; i < srcPts.length; i++) {
+      var pt = srcPts[i];
       var px = xScale.getPixelForValue(pt.x);
       var py = yScale.getPixelForValue(pt.y);
       var cx = Math.floor(px / SPATIAL_CELL);
@@ -15972,6 +16030,7 @@ var Scatter = (function() {
   function queryNear(mx, my, extraR) {
     var idx = _state.spatialIndex || buildSpatialIndex();
     if (!idx) return [];
+    var srcPts = _state.hoverPts && _state.hoverPts.length ? _state.hoverPts : _state.allPts;
     var grid = idx.grid;
     var cx = Math.floor(mx / SPATIAL_CELL);
     var cy = Math.floor(my / SPATIAL_CELL);
@@ -15982,8 +16041,12 @@ var Scatter = (function() {
         if (!bucket) continue;
         for (var k = 0; k < bucket.length; k++) {
           var entry = bucket[k];
-          var pt = _state.allPts[entry.i];
-          var r = ScatterEngine.tierSize(pt._p.rank) / 2 + 2 + (extraR || 0);
+          var pt = srcPts[entry.i];
+          // PR4: ghost dots render at fixed 3px regardless of rank. Use a
+          // small forgiving hover radius (8px) instead of tierSize so the
+          // hit area matches what the user sees on screen.
+          var r = pt._isGhost ? 8 : (ScatterEngine.tierSize(pt._p.rank) / 2 + 2);
+          r += (extraR || 0);
           var dxp = entry.px - mx, dyp = entry.py - my;
           if (dxp * dxp + dyp * dyp <= r * r) hits.push(pt);
         }
@@ -15998,6 +16061,7 @@ var Scatter = (function() {
   function queryClosest(mx, my, extraR) {
     var idx = _state.spatialIndex || buildSpatialIndex();
     if (!idx) return null;
+    var srcPts = _state.hoverPts && _state.hoverPts.length ? _state.hoverPts : _state.allPts;
     var grid = idx.grid;
     var cx = Math.floor(mx / SPATIAL_CELL);
     var cy = Math.floor(my / SPATIAL_CELL);
@@ -16008,8 +16072,14 @@ var Scatter = (function() {
         if (!bucket) continue;
         for (var k = 0; k < bucket.length; k++) {
           var entry = bucket[k];
-          var pt = _state.allPts[entry.i];
-          var r = ScatterEngine.tierSize(pt._p.rank) / 2 + ScatterLogoCache.BUBBLE_PAD + 2 + (extraR || 0);
+          var pt = srcPts[entry.i];
+          // PR4: clamp ghost hit radius to a small, forgiving value (10px).
+          // BUBBLE_PAD makes sense for the logo-bearing foreground dots,
+          // not for the 3px ghost circles.
+          var r = pt._isGhost
+            ? 10
+            : (ScatterEngine.tierSize(pt._p.rank) / 2 + ScatterLogoCache.BUBBLE_PAD + 2);
+          r += (extraR || 0);
           var dxp = entry.px - mx, dyp = entry.py - my;
           var d2 = dxp * dxp + dyp * dyp;
           if (d2 <= r * r && d2 < bestD) { bestD = d2; best = pt; }
@@ -16187,7 +16257,7 @@ var Scatter = (function() {
   // CSS [aria-pressed="true"] does the active-state visual.
   function setTrend(v) {
     _state.trend = !!v;
-    var btn = document.getElementById('scTrendBtn');
+    var btn = _scEl('scTrendBtn');
     if (btn) {
       btn.setAttribute('aria-pressed', _state.trend ? 'true' : 'false');
       btn.classList.toggle('active', _state.trend);
@@ -16195,7 +16265,7 @@ var Scatter = (function() {
   }
   function setQuadrants(v) {
     _state.quadrants = !!v;
-    var btn = document.getElementById('scQuadBtn');
+    var btn = _scEl('scQuadBtn');
     if (btn) {
       btn.setAttribute('aria-pressed', _state.quadrants ? 'true' : 'false');
       btn.classList.toggle('active', _state.quadrants);
@@ -16208,7 +16278,7 @@ var Scatter = (function() {
   // render after restoring state, exactly like setTrend/setQuadrants do.
   function setGhost(v) {
     _state.ghost = !!v;
-    var btn = document.getElementById('scGhostBtn');
+    var btn = _scEl('scGhostBtn');
     if (btn) {
       btn.setAttribute('aria-pressed', _state.ghost ? 'true' : 'false');
       btn.classList.toggle('active', _state.ghost);
@@ -16233,6 +16303,26 @@ var Scatter = (function() {
 // ════════════════════════════════════════════════════════════════════════
 // SCATTER PLOT (sc*) — axis selection, trend lines, ghost mode, tooltips
 // ════════════════════════════════════════════════════════════════════════
+// ── DOM cache for scatter elements ──────────────────────────────────────────
+// Memoized getElementById for the ~25 scatter DOM nodes. First call after
+// DOMContentLoaded resolves and caches the reference; subsequent calls are
+// O(1) Map lookups. Returns null if the element doesn't exist (same contract
+// as getElementById, so existing null-checks keep working unchanged).
+//
+// Why a function rather than a const cache populated at startup?  Some
+// scatter nodes (e.g. #scLegend, #scShelf) are dynamically inserted by
+// scRender on first activation. Lazy lookup avoids a startup-order coupling.
+let _scElCache = Object.create(null);
+function _scEl(id) {
+  let node = _scElCache[id];
+  if (node && node.isConnected) return node;
+  node = document.getElementById(id);
+  if (node) _scElCache[id] = node;
+  return node;
+}
+// Invalidate when tabs reload / scatter is re-mounted.
+function _scElCacheInvalidate() { _scElCache = Object.create(null); }
+
 function scHighlightPlayer(name) {
   // Delegate to Scatter.highlightPlayer — in-place mutation of pointStyle/
   // pointRadius arrays instead of allocating new n-length arrays per hover.
@@ -16247,7 +16337,7 @@ function scHighlightPlayer(name) {
 // SC_AXES by scPopulateAxes() on tab init. The tooltip and chart formatters
 // also read directly from here. Drift between selects and JS is structurally
 // impossible.
-var SC_AXES = {
+let SC_AXES = {
   age:       { label:'Age (yrs)',    short:'Age',         group:'physical', fmt:function(v){ return v.toFixed(1)+'y'; },                              inv:false },
   ht:        { label:'Height (in)',  short:'Height',      group:'physical', fmt:function(v){ return Math.floor(v/12)+"'"+Math.round(v%12)+'"'; },    inv:false },
   wt:        { label:'Weight (lbs)', short:'Weight',      group:'physical', fmt:function(v){ return Math.round(v)+'lb'; },                           inv:false },
@@ -16266,7 +16356,7 @@ var SC_AXES = {
 // Group ordering for the dropdowns. Same order on BOTH X and Y selects so the
 // user only learns the list once. Stats first because they are the most
 // frequently-chosen axis target, then Board (analytical), then Physical.
-var SC_AXIS_GROUPS = [
+let SC_AXIS_GROUPS = [
   { key:'stats',    label:'Stats' },
   { key:'board',    label:'Board' },
   { key:'physical', label:'Physical' }
@@ -16276,26 +16366,26 @@ var SC_AXIS_GROUPS = [
 // Idempotent: skips if already populated. Called on first scRender() so we
 // don't depend on DOM-ready timing or tab-activation order.
 function scPopulateAxes() {
-  var xSel = document.getElementById('scXAxis');
-  var ySel = document.getElementById('scYAxis');
+  let xSel = _scEl('scXAxis');
+  let ySel = _scEl('scYAxis');
   if (!xSel || !ySel) return;
   if (xSel.options.length > 0 && ySel.options.length > 0) return;
 
   // Preserve any existing selection that might have been set from URL state
   // before populate runs (defensive — currently selects are empty at parse time).
-  var xWant = xSel.value || 'age';
-  var yWant = ySel.value || 'ts_pct';
+  let xWant = xSel.value || 'age';
+  let yWant = ySel.value || 'ts_pct';
 
   SC_AXIS_GROUPS.forEach(function(g) {
-    var xGrp = document.createElement('optgroup');
-    var yGrp = document.createElement('optgroup');
+    let xGrp = document.createElement('optgroup');
+    let yGrp = document.createElement('optgroup');
     xGrp.label = g.label;
     yGrp.label = g.label;
     Object.keys(SC_AXES).forEach(function(k) {
-      var a = SC_AXES[k];
+      let a = SC_AXES[k];
       if (a.group !== g.key) return;
-      var xo = document.createElement('option'); xo.value = k; xo.textContent = a.short;
-      var yo = document.createElement('option'); yo.value = k; yo.textContent = a.short;
+      let xo = document.createElement('option'); xo.value = k; xo.textContent = a.short;
+      let yo = document.createElement('option'); yo.value = k; yo.textContent = a.short;
       xGrp.appendChild(xo);
       yGrp.appendChild(yo);
     });
@@ -16317,14 +16407,14 @@ function scPopulateAxes() {
 // Wired once at module init (not per-render) so no duplicate listeners accumulate.
 // Uses capture phase so it fires before any canvas handler.
 (function() {
-  var _scDocTouchWired = false;
+  let _scDocTouchWired = false;
   function _wireScDocDismiss() {
     if (_scDocTouchWired) return;
     _scDocTouchWired = true;
     document.addEventListener('touchstart', function(e) {
       // Only dismiss if a tip is currently visible AND the touch is outside the canvas
       if (!Scatter._state.tipEl || Scatter._state.tipEl.style.opacity === '0') return;
-      var canvas = document.getElementById('scCanvas');
+      let canvas = _scEl('scCanvas');
       if (!canvas || canvas.contains(e.target)) return;
       // PR1: also keep the tip open when the touch landed inside the tooltip
       // itself — that's how the pin button is activated on mobile/hybrid.
@@ -16344,7 +16434,7 @@ function scPopulateAxes() {
 
 function scToggleTrend() {
   Scatter._state.trend = !Scatter._state.trend;
-  var btn = document.getElementById('scTrendBtn');
+  let btn = _scEl('scTrendBtn');
   if (btn) {
     // Keep the icon markup intact — communicate state through aria-pressed
     // and the [aria-pressed="true"] CSS rule, not textContent.
@@ -16356,7 +16446,7 @@ function scToggleTrend() {
 
 function scToggleQuadrants() {
   Scatter._state.quadrants = !Scatter._state.quadrants;
-  var btn = document.getElementById('scQuadBtn');
+  let btn = _scEl('scQuadBtn');
   if (btn) {
     btn.setAttribute('aria-pressed', Scatter._state.quadrants ? 'true' : 'false');
     btn.classList.toggle('active', Scatter._state.quadrants);
@@ -16373,7 +16463,7 @@ function scToggleQuadrants() {
 // recreate path inside scRender handles cleanly.
 function scToggleGhost() {
   Scatter._state.ghost = !Scatter._state.ghost;
-  var btn = document.getElementById('scGhostBtn');
+  let btn = _scEl('scGhostBtn');
   if (btn) {
     btn.setAttribute('aria-pressed', Scatter._state.ghost ? 'true' : 'false');
     btn.classList.toggle('active', Scatter._state.ghost);
@@ -16387,7 +16477,7 @@ function scToggleGhost() {
 // as a tiny standalone fn rather than buried in ScatterShell because the zoom
 // plugin callbacks need a free-standing reference at config-build time.
 function scSyncZoomChrome() {
-  var btn = document.getElementById('scResetZoom');
+  let btn = _scEl('scResetZoom');
   if (!btn) return;
   btn.hidden = !Scatter._state.zoomed;
 }
@@ -16429,88 +16519,88 @@ function scResetZoom() {
 // Reverse pairs (yKey|xKey) are NOT enumerated — the plugin tries both
 // orderings and swaps the x/y rect coords when matching the reversed key.
 // Labels are short (≤2 words) so they fit comfortably inside small zones.
-var ARCHETYPE_ZONES = {
+let ARCHETYPE_ZONES = {
   // Production × Efficiency → the foundational star map
   'pa2_usg|ts_pct': [
-    { x:[.55,1.0],  y:[.55,1.0],  label:'Efficient Stars',   color:'#16A34A' },
-    { x:[.55,1.0],  y:[0.0,.45],  label:'Empty Volume',      color:'#DC2626' },
-    { x:[0.0,.45],  y:[.55,1.0],  label:'Specialists',       color:'#3B82F6' },
-    { x:[0.0,.45],  y:[0.0,.45],  label:'Low Impact',        color:'#94A3B8' }
+    { x:[.55,1.0],  y:[.55,1.0],  label:'Efficient Stars',   color:Theme.color('--green-dark') },
+    { x:[.55,1.0],  y:[0.0,.45],  label:'Empty Volume',      color:Theme.color('--red-dark') },
+    { x:[0.0,.45],  y:[.55,1.0],  label:'Specialists',       color:Theme.color('--blue-light') },
+    { x:[0.0,.45],  y:[0.0,.45],  label:'Low Impact',        color:Theme.color('--gray-400') }
   ],
   // FT-rate × 3PT-rate → shot-profile typology
   'ftar|tpar': [
-    { x:[0.0,.45],  y:[.55,1.0],  label:'Pure Shooters',     color:'#3B82F6' },
-    { x:[.55,1.0],  y:[0.0,.45],  label:'Slashers',          color:'#D97706' },
-    { x:[.55,1.0],  y:[.55,1.0],  label:'Three-Level',       color:'#2C4569' },
-    { x:[0.0,.45],  y:[0.0,.45],  label:'Mid-Range',         color:'#94A3B8' }
+    { x:[0.0,.45],  y:[.55,1.0],  label:'Pure Shooters',     color:Theme.color('--blue-light') },
+    { x:[.55,1.0],  y:[0.0,.45],  label:'Slashers',          color:Theme.color('--amber-deep') },
+    { x:[.55,1.0],  y:[.55,1.0],  label:'Three-Level',       color:Theme.color('--tier-lottery') },
+    { x:[0.0,.45],  y:[0.0,.45],  label:'Mid-Range',         color:Theme.color('--gray-400') }
   ],
   // Defense × Playmaking-care → two-way / connector axis
   'stl_bl|ato': [
-    { x:[.55,1.0],  y:[.55,1.0],  label:'Two-Way Connectors',color:'#16A34A' },
-    { x:[.55,1.0],  y:[0.0,.45],  label:'Defensive Specs',   color:'#3B82F6' },
-    { x:[0.0,.45],  y:[.55,1.0],  label:'Pure Playmakers',   color:'#D97706' },
-    { x:[0.0,.45],  y:[0.0,.45],  label:'Role Players',      color:'#94A3B8' }
+    { x:[.55,1.0],  y:[.55,1.0],  label:'Two-Way Connectors',color:Theme.color('--green-dark') },
+    { x:[.55,1.0],  y:[0.0,.45],  label:'Defensive Specs',   color:Theme.color('--blue-light') },
+    { x:[0.0,.45],  y:[.55,1.0],  label:'Pure Playmakers',   color:Theme.color('--amber-deep') },
+    { x:[0.0,.45],  y:[0.0,.45],  label:'Role Players',      color:Theme.color('--gray-400') }
   ],
   // Physical-tools map
   'ht|wt': [
-    { x:[.55,1.0],  y:[.55,1.0],  label:'Powerful Bigs',     color:'#2C4569' },
-    { x:[.55,1.0],  y:[0.0,.45],  label:'Lean Wings',        color:'#3B82F6' },
-    { x:[0.0,.45],  y:[.55,1.0],  label:'Combo Guards',      color:'#D97706' },
-    { x:[0.0,.45],  y:[0.0,.45],  label:'Quick Guards',      color:'#16A34A' }
+    { x:[.55,1.0],  y:[.55,1.0],  label:'Powerful Bigs',     color:Theme.color('--tier-lottery') },
+    { x:[.55,1.0],  y:[0.0,.45],  label:'Lean Wings',        color:Theme.color('--blue-light') },
+    { x:[0.0,.45],  y:[.55,1.0],  label:'Combo Guards',      color:Theme.color('--amber-deep') },
+    { x:[0.0,.45],  y:[0.0,.45],  label:'Quick Guards',      color:Theme.color('--green-dark') }
   ],
   // Age × HW Metric → projection lens
   'age|metric': [
-    { x:[0.0,.45],  y:[.55,1.0],  label:'Young Stars',       color:'#16A34A' },
-    { x:[.55,1.0],  y:[.55,1.0],  label:'Polished Producers',color:'#3B82F6' },
-    { x:[0.0,.45],  y:[0.0,.45],  label:'Young Projects',    color:'#D97706' },
-    { x:[.55,1.0],  y:[0.0,.45],  label:'Older Roleplayers', color:'#94A3B8' }
+    { x:[0.0,.45],  y:[.55,1.0],  label:'Young Stars',       color:Theme.color('--green-dark') },
+    { x:[.55,1.0],  y:[.55,1.0],  label:'Polished Producers',color:Theme.color('--blue-light') },
+    { x:[0.0,.45],  y:[0.0,.45],  label:'Young Projects',    color:Theme.color('--amber-deep') },
+    { x:[.55,1.0],  y:[0.0,.45],  label:'Older Roleplayers', color:Theme.color('--gray-400') }
   ],
   // Efficiency × 3PT volume → scorer type
   'ts_pct|tpar': [
-    { x:[.55,1.0],  y:[.55,1.0],  label:'Floor Spacers',     color:'#3B82F6' },
-    { x:[.55,1.0],  y:[0.0,.45],  label:'Inside Scorers',    color:'#D97706' },
-    { x:[0.0,.45],  y:[.55,1.0],  label:'Volume Shooters',   color:'#94A3B8' },
-    { x:[0.0,.45],  y:[0.0,.45],  label:'Low Volume',        color:'#94A3B8' }
+    { x:[.55,1.0],  y:[.55,1.0],  label:'Floor Spacers',     color:Theme.color('--blue-light') },
+    { x:[.55,1.0],  y:[0.0,.45],  label:'Inside Scorers',    color:Theme.color('--amber-deep') },
+    { x:[0.0,.45],  y:[.55,1.0],  label:'Volume Shooters',   color:Theme.color('--gray-400') },
+    { x:[0.0,.45],  y:[0.0,.45],  label:'Low Volume',        color:Theme.color('--gray-400') }
   ],
   // Defense × Overall talent
   'stl_bl|metric': [
-    { x:[.55,1.0],  y:[.55,1.0],  label:'Two-Way Stars',     color:'#16A34A' },
-    { x:[.55,1.0],  y:[0.0,.45],  label:'Defense-Only',      color:'#3B82F6' },
-    { x:[0.0,.45],  y:[.55,1.0],  label:'Offensive Stars',   color:'#D97706' },
-    { x:[0.0,.45],  y:[0.0,.45],  label:'Project Profiles',  color:'#94A3B8' }
+    { x:[.55,1.0],  y:[.55,1.0],  label:'Two-Way Stars',     color:Theme.color('--green-dark') },
+    { x:[.55,1.0],  y:[0.0,.45],  label:'Defense-Only',      color:Theme.color('--blue-light') },
+    { x:[0.0,.45],  y:[.55,1.0],  label:'Offensive Stars',   color:Theme.color('--amber-deep') },
+    { x:[0.0,.45],  y:[0.0,.45],  label:'Project Profiles',  color:Theme.color('--gray-400') }
   ],
   // Usage × A/TO → playmaking burden
   'pa2_usg|ato': [
-    { x:[.55,1.0],  y:[.55,1.0],  label:'Star Creators',     color:'#16A34A' },
-    { x:[.55,1.0],  y:[0.0,.45],  label:'Volume Scorers',    color:'#D97706' },
-    { x:[0.0,.45],  y:[.55,1.0],  label:'Floor Generals',    color:'#3B82F6' },
-    { x:[0.0,.45],  y:[0.0,.45],  label:'Off-Ball',          color:'#94A3B8' }
+    { x:[.55,1.0],  y:[.55,1.0],  label:'Star Creators',     color:Theme.color('--green-dark') },
+    { x:[.55,1.0],  y:[0.0,.45],  label:'Volume Scorers',    color:Theme.color('--amber-deep') },
+    { x:[0.0,.45],  y:[.55,1.0],  label:'Floor Generals',    color:Theme.color('--blue-light') },
+    { x:[0.0,.45],  y:[0.0,.45],  label:'Off-Ball',          color:Theme.color('--gray-400') }
   ],
   // Age × Efficiency
   'age|ts_pct': [
-    { x:[0.0,.45],  y:[.55,1.0],  label:'Young Efficient',   color:'#16A34A' },
-    { x:[.55,1.0],  y:[.55,1.0],  label:'Mature Scorers',    color:'#3B82F6' },
-    { x:[0.0,.45],  y:[0.0,.45],  label:'Young Volume',      color:'#D97706' },
-    { x:[.55,1.0],  y:[0.0,.45],  label:'Older Inefficient', color:'#94A3B8' }
+    { x:[0.0,.45],  y:[.55,1.0],  label:'Young Efficient',   color:Theme.color('--green-dark') },
+    { x:[.55,1.0],  y:[.55,1.0],  label:'Mature Scorers',    color:Theme.color('--blue-light') },
+    { x:[0.0,.45],  y:[0.0,.45],  label:'Young Volume',      color:Theme.color('--amber-deep') },
+    { x:[.55,1.0],  y:[0.0,.45],  label:'Older Inefficient', color:Theme.color('--gray-400') }
   ],
   // FT-rate × Efficiency — foul-drawing scorer profile
   'ftar|ts_pct': [
-    { x:[.55,1.0],  y:[.55,1.0],  label:'Foul-Drawer Stars', color:'#16A34A' },
-    { x:[0.0,.45],  y:[.55,1.0],  label:'Pure Shooters',     color:'#3B82F6' },
-    { x:[.55,1.0],  y:[0.0,.45],  label:'High-Volume Drivers',color:'#D97706' },
-    { x:[0.0,.45],  y:[0.0,.45],  label:'Low Impact',        color:'#94A3B8' }
+    { x:[.55,1.0],  y:[.55,1.0],  label:'Foul-Drawer Stars', color:Theme.color('--green-dark') },
+    { x:[0.0,.45],  y:[.55,1.0],  label:'Pure Shooters',     color:Theme.color('--blue-light') },
+    { x:[.55,1.0],  y:[0.0,.45],  label:'High-Volume Drivers',color:Theme.color('--amber-deep') },
+    { x:[0.0,.45],  y:[0.0,.45],  label:'Low Impact',        color:Theme.color('--gray-400') }
   ],
   // HW Metric × HW Rank — the board's own self-consistency
   'metric|rank': [
-    { x:[.55,1.0],  y:[0.0,.45],  label:'Top of Board',      color:'#16A34A' },
-    { x:[0.0,.45],  y:[.55,1.0],  label:'Lower of Board',    color:'#94A3B8' }
+    { x:[.55,1.0],  y:[0.0,.45],  label:'Top of Board',      color:Theme.color('--green-dark') },
+    { x:[0.0,.45],  y:[.55,1.0],  label:'Lower of Board',    color:Theme.color('--gray-400') }
   ],
   // 3PT-rate × Efficiency — shooter quality
   'tpar|ts_pct': [
-    { x:[.55,1.0],  y:[.55,1.0],  label:'Elite Spacers',     color:'#3B82F6' },
-    { x:[0.0,.45],  y:[.55,1.0],  label:'Inside Scorers',    color:'#D97706' },
-    { x:[.55,1.0],  y:[0.0,.45],  label:'Volume Shooters',   color:'#94A3B8' },
-    { x:[0.0,.45],  y:[0.0,.45],  label:'Low Volume',        color:'#94A3B8' }
+    { x:[.55,1.0],  y:[.55,1.0],  label:'Elite Spacers',     color:Theme.color('--blue-light') },
+    { x:[0.0,.45],  y:[.55,1.0],  label:'Inside Scorers',    color:Theme.color('--amber-deep') },
+    { x:[.55,1.0],  y:[0.0,.45],  label:'Volume Shooters',   color:Theme.color('--gray-400') },
+    { x:[0.0,.45],  y:[0.0,.45],  label:'Low Volume',        color:Theme.color('--gray-400') }
   ]
 };
 
@@ -16520,9 +16610,9 @@ var ARCHETYPE_ZONES = {
 // "draw nothing" so unknown pairs are silently absent rather than rendering
 // broken regions.
 function scArchetypesFor(xKey, yKey) {
-  var direct = ARCHETYPE_ZONES[xKey + '|' + yKey];
+  let direct = ARCHETYPE_ZONES[xKey + '|' + yKey];
   if (direct) return direct;
-  var swapped = ARCHETYPE_ZONES[yKey + '|' + xKey];
+  let swapped = ARCHETYPE_ZONES[yKey + '|' + xKey];
   if (!swapped) return null;
   // Flip x/y on each zone so the curated coordinates still describe the
   // same archetype after swap. Cheap — at most 4 small objects.
@@ -16543,14 +16633,14 @@ function scArchetypesFor(xKey, yKey) {
 // chooses the zone whose center is closest to each corner. Falls back to
 // ELITE/LAGGING on the diagonals when no archetype lookup exists.
 function scQuadrantLabelsFor(xKey, yKey) {
-  var zones = scArchetypesFor(xKey, yKey);
+  let zones = scArchetypesFor(xKey, yKey);
   if (!zones || zones.length < 2) return null;
   function pick(targetX, targetY) {
-    var best = null, bestD = Infinity;
+    let best = null, bestD = Infinity;
     zones.forEach(function(z) {
-      var cx = (z.x[0] + z.x[1]) / 2;
-      var cy = (z.y[0] + z.y[1]) / 2;
-      var d = Math.abs(cx - targetX) + Math.abs(cy - targetY);
+      let cx = (z.x[0] + z.x[1]) / 2;
+      let cy = (z.y[0] + z.y[1]) / 2;
+      let d = Math.abs(cx - targetX) + Math.abs(cy - targetY);
       if (d < bestD) { bestD = d; best = z; }
     });
     return best ? best.label : null;
@@ -16568,20 +16658,20 @@ function scQuadrantLabelsFor(xKey, yKey) {
 // Y-axis labels. Reads Scatter._state.crosshair set/cleared by the canvas
 // mousemove/mouseleave handlers. Drawn in afterDatasetsDraw so the lines
 // sit ON TOP of logos but UNDER the tooltip.
-var SC_CROSSHAIR_PLUGIN = {
+let SC_CROSSHAIR_PLUGIN = {
   id: 'scCrosshair',
   afterDatasetsDraw: function(chart) {
-    var cross = Scatter._state.crosshair;
+    let cross = Scatter._state.crosshair;
     if (!cross) return;
-    var xScale = chart.scales.x;
-    var yScale = chart.scales.y;
+    let xScale = chart.scales.x;
+    let yScale = chart.scales.y;
     if (!xScale || !yScale) return;
 
-    var px = xScale.getPixelForValue(cross.x);
-    var py = yScale.getPixelForValue(cross.y);
+    let px = xScale.getPixelForValue(cross.x);
+    let py = yScale.getPixelForValue(cross.y);
     if (isNaN(px) || isNaN(py)) return;
 
-    var ctx = chart.ctx;
+    let ctx = chart.ctx;
     ctx.save();
     ctx.strokeStyle = 'rgba(15,23,42,0.18)';
     ctx.lineWidth = 1;
@@ -16597,32 +16687,32 @@ var SC_CROSSHAIR_PLUGIN = {
 
     // Small value chips at the axis intercepts. Reads formatters from the
     // axis ticks callback so the chip values match the axis tick format.
-    var xFmt = (xScale.options.ticks && xScale.options.ticks.callback) || function(v){ return v; };
-    var yFmt = (yScale.options.ticks && yScale.options.ticks.callback) || function(v){ return v; };
-    var xLabel = String(xFmt.call(xScale, cross.x));
-    var yLabel = String(yFmt.call(yScale, cross.y));
+    let xFmt = (xScale.options.ticks && xScale.options.ticks.callback) || function(v){ return v; };
+    let yFmt = (yScale.options.ticks && yScale.options.ticks.callback) || function(v){ return v; };
+    let xLabel = String(xFmt.call(xScale, cross.x));
+    let yLabel = String(yFmt.call(yScale, cross.y));
 
     ctx.setLineDash([]);
     ctx.font = '700 10px "DM Sans", sans-serif';
     ctx.textBaseline = 'top';
 
     // X-axis chip (centered below point at axis bottom)
-    var xTextW = ctx.measureText(xLabel).width;
-    var xChipX = px - xTextW / 2 - 5;
-    var xChipY = yScale.bottom + 4;
+    let xTextW = ctx.measureText(xLabel).width;
+    let xChipX = px - xTextW / 2 - 5;
+    let xChipY = yScale.bottom + 4;
     ctx.fillStyle = 'rgba(15,23,42,0.92)';
     ctx.fillRect(xChipX, xChipY, xTextW + 10, 16);
-    ctx.fillStyle = '#F0C94A';
+    ctx.fillStyle = Theme.color('--amber-soft');
     ctx.textAlign = 'left';
     ctx.fillText(xLabel, xChipX + 5, xChipY + 3);
 
     // Y-axis chip (left of point at axis edge)
-    var yTextW = ctx.measureText(yLabel).width;
-    var yChipX = xScale.left - yTextW - 14;
-    var yChipY = py - 8;
+    let yTextW = ctx.measureText(yLabel).width;
+    let yChipX = xScale.left - yTextW - 14;
+    let yChipY = py - 8;
     ctx.fillStyle = 'rgba(15,23,42,0.92)';
     ctx.fillRect(yChipX, yChipY, yTextW + 10, 16);
-    ctx.fillStyle = '#F0C94A';
+    ctx.fillStyle = Theme.color('--amber-soft');
     ctx.fillText(yLabel, yChipX + 5, yChipY + 3);
 
     ctx.restore();
@@ -16652,20 +16742,20 @@ var SC_CROSSHAIR_PLUGIN = {
    The plugin respects axis inversion: when an axis has reverse:true (e.g. rank
    where lower is better), the "good" direction flips automatically.
    Drawn in beforeDatasetsDraw so data points sit ON TOP of the tints. */
-var SC_QUADRANT_PLUGIN = {
+let SC_QUADRANT_PLUGIN = {
   id: 'scQuadrants',
   beforeDatasetsDraw: function(chart) {
     if (!Scatter._state.quadrants) return;
-    var ctx     = chart.ctx;
-    var xScale  = chart.scales.x;
-    var yScale  = chart.scales.y;
+    let ctx     = chart.ctx;
+    let xScale  = chart.scales.x;
+    let yScale  = chart.scales.y;
     if (!xScale || !yScale) return;
 
     // Collect actual data points. PR2: with the ghost overlay enabled the
     // foreground dataset is at index 1, not 0 — quadrant medians need to be
     // computed from the foreground only, otherwise ghost (historical) points
     // skew the split. Find by $scIsForeground tag with fallback to index 0.
-    var ds = null;
+    let ds = null;
     for (var di = 0; di < chart.data.datasets.length; di++) {
       if (chart.data.datasets[di].$scIsForeground) { ds = chart.data.datasets[di]; break; }
     }
@@ -16673,28 +16763,28 @@ var SC_QUADRANT_PLUGIN = {
     if (!ds || !ds.data || !ds.data.length) return;
 
     // Compute median for each axis from the rendered data
-    var xs = ds.data.map(function(d){ return d.x; }).filter(function(v){ return v != null && isFinite(v); }).sort(function(a,b){return a-b;});
-    var ys = ds.data.map(function(d){ return d.y; }).filter(function(v){ return v != null && isFinite(v); }).sort(function(a,b){return a-b;});
+    let xs = ds.data.map(function(d){ return d.x; }).filter(function(v){ return v != null && isFinite(v); }).sort(function(a,b){return a-b;});
+    let ys = ds.data.map(function(d){ return d.y; }).filter(function(v){ return v != null && isFinite(v); }).sort(function(a,b){return a-b;});
     if (xs.length < 4 || ys.length < 4) return; // not enough data to make quadrants meaningful
 
-    var xMed = xs[Math.floor(xs.length / 2)];
-    var yMed = ys[Math.floor(ys.length / 2)];
+    let xMed = xs[Math.floor(xs.length / 2)];
+    let yMed = ys[Math.floor(ys.length / 2)];
 
     // Plot area pixel boundaries
-    var left   = xScale.left;
-    var right  = xScale.right;
-    var top    = yScale.top;
-    var bottom = yScale.bottom;
-    var xMid   = xScale.getPixelForValue(xMed);
-    var yMid   = yScale.getPixelForValue(yMed);
+    let left   = xScale.left;
+    let right  = xScale.right;
+    let top    = yScale.top;
+    let bottom = yScale.bottom;
+    let xMid   = xScale.getPixelForValue(xMed);
+    let yMid   = yScale.getPixelForValue(yMed);
 
     // Quadrant "goodness": account for axis inversion. If x is reversed, the
     // 'high' side is the LEFT visually (because higher data values map to
     // smaller pixel x). Same for y inversion (but charts have inverted Y by
     // default — top = lower pixel y = higher data value, so the natural
     // 'high y' quadrant is the TOP).
-    var xRev = !!xScale.options.reverse;
-    var yRev = !!yScale.options.reverse;
+    let xRev = !!xScale.options.reverse;
+    let yRev = !!yScale.options.reverse;
 
     // Determine which pixel-quadrant corresponds to (high X, high Y) in data terms
     // Pixel layout: top-left = (left, top), bottom-right = (right, bottom)
@@ -16702,21 +16792,21 @@ var SC_QUADRANT_PLUGIN = {
     //   → "elite" quadrant = top-right pixel rect = (xMid..right, top..yMid)
     // With xRev: high data X = left pixel → "elite" quadrant = top-LEFT pixel rect
     // With yRev: high data Y = bottom pixel → "elite" quadrant = bottom side
-    var eliteX1 = xRev ? left  : xMid;
-    var eliteX2 = xRev ? xMid  : right;
-    var eliteY1 = yRev ? yMid  : top;
-    var eliteY2 = yRev ? bottom : yMid;
+    let eliteX1 = xRev ? left  : xMid;
+    let eliteX2 = xRev ? xMid  : right;
+    let eliteY1 = yRev ? yMid  : top;
+    let eliteY2 = yRev ? bottom : yMid;
 
-    var lagX1 = xRev ? xMid  : left;
-    var lagX2 = xRev ? right : xMid;
-    var lagY1 = yRev ? top   : yMid;
-    var lagY2 = yRev ? yMid  : bottom;
+    let lagX1 = xRev ? xMid  : left;
+    let lagX2 = xRev ? right : xMid;
+    let lagY1 = yRev ? top   : yMid;
+    let lagY2 = yRev ? yMid  : bottom;
 
     // Two off-diagonal trade-off quadrants — fill the rest
     // tradeoff A: high X, low Y (pixel = lag Y side at elite X side)
-    var tA_x1 = eliteX1, tA_x2 = eliteX2, tA_y1 = lagY1, tA_y2 = lagY2;
+    let tA_x1 = eliteX1, tA_x2 = eliteX2, tA_y1 = lagY1, tA_y2 = lagY2;
     // tradeoff B: low X, high Y (pixel = elite Y side at lag X side)
-    var tB_x1 = lagX1,  tB_x2 = lagX2,  tB_y1 = eliteY1, tB_y2 = eliteY2;
+    let tB_x1 = lagX1,  tB_x2 = lagX2,  tB_y1 = eliteY1, tB_y2 = eliteY2;
 
     ctx.save();
     // Elite quadrant (top-right semantically) — soft green
@@ -16744,7 +16834,7 @@ var SC_QUADRANT_PLUGIN = {
     // Falls back to the original ELITE/LAGGING display on the diagonals.
     ctx.setLineDash([]);
     ctx.font = '700 9px "Barlow Condensed", sans-serif';
-    var labels = scQuadrantLabelsFor(chart.$scXKey, chart.$scYKey);
+    let labels = scQuadrantLabelsFor(chart.$scXKey, chart.$scYKey);
     if (labels && labels.tr && labels.br && labels.bl && labels.tl) {
       // Semantic mode — label all four corners with the curated archetype.
       // Pixel positions: tr = elite quadrant (in non-inverted axes), etc.
@@ -16772,14 +16862,14 @@ var SC_QUADRANT_PLUGIN = {
     } else {
       // Generic mode — original ELITE/LAGGING diagonals only.
       ctx.fillStyle = 'rgba(21,128,61,0.55)';   // elite — green-700
-      var elitePadY = 14;
-      var eliteCx = eliteX1 + (eliteX2 - eliteX1) / 2;
-      var eliteCy = eliteY1 + elitePadY;
+      let elitePadY = 14;
+      let eliteCx = eliteX1 + (eliteX2 - eliteX1) / 2;
+      let eliteCy = eliteY1 + elitePadY;
       ctx.textAlign = 'center';
       ctx.fillText('ELITE', eliteCx, eliteCy);
       ctx.fillStyle = 'rgba(185,28,28,0.50)';   // lagging — red-700
-      var lagCx = lagX1 + (lagX2 - lagX1) / 2;
-      var lagCy = lagY2 - 6;
+      let lagCx = lagX1 + (lagX2 - lagX1) / 2;
+      let lagCy = lagY2 - 6;
       ctx.fillText('LAGGING', lagCx, lagCy);
     }
     ctx.restore();
@@ -16835,9 +16925,9 @@ function scGetTip() {
 // index for `v` — i.e. the count of values strictly less than v. Used by
 // percentilePct() to compute the cohort rank of a tooltip-hovered value.
 function _scBisectLeft(arr, v) {
-  var lo = 0, hi = arr.length;
+  let lo = 0, hi = arr.length;
   while (lo < hi) {
-    var mid = (lo + hi) >>> 1;
+    let mid = (lo + hi) >>> 1;
     if (arr[mid] < v) lo = mid + 1; else hi = mid;
   }
   return lo;
@@ -16850,8 +16940,8 @@ function _scBisectLeft(arr, v) {
 // for a useful percentile).
 function _scPercentile(arr, v, invert) {
   if (!arr || arr.length < 3 || v == null || !isFinite(v)) return null;
-  var below = _scBisectLeft(arr, v);
-  var pct = (below / arr.length) * 100;
+  let below = _scBisectLeft(arr, v);
+  let pct = (below / arr.length) * 100;
   if (invert) pct = 100 - pct;
   return Math.round(pct);
 }
@@ -16859,29 +16949,29 @@ function _scPercentile(arr, v, invert) {
 // Color a percentile pill: green for top quartile, amber for middle, muted
 // red for bottom quartile. Communicates direction at a glance.
 function _scPctColor(pct) {
-  if (pct == null) return '#94A3B8';
-  if (pct >= 75)   return '#22C55E';   // green-500
-  if (pct >= 50)   return '#F0C94A';   // amber accent
-  if (pct >= 25)   return '#FB923C';   // orange-400
-  return '#EF4444';                    // red-500
+  if (pct == null) return Theme.color('--gray-400');
+  if (pct >= 75)   return Theme.color('--green-500');   // green-500
+  if (pct >= 50)   return Theme.color('--amber-soft');   // amber accent
+  if (pct >= 25)   return Theme.color('--orange');   // orange-400
+  return Theme.color('--red');                    // red-500
 }
 
 function scShowTip(e, nearby, xM, yM) {
-  var tt = scGetTip();
+  let tt = scGetTip();
   if (!nearby.length) { tt.style.opacity = '0'; return; }
-  var h = '';
+  let h = '';
   if (nearby.length > 1) h += '<div style="font-size:var(--text-10);color:rgba(255,255,255,.4);margin-bottom:5px">' + nearby.length + ' players here</div>';
 
   // PR2: percentile cache built once per scRender — read .xKey/.yKey to
   // confirm the cache matches the current axes (handles the race where
   // a user changes axes between hover/render cycles).
-  var pc = Scatter._state.percentileCache;
-  var pcValid = pc && pc.xKey === (Scatter._state.chart && Scatter._state.chart.$scXKey)
+  let pc = Scatter._state.percentileCache;
+  let pcValid = pc && pc.xKey === (Scatter._state.chart && Scatter._state.chart.$scXKey)
                    && pc.yKey === (Scatter._state.chart && Scatter._state.chart.$scYKey);
 
   nearby.forEach(function(pt, i) {
     if (i > 0) h += '<hr style="border:none;border-top:1px solid rgba(255,255,255,.1);margin:5px 0">';
-    var dotColor = ScatterEngine.POS_HEX[pt._p.position] || '#94A3B8';
+    let dotColor = ScatterEngine.POS_HEX[pt._p.position] || Theme.color('--gray-400');
 
     // PR3: player headshot via avatarHtml — same helper used by player cards
     // and the modal, so photo URL resolution (ESPN headshot CDN with initials
@@ -16889,9 +16979,9 @@ function scShowTip(e, nearby, xM, yM) {
     // mini player profile: portrait left, name + school right, stats below.
     // Falls back to position-colored initials when no photo is on file —
     // avatarHtml handles the onerror/onload chain for placeholder images.
-    var name   = pt._p._n || pt._p.name || '';
-    var school = pt._p._s || '';
-    var photoHtml = (typeof avatarHtml === 'function')
+    let name   = pt._p._n || pt._p.name || '';
+    let school = pt._p._s || '';
+    let photoHtml = (typeof avatarHtml === 'function')
       ? avatarHtml(name, pt._p.position, '40px', '8px', false)
       : '<div style="width:40px;height:40px;border-radius:8px;background:' + dotColor + '"></div>';
 
@@ -16918,7 +17008,7 @@ function scShowTip(e, nearby, xM, yM) {
     // the value so the eye scans label → value → "vs cohort" in one line.
     function pctPill(pct) {
       if (pct == null) return '';
-      var color = _scPctColor(pct);
+      let color = _scPctColor(pct);
       // Bar-style mini ranking — fixed 36px width, fill color = pct color.
       return '<span style="display:inline-flex;align-items:center;gap:5px;margin-left:8px">'
            +   '<span style="position:relative;display:inline-block;width:36px;height:5px;background:rgba(255,255,255,.12);border-radius:3px;overflow:hidden">'
@@ -16928,8 +17018,8 @@ function scShowTip(e, nearby, xM, yM) {
            + '</span>';
     }
 
-    var xPct = (pcValid) ? _scPercentile(pc.xSorted, pt._xr, !!xM.inv) : null;
-    var yPct = (pcValid) ? _scPercentile(pc.ySorted, pt._yr, !!yM.inv) : null;
+    let xPct = (pcValid) ? _scPercentile(pc.xSorted, pt._xr, !!xM.inv) : null;
+    let yPct = (pcValid) ? _scPercentile(pc.ySorted, pt._yr, !!yM.inv) : null;
 
     h += '<table style="width:100%;border-spacing:0"><tr>'
        + '<td style="font-size:var(--text-10);color:rgba(255,255,255,.5);padding-right:8px;padding-bottom:2px">' + escHtml(xM.label) + '</td>'
@@ -16945,9 +17035,9 @@ function scShowTip(e, nearby, xM, yM) {
     // player only — when multiple players are stacked under the cursor we
     // skip pin because picking the wrong one would be unforgiving.
     if (nearby.length === 1 && typeof ScatterShell !== 'undefined') {
-      var pinned = ScatterShell.isPinned(pt._p);
+      let pinned = ScatterShell.isPinned(pt._p);
       // `name` is already declared in the header block above — reuse it.
-      var year = pt._p._y || '2026';
+      let year = pt._p._y || '2026';
       h += '<button type="button" class="sc-tip-pin"'
          + ' data-pin-name="' + escHtml(name) + '"'
          + ' data-pin-year="' + escHtml(year) + '">'
@@ -16962,12 +17052,12 @@ function scShowTip(e, nearby, xM, yM) {
   });
   tt.innerHTML = h;
   tt.style.opacity = '1';
-  var margin = 8;
+  let margin = 8;
   // PR2: wider tooltip to accommodate percentile pills without wrap. Cap at
   // viewport width minus margins for narrow mobile screens.
-  var ttW = Math.min(280, window.innerWidth - margin * 2);
-  var ttH = 220;
-  var cx = e.clientX + 16, cy = e.clientY - 10;
+  let ttW = Math.min(280, window.innerWidth - margin * 2);
+  let ttH = 220;
+  let cx = e.clientX + 16, cy = e.clientY - 10;
   // Clamp tooltip — critical on narrow mobile screens
   if (cx + ttW > window.innerWidth - margin)  cx = Math.max(margin, e.clientX - ttW - 4);
   if (cy + ttH > window.innerHeight - margin) cy = Math.max(margin, e.clientY - ttH - 4);
@@ -16977,7 +17067,7 @@ function scShowTip(e, nearby, xM, yM) {
   tt.style.top  = cy + 'px';
 }
 function scHideTip() {
-  var tt = scGetTip();
+  let tt = scGetTip();
   tt.style.opacity = '0';
   // PR2: clear crosshair when tip is hidden so the guidelines vanish with
   // the tooltip. The mousemove path will set a new crosshair on next hover.
@@ -17021,7 +17111,7 @@ function scRenderDebounced() {
 // so subsequent renders replace rather than accumulate. Coarse-pointer devices
 // get the mobile focus-card path exclusively; fine-pointer devices get the
 // proximity-tooltip path. The two are mutually exclusive — never both.
-var ScatterInteraction = (function() {
+let ScatterInteraction = (function() {
   function wire(canvas, pts, xM, yM, chart) {
     if (!canvas) return;
 
@@ -17030,22 +17120,22 @@ var ScatterInteraction = (function() {
     // calls to ~5-15 (avg points in the 9 surrounding cells), a 40-100× win.
     canvas.onmousemove = function(e) {
       if (!Scatter._state.chart || !Scatter._state.allPts.length) return;
-      var rect = canvas.getBoundingClientRect();
-      var mx = e.clientX - rect.left;
-      var my = e.clientY - rect.top;
+      let rect = canvas.getBoundingClientRect();
+      let mx = e.clientX - rect.left;
+      let my = e.clientY - rect.top;
       try {
-        var isTouchEvent = (e.pointerType === 'touch') ||
+        let isTouchEvent = (e.pointerType === 'touch') ||
           (window.matchMedia && matchMedia('(pointer:coarse)').matches);
-        var touchBoost = isTouchEvent ? 14 : 0;
-        var near = Scatter.queryNear(mx, my, touchBoost);
+        let touchBoost = isTouchEvent ? 14 : 0;
+        let near = Scatter.queryNear(mx, my, touchBoost);
         scShowTip(e, near, xM, yM);
         // PR2: drive the crosshair plugin from the same proximity query.
         // Only paint guidelines when the cursor is on EXACTLY one point —
         // stacked points would draw competing crosshairs through the same
         // pixel position, which adds visual noise without information.
         if (near.length === 1) {
-          var pt = near[0];
-          var prev = Scatter._state.crosshair;
+          let pt = near[0];
+          let prev = Scatter._state.crosshair;
           if (!prev || prev.x !== pt._xr || prev.y !== pt._yr) {
             Scatter._state.crosshair = { x: pt._xr, y: pt._yr };
             // Chart.js update('none') skips animations and triggers a redraw.
@@ -17079,7 +17169,7 @@ var ScatterInteraction = (function() {
     // The mobile focus card and the proximity tooltip are mutually exclusive
     // interaction models. Wiring both caused both to fire on the same tap,
     // producing a flickering UI. Pick one and null out the other.
-    var isCoarse = (typeof window !== 'undefined'
+    let isCoarse = (typeof window !== 'undefined'
       && window.matchMedia
       && window.matchMedia('(pointer:coarse)').matches);
 
@@ -17110,13 +17200,13 @@ var ScatterInteraction = (function() {
           Scatter._state.tipHideTimer = null;
         }
         if (!Scatter._state.chart || !Scatter._state.allPts.length) return;
-        var rect = canvas.getBoundingClientRect();
-        var touch = e.touches[0];
+        let rect = canvas.getBoundingClientRect();
+        let touch = e.touches[0];
         if (!touch) return;
-        var mx = touch.clientX - rect.left;
-        var my = touch.clientY - rect.top;
+        let mx = touch.clientX - rect.left;
+        let my = touch.clientY - rect.top;
         try {
-          var near = Scatter.queryNear(mx, my, 14);
+          let near = Scatter.queryNear(mx, my, 14);
           if (near.length) scShowTip({ clientX: touch.clientX, clientY: touch.clientY }, near, xM, yM);
           else scHideTip();
         } catch (err) { scHideTip(); }
@@ -17152,14 +17242,14 @@ var ScatterInteraction = (function() {
     // Click a logo → open player profile modal. Uses queryClosest (spatial index).
     canvas.onclick = function(e) {
       if (!Scatter._state.chart || !Scatter._state.allPts.length) return;
-      var rect = canvas.getBoundingClientRect();
-      var mx = e.clientX - rect.left;
-      var my = e.clientY - rect.top;
+      let rect = canvas.getBoundingClientRect();
+      let mx = e.clientX - rect.left;
+      let my = e.clientY - rect.top;
       try {
-        var isTap = (e.pointerType === 'touch') ||
+        let isTap = (e.pointerType === 'touch') ||
           (window.matchMedia && matchMedia('(pointer:coarse)').matches);
-        var tapBoost = isTap ? 16 : 0;
-        var clicked = Scatter.queryClosest(mx, my, tapBoost);
+        let tapBoost = isTap ? 16 : 0;
+        let clicked = Scatter.queryClosest(mx, my, tapBoost);
         if (clicked && typeof openPlayerModal === 'function') {
           openPlayerModal(clicked._p.rank, clicked._p._y || '2026');
         }
@@ -17176,11 +17266,11 @@ var ScatterInteraction = (function() {
 // Called from scRender() so the legend always matches the colorBy + data on
 // screen (e.g. 'year' mode legend only shows years actually present).
 function scRenderLegend(colorBy, players) {
-  var el = document.getElementById('scLegend');
+  let el = _scEl('scLegend');
   if (!el) return;
-  var items = ScatterEngine.legendItems(colorBy, players);
+  let items = ScatterEngine.legendItems(colorBy, players);
   if (!items.length) { el.innerHTML = ''; return; }
-  var html = '';
+  let html = '';
   for (var i = 0; i < items.length; i++) {
     html += '<span class="sc-legend-item">'
          +   '<span class="sc-legend-swatch" style="background:' + items[i].color + '"></span>'
@@ -17199,14 +17289,14 @@ function scShowEmptyState(xM, yM, year, posFil, wrapEl, emptyEl) {
   if (wrapEl) wrapEl.classList.add('is-empty');
   emptyEl.hidden = false;
 
-  var titleEl  = document.getElementById('scEmptyTitle');
-  var msgEl    = document.getElementById('scEmptyMsg');
-  var actionEl = document.getElementById('scEmptyAction');
+  let titleEl  = _scEl('scEmptyTitle');
+  let msgEl    = _scEl('scEmptyMsg');
+  let actionEl = _scEl('scEmptyAction');
 
   if (titleEl) titleEl.textContent = 'No data for this combination';
 
   if (msgEl) {
-    var scope;
+    let scope;
     if (year === 'all' && posFil === 'all')          scope = 'across the historical board';
     else if (year === 'all' && posFil !== 'all')     scope = 'for ' + posFil + 's across all classes';
     else if (year !== 'all' && posFil === 'all')     scope = 'in the ' + year + ' class';
@@ -17223,13 +17313,13 @@ function scShowEmptyState(xM, yM, year, posFil, wrapEl, emptyEl) {
     if (year !== 'all') {
       actionEl.textContent = 'Show all classes instead';
       actionEl.onclick = function() {
-        var yr = document.getElementById('scYear');
+        let yr = _scEl('scYear');
         if (yr) { yr.value = 'all'; yr.dispatchEvent(new Event('change', { bubbles: true })); }
       };
     } else if (posFil !== 'all') {
       actionEl.textContent = 'Clear position filter';
       actionEl.onclick = function() {
-        var p = document.getElementById('scPosFilter');
+        let p = _scEl('scPosFilter');
         if (p) { p.value = 'all'; p.dispatchEvent(new Event('change', { bubbles: true })); }
       };
     } else {
@@ -17252,20 +17342,20 @@ function scShowEmptyState(xM, yM, year, posFil, wrapEl, emptyEl) {
 //
 // The actual row rendering still lives in ScatterTopPanel / ScatterBotPanel
 // (they predate PR1 and were left intact as pure renderers).
-var ScatterRankings = (function() {
+let ScatterRankings = (function() {
 
   // Update the toggle button labels to show the actual axis names. Called
   // from scRender so the toggle stays in sync with the current axis selection.
   // Also updates aria-pressed and active class on the buttons.
   function syncAxisToggle(xM, yM) {
-    var rankAxis = Scatter._state.rankAxis || 'y';
-    var xLab = document.getElementById('scRankAxisXLabel');
-    var yLab = document.getElementById('scRankAxisYLabel');
+    let rankAxis = Scatter._state.rankAxis || 'y';
+    let xLab = _scEl('scRankAxisXLabel');
+    let yLab = _scEl('scRankAxisYLabel');
     if (xLab) xLab.textContent = xM ? xM.short : '—';
     if (yLab) yLab.textContent = yM ? yM.short : '—';
-    var btns = document.querySelectorAll('[data-sc-rank-axis]');
+    let btns = document.querySelectorAll('[data-sc-rank-axis]');
     for (var i = 0; i < btns.length; i++) {
-      var on = btns[i].getAttribute('data-sc-rank-axis') === rankAxis;
+      let on = btns[i].getAttribute('data-sc-rank-axis') === rankAxis;
       btns[i].classList.toggle('active', on);
       btns[i].setAttribute('aria-pressed', on ? 'true' : 'false');
     }
@@ -17289,26 +17379,26 @@ var ScatterRankings = (function() {
   // .sc-panels-strip wiring (highlights the corresponding bubble on the
   // chart via scHighlightPlayer); without this rankings would feel
   // disconnected from the chart they describe.
-  var _wired = false;
-  var _hoveredRow = null;
+  let _wired = false;
+  let _hoveredRow = null;
 
   function wire() {
     if (_wired) return;
-    var root = document.getElementById('scRankings');
+    let root = _scEl('scRankings');
     if (!root) return;
 
     // Axis-toggle clicks
     root.addEventListener('click', function(e) {
-      var btn = e.target.closest && e.target.closest('[data-sc-rank-axis]');
+      let btn = e.target.closest && e.target.closest('[data-sc-rank-axis]');
       if (btn) {
         setRankAxis(btn.getAttribute('data-sc-rank-axis'));
         return;
       }
       // Row click → open profile modal
-      var row = e.target.closest && e.target.closest('.sc-top5-row');
+      let row = e.target.closest && e.target.closest('.sc-top5-row');
       if (row) {
-        var rank = parseInt(row.getAttribute('data-rank'), 10);
-        var year = row.getAttribute('data-year') || '2026';
+        let rank = parseInt(row.getAttribute('data-rank'), 10);
+        let year = row.getAttribute('data-year') || '2026';
         if (rank && typeof openPlayerModal === 'function') openPlayerModal(rank, year);
       }
     });
@@ -17317,7 +17407,7 @@ var ScatterRankings = (function() {
     // _hoveredRow guard so we don't fire enter/leave on every internal
     // child transition (logo img, name span, etc.).
     root.addEventListener('mouseover', function(e) {
-      var row = e.target.closest && e.target.closest('.sc-top5-row');
+      let row = e.target.closest && e.target.closest('.sc-top5-row');
       if (!row || row === _hoveredRow) return;
       if (_hoveredRow) _hoveredRow.classList.remove('sc-top5-row-active');
       _hoveredRow = row;
@@ -17327,12 +17417,12 @@ var ScatterRankings = (function() {
       }
     });
     root.addEventListener('mouseout', function(e) {
-      var row = e.target.closest && e.target.closest('.sc-top5-row');
+      let row = e.target.closest && e.target.closest('.sc-top5-row');
       if (!row || row !== _hoveredRow) return;
       // Only leave the row when relatedTarget exits the row entirely —
       // otherwise hovering over the logo or name (child elements) would
       // fire spurious leave/enter cycles.
-      var to = e.relatedTarget;
+      let to = e.relatedTarget;
       if (!to || !row.contains(to)) {
         _hoveredRow.classList.remove('sc-top5-row-active');
         _hoveredRow = null;
@@ -17367,7 +17457,7 @@ var ScatterRankings = (function() {
 // the appropriate immediate/debounced render. This preserves the contract
 // the old visible selects had and means scRender is reached through exactly
 // one path regardless of which UI surface initiated the change.
-var ScatterShell = (function() {
+let ScatterShell = (function() {
 
   // Per-pick metadata. The picker popover renders one of these on demand
   // when a pill/chip is tapped. Keys match the values of [data-sc-pick].
@@ -17377,18 +17467,18 @@ var ScatterShell = (function() {
   // smaller fixed lists (year/pos/color) we declare options inline since
   // their copy is editorial (e.g. "All Classes 2019–2026" reads better than
   // the raw "all" select value).
-  var POS_SWATCH = { Guard:'#3B82F6', Forward:'#8B5CF6', Center:'#0D9488' };
-  var YEAR_SWATCH = { '2026':'#D97706', '2025':'#B45309', '2024':'#2C4569', '2023':'#5B21B6',
-                      '2022':'#3B82F6', '2021':'#1D4ED8', '2020':'#0D9488', '2019':'#0F766E',
-                      'all':'#475569' };
+  let POS_SWATCH = { Guard:Theme.color('--blue-light'), Forward:Theme.color('--purple'), Center:Theme.color('--teal') };
+  let YEAR_SWATCH = { '2026':Theme.color('--amber-deep'), '2025':Theme.color('--amber-dark'), '2024':Theme.color('--tier-lottery'), '2023':Theme.color('--purple-dark'),
+                      '2022':Theme.color('--blue-light'), '2021':Theme.color('--blue-dark'), '2020':Theme.color('--teal'), '2019':Theme.color('--teal-dark'),
+                      'all':Theme.color('--gray-600') };
 
   function pickConfig(pickKey) {
     if (pickKey === 'x' || pickKey === 'y') {
       // Build from SC_AXES — single source of truth.
-      var groups = SC_AXIS_GROUPS.map(function(g) {
-        var opts = [];
+      let groups = SC_AXIS_GROUPS.map(function(g) {
+        let opts = [];
         Object.keys(SC_AXES).forEach(function(k) {
-          var a = SC_AXES[k];
+          let a = SC_AXES[k];
           if (a.group !== g.key) return;
           opts.push({ value: k, label: a.short, hint: a.label });
         });
@@ -17426,9 +17516,9 @@ var ScatterShell = (function() {
         searchable: false,
         groups: [{ label: '', opts: [
           { value: 'all',     label: 'All Positions' },
-          { value: 'Guard',   label: 'Guards',   swatches:['#3B82F6'] },
-          { value: 'Forward', label: 'Forwards', swatches:['#8B5CF6'] },
-          { value: 'Center',  label: 'Centers',  swatches:['#0D9488'] },
+          { value: 'Guard',   label: 'Guards',   swatches:[Theme.color('--blue-light')] },
+          { value: 'Forward', label: 'Forwards', swatches:[Theme.color('--purple')] },
+          { value: 'Center',  label: 'Centers',  swatches:[Theme.color('--teal')] },
         ]}],
       };
     }
@@ -17438,8 +17528,8 @@ var ScatterShell = (function() {
         selectId: 'scColorBy',
         searchable: false,
         groups: [{ label: '', opts: [
-          { value: 'position', label: 'Position', swatches:['#3B82F6','#8B5CF6','#0D9488'] },
-          { value: 'year',     label: 'Class',    swatches:['#D97706','#3B82F6','#8B5CF6'] },
+          { value: 'position', label: 'Position', swatches:[Theme.color('--blue-light'),Theme.color('--purple'),Theme.color('--teal')] },
+          { value: 'year',     label: 'Class',    swatches:[Theme.color('--amber-deep'),Theme.color('--blue-light'),Theme.color('--purple')] },
         ]}],
       };
     }
@@ -17452,8 +17542,8 @@ var ScatterShell = (function() {
   // about what's on screen because they're updated from the same xKey/yKey
   // values scRender just used to build the chart.
   function syncFromState(xKey, yKey, year, posFil, colorBy, count) {
-    var xM = SC_AXES[xKey], yM = SC_AXES[yKey];
-    var setText = function(id, txt) { var el = document.getElementById(id); if (el) el.textContent = txt; };
+    let xM = SC_AXES[xKey], yM = SC_AXES[yKey];
+    let setText = function(id, txt) { var el = document.getElementById(id); if (el) el.textContent = txt; };
 
     if (xM) setText('scPillXVal', xM.short);
     if (yM) setText('scPillYVal', yM.short);
@@ -17461,15 +17551,15 @@ var ScatterShell = (function() {
     setText('scChipYearVal', year === 'all' ? 'All' : year);
     setText('scChipPosVal',  posFil === 'all' ? 'All' : posFil + 's');
 
-    var colorLabel = colorBy === 'year' ? 'Class' : 'Position';
+    let colorLabel = colorBy === 'year' ? 'Class' : 'Position';
     setText('scChipColorVal', colorLabel);
 
     // Color chip swatches — show 3 sample dots in the active mode's palette.
-    var swEl = document.getElementById('scChipColorSwatches');
+    let swEl = _scEl('scChipColorSwatches');
     if (swEl) {
-      var sw = colorBy === 'year'
-        ? ['#D97706','#3B82F6','#8B5CF6']
-        : ['#3B82F6','#8B5CF6','#0D9488'];
+      let sw = colorBy === 'year'
+        ? [Theme.color('--amber-deep'),Theme.color('--blue-light'),Theme.color('--purple')]
+        : [Theme.color('--blue-light'),Theme.color('--purple'),Theme.color('--teal')];
       swEl.innerHTML = sw.map(function(c){ return '<i style="background:'+c+'"></i>'; }).join('');
     }
 
@@ -17483,9 +17573,9 @@ var ScatterShell = (function() {
     // title explaining why. Disabling is structural (aria-disabled + CSS) —
     // clicks are also gated in the action dispatcher so even keyboard
     // activation is inert.
-    var ghostBtn = document.getElementById('scGhostBtn');
+    let ghostBtn = _scEl('scGhostBtn');
     if (ghostBtn) {
-      var ghostDisabled = (year === 'all');
+      let ghostDisabled = (year === 'all');
       ghostBtn.setAttribute('aria-disabled', ghostDisabled ? 'true' : 'false');
       ghostBtn.title = ghostDisabled
         ? 'Historical overlay needs a single class — already showing all classes'
@@ -17502,19 +17592,19 @@ var ScatterShell = (function() {
   // Single shared instance. The opener pill/chip is tracked so the popover
   // can be positioned relative to it (desktop) and so we know which select
   // to write to when a selection is made.
-  var _openerEl = null;
-  var _currentPick = null;
+  let _openerEl = null;
+  let _currentPick = null;
 
   function _buildBody(cfg, currentValue, searchText) {
-    var body = document.getElementById('scPopoverBody');
+    let body = _scEl('scPopoverBody');
     if (!body) return;
-    var q = (searchText || '').trim().toLowerCase();
-    var html = '';
-    var anyMatch = false;
+    let q = (searchText || '').trim().toLowerCase();
+    let html = '';
+    let anyMatch = false;
     cfg.groups.forEach(function(g) {
-      var matchedOpts = g.opts.filter(function(o) {
+      let matchedOpts = g.opts.filter(function(o) {
         if (!q) return true;
-        var hay = (o.label + ' ' + (o.hint || '')).toLowerCase();
+        let hay = (o.label + ' ' + (o.hint || '')).toLowerCase();
         return hay.indexOf(q) !== -1;
       });
       if (!matchedOpts.length) return;
@@ -17522,8 +17612,8 @@ var ScatterShell = (function() {
       html += '<div class="sc-popover-group">';
       if (g.label) html += '<div class="sc-popover-group-label">' + escHtml(g.label) + '</div>';
       matchedOpts.forEach(function(o) {
-        var isActive = (o.value === currentValue);
-        var swHtml = '';
+        let isActive = (o.value === currentValue);
+        let swHtml = '';
         if (o.swatches) {
           swHtml = '<span class="sc-popover-opt-swatches">'
             + o.swatches.map(function(c){ return '<i style="background:'+c+'"></i>'; }).join('')
@@ -17540,24 +17630,24 @@ var ScatterShell = (function() {
   }
 
   function _positionPopover(triggerEl) {
-    var pop = document.getElementById('scPopover');
+    let pop = _scEl('scPopover');
     if (!pop || !triggerEl) return;
     // On mobile/coarse pointer the bottom-sheet CSS handles positioning —
     // we just clear any inline position state.
-    var isCoarse = (window.matchMedia && window.matchMedia('(pointer:coarse)').matches);
+    let isCoarse = (window.matchMedia && window.matchMedia('(pointer:coarse)').matches);
     if (isCoarse) {
       pop.style.top = ''; pop.style.left = ''; pop.style.right = '';
       pop.style.minWidth = ''; pop.style.maxWidth = '';
       return;
     }
-    var wrap = triggerEl.closest('.sc-canvas-wrap') || triggerEl.parentElement;
+    let wrap = triggerEl.closest('.sc-canvas-wrap') || triggerEl.parentElement;
     if (!wrap) return;
-    var wrapRect = wrap.getBoundingClientRect();
-    var trigRect = triggerEl.getBoundingClientRect();
+    let wrapRect = wrap.getBoundingClientRect();
+    let trigRect = triggerEl.getBoundingClientRect();
     // Position popover within .sc-canvas-wrap (which has position:relative);
     // anchor below the trigger by default, clamp to the canvas wrap bounds.
-    var leftWithinWrap = trigRect.left - wrapRect.left;
-    var topWithinWrap  = trigRect.bottom - wrapRect.top + 6;
+    let leftWithinWrap = trigRect.left - wrapRect.left;
+    let topWithinWrap  = trigRect.bottom - wrapRect.top + 6;
     pop.style.left = Math.max(8, leftWithinWrap) + 'px';
     pop.style.top  = topWithinWrap + 'px';
     pop.style.right = 'auto';
@@ -17565,7 +17655,7 @@ var ScatterShell = (function() {
     // After render measure popover width; if it overflows the wrap right edge
     // flip to right-anchor.
     requestAnimationFrame(function() {
-      var popRect = pop.getBoundingClientRect();
+      let popRect = pop.getBoundingClientRect();
       if (popRect.right > wrapRect.right - 8) {
         pop.style.left = 'auto';
         pop.style.right = Math.max(8, wrapRect.right - trigRect.right) + 'px';
@@ -17574,23 +17664,23 @@ var ScatterShell = (function() {
   }
 
   function openPicker(pickKey, triggerEl) {
-    var cfg = pickConfig(pickKey);
+    let cfg = pickConfig(pickKey);
     if (!cfg) return;
-    var pop = document.getElementById('scPopover');
-    var backdrop = document.getElementById('scPopoverBackdrop');
-    var search = document.getElementById('scPopoverSearch');
+    let pop = _scEl('scPopover');
+    let backdrop = _scEl('scPopoverBackdrop');
+    let search = _scEl('scPopoverSearch');
     if (!pop || !backdrop) return;
 
     // Move popover into the canvas wrap so absolute positioning is local
     // to the chart container rather than the body.
-    var wrap = triggerEl.closest('.sc-canvas-wrap');
+    let wrap = triggerEl.closest('.sc-canvas-wrap');
     if (wrap && pop.parentElement !== wrap) wrap.appendChild(pop);
 
     _currentPick = pickKey;
     _openerEl = triggerEl;
 
-    var sel = document.getElementById(cfg.selectId);
-    var currentValue = sel ? sel.value : '';
+    let sel = document.getElementById(cfg.selectId);
+    let currentValue = sel ? sel.value : '';
 
     if (search) {
       search.value = '';
@@ -17612,8 +17702,8 @@ var ScatterShell = (function() {
   }
 
   function closePicker() {
-    var pop = document.getElementById('scPopover');
-    var backdrop = document.getElementById('scPopoverBackdrop');
+    let pop = _scEl('scPopover');
+    let backdrop = _scEl('scPopoverBackdrop');
     if (pop) pop.hidden = true;
     if (backdrop) backdrop.hidden = true;
     if (_openerEl) _openerEl.setAttribute('aria-expanded', 'false');
@@ -17623,17 +17713,17 @@ var ScatterShell = (function() {
 
   function _onSearchInput(e) {
     if (!_currentPick) return;
-    var cfg = pickConfig(_currentPick);
+    let cfg = pickConfig(_currentPick);
     if (!cfg) return;
-    var sel = document.getElementById(cfg.selectId);
+    let sel = document.getElementById(cfg.selectId);
     _buildBody(cfg, sel ? sel.value : '', e.target.value);
   }
 
   function _onOptClick(value) {
     if (!_currentPick) return;
-    var cfg = pickConfig(_currentPick);
+    let cfg = pickConfig(_currentPick);
     if (!cfg) return;
-    var sel = document.getElementById(cfg.selectId);
+    let sel = document.getElementById(cfg.selectId);
     if (sel && sel.value !== value) {
       sel.value = value;
       sel.dispatchEvent(new Event('change', { bubbles: true }));
@@ -17643,10 +17733,10 @@ var ScatterShell = (function() {
 
   // ── Swap axes ──────────────────────────────────────────────────────────────
   function swapAxes() {
-    var xSel = document.getElementById('scXAxis');
-    var ySel = document.getElementById('scYAxis');
+    let xSel = _scEl('scXAxis');
+    let ySel = _scEl('scYAxis');
     if (!xSel || !ySel) return;
-    var x = xSel.value, y = ySel.value;
+    let x = xSel.value, y = ySel.value;
     xSel.value = y;
     ySel.value = x;
     // Single dispatch (both selects share the immediate render path; firing
@@ -17659,21 +17749,21 @@ var ScatterShell = (function() {
   // Cap of 3 — tight enough that the shelf stays scannable in one row of
   // cards. Pinned players persist across renders (they live in Scatter._state.pinned
   // keyed by name+year so they survive class-filter changes too).
-  var PIN_CAP = 3;
+  let PIN_CAP = 3;
 
   function _pinKey(p) {
     if (!p) return '';
-    var name = p._n || p.name || '';
-    var year = p._y || '2026';
+    let name = p._n || p.name || '';
+    let year = p._y || '2026';
     return name + '|' + year;
   }
 
   function pin(player) {
     if (!player) return;
     if (!Scatter._state.pinned) Scatter._state.pinned = [];
-    var key = _pinKey(player);
+    let key = _pinKey(player);
     // Toggle: clicking pin on an already-pinned player removes it.
-    var existingIdx = -1;
+    let existingIdx = -1;
     for (var i = 0; i < Scatter._state.pinned.length; i++) {
       if (_pinKey(Scatter._state.pinned[i]) === key) { existingIdx = i; break; }
     }
@@ -17717,7 +17807,7 @@ var ScatterShell = (function() {
 
   function isPinned(player) {
     if (!player || !Scatter._state.pinned) return false;
-    var key = _pinKey(player);
+    let key = _pinKey(player);
     return Scatter._state.pinned.some(function(p){ return _pinKey(p) === key; });
   }
 
@@ -17726,12 +17816,12 @@ var ScatterShell = (function() {
   // and delta-to-cohort columns stay live as the user changes axes. The shelf
   // is the only place the pinned players appear in chart context.
   function renderShelf() {
-    var shelf = document.getElementById('scShelf');
-    var rowsEl = document.getElementById('scShelfRows');
-    var clearBtn = document.getElementById('scShelfClear');
+    let shelf = _scEl('scShelf');
+    let rowsEl = _scEl('scShelfRows');
+    let clearBtn = _scEl('scShelfClear');
     if (!shelf || !rowsEl) return;
 
-    var pinned = (Scatter._state && Scatter._state.pinned) || [];
+    let pinned = (Scatter._state && Scatter._state.pinned) || [];
     if (!pinned.length) {
       shelf.setAttribute('data-empty', 'true');
       rowsEl.innerHTML = '';
@@ -17742,44 +17832,44 @@ var ScatterShell = (function() {
     if (clearBtn) clearBtn.hidden = false;
 
     // Current axes / chart context.
-    var xSel = document.getElementById('scXAxis');
-    var ySel = document.getElementById('scYAxis');
-    var xKey = xSel ? xSel.value : 'age';
-    var yKey = ySel ? ySel.value : 'ts_pct';
-    var xM = SC_AXES[xKey], yM = SC_AXES[yKey];
+    let xSel = _scEl('scXAxis');
+    let ySel = _scEl('scYAxis');
+    let xKey = xSel ? xSel.value : 'age';
+    let yKey = ySel ? ySel.value : 'ts_pct';
+    let xM = SC_AXES[xKey], yM = SC_AXES[yKey];
 
     // Cohort averages for delta — pulled from current filtered set.
-    var pts = (Scatter._state && Scatter._state.allPts) || [];
-    var xs = pts.map(function(p){ return p._xr; }).filter(function(v){ return v != null && !isNaN(v); });
-    var ys = pts.map(function(p){ return p._yr; }).filter(function(v){ return v != null && !isNaN(v); });
-    var xAvg = xs.length ? xs.reduce(function(a,b){return a+b;},0) / xs.length : null;
-    var yAvg = ys.length ? ys.reduce(function(a,b){return a+b;},0) / ys.length : null;
+    let pts = (Scatter._state && Scatter._state.allPts) || [];
+    let xs = pts.map(function(p){ return p._xr; }).filter(function(v){ return v != null && !isNaN(v); });
+    let ys = pts.map(function(p){ return p._yr; }).filter(function(v){ return v != null && !isNaN(v); });
+    let xAvg = xs.length ? xs.reduce(function(a,b){return a+b;},0) / xs.length : null;
+    let yAvg = ys.length ? ys.reduce(function(a,b){return a+b;},0) / ys.length : null;
 
     function formatDelta(val, avg, m) {
       if (val == null || avg == null || !m) return '';
-      var d = val - avg;
+      let d = val - avg;
       if (Math.abs(d) < 0.001) return '<span class="sc-shelf-delta">≈ avg</span>';
-      var cls = d > 0 ? 'sc-shelf-delta-pos' : 'sc-shelf-delta-neg';
-      var sign = d > 0 ? '+' : '';
+      let cls = d > 0 ? 'sc-shelf-delta-pos' : 'sc-shelf-delta-neg';
+      let sign = d > 0 ? '+' : '';
       return '<span class="sc-shelf-delta ' + cls + '">' + sign + m.fmt(d).replace(/^\+/, '') + ' vs avg</span>';
     }
 
-    var html = '';
+    let html = '';
     pinned.forEach(function(p) {
       // Look up live player values from the master data; pinned cards store
       // identity only, so a render-time lookup keeps the displayed values
       // honest against the currently selected data source.
-      var live = _findPlayer(p._n, p._y);
-      var xv = live ? _valueOf(live, xKey) : null;
-      var yv = live ? _valueOf(live, yKey) : null;
-      var school = (live && live.school) || p._s || '';
-      var logoH = (typeof schoolLogoHtml === 'function' && school)
+      let live = _findPlayer(p._n, p._y);
+      let xv = live ? _valueOf(live, xKey) : null;
+      let yv = live ? _valueOf(live, yKey) : null;
+      let school = (live && live.school) || p._s || '';
+      let logoH = (typeof schoolLogoHtml === 'function' && school)
         ? schoolLogoHtml(school, '24px', '3px')
         : '<div style="width:22px;height:22px;background:var(--gray-200);border-radius:4px"></div>';
-      var key = _pinKey(p);
+      let key = _pinKey(p);
 
-      var xLine = (xv != null && xM) ? '<b>' + xM.short + '</b> ' + xM.fmt(xv) + ' ' + formatDelta(xv, xAvg, xM) : '<b>' + (xM ? xM.short : 'X') + '</b> —';
-      var yLine = (yv != null && yM) ? '<b>' + yM.short + '</b> ' + yM.fmt(yv) + ' ' + formatDelta(yv, yAvg, yM) : '<b>' + (yM ? yM.short : 'Y') + '</b> —';
+      let xLine = (xv != null && xM) ? '<b>' + xM.short + '</b> ' + xM.fmt(xv) + ' ' + formatDelta(xv, xAvg, xM) : '<b>' + (xM ? xM.short : 'X') + '</b> —';
+      let yLine = (yv != null && yM) ? '<b>' + yM.short + '</b> ' + yM.fmt(yv) + ' ' + formatDelta(yv, yAvg, yM) : '<b>' + (yM ? yM.short : 'Y') + '</b> —';
 
       html += '<div class="sc-shelf-card" data-pin-key="' + escHtml(key) + '" data-rank="' + (p.rank||'') + '" data-year="' + (p._y||'2026') + '">'
            +  '<div class="sc-shelf-card-logo">' + logoH + '</div>'
@@ -17800,7 +17890,7 @@ var ScatterShell = (function() {
   // pin time.
   function _findPlayer(name, year) {
     try {
-      var src;
+      let src;
       if (year === '2026' || !year) src = DATA && DATA.board2026;
       else src = (DATA && DATA.historical && DATA.historical[String(year)]) || null;
       if (!src) return null;
@@ -17815,7 +17905,7 @@ var ScatterShell = (function() {
   // ScatterEngine.computePoints uses so the shelf values match the chart.
   function _valueOf(player, key) {
     if (!player) return null;
-    var v = player[key];
+    let v = player[key];
     if (key === 'ts_pct' && v != null && v < 2) v = v * 100;
     return (typeof v === 'number' && !isNaN(v)) ? v : null;
   }
@@ -17825,23 +17915,23 @@ var ScatterShell = (function() {
   // Reads/writes go through urlSetState/urlGetState so the hash stays canonical.
   function _syncUrlPinned() {
     if (typeof urlSetState !== 'function') return;
-    var pinned = (Scatter._state && Scatter._state.pinned) || [];
-    var sp = pinned.map(_pinKey).join('\\');
+    let pinned = (Scatter._state && Scatter._state.pinned) || [];
+    let sp = pinned.map(_pinKey).join('\\');
     try { urlSetState({ sp: sp }); } catch(e) {}
   }
 
   function restoreFromUrl() {
     if (typeof urlGetState !== 'function') return;
-    var p = urlGetState();
+    let p = urlGetState();
     if (!p || !p.sp) return;
-    var keys = String(p.sp).split('\\').filter(Boolean);
+    let keys = String(p.sp).split('\\').filter(Boolean);
     if (!keys.length) return;
     Scatter._state.pinned = [];
     keys.forEach(function(k) {
-      var parts = k.split('|');
-      var name = parts[0];
-      var year = parts[1] || '2026';
-      var live = _findPlayer(name, year);
+      let parts = k.split('|');
+      let name = parts[0];
+      let year = parts[1] || '2026';
+      let live = _findPlayer(name, year);
       if (live) {
         Scatter._state.pinned.push({
           _n: live.name, _s: live.school || '', _y: year,
@@ -17853,17 +17943,17 @@ var ScatterShell = (function() {
   }
 
   // ── Wire shell-specific event listeners (idempotent) ───────────────────────
-  var _wired = false;
+  let _wired = false;
   function wire() {
     if (_wired) return;
-    var wrap = document.querySelector('.sc-wrap-v2');
+    let wrap = document.querySelector('.sc-wrap-v2');
     if (!wrap) return;
 
     // Pills and chips with data-sc-pick open the picker.
     wrap.addEventListener('click', function(e) {
-      var pickBtn = e.target.closest && e.target.closest('[data-sc-pick]');
+      let pickBtn = e.target.closest && e.target.closest('[data-sc-pick]');
       if (pickBtn) {
-        var key = pickBtn.getAttribute('data-sc-pick');
+        let key = pickBtn.getAttribute('data-sc-pick');
         // Toggle: clicking the open trigger again closes the popover.
         if (_openerEl === pickBtn) closePicker();
         else openPicker(key, pickBtn);
@@ -17875,7 +17965,7 @@ var ScatterShell = (function() {
         return;
       }
       // Shelf unpin / clear
-      var unpinBtn = e.target.closest && e.target.closest('[data-sc-unpin]');
+      let unpinBtn = e.target.closest && e.target.closest('[data-sc-unpin]');
       if (unpinBtn) {
         unpinByKey(unpinBtn.getAttribute('data-sc-unpin'));
         return;
@@ -17887,10 +17977,10 @@ var ScatterShell = (function() {
     });
 
     // Popover internal events (search + option select)
-    var pop = document.getElementById('scPopover');
+    let pop = _scEl('scPopover');
     if (pop) {
       pop.addEventListener('click', function(e) {
-        var opt = e.target.closest && e.target.closest('[data-sc-opt]');
+        let opt = e.target.closest && e.target.closest('[data-sc-opt]');
         if (opt) {
           _onOptClick(opt.getAttribute('data-sc-opt'));
           return;
@@ -17899,13 +17989,13 @@ var ScatterShell = (function() {
           closePicker();
         }
       });
-      var search = document.getElementById('scPopoverSearch');
+      let search = _scEl('scPopoverSearch');
       if (search) search.addEventListener('input', _onSearchInput);
     }
 
     // Click outside → close. Uses the dedicated backdrop layer so we don't
     // have to hand-roll an "is the click outside my popover" check.
-    var backdrop = document.getElementById('scPopoverBackdrop');
+    let backdrop = _scEl('scPopoverBackdrop');
     if (backdrop) backdrop.addEventListener('click', closePicker);
     document.addEventListener('keydown', function(e) {
       if (e.key === 'Escape' && _openerEl) closePicker();
@@ -17914,13 +18004,13 @@ var ScatterShell = (function() {
     // Tooltip pin button — delegated on the document since the tooltip
     // element lives on document.body and the button is injected inline.
     document.addEventListener('click', function(e) {
-      var btn = e.target.closest && e.target.closest('.sc-tip-pin');
+      let btn = e.target.closest && e.target.closest('.sc-tip-pin');
       if (!btn || btn.hasAttribute('disabled')) return;
       e.preventDefault(); e.stopPropagation();
-      var name = btn.getAttribute('data-pin-name');
-      var year = btn.getAttribute('data-pin-year') || '2026';
+      let name = btn.getAttribute('data-pin-name');
+      let year = btn.getAttribute('data-pin-year') || '2026';
       if (!name) return;
-      var live = _findPlayer(name, year);
+      let live = _findPlayer(name, year);
       if (live) pin({ _n: live.name, _s: live.school || '', _y: year, rank: live.rank, position: live.position });
       // Hide tooltip after pinning — feels resolved.
       if (typeof scHideTip === 'function') scHideTip();
@@ -17968,7 +18058,7 @@ function scRender() {
   // during this render captures myToken in closure and bails if a newer
   // render has taken over before it fires.
   Scatter._state.renderToken++;
-  var myToken = Scatter._state.renderToken;
+  let myToken = Scatter._state.renderToken;
 
   // Invalidate spatial index and reset highlight tracking — the chart layout
   // is about to change so old pixel positions are stale. The next mousemove
@@ -17986,18 +18076,18 @@ function scRender() {
   if (Scatter._state.tipHideTimer) { clearTimeout(Scatter._state.tipHideTimer); Scatter._state.tipHideTimer = null; }
   scHideTip();
 
-  var xEl = document.getElementById('scXAxis');
-  var yEl = document.getElementById('scYAxis');
+  let xEl = _scEl('scXAxis');
+  let yEl = _scEl('scYAxis');
   if (!xEl || !yEl) return;
 
-  var xKey    = xEl.value;
-  var yKey    = yEl.value;
-  var colorBy = (document.getElementById('scColorBy')  || { value:'position' }).value;
-  var posFil  = (document.getElementById('scPosFilter') || { value:'all' }).value;
-  var yearEl  = document.getElementById('scYear');
-  var year    = yearEl ? yearEl.value : '2026';
-  var xM      = SC_AXES[xKey] || { label:xKey, fmt:function(v){ return String(v); }, inv:false };
-  var yM      = SC_AXES[yKey] || { label:yKey, fmt:function(v){ return String(v); }, inv:false };
+  let xKey    = xEl.value;
+  let yKey    = yEl.value;
+  let colorBy = (_scEl('scColorBy')  || { value:'position' }).value;
+  let posFil  = (_scEl('scPosFilter') || { value:'all' }).value;
+  let yearEl  = _scEl('scYear');
+  let year    = yearEl ? yearEl.value : '2026';
+  let xM      = SC_AXES[xKey] || { label:xKey, fmt:function(v){ return String(v); }, inv:false };
+  let yM      = SC_AXES[yKey] || { label:yKey, fmt:function(v){ return String(v); }, inv:false };
 
   // Persist state to URL — full control set so reload reproduces the view.
   // Previously only x/y/year/color were stored; pos/trend/quadrants got lost.
@@ -18029,9 +18119,9 @@ function scRender() {
   // from the same filtered list. Top-5/Bottom-5 rankings (PR1-revision) read
   // from the same filtered set; their ranking dimension is Scatter._state.rankAxis
   // ('x' or 'y') — defaulted to 'y' to match the pre-PR1 contract.
-  var players  = ScatterEngine.getPlayers(year);
-  var filtered = ScatterEngine.getFiltered(players, posFil);
-  var pts      = ScatterEngine.computePoints(filtered, xKey, yKey);
+  let players  = ScatterEngine.getPlayers(year);
+  let filtered = ScatterEngine.getFiltered(players, posFil);
+  let pts      = ScatterEngine.computePoints(filtered, xKey, yKey);
 
   // Render the color legend — uses the filtered list so 'year' mode only
   // shows classes actually present in the current view.
@@ -18041,8 +18131,8 @@ function scRender() {
   // The canvas-wrap gets `.is-empty` which hides the canvas (CSS rule), and
   // #scEmpty is unhidden with contextual messaging. If we have a fallback
   // suggestion (e.g. "Try All Years"), the action button is wired up.
-  var wrapEl = document.querySelector('.sc-canvas-wrap');
-  var emptyEl = document.getElementById('scEmpty');
+  let wrapEl = document.querySelector('.sc-canvas-wrap');
+  let emptyEl = _scEl('scEmpty');
   if (!pts.length) {
     ScatterShell.syncFromState(xKey, yKey, year, posFil, colorBy, 0);
     scShowEmptyState(xM, yM, year, posFil, wrapEl, emptyEl);
@@ -18068,10 +18158,10 @@ function scRender() {
   // The rank axis defaults to 'y' (preserves the pre-PR1 behaviour) but the
   // user can flip to 'x' via the toggle in the rankings header. Single sort
   // pass over filtered; both ends sliced (see ScatterEngine.endsByAxis).
-  var rankAxis = Scatter._state.rankAxis || 'y';
-  var rankKey  = rankAxis === 'x' ? xKey : yKey;
-  var rankM    = rankAxis === 'x' ? xM   : yM;
-  var ends = ScatterEngine.endsByAxis(filtered, rankKey, 5);
+  let rankAxis = Scatter._state.rankAxis || 'y';
+  let rankKey  = rankAxis === 'x' ? xKey : yKey;
+  let rankM    = rankAxis === 'x' ? xM   : yM;
+  let ends = ScatterEngine.endsByAxis(filtered, rankKey, 5);
   ScatterTopPanel.render(ends.top, rankM);
   ScatterBotPanel.render(ends.bot, rankM);
   ScatterRankings.syncAxisToggle(xM, yM);
@@ -18108,14 +18198,14 @@ function scRender() {
     // PR2: find foreground dataset by tag — index 0 is the ghost dataset
     // when the historical-overlay toggle is on, and we never want to paint
     // logo styles onto ghost circles.
-    var dsList = Scatter._state.chart.data.datasets;
-    var ds = null;
+    let dsList = Scatter._state.chart.data.datasets;
+    let ds = null;
     for (var dsi = 0; dsi < dsList.length; dsi++) {
       if (dsList[dsi].$scIsForeground) { ds = dsList[dsi]; break; }
     }
     if (!ds) ds = dsList[0];
     if (!ds) return;
-    var logoData = ScatterLogoCache.getPointStyles(Scatter._state.allPts, ScatterEngine.tierSize);
+    let logoData = ScatterLogoCache.getPointStyles(Scatter._state.allPts, ScatterEngine.tierSize);
     // Always keep Scatter._state.lastLogoData current — it is the authoritative restore target.
     // Without this update it stays stale (contains 'circle' for logos that loaded
     // after the initial render) and clearHighlight() would restore the old circles.
@@ -18135,26 +18225,26 @@ function scRender() {
     }
   });
 
-  var logoData  = ScatterLogoCache.getPointStyles(pts, ScatterEngine.tierSize);
+  let logoData  = ScatterLogoCache.getPointStyles(pts, ScatterEngine.tierSize);
 
   // Store for highlight system (ScatterTopPanel.highlight → scHighlightPlayer)
   Scatter._state.currentColorBy = colorBy;
   Scatter._state.lastLogoData   = logoData;
 
   // fallback circles use the colorBy value for semantic color
-  var bgColors  = pts.map(function(pt) { return ScatterEngine.pointColor(pt, colorBy) + 'CC'; });
+  let bgColors  = pts.map(function(pt) { return ScatterEngine.pointColor(pt, colorBy) + 'CC'; });
 
   // ── Trend line (computed once, used for both dataset and stat bar) ─────────
-  var reg = (Scatter._state.trend && pts.length >= 3) ? ScatterEngine.linReg(pts) : null;
+  let reg = (Scatter._state.trend && pts.length >= 3) ? ScatterEngine.linReg(pts) : null;
 
   // ── PR2: Percentile cache for tooltip ─────────────────────────────────────
   // Pre-sort foreground x and y values so the tooltip can compute percentile
   // via binary search per hover. Built once per render so the work amortizes
   // across every mouseover for the duration of the chart's lifetime.
   (function buildPercentileCache() {
-    var xs = [], ys = [];
+    let xs = [], ys = [];
     for (var i = 0; i < pts.length; i++) {
-      var p = pts[i];
+      let p = pts[i];
       if (p._xr != null && isFinite(p._xr)) xs.push(p._xr);
       if (p._yr != null && isFinite(p._yr)) ys.push(p._yr);
     }
@@ -18179,11 +18269,12 @@ function scRender() {
   // are NOT added to Scatter._state.allPts so the spatial index, tooltip,
   // mobile focus card, click-to-modal, and pin-to-shelf all bind only to
   // the foreground — ghosts are visual-only context.
-  var ghostDs = null;
-  var ghostActive = Scatter._state.ghost && year !== 'all';
+  let ghostDs = null;
+  let ghostPts = null;   // hoisted: also read by hoverPts merge below
+  let ghostActive = Scatter._state.ghost && year !== 'all';
   if (ghostActive) {
-    var ghostYears = [];
-    var historical = (typeof DATA !== 'undefined' && DATA.historical) || {};
+    let ghostYears = [];
+    let historical = (typeof DATA !== 'undefined' && DATA.historical) || {};
     Object.keys(historical).forEach(function(yr) {
       if (yr !== year) ghostYears.push(yr);
     });
@@ -18191,17 +18282,23 @@ function scRender() {
     // probably wants the current draft class as the contextual layer too.
     if (year !== '2026' && DATA && DATA.board2026) ghostYears.push('2026');
 
-    var ghostPts = [];
-    var ghostColors = [];
-    var YEAR_COLOR = { '2026':'#D97706','2025':'#B45309','2024':'#2C4569','2023':'#5B21B6',
-                       '2022':'#3B82F6','2021':'#1D4ED8','2020':'#0D9488','2019':'#0F766E' };
+    ghostPts = [];
+    let ghostColors = [];
+    let YEAR_COLOR = { '2026':Theme.color('--amber-deep'),'2025':Theme.color('--amber-dark'),'2024':Theme.color('--tier-lottery'),'2023':Theme.color('--purple-dark'),
+                       '2022':Theme.color('--blue-light'),'2021':Theme.color('--blue-dark'),'2020':Theme.color('--teal'),'2019':Theme.color('--teal-dark') };
     ghostYears.forEach(function(yr) {
-      var ghostPlayers = ScatterEngine.getPlayers(yr);
-      var ghostFiltered = ScatterEngine.getFiltered(ghostPlayers, posFil);
-      var ghostYearPts = ScatterEngine.computePoints(ghostFiltered, xKey, yKey);
-      var color = YEAR_COLOR[yr] || '#94A3B8';
+      let ghostPlayers = ScatterEngine.getPlayers(yr);
+      let ghostFiltered = ScatterEngine.getFiltered(ghostPlayers, posFil);
+      let ghostYearPts = ScatterEngine.computePoints(ghostFiltered, xKey, yKey);
+      let color = YEAR_COLOR[yr] || Theme.color('--gray-400');
       ghostYearPts.forEach(function(pt) {
-        ghostPts.push({ x: pt.x, y: pt.y });
+        // Preserve the full point structure — Chart.js only reads x/y from
+        // data array entries so the extra fields (_p, _xr, _yr) ride along
+        // harmlessly. scShowTip needs pt._p for name/school/rank/year and
+        // the spatial index needs them to resolve hover hits to a tooltip.
+        pt._isGhost    = true;
+        pt._ghostColor = color;
+        ghostPts.push(pt);
         ghostColors.push(color + '44');  // ~27% alpha — present but recessive
       });
     });
@@ -18235,7 +18332,7 @@ function scRender() {
   // reference for restore. Memory cost: 3 × N pointers (~5KB for 600 points).
   // The same slice() trick is required wherever ds.* is reassigned from
   // logoData below (the canUpdate-patch path and the setOnLoad callback).
-  var foregroundDs = {
+  let foregroundDs = {
     label:             'Prospects',
     data:              pts,
     pointStyle:        logoData.styles.slice(),
@@ -18249,7 +18346,13 @@ function scRender() {
     // ghost dataset shifts the foreground from index 0 to index 1.
     $scIsForeground:   true
   };
-  var datasets = ghostDs ? [ghostDs, foregroundDs] : [foregroundDs];
+  let datasets = ghostDs ? [ghostDs, foregroundDs] : [foregroundDs];
+
+  // PR4: spatial index drives hover detection (queryNear/queryClosest) and
+  // walks Scatter._state.hoverPts. Keep allPts foreground-only so the
+  // highlight system (which indexes parallel arrays of the foreground
+  // dataset) is untouched; hoverPts is the strict superset for hit-testing.
+  Scatter._state.hoverPts = ghostPts && ghostPts.length ? pts.concat(ghostPts) : pts;
 
   if (reg) {
     datasets.push({
@@ -18265,16 +18368,16 @@ function scRender() {
   }
 
   // ── Chart.js config ───────────────────────────────────────────────────────
-  var canvas = document.getElementById('scCanvas');
+  let canvas = _scEl('scCanvas');
   if (!canvas) return;
 
-  var axisStyle = {
+  let axisStyle = {
     grid:  { color:'rgba(203,213,225,.3)', lineWidth:1 },
-    ticks: { color:'#94A3B8', font:{ size:11, family:"'DM Sans',sans-serif" } },
-    title: { display:true, color:'#475569', font:{ family:"'Barlow Condensed',sans-serif", weight:'800', size:13 } },
+    ticks: { color:Theme.color('--gray-400'), font:{ size:11, family:"'DM Sans',sans-serif" } },
+    title: { display:true, color:Theme.color('--gray-600'), font:{ family:"'Barlow Condensed',sans-serif", weight:'800', size:13 } },
   };
 
-  var chartConfig = {
+  let chartConfig = {
     type: 'scatter',
     data: { datasets: datasets },
     options: {
@@ -18328,7 +18431,7 @@ function scRender() {
             // still pan (the touches array is empty for mouse events, so
             // the guard only triggers when touches.length === 1).
             onPanStart: function(ctx) {
-              var ev = ctx && ctx.event && ctx.event.srcEvent ? ctx.event.srcEvent : (ctx && ctx.event);
+              let ev = ctx && ctx.event && ctx.event.srcEvent ? ctx.event.srcEvent : (ctx && ctx.event);
               if (ev && ev.touches && ev.touches.length === 1) return false;
             },
             onPanComplete: function() {
@@ -18345,13 +18448,13 @@ function scRender() {
       },
       scales: {
         x: Object.assign({}, axisStyle, {
-          title:   { display:true, text:xM.label, color:'#64748B', font:{ family:"'Barlow Condensed',sans-serif", weight:'700', size:12 } },
-          ticks:   { color:'#94A3B8', font:{ size:10 }, callback:function(v){ return xM.fmt(v); } },
+          title:   { display:true, text:xM.label, color:Theme.color('--gray-500'), font:{ family:"'Barlow Condensed',sans-serif", weight:'700', size:12 } },
+          ticks:   { color:Theme.color('--gray-400'), font:{ size:10 }, callback:function(v){ return xM.fmt(v); } },
           reverse: !!xM.inv,
         }),
         y: Object.assign({}, axisStyle, {
-          title:   { display:true, text:yM.label, color:'#64748B', font:{ family:"'Barlow Condensed',sans-serif", weight:'700', size:12 } },
-          ticks:   { color:'#94A3B8', font:{ size:10 }, callback:function(v){ return yM.fmt(v); } },
+          title:   { display:true, text:yM.label, color:Theme.color('--gray-500'), font:{ family:"'Barlow Condensed',sans-serif", weight:'700', size:12 } },
+          ticks:   { color:Theme.color('--gray-400'), font:{ size:10 }, callback:function(v){ return yM.fmt(v); } },
           reverse: !!yM.inv,
         }),
       },
@@ -18362,15 +18465,15 @@ function scRender() {
   // render or when the number of datasets changes (e.g. trend line added/removed).
   // Updating is dramatically faster than destroy+new: no full canvas repaint,
   // no plugin re-registration, no scale reconstruction.
-  var needsDatasets = datasets.length;
-  var canUpdate = Scatter._state.chart
+  let needsDatasets = datasets.length;
+  let canUpdate = Scatter._state.chart
     && Scatter._state.chart.data
     && Scatter._state.chart.data.datasets.length === needsDatasets;
 
   if (canUpdate) {
     // Patch existing datasets in-place — Chart.js reads these on next update()
     datasets.forEach(function(ds, i) {
-      var existing = Scatter._state.chart.data.datasets[i];
+      let existing = Scatter._state.chart.data.datasets[i];
       existing.data             = ds.data;
       existing.pointStyle       = ds.pointStyle;
       existing.backgroundColor  = ds.backgroundColor;
@@ -18387,8 +18490,8 @@ function scRender() {
       existing.$scIsGhost      = !!ds.$scIsGhost;
     });
     // Sync all axis config: label, reverse, and tick formatter
-    var sx = Scatter._state.chart.options.scales.x;
-    var sy = Scatter._state.chart.options.scales.y;
+    let sx = Scatter._state.chart.options.scales.x;
+    let sy = Scatter._state.chart.options.scales.y;
     sx.title.text = xM.label;
     sy.title.text = yM.label;
     sx.reverse    = !!xM.inv;
@@ -18443,7 +18546,7 @@ function scRender() {
     // observer reference is held on Scatter._state so we don't re-create
     // it on every render — the flag is checked first.
     if (!Scatter._state.resizeObserver && typeof ResizeObserver !== 'undefined') {
-      var wrap = canvas.parentElement; // .sc-canvas-wrap
+      let wrap = canvas.parentElement; // .sc-canvas-wrap
       if (wrap) {
         Scatter._state.resizeObserver = new ResizeObserver(function() {
           if (Scatter._state.chart) Scatter._state.chart.resize();
@@ -18461,20 +18564,20 @@ function scRender() {
   ScatterInteraction.wire(canvas, pts, xM, yM, Scatter._state.chart);
 
   // ── Stats bar ─────────────────────────────────────────────────────────────
-  var statEl = document.getElementById('scStatBar');
+  let statEl = _scEl('scStatBar');
   if (statEl) {
-    var xs = pts.map(function(pt){ return pt._xr; });
-    var ys = pts.map(function(pt){ return pt._yr; });
+    let xs = pts.map(function(pt){ return pt._xr; });
+    let ys = pts.map(function(pt){ return pt._yr; });
     function statChip(vals, m) {
-      var mn = Math.min.apply(null, vals);
-      var mx = Math.max.apply(null, vals);
-      var av = vals.reduce(function(a,b){ return a+b; }, 0) / vals.length;
+      let mn = Math.min.apply(null, vals);
+      let mx = Math.max.apply(null, vals);
+      let av = vals.reduce(function(a,b){ return a+b; }, 0) / vals.length;
       return '<span class="sc-stat-chip"><b>' + m.label + '</b> ' + m.fmt(mn) + ' \u2192 avg ' + m.fmt(av) + ' \u2192 ' + m.fmt(mx) + '</span>';
     }
-    var r2html = '';
+    let r2html = '';
     if (reg) {
-      var str  = reg.r2 > 0.5 ? 'Strong' : reg.r2 > 0.25 ? 'Moderate' : 'Weak';
-      var scol = reg.r2 > 0.5 ? '#16A34A' : reg.r2 > 0.25 ? '#D97706' : '#94A3B8';
+      let str  = reg.r2 > 0.5 ? 'Strong' : reg.r2 > 0.25 ? 'Moderate' : 'Weak';
+      let scol = reg.r2 > 0.5 ? Theme.color('--green-dark') : reg.r2 > 0.25 ? Theme.color('--amber-deep') : Theme.color('--gray-400');
       r2html = '<span class="sc-stat-chip"><b>R\u00b2</b> ' + reg.r2.toFixed(3) + ' <span style="color:' + scol + '">' + str + '</span></span>';
     }
     statEl.innerHTML = statChip(xs, xM) + statChip(ys, yM) + r2html;
@@ -18489,7 +18592,7 @@ function scRender() {
 
 // ── TIER MANAGEMENT FUNCTIONS ──────────────────────────────────────────────
 function rebuildBBTiers() {
-  var c = TIER_CUTS;
+  let c = TIER_CUTS;
   // EDITORIAL TIER RATIONALE (priority #1):
   // Each tier carries a one-sentence positioning statement explaining what
   // a player at this tier represents in terms of NBA projection. These are
@@ -18535,10 +18638,10 @@ function rebuildBBTiers() {
 rebuildBBTiers();
 
 function updateTierCuts() {
-  var f  = Math.max(1,    Math.min(10, parseInt(document.getElementById('cutFranchise').value)||5));
-  var l  = Math.max(f+1,  Math.min(20, parseInt(document.getElementById('cutLottery').value)||14));
-  var lf = Math.max(l+1,  Math.min(30, parseInt(document.getElementById('cutLateFirst').value)||30));
-  var s  = Math.max(lf+1, Math.min(60, parseInt(document.getElementById('cutSecond').value)||60));
+  let f  = Math.max(1,    Math.min(10, parseInt(document.getElementById('cutFranchise').value)||5));
+  let l  = Math.max(f+1,  Math.min(20, parseInt(document.getElementById('cutLottery').value)||14));
+  let lf = Math.max(l+1,  Math.min(30, parseInt(document.getElementById('cutLateFirst').value)||30));
+  let s  = Math.max(lf+1, Math.min(60, parseInt(document.getElementById('cutSecond').value)||60));
   document.getElementById('cutFranchise').value = f;
   document.getElementById('cutLottery').value   = l;
   document.getElementById('cutLateFirst').value = lf;
@@ -18553,19 +18656,19 @@ function resetTierCuts() {
   TIER_CUTS = { franchise:5, lottery:14, lateFirst:30, second:60 };
   StorageService.clearTierCuts();
   rebuildBBTiers();
-  var vals = {cutFranchise:5, cutLottery:14, cutLateFirst:30, cutSecond:60};
+  let vals = {cutFranchise:5, cutLottery:14, cutLateFirst:30, cutSecond:60};
   Object.keys(vals).forEach(function(id) {
-    var el = document.getElementById(id); if(el) el.value = vals[id];
+    let el = document.getElementById(id); if(el) el.value = vals[id];
   });
   if (isBoardActive()) renderBoard2026();
 }
 
 // M6: Module-level reference so we can remove the exact listener that was added,
 // regardless of how many times the editor was opened/closed.
-var _tierEditorDismiss = null;
+let _tierEditorDismiss = null;
 
 function toggleTierEditor() {
-  var ed=document.getElementById('tierEditor'), btn=document.getElementById('tierCustomBtn');
+  let ed=document.getElementById('tierEditor'), btn=document.getElementById('tierCustomBtn');
   if (!ed) return;
 
   // M6: Always remove any existing dismiss listener before toggling state.
@@ -18576,7 +18679,7 @@ function toggleTierEditor() {
     _tierEditorDismiss = null;
   }
 
-  var wasVisible = ed.classList.contains('visible');
+  let wasVisible = ed.classList.contains('visible');
   ed.classList.toggle('visible');
   if (btn) btn.classList.toggle('on', ed.classList.contains('visible'));
 
