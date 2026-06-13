@@ -253,7 +253,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--gray-50);color:var(--navy
 .card-rank-num{font-family:'Barlow Condensed',sans-serif;font-size:32px;font-weight:900;color:var(--navy);letter-spacing:-1.5px;line-height:1;margin-top:1px}
 .card-rank-crown{font-size:14px;line-height:1;margin-top:3px;display:block}
 .card-avatar-wrap{overflow:visible !important;isolation:isolate;transition:box-shadow 280ms cubic-bezier(.22,1,.36,1),transform 220ms cubic-bezier(.22,1,.36,1)}
-.card-avatar-img{border-radius:inherit;display:block;transition:transform 320ms cubic-bezier(.22,1,.36,1);transform-origin:50% 40%;image-rendering:-webkit-optimize-contrast;-webkit-backface-visibility:hidden;backface-visibility:hidden}
+.card-avatar-img{border-radius:inherit;display:block;transition:transform 320ms cubic-bezier(.22,1,.36,1);transform-origin:50% 40%;image-rendering:auto;-webkit-backface-visibility:hidden;backface-visibility:hidden}
 .card-avatar-wrap .avatar-fallback{border-radius:inherit;transition:transform 320ms cubic-bezier(.22,1,.36,1)}
 .player-card:hover .card-avatar-wrap{box-shadow:0 0 0 2.5px rgba(var(--tier-glow),.28),0 0 14px 4px rgba(var(--tier-glow),.16),0 0 28px 8px rgba(var(--tier-glow),.06)}
 .player-card:hover .card-avatar-img,.player-card:hover .card-avatar-wrap .avatar-fallback{transform:scale(1.08)}
@@ -505,7 +505,11 @@ body{font-family:'DM Sans',sans-serif;background:var(--gray-50);color:var(--navy
 .compare-metric-val{font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900}
 .compare-metric-lbl{font-size:10px;color:var(--gray-400);text-transform:uppercase;letter-spacing:.4px}
 .compare-radar-title{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:800;color:var(--navy);margin-bottom:14px}
-.compare-table-title{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:800;color:var(--navy);padding:14px 16px;border-bottom:1px solid var(--gray-100)}
+.compare-table-title{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:800;color:var(--navy);padding:14px 16px;border-bottom:1px solid var(--gray-100);display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.cg-legend{display:flex;align-items:center;gap:14px;margin-left:auto;font-family:'DM Sans',sans-serif}
+.cg-legend-bit{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:600;color:var(--gray-400);text-transform:none;letter-spacing:0}
+.cg-legend-tri{font-size:8px;color:var(--amber);font-style:normal}
+.cg-legend-bar{width:16px;height:5px;border-radius:3px;background:linear-gradient(90deg,var(--gray-200),var(--navy-mid))}
 .compare-best{font-weight:800;color:var(--green)}
 .compare-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 20px;color:var(--gray-400);gap:12px}
 .compare-empty-icon{font-size:40px;opacity:.4}
@@ -566,16 +570,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--gray-50);color:var(--navy
   border-radius:5px;padding:2px 8px;cursor:default;
 }
 .cqr-age{display:block;font-size:9px;font-weight:700;color:var(--gray-400);margin-top:2px;font-variant-numeric:tabular-nums}
-.ctd-bar{height:4px;background:var(--gray-100);border-radius:2px;overflow:hidden;margin-top:3px}
-.ctd-bar span{display:block;height:100%;border-radius:2px}
-.ctr-style-tag{
-  font-size:7.5px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;
-  color:var(--gray-400);background:var(--gray-100);
-  border-radius:3px;padding:1px 4px;vertical-align:1px;cursor:default;
-}
-/* Sticky player-identity header — 20 rows down you still know who's who */
-.compare-table thead th{position:sticky;top:0;z-index:5;background:white}
-.compare-table thead th:first-child{left:0;z-index:6}
 .crl-item{cursor:pointer;transition:opacity var(--motion-fast)}
 .crl-item.is-off{opacity:.35}
 .crl-item:focus-visible{outline:2px solid var(--blue);outline-offset:2px;border-radius:4px}
@@ -593,7 +587,96 @@ body{font-family:'DM Sans',sans-serif;background:var(--gray-50);color:var(--navy
 .ccs-lbl{display:block;font-size:8px;font-weight:600;color:var(--gray-400);text-transform:uppercase;letter-spacing:.4px;margin-top:1px}
 .ccs-lead .ccs-val{color:var(--green)}
 
-/* ── Stats comparison table section ── */
+/* ══ STAT COMPARISON v3 — diverging head-to-head grid ═══════════════════
+   Replaces the old <table>. Each stat is a grid row; bars are the primary
+   visual element. 2-player → center-anchored tug-of-war; 3–4 → stacked
+   per-player percentile bars. Leader signal is a single small triangle. */
+.compare-grid{font-family:'DM Sans',sans-serif;padding:4px 4px 8px}
+
+/* ── Header strip: sticky player identity + leads tally ── */
+.cg-head{display:grid;grid-template-columns:var(--cg-statcol,108px) 1fr;align-items:stretch;
+  position:sticky;top:0;z-index:6;background:white;border-bottom:1.5px solid var(--gray-200);padding-bottom:8px}
+.cg-head-spacer{}
+.cg-head-players{display:grid;grid-template-columns:repeat(var(--np),1fr);gap:8px}
+.cg-h2h .cg-head-players{grid-template-columns:1fr 1fr}
+.cgh-player{position:relative;display:flex;flex-direction:column;gap:7px;padding:10px 10px 9px;
+  border:1px solid var(--gray-200);border-radius:10px;background:var(--gray-50);overflow:hidden}
+.cgh-player.is-leader{background:linear-gradient(180deg,rgba(212,168,48,.07),var(--gray-50));border-color:rgba(212,168,48,.35)}
+.cgh-accent{position:absolute;top:0;left:0;right:0;height:3px;background:var(--c)}
+.cgh-top{display:flex;align-items:center;gap:8px;min-width:0}
+.cgh-id{display:flex;flex-direction:column;min-width:0;line-height:1.15}
+.cgh-name{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:800;color:var(--navy);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cgh-meta{display:flex;align-items:center;gap:6px;font-size:9.5px;font-weight:600;color:var(--gray-400);font-variant-numeric:tabular-nums}
+.cgh-age{color:var(--gray-500)}
+.cgh-leads{display:flex;align-items:baseline;gap:5px;flex-wrap:wrap}
+.cgh-leads-n{font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:900;color:var(--navy);line-height:1}
+.is-leader .cgh-leads-n{color:#92400E}
+.cgh-leads-l{font-size:9px;font-weight:600;color:var(--gray-400);text-transform:uppercase;letter-spacing:.4px}
+.cgh-crown{margin-left:auto;font-size:11px;color:var(--amber)}
+
+/* ── Section divider ── */
+.cg-section{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:800;letter-spacing:1.2px;
+  text-transform:uppercase;color:var(--gray-400);padding:14px 6px 5px;display:flex;align-items:center;gap:8px}
+.cg-section::after{content:'';flex:1;height:1px;background:var(--gray-200)}
+.cg-depth-sec{display:none}
+.compare-table-section.expanded .cg-depth-sec{display:flex}
+
+/* ── Stat row: [stat label][bars / cells] ── */
+.cg-row{display:grid;grid-template-columns:var(--cg-statcol,108px) 1fr;align-items:center;
+  gap:0;padding:5px 0;border-radius:7px;transition:background var(--motion-fast)}
+.cg-row:hover{background:var(--gray-50)}
+.cg-depth{display:none}
+.compare-table-section.expanded .cg-depth{display:grid}
+.cg-stat{font-family:'Barlow Condensed',sans-serif;font-size:13.5px;font-weight:700;color:var(--navy);
+  padding-left:8px;display:flex;align-items:center;gap:5px;line-height:1.1}
+.cg-style-tag{font-size:7.5px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;
+  color:var(--gray-400);background:var(--gray-100);border-radius:3px;padding:1px 4px}
+
+/* shared value + delta + marker styling */
+.cg-val{font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:700;color:var(--navy);
+  font-variant-numeric:tabular-nums;line-height:1}
+.cg-delta{font-family:'Barlow Condensed',sans-serif;font-size:10.5px;font-weight:700;
+  color:var(--gray-400);font-variant-numeric:tabular-nums}
+.cg-mark{font-size:9px;color:var(--amber);line-height:1}
+.is-lead .cg-val{color:#92400E;font-weight:800}
+
+/* ══ 2-player diverging mode ══ */
+.cg-h2h .cg-row{grid-template-columns:var(--cg-statcol,108px) minmax(72px,auto) 1fr minmax(72px,auto);
+  column-gap:10px}
+.cg-h2h .cg-stat{grid-column:1}
+.cg-valbox{display:flex;align-items:center;gap:6px}
+.cg-valbox.cg-left{grid-column:2;justify-content:flex-end;text-align:right}
+.cg-valbox.cg-right{grid-column:4;justify-content:flex-start;text-align:left}
+.cg-track{grid-column:3;position:relative;height:14px;border-radius:7px;background:var(--gray-100);
+  display:flex;align-items:stretch;overflow:hidden}
+.cg-fill{position:absolute;top:0;bottom:0;display:block;opacity:.92;transition:width .35s cubic-bezier(.4,0,.2,1)}
+.cg-fill-l{right:50%;border-radius:7px 0 0 7px}
+.cg-fill-r{left:50%;border-radius:0 7px 7px 0}
+.cg-axis{position:absolute;left:50%;top:-1px;bottom:-1px;width:1.5px;transform:translateX(-50%);
+  background:var(--gray-300);z-index:2}
+.cg-valbox.is-lead .cg-val{color:#92400E}
+
+/* ══ 3–4 player multi mode ══ */
+.cg-multi-cells{grid-column:2;display:grid;grid-template-columns:repeat(var(--np),1fr);gap:8px}
+.cg-mcell{display:flex;flex-direction:column;gap:4px;min-width:0}
+.cg-mtop{display:flex;align-items:baseline;gap:5px;min-width:0}
+.cg-mtop .cg-val{font-size:15px}
+.cg-mbar{height:7px;border-radius:4px;background:var(--gray-100);overflow:hidden}
+.cg-mbar span{display:block;height:100%;border-radius:4px;opacity:.92;transition:width .35s cubic-bezier(.4,0,.2,1)}
+.cg-mcell.is-lead .cg-val{color:#92400E;font-weight:800}
+
+/* mobile: tighten the diverging grid, shrink type */
+@media (max-width:600px){
+  .compare-grid{--cg-statcol:74px}
+  .cg-h2h .cg-row{grid-template-columns:74px minmax(54px,auto) 1fr minmax(54px,auto);column-gap:6px}
+  .cg-val{font-size:15px}
+  .cgh-name{font-size:13px}
+  .cgh-leads-n{font-size:20px}
+  .cg-track{height:12px}
+}
+
+
 .compare-table-section{background:white;border:1.5px solid var(--gray-200);border-radius:12px;overflow:hidden;box-shadow:var(--shadow-sm)}
 .compare-table-header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;cursor:pointer;user-select:none;border-bottom:1px solid var(--gray-100);transition:background .12s}
 .compare-table-header:hover{background:var(--gray-50)}
@@ -603,35 +686,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--gray-50);color:var(--navy
 .compare-table-section .compare-table-body{max-height:0;overflow:hidden;transition:max-height .3s ease}
 .compare-table-section.expanded .compare-table-body{max-height:4000px}
 
-/* ── Inner table ── */
-.compare-table{width:100%;border-collapse:collapse}
-.compare-table table{width:100%;border-collapse:collapse}
-.compare-table th{background:#F8FAFC;padding:8px 12px;text-align:center;font-size:11px;font-weight:700;color:var(--gray-500);border-bottom:1.5px solid var(--gray-200);white-space:nowrap;vertical-align:bottom}
-.compare-table td{padding:6px 12px;text-align:center;border-bottom:1px solid var(--gray-100);vertical-align:middle;font-size:13px}
-
-/* Stat value + delta layout */
-.ctd-val{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;color:var(--navy)}
-.ctd-delta{display:inline-block;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;padding:1px 5px;border-radius:3px;margin-left:5px;vertical-align:middle;letter-spacing:.2px}
-.ctd-delta.pos{color:#15803d;background:rgba(21,128,61,.08)}
-.ctd-delta.neg{color:#dc2626;background:rgba(220,38,38,.08)}
-.ctd-delta.neu{color:var(--gray-400);background:var(--gray-50)}
-
-/* Quick-score row */
-.compare-quick-row td{padding:8px 12px;border-bottom:2px solid var(--gray-200)}
-.cqr-score{font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:900;color:var(--navy)}
-.cqr-lead{color:var(--green)}
-.cqr-wins{font-size:10px;font-weight:600;color:var(--gray-400);margin-left:3px}
-
-/* Section + data rows */
-.ctr-row td{transition:background .1s}
-.ctr-row:hover td{background:var(--gray-50)}
-.ctr-section td{cursor:default}
-.ctr-depth{display:none}
-.compare-table-section.expanded .ctr-depth{display:table-row}
-.ctr-toggle{cursor:pointer}
-.ctr-toggle:hover td{background:#EEF2FF}
-
-/* Gap visualization bars */
 
 /* RANK BADGE */
 .rank-badge{width:38px;height:38px;border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0}
@@ -1020,12 +1074,6 @@ tr:hover td{background:var(--gray-50)}
 .comp-name-sub{font-size:11px;color:var(--gray-400);margin-top:2px;white-space:nowrap}
 
 /* ── Stat value + delta ── */
-.ctd-stat{display:flex;flex-direction:column;align-items:center;gap:2px}
-.ctd-val{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:800;color:var(--navy);line-height:1}
-.ctd-delta{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;padding:1px 5px;border-radius:3px;letter-spacing:.1px;line-height:1.3;white-space:nowrap}
-.ctd-delta.pos{color:#15803d;background:rgba(21,128,61,.09)}
-.ctd-delta.neg{color:#dc2626;background:rgba(220,38,38,.09)}
-.ctd-delta.neu{color:var(--gray-400);background:var(--gray-50)}
 .ctd-missing{font-size:12px;color:var(--gray-200)}
 
 /* ── Sim score badge ── */
@@ -2127,13 +2175,7 @@ tr:hover td{background:var(--gray-50)}
 
   /* Hero: vertical stack on mobile — covered by 760px MQ */
 
-  /* Stats table: tighter on mobile */
-  .compare-table td, .compare-table thead th {
-    padding: 4px 7px;
-    font-size: 11px;
-  }
-  .ctd-val { font-size: 14px; }
-  .ctd-delta { font-size: 10px; }
+  /* Stats comparison: grid has its own @media(max-width:600px) sizing */
 
   /* Mini stats grid in card: 5-col still works at 160px+ card */
   .ccard-stats { grid-template-columns: repeat(5, 1fr); }
@@ -3078,7 +3120,7 @@ tr:hover td{background:var(--gray-50)}
 
 /* ── Avatar — WHITE THEME ───────────────────────────────────────────── */
 .bb-av{flex-shrink:0;display:flex;align-items:center;justify-content:center}
-.bb-av img{image-rendering:-webkit-optimize-contrast;image-rendering:crisp-edges;-webkit-backface-visibility:hidden;backface-visibility:hidden}
+.bb-av img{image-rendering:auto;-webkit-backface-visibility:hidden;backface-visibility:hidden}
 /* Tier accent ring around avatar */
 .bb-row.bbt1 .bb-av > div{
   box-shadow:0 0 0 2px rgba(245,158,11,.4),0 0 8px rgba(245,158,11,.12) !important;
@@ -8349,30 +8391,72 @@ function normalizeTeamCode(raw) {
 }
 
 
-function getPhotoUrl(playerName) {
+// Wrap an ESPN image path through the combiner so it's server-resized — sharp at
+// small sizes instead of the browser downscaling a large /full/ headshot.
+// IMPORTANT: ESPN college headshots are NOT square (~350×254, wider than tall).
+// Requesting a square w=h made the combiner squeeze the wide source into a box,
+// distorting the face. Instead we drive the resize off HEIGHT only and let the
+// combiner preserve the native aspect ratio; CSS object-fit:cover then crops the
+// (correctly-proportioned) image to the square avatar box. We size by the box's
+// LIMITING dimension — for a cover-crop into a square that's the source height —
+// so the shorter side still has enough pixels to stay crisp.
+function espnCombiner(espnImgPath, px) {
+  return 'https://a.espncdn.com/combiner/i?img=' + espnImgPath
+       + '&h=' + px + '&transparent=true';
+}
+
+// getPhotoUrl(name)            → best available URL at full quality (exports, etc.)
+// getPhotoUrl(name, cssPx)     → ESPN headshots resized via combiner to a
+//                                high-DPI pixel target so they render crisp in
+//                                small avatar boxes. Overrides (data-URIs / direct
+//                                URLs) can't be server-resized and pass through.
+function getPhotoUrl(playerName, cssPx) {
   const base = splitName(playerName)[0];
-  // 1) Explicit override (direct URL — team site, league CDN, etc.)
+  // 1) Explicit override (direct URL / base64 — fixed resolution, use as-is)
   const override = PHOTO_OVERRIDES[base];
   if (override) return override;
   // 2) ESPN headshot CDN
   const id = ESPN_IDS[base];
-  if (id) return `https://a.espncdn.com/i/headshots/mens-college-basketball/players/full/${id}.png`;
+  if (id) {
+    const path = '/i/headshots/mens-college-basketball/players/full/' + id + '.png';
+    if (cssPx) {
+      // Target physical pixels = CSS px × devicePixelRatio, clamped so we never
+      // request below the source-useful floor or above a sane ceiling. 3× covers
+      // 2x/3x retina and guarantees a crisp downscale on 1x displays too.
+      var dpr = (typeof window !== 'undefined' && window.devicePixelRatio) ? window.devicePixelRatio : 2;
+      var target = Math.round(Math.min(600, Math.max(96, cssPx * Math.max(2, Math.min(3, dpr)))));
+      return espnCombiner(path, target);
+    }
+    return 'https://a.espncdn.com' + path; // full res for exports
+  }
   return null;
 }
 
 function avatarHtml(playerName, position, size='52px', borderRadius='10px', spotlight=false) {
   const color    = posColor(position);
   const initials = escHtml(getInitials(playerName).toUpperCase());
-  const url      = getPhotoUrl(playerName);
+  // Resolve the CSS box to a concrete pixel size so the photo can be fetched at
+  // the right resolution. '100%' (modal) fills the largest container (~96px),
+  // so we treat it as 96 for sizing purposes; the img still stretches to 100%.
+  const sizePx   = (typeof size === 'string' && size.indexOf('%') >= 0) ? 96 : (parseInt(size, 10) || 52);
+  const url      = getPhotoUrl(playerName, sizePx);
+  const fullUrl  = getPhotoUrl(playerName);   // direct full-res, for error retry
   // onload: if ESPN returns a silent placeholder (naturalWidth <= 10) show initials instead
   const loadChk  = "if(this.naturalWidth<=10){this.style.display='none';this.nextElementSibling.style.display='flex';}";
-  const errChk   = "this.style.display='none';this.nextElementSibling.style.display='flex';";
+  // onerror: if the resized combiner image fails, retry the direct full-res URL
+  // once (data-retry guard prevents a loop) before falling back to initials.
+  const canRetry = fullUrl && fullUrl !== url;
+  const errChk   = canRetry
+    ? "if(!this.dataset.retried){this.dataset.retried='1';this.src='"+fullUrl.replace(/'/g,"\\'")+"';}else{this.style.display='none';this.nextElementSibling.style.display='flex';}"
+    : "this.style.display='none';this.nextElementSibling.style.display='flex';";
   // spotlight=true: add card-avatar-wrap class + card-avatar-img class so CSS hover
   // can scale the image and add a tier-colored glow pulse without JS.
   const wrapClass = spotlight ? ' class="card-avatar-wrap"' : '';
   const imgClass  = spotlight ? ' class="card-avatar-img"' : '';
+  // decoding=async + high quality interpolation keep the photo sharp; object-fit
+  // cover with a top-biased focal point frames the face consistently.
   const imgTag   = url
-    ? `<img${imgClass} src="${url}" onload="${loadChk}" onerror="${errChk}" alt="" loading="lazy" style="width:100%;height:100%;object-fit:cover;object-position:50% 12%">`
+    ? `<img${imgClass} src="${url}" onload="${loadChk}" onerror="${errChk}" alt="" loading="lazy" decoding="async" style="width:100%;height:100%;object-fit:cover;object-position:50% 12%;image-rendering:auto;-webkit-backface-visibility:hidden;transform:translateZ(0)">`
     : '';
   const fbDisplay = url ? 'none' : 'flex';
   return `<div${wrapClass} style="width:${size};height:${size};border-radius:${borderRadius};overflow:hidden;flex-shrink:0;position:relative;background:${color}">
@@ -14584,114 +14668,172 @@ function renderCompare() {
   out += '<div class="compare-table-header" onclick="var s=document.getElementById(\'compareTableSection\');s.classList.toggle(\'expanded\');">';
   out += '<div class="compare-table-title">'
        + '<span>Stat Comparison</span>'
-       + '<span style="font-size:10px;font-weight:500;color:var(--gray-400);text-transform:none">\u2605\u00a0leader\u2003\u00b1\u00a0delta</span>'
+       + '<span class="cg-legend">'
+       +   '<span class="cg-legend-bit"><i class="cg-legend-tri">\u25B2</i>leader</span>'
+       +   '<span class="cg-legend-bit"><i class="cg-legend-bar"></i>percentile vs class</span>'
+       +   '<span class="cg-legend-bit">\u00b1\u00a0gap to best</span>'
+       + '</span>'
        + '</div>';
   out += '<span class="compare-table-toggle">\u25be</span>';
   out += '</div>'; // compare-table-header
 
   out += '<div class="compare-table-body">';
-  out += '<div style="padding:0 6px 6px">';
 
-  // ── Table header ─────────────────────────────────────────────
-  var tableHtml = '<div class="compare-table"><table><thead><tr>'
-    + '<th style="background:#F8FAFC;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--gray-400);padding:8px 10px">Stat</th>';
+  // ╔══════════════════════════════════════════════════════════════╗
+  // ║  STAT COMPARISON v3 — grid head-to-head, not a data table.    ║
+  // ║  • 2 players → center-anchored diverging bars (tug-of-war):   ║
+  // ║    one shared track per stat, each side fills toward its      ║
+  // ║    player by board percentile, so the eye reads who "pulls"   ║
+  // ║    harder at a glance.                                        ║
+  // ║  • 3–4 players → per-player percentile bars on a shared       ║
+  // ║    baseline, directly comparable.                             ║
+  // ║  Leader signal is minimal: a small triangle marker on the     ║
+  // ║  leading value, winner bolded, others muted. No row tint.     ║
+  // ╚══════════════════════════════════════════════════════════════╝
+  var nP    = compareList.length;
+  var isH2H = nP === 2;
+  var grid  = 'compare-grid' + (isH2H ? ' cg-h2h' : ' cg-multi');
 
+  // Per-stat delta text (signed, formatted per unit) vs the group best.
+  function fmtDelta(st, v, best){
+    var d = Number(v) - best;
+    if (Math.abs(d) <= 0.001) return '';
+    var sign = d>0?'+':'';
+    if      (st.k==='ts_pct')  return sign+((d)*100).toFixed(1)+'%';
+    else if (st.k==='pa2_usg') return sign+Math.round(d);
+    else if (st.k==='ht')      return sign+d+'"';
+    else if (st.k==='wt')      return sign+Math.round(d)+'lb';
+    else if (st.k==='age')     return sign+d.toFixed(1)+'y';
+    return sign+d.toFixed(1);
+  }
+
+  var g = '<div class="'+grid+'" style="--np:'+nP+'">';
+
+  // ── Header strip: player identity + stat-leads tally ────────────
+  g += '<div class="cg-head">';
+  g += '<div class="cg-head-spacer"></div>';
+  g += '<div class="cg-head-players">';
   compareList.forEach(function(p,ci){
-    var isLdr = wins[ci]===maxWins && compareList.length>1;
-    var color = COMPARE_COLORS[ci];
-    tableHtml += '<th class="cth" style="border-top:3px solid '+color+'">'
-              + '<div style="display:flex;flex-direction:column;align-items:center;gap:3px;padding:5px 0">'
-              + avatarHtml(p.name,p.position||'','28px','5px')
-              + '<span style="font-family:\'Barlow Condensed\',sans-serif;font-size:13px;font-weight:800;color:var(--navy);white-space:nowrap">'
-              + escHtml(p.name) + '</span>'
-              + '<span style="font-size:9px;color:var(--gray-400)">'+(p._year||'2026')+'</span>'
-              + '</div></th>';
+    var isLdr   = wins[ci]===maxWins && nP>1;
+    var color   = COMPARE_COLORS[ci];
+    var nm      = (p.name||'').split(' - ')[0];
+    var aF      = hwAgeFlag(p.cls, p.age);
+    var ageChip = p.age
+      ? '<span class="cgh-age"'+(aF?' style="color:'+aF.col+'" title="'+escHtml(aF.tip)+'"':'')+'>'
+        + escHtml((p.cls||'').slice(0,2).toUpperCase() || '\u2014') + '\u00B7' + parseFloat(p.age).toFixed(1) + '</span>'
+      : '';
+    g += '<div class="cgh-player'+(isLdr?' is-leader':'')+'" style="--c:'+color+'">'
+       + '<div class="cgh-accent"></div>'
+       + '<div class="cgh-top">'
+       +   avatarHtml(p.name, p.position||'', '30px', '6px')
+       +   '<div class="cgh-id">'
+       +     '<span class="cgh-name">'+escHtml(nm)+'</span>'
+       +     '<span class="cgh-meta">'+(p._year||'2026')+ageChip+'</span>'
+       +   '</div>'
+       + '</div>'
+       + '<div class="cgh-leads">'
+       +   '<span class="cgh-leads-n">'+wins[ci]+'</span>'
+       +   '<span class="cgh-leads-l">of '+totalStats+' stat leads</span>'
+       +   (isLdr ? '<span class="cgh-crown" title="Leads the most categories">\u25B2</span>' : '')
+       + '</div>'
+       + '</div>';
   });
-  tableHtml += '</tr></thead><tbody>';
+  g += '</div></div>'; // cg-head-players + cg-head
 
-  // ── Quick-score row ─────────────────────────────────────────
-  // HONESTY: "Stat Leads", not "Overall Wins" — a count of category bests
-  // is descriptive, not a verdict (every stat weighted equally). Each cell
-  // also carries the player's class/age chip, tinted by age-for-class, so
-  // the rawest comparison trap is visible right where the score is.
-  tableHtml += '<tr class="compare-quick-row"><td style="font-size:9px;font-weight:700;letter-spacing:.6px;text-transform:uppercase">Stat Leads</td>';
-  compareList.forEach(function(p,ci){
-    var isLdr = wins[ci]===maxWins && compareList.length>1;
-    var ageChip = '';
-    var aF = hwAgeFlag(p.cls, p.age);
-    if (p.age) {
-      ageChip = '<span class="cqr-age"'+(aF?' style="color:'+aF.col+'" title="'+aF.tip+'"':'')+'>'
-              + escHtml((p.cls||'').slice(0,2).toUpperCase() || '\u2014') + ' \u00B7 ' + parseFloat(p.age).toFixed(1) + '</span>';
-    }
-    tableHtml += '<td><span class="cqr-score'+(isLdr?' cqr-lead':'')+'">'+wins[ci]+'</span>'
-              + '<span class="cqr-wins">of '+totalStats+' stats</span>' + ageChip + '</td>';
-  });
-  tableHtml += '</tr>';
-
-  // ── Data sections ────────────────────────────────────────────
+  // ── Sections + stat rows ────────────────────────────────────────
   SECTIONS.forEach(function(sec){
-    tableHtml += '<tr class="ctr-section'+(sec.depth?' ctr-toggle':'')+'" data-sec="'+sec.label+'">'
-              + '<td colspan="'+(compareList.length+1)+'" style="background:#F4F6F9;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--gray-400);padding:3px 10px;border-bottom:1px solid var(--gray-200)">'+sec.label+'</td></tr>';
+    g += '<div class="cg-section'+(sec.depth?' cg-depth-sec':'')+'">'+sec.label+'</div>';
 
     sec.stats.forEach(function(st){
-      var vals = compareList.map(function(p){ return p[st.k]; });
-      var maxV = vals.reduce(function(a,b){ return (b!=null&&!isNaN(b)&&Number(b)>Number(a))?b:a; },-Infinity);
-      var rowClass = 'ctr-row'+(sec.depth?' ctr-depth':'');
+      var vals        = compareList.map(function(p){ return p[st.k]; });
       var numericVals = vals.filter(function(v){ return v!=null&&!isNaN(v); }).map(Number);
+      var hasBest     = st.hb!==null && nP>1 && numericVals.length>1;
+      var groupBest   = !numericVals.length ? null
+                      : (st.hb ? Math.max.apply(null,numericVals) : Math.min.apply(null,numericVals));
+      // For style stats (hb===false) we still mark the "best" as the larger
+      // value for delta sign, but never crown a leader — they're descriptive.
+      var maxV        = numericVals.length ? Math.max.apply(null,numericVals) : null;
+      var rowCls      = 'cg-row'+(sec.depth?' cg-depth':'');
 
-      tableHtml += '<tr class="'+rowClass+'">';
-      tableHtml += '<td style="font-family:\'Barlow Condensed\',sans-serif;font-size:13px;font-weight:700;color:var(--navy);position:sticky;left:0;background:white;border-right:1px solid var(--gray-100);padding:5px 18px 5px 10px">'+st.l
-                + (st.tag==='style' ? ' <span class="ctr-style-tag" title="Shot-diet profile \u2014 descriptive, no better/worse">style</span>' : '')
-                + '</td>';
+      g += '<div class="'+rowCls+'">';
+      g += '<div class="cg-stat">'+st.l
+         + (st.tag==='style' ? '<span class="cg-style-tag" title="Shot-diet profile \u2014 descriptive, no better/worse">style</span>' : '')
+         + '</div>';
 
-      compareList.forEach(function(p,ci){
-        var v = p[st.k];
-        var disp = st.fmt(v);
-        var isBest = st.hb && v!=null && !isNaN(v) && Number(v)===Number(maxV) && compareList.length>1;
+      // board percentile per player (clamped to a readable floor)
+      function pct(p,v){
+        if (st.hb===null || v==null || isNaN(v)) return null;
+        var bp = compareBoardPct(p._year||'2026', st.k, Number(v));
+        return bp==null ? null : Math.max(4, Math.min(100, bp));
+      }
 
-        var delta='';
-        if(compareList.length>1 && st.hb!==null && v!=null && !isNaN(v) && numericVals.length>1){
-          var best = st.hb ? Math.max.apply(null,numericVals) : Math.min.apply(null,numericVals);
-          var d = Number(v) - best;
-          if(Math.abs(d)>0.001){
-            var sign = d>0?'+':'';
-            var dtxt;
-            if      (st.k==='ts_pct')  dtxt=sign+((d)*100).toFixed(1)+'%';
-            else if (st.k==='pa2_usg') dtxt=sign+Math.round(d);
-            else if (st.k==='ht')      dtxt=sign+d+'"';
-            else if (st.k==='wt')      dtxt=sign+Math.round(d)+'lb';
-            else if (st.k==='age')     dtxt=sign+d.toFixed(1)+'y';
-            else                        dtxt=sign+d.toFixed(1);
-            delta = '<span class="ctd-delta '+(st.hb?(d>=0?'pos':'neg'):(d<=0?'pos':'neg'))+'">'+dtxt+'</span>';
+      if (isH2H) {
+        // ── Diverging tug-of-war: [valL] [bar:L<-center->R] [valR] ──
+        var pL = compareList[0], pR = compareList[1];
+        var vL = pL[st.k], vR = pR[st.k];
+        var dispL = st.fmt(vL), dispR = st.fmt(vR);
+        var ldL = st.hb===true && vL!=null && !isNaN(vL) && Number(vL)===Number(groupBest);
+        var ldR = st.hb===true && vR!=null && !isNaN(vR) && Number(vR)===Number(groupBest);
+        if (ldL && ldR){ ldL=false; ldR=false; } // tie → no marker
+        var pctL = pct(pL,vL), pctR = pct(pR,vR);
+
+        var dL = (hasBest && vL!=null && !isNaN(vL)) ? fmtDelta(st, vL, groupBest) : '';
+        var dR = (hasBest && vR!=null && !isNaN(vR)) ? fmtDelta(st, vR, groupBest) : '';
+        var dlClsL = st.hb ? 'neg' : 'neg', dlClsR = st.hb ? 'neg' : 'neg';
+        // delta is always vs best, so sign is 0/neg for the non-leader; the
+        // leader shows no delta. Keep it muted-neutral, the marker is the cue.
+
+        g += '<div class="cg-valbox cg-left'+(ldL?' is-lead':'')+'">'
+           +   (ldL?'<span class="cg-mark">\u25C0</span>':'')
+           +   '<span class="cg-val">'+dispL+'</span>'
+           +   (dL?'<span class="cg-delta">'+dL+'</span>':'')
+           + '</div>';
+
+        g += '<div class="cg-track">';
+        if (pctL!=null) g += '<span class="cg-fill cg-fill-l" style="width:'+(pctL/2)+'%;background:'+COMPARE_COLORS[0]+'"></span>';
+        if (pctR!=null) g += '<span class="cg-fill cg-fill-r" style="width:'+(pctR/2)+'%;background:'+COMPARE_COLORS[1]+'"></span>';
+        g += '<span class="cg-axis"></span>';
+        g += '</div>';
+
+        g += '<div class="cg-valbox cg-right'+(ldR?' is-lead':'')+'">'
+           +   (dR?'<span class="cg-delta">'+dR+'</span>':'')
+           +   '<span class="cg-val">'+dispR+'</span>'
+           +   (ldR?'<span class="cg-mark">\u25B6</span>':'')
+           + '</div>';
+
+      } else {
+        // ── Multi (3–4): stacked per-player bars on shared baseline ──
+        g += '<div class="cg-multi-cells">';
+        compareList.forEach(function(p,ci){
+          var v    = p[st.k];
+          var disp = st.fmt(v);
+          var isLd = st.hb===true && v!=null && !isNaN(v) && Number(v)===Number(groupBest);
+          // tie check: if more than one ties the best, don't crown
+          if (isLd){
+            var tieCt = numericVals.filter(function(x){ return x===Number(groupBest); }).length;
+            if (tieCt>1) isLd=false;
           }
-        }
+          var p100 = pct(p,v);
+          var dl   = (hasBest && v!=null && !isNaN(v)) ? fmtDelta(st, v, groupBest) : '';
+          g += '<div class="cg-mcell'+(isLd?' is-lead':'')+'" style="--c:'+COMPARE_COLORS[ci]+'">'
+             +   '<div class="cg-mtop">'
+             +     (isLd?'<span class="cg-mark">\u25B2</span>':'')
+             +     '<span class="cg-val">'+disp+'</span>'
+             +     (dl?'<span class="cg-delta">'+dl+'</span>':'')
+             +   '</div>'
+             +   '<div class="cg-mbar">'+(p100!=null?'<span style="width:'+p100+'%;background:'+COMPARE_COLORS[ci]+'"></span>':'')+'</div>'
+             + '</div>';
+        });
+        g += '</div>';
+      }
 
-        // TRUE SCALE: bar embedded in the value cell, filled by the
-        // player's percentile within HIS OWN draft board for this stat.
-        // The old separate gap-rows normalized within the compared group —
-        // with two players that's always 100% vs 0%, rendering a 64.9 vs
-        // 65.1 TS% as total domination. Board percentile = honest distance,
-        // and merging the bar into the cell halves the table's height.
-        var bar = '';
-        if (st.hb !== null && v != null && !isNaN(v)) {
-          var bp = compareBoardPct(p._year||'2026', st.k, Number(v));
-          if (bp != null) {
-            bar = '<div class="ctd-bar"><span style="width:'+Math.max(3,bp)+'%;background:'+COMPARE_COLORS[ci]+'"></span></div>';
-          }
-        }
-        tableHtml += '<td class="'+(isBest?'compare-best':'')+'">'
-                  + '<span class="ctd-val">'+disp+'</span>'
-                  + delta
-                  + bar
-                  + '</td>';
-      });
-      tableHtml += '</tr>';
+      g += '</div>'; // cg-row
     });
   });
 
-  tableHtml += '</tbody></table></div>';
-  out += tableHtml;
-  out += '</div></div>'; // compare-table-body + padding
+  g += '</div>'; // compare-grid
+  out += g;
+  out += '</div>'; // compare-table-body
 
   // Depth toggle button
   out += '<div style="padding:8px 16px;border-top:1px solid var(--gray-100);display:flex;justify-content:center">'
