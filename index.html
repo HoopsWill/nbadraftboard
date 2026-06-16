@@ -49,8 +49,34 @@
   --gray-50:#F8FAFC;--gray-100:#F1F5F9;--gray-200:#E2E8F0;--gray-300:#CBD5E1;
   --gray-400:#94A3B8;--gray-500:#64748B;--gray-600:#475569;--gray-700:#334155;
 
+  /* ── ELEVATION SYSTEM ────────────────────────────────────────────────────
+     A single physical light model expressed as a 5-step scale, so every
+     surface in the product shares a consistent sense of depth. Each level
+     layers an AMBIENT shadow (soft, wide, low-opacity — simulates scattered
+     room light) with a KEY shadow (tighter, directional — simulates a light
+     above), which is what makes elevation read as real depth rather than a
+     flat drop-shadow. Tuned for the dark navy canvas: opacities run higher
+     than a light-theme scale because shadows must register against #0A1628.
+
+       --elev-1  resting cards, table rows, chips
+       --elev-2  hover lift, raised cards
+       --elev-3  popovers, dropdowns, the freeform hover panel
+       --elev-4  modals, the export dialog, command surfaces
+       --elev-0  flush / inset (pressed, wells)
+
+     Legacy --shadow-sm/md/xl are kept (still referenced) and re-pointed at the
+     scale so the whole product converges on one model. */
+  --elev-0: inset 0 1px 2px rgba(0,0,0,.18);
+  --elev-1: 0 1px 2px rgba(0,0,0,.20), 0 2px 6px rgba(0,0,0,.16);
+  --elev-2: 0 2px 4px rgba(0,0,0,.22), 0 6px 16px rgba(0,0,0,.24);
+  --elev-3: 0 4px 10px rgba(0,0,0,.28), 0 14px 34px rgba(0,0,0,.34);
+  --elev-4: 0 8px 18px rgba(0,0,0,.34), 0 28px 64px rgba(0,0,0,.46);
+  /* Hairline ring used to crisp the top edge of elevated dark surfaces. */
+  --ring-hair: inset 0 1px 0 rgba(255,255,255,.06);
+
   --shadow-sm:0 1px 3px rgba(0,0,0,.08);
   --shadow-md:0 4px 16px rgba(0,0,0,.10),0 2px 6px rgba(0,0,0,.07);
+  --shadow-lg:var(--elev-3);
   --shadow-xl:0 20px 60px rgba(0,0,0,.22);
 
   /* ── Extended design system tokens ── */
@@ -138,10 +164,34 @@
      tab switch), and --motion-slow for layout-scale shifts (panel slide,
      modal enter). Consistent application across the codebase produces
      the "premium feel" perception that's otherwise expensive. */
-  --ease-out:       cubic-bezier(.4, 0, .2, 1);
-  --motion-fast:    120ms var(--ease-out);
-  --motion-base:    200ms var(--ease-out);
-  --motion-slow:    350ms var(--ease-out);
+  /* ── MOTION SYSTEM ───────────────────────────────────────────────────────
+     One physical signature for all motion. Durations and easings are tokens
+     so every transition in the product shares a feel rather than each being
+     hand-picked. Easings:
+       --ease-out    standard UI deceleration (enter, most transitions)
+       --ease-in-out symmetric (position changes, relayout)
+       --ease-spring slight overshoot — for satisfying, tactile affordances
+                     (card lift, add-to-compare, pin) used sparingly
+       --ease-emphat dramatic decel for large surfaces (modal/panel enter)
+     Durations follow a 1.7x-ish ratio so steps feel distinct:
+       --dur-instant 90ms · --dur-fast 140ms · --dur-base 240ms
+       --dur-slow 380ms · --dur-slower 560ms
+     Combined shorthands (--motion-*) keep existing call sites working. */
+  --ease-out:       cubic-bezier(.2, .7, .3, 1);
+  --ease-in-out:    cubic-bezier(.45, 0, .25, 1);
+  --ease-spring:    cubic-bezier(.34, 1.4, .5, 1);
+  --ease-emphat:    cubic-bezier(.16, 1, .3, 1);
+
+  --dur-instant:    90ms;
+  --dur-fast:       140ms;
+  --dur-base:       240ms;
+  --dur-slow:       380ms;
+  --dur-slower:     560ms;
+
+  --motion-fast:    var(--dur-fast) var(--ease-out);
+  --motion-base:    var(--dur-base) var(--ease-out);
+  --motion-slow:    var(--dur-slow) var(--ease-out);
+  --motion-spring:  var(--dur-base) var(--ease-spring);
 
   /* ── Scale extensions (added to finish color-token migration) ────────────
      The base palette intentionally stays small (navy / amber / blue / grays
@@ -288,6 +338,82 @@ body{font-family:'DM Sans',sans-serif;background:var(--gray-50);color:var(--navy
 .vb-label{font-size:var(--text-2xs);font-weight:700;letter-spacing:.5px}
 .vb-badge{font-size:var(--text-8);font-weight:900;letter-spacing:.8px;text-transform:uppercase;background:linear-gradient(135deg,#F59E0B,#D97706);color:var(--navy);padding:1px 4px;border-radius:3px;margin-left:1px;line-height:1.4}
 .count-badge{font-size:var(--text-2xs);color:var(--gray-500);font-weight:600;margin-left:auto;background:var(--gray-100);padding:3px 9px;border-radius:20px;border:1px solid var(--gray-200);letter-spacing:.01em;white-space:nowrap}
+
+/* ── MOTION & TACTILE ENHANCEMENT LAYER ───────────────────────────────────
+   Built on the elevation + motion token systems above. These add the
+   "physical" micro-feedback that separates a premium product from a
+   functional one: surfaces lift toward the cursor, presses depress, and
+   entrances are choreographed rather than instantaneous. All gated by
+   prefers-reduced-motion at the bottom so accessibility is preserved. */
+
+/* Primary nav tabs: subtle upward intent on hover, crisp press. The active
+   underline already exists; this adds the tactile layer beneath it. */
+.nav-tab{transition:color var(--motion-fast),border-color var(--motion-fast),
+  background var(--motion-fast),transform var(--dur-instant) var(--ease-out)}
+.nav-tab:hover{transform:translateY(-1px)}
+.nav-tab:active{transform:translateY(0) scale(.97);transition-duration:60ms}
+
+/* Segmented view buttons (Cards/Table/Board/Freeform): press depression so
+   switching views feels physical, not just a color swap. */
+.view-btn{transition:background var(--motion-fast),color var(--motion-fast),
+  box-shadow var(--motion-fast),transform var(--dur-instant) var(--ease-out)}
+.view-btn:active{transform:scale(.95)}
+.view-btn.active{box-shadow:var(--elev-1)}
+
+/* Generic press utility: any element tagged with .tactile depresses on press.
+   Applied to primary action buttons so taps register physically. */
+.tactile{transition:transform var(--dur-instant) var(--ease-out),
+  box-shadow var(--motion-fast),filter var(--motion-fast)}
+.tactile:hover{filter:brightness(1.06)}
+.tactile:active{transform:scale(.96)}
+
+/* Branded focus ring — replaces inconsistent/absent focus styling with one
+   considered amber glow. :focus-visible only, so it never shows on mouse
+   click, only keyboard/AT navigation (the accessibility-correct behavior). */
+.nav-tab:focus-visible,
+.view-btn:focus-visible,
+button:focus-visible,
+[role="button"]:focus-visible,
+a:focus-visible,
+.player-card:focus-visible,
+input:focus-visible,
+select:focus-visible{
+  outline:none;
+  box-shadow:0 0 0 2px var(--navy),0 0 0 4px var(--amber);
+  border-radius:6px;
+}
+
+/* Staggered card entrance — when a board renders, cards arrive in a quick
+   cascade rather than all at once, which reads as deliberate. The delay is
+   driven by --enter-i (set inline per card in render order); capped so late
+   cards don't lag. Keyframe is gentle: 6px rise + fade, no bounce, so it
+   stays fast and professional rather than playful. */
+@keyframes card-enter{
+  from{opacity:0;transform:translateY(6px)}
+  to{opacity:1;transform:translateY(0)}
+}
+.card-stagger{
+  animation:card-enter var(--dur-base) var(--ease-out) both;
+  animation-delay:calc(min(var(--enter-i,0),24) * 18ms);
+}
+
+/* Accessibility: honor the OS "reduce motion" setting across the whole
+   motion system. Transforms and animated entrances are removed; opacity
+   still resolves so content remains visible, just without movement. */
+@media (prefers-reduced-motion: reduce){
+  .nav-tab:hover,.nav-tab:active,
+  .view-btn:active,.tactile:active,
+  button:not(.no-press):active{transform:none}
+  .card-stagger{animation:none}
+  *{scroll-behavior:auto !important}
+}
+
+/* Universal button press feedback — every <button> depresses slightly on
+   press, giving the whole product a consistent physical response without
+   tagging each of the 46 button classes individually. Buttons that opt out
+   (or need a different active state) can override .no-press. */
+button:not(.no-press):active{transform:scale(.97)}
+button{transition:transform var(--dur-instant) var(--ease-out)}
 
 /* TIER */
 .tier-section{margin-bottom:28px;content-visibility:auto;contain-intrinsic-size:0 800px}
@@ -799,7 +925,7 @@ tr:hover td{background:var(--gray-50)}
 /* MODAL */
 .modal-overlay{position:fixed;inset:0;background:rgba(10,22,40,.72);z-index:1000;display:flex;align-items:flex-end;justify-content:center;padding:0;overflow-y:hidden;opacity:0;pointer-events:none;transition:opacity .2s;backdrop-filter:blur(4px)}
 .modal-overlay.open{opacity:1;pointer-events:all}
-.modal{background:white;border-radius:16px 16px 0 0;width:100%;max-width:100%;max-height:88vh;box-shadow:var(--shadow-xl);transform:translateY(40px);transition:transform .2s;margin:0;display:flex;flex-direction:column;overflow:hidden}
+.modal{background:white;border-radius:16px 16px 0 0;width:100%;max-width:100%;max-height:88vh;box-shadow:var(--elev-4),var(--ring-hair);transform:translateY(40px);transition:transform var(--dur-slow) var(--ease-emphat);margin:0;display:flex;flex-direction:column;overflow:hidden}
 .modal-overlay.open .modal{transform:translateY(0)}
 /* PROFILE-4: scouting masthead — left-aligned row (photo · identity · stat),
    replacing the centered poster stack. Mobile block below re-stacks it. */
@@ -4810,8 +4936,8 @@ ap{
 .ff2-shell{
   /* Density-derived sizing (overridden by .ff2-density-* modifiers) */
   --ff-card-w:        108px;
-  --ff-card-fs-name:  11px;
-  --ff-card-fs-rank:  12px;
+  --ff-card-fs-name:  12.5px;
+  --ff-card-fs-rank:  13.5px;
   --ff-card-fs-role:  8px;
   --ff-card-pad-x:    6px;
   --ff-card-pad-y:    3px;
@@ -4838,8 +4964,8 @@ ap{
 
 .ff2-shell.ff2-density-compact{
   --ff-card-w:        78px;
-  --ff-card-fs-name:  10px;
-  --ff-card-fs-rank:  10.5px;
+  --ff-card-fs-name:  11px;
+  --ff-card-fs-rank:  11.5px;
   --ff-card-fs-role:  0px;
   --ff-card-pad-x:    4px;
   --ff-card-pad-y:    2px;
@@ -4847,8 +4973,8 @@ ap{
 }
 .ff2-shell.ff2-density-comfortable{
   --ff-card-w:        140px;
-  --ff-card-fs-name:  13px;
-  --ff-card-fs-rank:  14px;
+  --ff-card-fs-name:  14px;
+  --ff-card-fs-rank:  15px;
   --ff-card-fs-role:  9px;
   --ff-card-pad-x:    8px;
   --ff-card-pad-y:    5px;
@@ -5049,7 +5175,7 @@ ap{
              box-shadow .15s,border-color .15s,opacity .18s,filter .18s;
   transform:translate(-50%,-50%);
   /* Entrance animation — only plays while shell has .ff2-staged */
-  animation:ff2-card-in .42s cubic-bezier(.2,.7,.3,1) both;
+  animation:ff2-card-in var(--dur-slow) var(--ease-out) both;
   animation-delay:var(--ff-stagger,0ms);
 }
 .ff2-card:active{cursor:grabbing}
@@ -5099,6 +5225,10 @@ ap{
   font-size:var(--ff-card-fs-rank);font-weight:900;
   color:var(--tier-color);opacity:1;flex-shrink:0;line-height:1;
   letter-spacing:0;
+  /* Shadow lifts the tier-colored rank off the busy plot background so it
+     stays legible even where a card sits over a gridline or another card's
+     glow. */
+  text-shadow:0 1px 2px rgba(0,0,0,.65);
 }
 /* Metric value displayed in the top row — replaces the redundant pos-color
    dot. Tabular-nums keeps the digits aligned column-to-column across cards. */
@@ -5114,10 +5244,13 @@ ap{
 .ff2-card-name{
   font-family:'Barlow Condensed',sans-serif;
   font-size:var(--ff-card-fs-name);font-weight:900;
-  color:rgba(255,255,255,.95);
+  color:#fff;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
   line-height:1.15;padding:0 var(--ff-card-pad-x);
   letter-spacing:.15px;
+  /* Subtle shadow so the white name reads cleanly over varied card fills and
+     the plot behind translucent cards. */
+  text-shadow:0 1px 2px rgba(0,0,0,.6);
 }
 /* Role: brightened from .42 to a tier-tinted mix so it inherits a faint
    cast of the tier color (gold on franchise, purple on lottery, etc.) —
@@ -5513,12 +5646,12 @@ ap{
      hidden (fs 0) per the shared density rule. */
   .ff2-shell.ff2-density-compact{
     --ff-card-w:        88px;
-    --ff-card-fs-name:  10.5px;
-    --ff-card-fs-rank:  11px;
+    --ff-card-fs-name:  11.5px;
+    --ff-card-fs-rank:  12px;
   }
   .ff2-shell.ff2-density-standard{
     --ff-card-w:        96px;
-    --ff-card-fs-name:  11px;
+    --ff-card-fs-name:  12px;
   }
 
   /* Expanded card — fill more of viewport on tap */
@@ -5559,7 +5692,7 @@ ap{
 .ff2-export-modal{
   background:#0A1525;border:1px solid rgba(255,255,255,.12);
   border-radius:12px;padding:22px;max-width:440px;width:100%;
-  box-shadow:0 24px 64px rgba(0,0,0,.7);
+  box-shadow:var(--elev-4),var(--ring-hair);
   font-family:'Barlow Condensed',sans-serif;color:white;
 }
 .ff2-export-title{
@@ -19564,6 +19697,7 @@ var FreeformLayout = (function() {
     // On a narrower plot, MIN_X is larger in % terms — denser collision detection.
     var CARD_W_PX = 110, GAP_PX = 12;
     var MIN_X = (CARD_W_PX + GAP_PX) / Math.max(plotW, 300) * 100;
+
     for (var pass = 0; pass < layout.COLLISION_PASSES; pass++) {
       for (var i = 1; i < placed.length; i++) {
         for (var j = 0; j < i; j++) {
@@ -19571,13 +19705,44 @@ var FreeformLayout = (function() {
           var dy = Math.abs(placed[i].y - placed[j].y);
           if (dx < MIN_X && dy < MIN_Y) {
             var push = (MIN_Y - dy) * layout.COLLISION_Y_PUSH;
-            var dir  = placed[i].y >= placed[j].y ? 1 : -1;
+            // RANK-AWARE PUSH: the vertical axis encodes draft rank (top = #1),
+            // so a collision must never flip rank order. Instead of pushing by
+            // current Y position (which could shove a worse-ranked card ABOVE a
+            // better-ranked one), push by RANK: the better-ranked player (lower
+            // rank number) moves up, the worse-ranked moves down. This keeps the
+            // board reading top-to-bottom in draft order within every column.
+            var iIsBetter = placed[i].p.rank < placed[j].p.rank;
+            var dir = iIsBetter ? -1 : 1;   // better rank -> up (smaller Y)
             placed[i].y += dir * push;
             placed[i].y  = Math.max(layout.Y_TOP_PCT, Math.min(layout.Y_BOT_PCT, placed[i].y));
           }
         }
       }
     }
+
+    // FINAL ENFORCEMENT: after the iterative nudging, guarantee strict rank
+    // ordering within each X-column. Group cards whose X values fall in the same
+    // column band, sort each group by rank, and re-stack any pair that is still
+    // out of order so that better rank is always at a smaller Y. This converts
+    // the soft collision result into a hard guarantee the eye can rely on.
+    var byCol = {};
+    for (var k = 0; k < placed.length; k++) {
+      var colKey = Math.round(placed[k].x / Math.max(MIN_X, 0.001));
+      (byCol[colKey] || (byCol[colKey] = [])).push(placed[k]);
+    }
+    Object.keys(byCol).forEach(function(key) {
+      var col = byCol[key];
+      if (col.length < 2) return;
+      // Ascending rank = ascending desired Y (top to bottom).
+      col.sort(function(a, b) { return a.p.rank - b.p.rank; });
+      for (var n = 1; n < col.length; n++) {
+        var minY = col[n - 1].y + MIN_Y;          // must sit at least MIN_Y below
+        if (col[n].y < minY) {
+          col[n].y = Math.min(layout.Y_BOT_PCT, minY);
+        }
+      }
+    });
+
     return placed;
   }
 
