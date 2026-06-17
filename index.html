@@ -1283,77 +1283,604 @@ tr:hover td{background:var(--gray-50)}
 .watch-banner{background:linear-gradient(135deg,#162340,#1e3a6e);border-radius:12px;padding:18px 22px;margin-bottom:18px;display:flex;align-items:center;gap:14px}
 .watch-badge{background:rgba(245,158,11,.2);border:1px solid rgba(245,158,11,.4);color:var(--amber-light);font-size:var(--text-10);font-weight:700;padding:3px 9px;border-radius:4px;text-transform:uppercase;letter-spacing:.5px}
 
-/* ═══════════════════════════════════════════════════════════
-   COMP EXPLORER — Complete Design System
-   ═══════════════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════════════════════
+   COMP EXPLORER V2 — A+ Redesign
+   Replaces the entire .comp-* block (lines ~1286-1356 in index.html).
+   Mobile rules in the existing @media block (~lines 1889-1920, 2080-2090)
+   for .comp-mobile-cards / .comp-tbl can be DELETED — V2 has its own
+   responsive system below.
+   ═══════════════════════════════════════════════════════════════════════════ */
 
-/* Search card */
-.comp-search-card{background:white;border:1.5px solid var(--gray-200);border-radius:12px;padding:20px;margin-bottom:18px;box-shadow:var(--shadow-sm)}
+/* ── Anchor strip (replaces .comp-search-card + .comp-player-header) ─────── */
+.cev2-anchor {
+  background: linear-gradient(135deg, var(--navy) 0%, #14264a 55%, #1a2f58 100%);
+  border-radius: 14px;
+  padding: 16px 20px;
+  margin-bottom: 14px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 18px;
+  align-items: center;
+  box-shadow: 0 4px 20px rgba(10, 22, 40, 0.18);
+  position: relative;
+  overflow: hidden;
+}
+.cev2-anchor::before {
+  /* subtle radial highlight, signals "this is the hero" */
+  content: '';
+  position: absolute;
+  top: -40%; right: -10%;
+  width: 320px; height: 320px;
+  background: radial-gradient(circle, rgba(212,168,48,0.10) 0%, transparent 60%);
+  pointer-events: none;
+}
+.cev2-anchor-left { display: flex; align-items: center; gap: 14px; min-width: 0; position: relative; }
+.cev2-anchor-text { min-width: 0; flex: 1; }
+.cev2-anchor-name {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 28px; font-weight: 900; color: white;
+  line-height: 1; letter-spacing: -0.3px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.cev2-anchor-meta {
+  font-size: var(--text-xs); color: rgba(255,255,255,0.6);
+  margin-top: 5px; font-weight: 500; letter-spacing: 0.2px;
+}
+.cev2-anchor-meta b { color: rgba(255,255,255,0.85); font-weight: 700; }
+.cev2-anchor-metric { text-align: right; flex-shrink: 0; position: relative; }
+.cev2-anchor-metric-val {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 44px; font-weight: 900; color: var(--amber);
+  line-height: 1; letter-spacing: -1.2px;
+}
+.cev2-anchor-metric-lbl {
+  font-size: var(--text-3xs); color: rgba(255,255,255,0.45);
+  text-transform: uppercase; letter-spacing: 0.6px; margin-top: 3px;
+}
+/* Pivot banner shown when anchor != selected 2026 prospect */
+.cev2-pivot-banner {
+  background: rgba(212,168,48,0.14);
+  border: 1px solid rgba(212,168,48,0.35);
+  color: var(--amber-light, #fbbf24);
+  font-size: var(--text-2xs); font-weight: 700;
+  padding: 4px 10px; border-radius: 6px;
+  display: inline-flex; align-items: center; gap: 8px;
+  text-transform: uppercase; letter-spacing: 0.4px;
+  margin-bottom: 6px;
+  font-family: 'Barlow Condensed', sans-serif;
+}
+.cev2-pivot-banner button {
+  background: rgba(0,0,0,0.25); border: 0; color: white;
+  border-radius: 4px; padding: 2px 6px; cursor: pointer;
+  font-size: var(--text-10); font-weight: 700;
+}
+.cev2-pivot-banner button:hover { background: rgba(0,0,0,0.4); }
 
-/* Prospect header card (dark navy) */
-.comp-player-header{background:linear-gradient(135deg,var(--navy) 0%,#1a2f58 100%);border-radius:12px;padding:18px 20px;display:flex;align-items:center;gap:14px;margin-bottom:14px;box-shadow:var(--shadow-md)}
-.comp-header-name{font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:900;color:white;line-height:1;letter-spacing:-.2px}
-.comp-header-sub{font-size:var(--text-xs);color:rgba(255,255,255,.55);margin-top:3px;font-weight:500;letter-spacing:.1px}
-.comp-header-metric{text-align:right;flex-shrink:0}
-.comp-header-text{flex:1;min-width:0}
-.comp-header-metric-val{font-family:'Barlow Condensed',sans-serif;font-size:42px;font-weight:900;color:var(--amber);line-height:1;letter-spacing:-1px}
-.comp-header-metric-lbl{font-size:var(--text-3xs);color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.6px;margin-top:2px}
+/* ── Picker (searchable) ─────────────────────────────────────────────────── */
+.cev2-picker { position: relative; }
+.cev2-picker-input {
+  width: 280px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 8px;
+  padding: 9px 12px 9px 34px;
+  color: white;
+  font-size: var(--text-sm);
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 500;
+  outline: none;
+  transition: all 0.15s;
+}
+.cev2-picker-input::placeholder { color: rgba(255,255,255,0.45); }
+.cev2-picker-input:focus {
+  background: rgba(255,255,255,0.14);
+  border-color: var(--amber);
+  box-shadow: 0 0 0 3px rgba(212,168,48,0.2);
+}
+.cev2-picker-icon {
+  position: absolute; left: 11px; top: 50%; transform: translateY(-50%);
+  color: rgba(255,255,255,0.5); pointer-events: none;
+  font-size: 14px;
+}
+.cev2-picker-dropdown {
+  position: absolute; top: calc(100% + 6px); left: 0; right: 0;
+  background: white; border: 1px solid var(--gray-200);
+  border-radius: 8px; max-height: 320px; overflow-y: auto;
+  box-shadow: 0 12px 32px rgba(10,22,40,0.18);
+  z-index: 50; display: none;
+}
+.cev2-picker.open .cev2-picker-dropdown { display: block; }
+.cev2-picker-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 12px; cursor: pointer;
+  border-bottom: 1px solid var(--gray-50);
+}
+.cev2-picker-item:last-child { border-bottom: none; }
+.cev2-picker-item:hover, .cev2-picker-item.focused { background: var(--blue-50); }
+.cev2-picker-rank {
+  font-family: 'Barlow Condensed', sans-serif; font-size: var(--text-base);
+  font-weight: 900; color: var(--blue); min-width: 24px; text-align: right;
+}
+.cev2-picker-name {
+  font-family: 'Barlow Condensed', sans-serif; font-size: var(--text-base);
+  font-weight: 800; color: var(--navy); flex: 1;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.cev2-picker-pos {
+  font-size: var(--text-2xs); color: var(--gray-500);
+  text-transform: uppercase; letter-spacing: 0.4px; font-weight: 700;
+}
+.cev2-picker-empty {
+  padding: 24px 12px; text-align: center; color: var(--gray-400);
+  font-size: var(--text-sm);
+}
 
-/* Section dividers */
-.comp-section-title{font-family:'Barlow Condensed',sans-serif;font-size:var(--text-14);font-weight:800;color:var(--navy);text-transform:uppercase;letter-spacing:.7px;margin:14px 0 8px;display:flex;align-items:center;gap:6px}
-.comp-section-title span{font-family:'DM Sans','DM Sans',sans-serif;font-size:var(--text-2xs);font-weight:500;color:var(--gray-400);text-transform:none;letter-spacing:0}
+/* ── Controls strip (lens + dimension weights + topN) ────────────────────── */
+.cev2-controls {
+  background: white;
+  border: 1px solid var(--gray-200);
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin-bottom: 14px;
+  display: flex; flex-wrap: wrap; gap: 14px;
+  align-items: center;
+  box-shadow: var(--shadow-sm);
+}
+.cev2-ctrl-group { display: flex; align-items: center; gap: 6px; }
+.cev2-ctrl-label {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: var(--text-2xs); font-weight: 800;
+  color: var(--gray-500); text-transform: uppercase; letter-spacing: 0.6px;
+}
 
-/* Manual comp chips */
-.comps-list{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:4px}
-.comp-chip{background:var(--blue-50);border-radius:6px;padding:4px 11px;font-family:'Barlow Condensed',sans-serif;font-size:var(--text-sm);font-weight:700;color:var(--blue);border:1px solid #BFDBFE;letter-spacing:.1px}
+/* Lens toggle */
+.cev2-lens { display: inline-flex; background: var(--gray-100); border-radius: 8px; padding: 3px; }
+.cev2-lens-btn {
+  background: transparent; border: 0; cursor: pointer;
+  padding: 6px 12px; border-radius: 6px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: var(--text-2xs); font-weight: 800;
+  color: var(--gray-500); text-transform: uppercase; letter-spacing: 0.5px;
+  transition: all 0.15s;
+}
+.cev2-lens-btn.active {
+  background: white; color: var(--navy);
+  box-shadow: 0 1px 3px rgba(10,22,40,0.1);
+}
+.cev2-lens-btn:hover:not(.active) { color: var(--navy); }
 
-/* Draft pick chips */
-.draft-chip{display:inline-flex;align-items:center;justify-content:center;color:white;font-size:var(--text-10);font-weight:700;padding:2px 7px;border-radius:4px;font-family:'Barlow Condensed',sans-serif;background:var(--navy);white-space:nowrap}
-.draft-chip.top{background:linear-gradient(135deg,#2C4569,#A855F7)}
-.draft-chip.udfa{background:var(--gray-500)}
+/* Top N segmented */
+.cev2-topn { display: inline-flex; background: var(--gray-100); border-radius: 6px; padding: 2px; }
+.cev2-topn-btn {
+  background: transparent; border: 0; cursor: pointer;
+  padding: 4px 9px; border-radius: 4px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: var(--text-2xs); font-weight: 800;
+  color: var(--gray-500);
+}
+.cev2-topn-btn.active { background: var(--navy); color: white; }
 
-/* ── Table wrapper ── */
-.comp-tbl-wrap{background:white;border:1.5px solid var(--gray-200);border-radius:12px;overflow:hidden;box-shadow:var(--shadow-sm)}
-.comp-mobile-cards{display:none}
+/* Dimension weight sliders */
+.cev2-weights {
+  display: flex; flex-wrap: wrap; gap: 12px;
+  padding-left: 14px;
+  border-left: 1px solid var(--gray-200);
+  flex: 1; min-width: 0;
+}
+.cev2-weight {
+  display: flex; flex-direction: column; gap: 3px; min-width: 76px;
+}
+.cev2-weight-lbl {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: var(--text-9h); font-weight: 800;
+  color: var(--gray-600); text-transform: uppercase; letter-spacing: 0.4px;
+  display: flex; justify-content: space-between; align-items: baseline;
+}
+.cev2-weight-val {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 800; font-size: var(--text-10);
+  color: var(--blue);
+}
+.cev2-weight-val.dim { color: var(--gray-300); }
+.cev2-weight-val.boost { color: var(--amber); }
+.cev2-weight input[type=range] {
+  -webkit-appearance: none; appearance: none;
+  width: 100%; height: 4px; background: var(--gray-200);
+  border-radius: 2px; outline: none; margin: 0;
+}
+.cev2-weight input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none; appearance: none;
+  width: 14px; height: 14px; border-radius: 50%;
+  background: var(--blue); cursor: pointer;
+  border: 2px solid white; box-shadow: 0 1px 3px rgba(10,22,40,0.2);
+  transition: transform 0.1s;
+}
+.cev2-weight input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.15); }
+.cev2-weight input[type=range]::-moz-range-thumb {
+  width: 14px; height: 14px; border-radius: 50%;
+  background: var(--blue); cursor: pointer;
+  border: 2px solid white; box-shadow: 0 1px 3px rgba(10,22,40,0.2);
+}
 
-/* ── Table base ── */
-.comp-tbl{width:100%;border-collapse:collapse}
-.comp-tbl thead tr{background:var(--gray-100);border-bottom:2px solid var(--gray-200)}
-.comp-tbl th{font-family:'Barlow Condensed',sans-serif;font-size:var(--text-sm);font-weight:800;color:var(--gray-500);text-transform:uppercase;letter-spacing:.5px;padding:10px 12px;text-align:center;white-space:nowrap}
-.comp-tbl th:first-child{text-align:left;padding-left:16px;min-width:180px}
-.comp-tbl .stat-col{min-width:76px}
+.cev2-weight-reset {
+  background: transparent; border: 1px solid var(--gray-200);
+  color: var(--gray-500); border-radius: 6px;
+  padding: 5px 10px; font-size: var(--text-10); font-weight: 700;
+  cursor: pointer; font-family: 'Barlow Condensed', sans-serif;
+  text-transform: uppercase; letter-spacing: 0.4px;
+}
+.cev2-weight-reset:hover { background: var(--gray-50); color: var(--navy); }
 
-/* ── Pinned prospect row ── */
-.prospect-row td{background:var(--blue-50);border-bottom:2px solid #BFDBFE}
-.prospect-row:hover td{background:var(--blue-100)}
-.prospect-label{display:inline-block;font-family:'Barlow Condensed',sans-serif;font-size:var(--text-3xs);font-weight:800;text-transform:uppercase;letter-spacing:.4px;background:var(--blue);color:white;padding:1px 6px;border-radius:3px}
+/* ── Section title ───────────────────────────────────────────────────────── */
+.cev2-section {
+  display: flex; align-items: baseline; justify-content: space-between;
+  margin: 18px 0 10px;
+  gap: 12px;
+}
+.cev2-section-title {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: var(--text-14); font-weight: 800;
+  color: var(--navy); text-transform: uppercase; letter-spacing: 0.7px;
+  display: flex; align-items: baseline; gap: 8px;
+}
+.cev2-section-title span {
+  font-family: 'DM Sans', sans-serif;
+  font-size: var(--text-2xs); font-weight: 500;
+  color: var(--gray-400); text-transform: none; letter-spacing: 0;
+}
 
-/* ── Comp rows ── */
-.comp-row-tr td{border-bottom:1px solid var(--gray-100);transition:background .1s}
-.comp-row-tr:hover td{background:var(--gray-50)}
-.comp-row-tr:last-child td{border-bottom:none}
+/* ── Eye-test reconciliation row ─────────────────────────────────────────── */
+.cev2-eyetest {
+  background: white; border: 1px solid var(--gray-200);
+  border-radius: 10px; padding: 10px 14px;
+  display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+  margin-bottom: 14px;
+}
+.cev2-eyetest-lbl {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: var(--text-2xs); font-weight: 800;
+  color: var(--gray-500); text-transform: uppercase; letter-spacing: 0.5px;
+  margin-right: 4px;
+}
+.cev2-eyetest-chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--blue-50); border: 1px solid #BFDBFE;
+  color: var(--blue); border-radius: 16px; padding: 3px 10px;
+  font-size: var(--text-xs); font-weight: 700;
+  font-family: 'Barlow Condensed', sans-serif; letter-spacing: 0.2px;
+}
+.cev2-eyetest-chip .rank-tag {
+  background: var(--blue); color: white;
+  font-size: var(--text-9h); font-weight: 800;
+  padding: 1px 6px; border-radius: 3px; letter-spacing: 0.3px;
+}
+.cev2-eyetest-chip .rank-tag.miss { background: var(--gray-400); }
+.cev2-eyetest-chip .rank-tag.hit  { background: #15803d; }
 
-/* ── All cells ── */
-.comp-tbl td{padding:8px 12px;vertical-align:middle;text-align:center}
-.comp-tbl td:first-child{text-align:left;padding-left:16px}
+/* ── Top-3 headline cards ────────────────────────────────────────────────── */
+.cev2-top3 {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 12px; margin-bottom: 6px;
+}
+.cev2-top3-card {
+  background: white; border: 1.5px solid var(--gray-200);
+  border-radius: 14px; padding: 14px 14px 12px;
+  position: relative; cursor: pointer;
+  transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+}
+.cev2-top3-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
+  background: var(--card-accent, var(--blue));
+}
+.cev2-top3-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--card-accent, var(--blue));
+  box-shadow: 0 8px 24px rgba(10,22,40,0.10);
+}
+.cev2-top3-rank {
+  position: absolute; top: 10px; right: 12px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: var(--text-10); font-weight: 800;
+  color: var(--gray-400); text-transform: uppercase; letter-spacing: 0.5px;
+}
+.cev2-top3-head { display: flex; align-items: center; gap: 12px; margin-top: 6px; }
+.cev2-top3-arc { flex-shrink: 0; position: relative; width: 64px; height: 64px; }
+.cev2-top3-arc-pct {
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+  flex-direction: column;
+}
+.cev2-top3-arc-num {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 20px; font-weight: 900; color: var(--navy); line-height: 1;
+}
+.cev2-top3-arc-sub {
+  font-size: 8px; font-weight: 700; color: var(--gray-400);
+  text-transform: uppercase; letter-spacing: 0.4px; margin-top: 1px;
+}
+.cev2-top3-info { min-width: 0; flex: 1; }
+.cev2-top3-name {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 19px; font-weight: 800; color: var(--navy); line-height: 1.1;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.cev2-top3-school {
+  font-size: var(--text-2xs); color: var(--gray-500);
+  margin-top: 3px; font-weight: 600;
+}
+.cev2-top3-chips {
+  display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap;
+}
+.cev2-top3-chip {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: var(--text-10); font-weight: 700;
+  padding: 2px 8px; border-radius: 4px; letter-spacing: 0.3px;
+  background: var(--gray-100); color: var(--gray-700);
+}
+.cev2-top3-chip.draft-lottery {
+  background: linear-gradient(135deg, #2C4569, #A855F7); color: white;
+}
+.cev2-top3-chip.draft-late1   { background: var(--navy); color: white; }
+.cev2-top3-chip.draft-2nd     { background: var(--gray-500); color: white; }
+.cev2-top3-chip.draft-undraft { background: var(--gray-200); color: var(--gray-600); }
+.cev2-top3-fingerprint {
+  display: flex; gap: 3px; margin-top: 10px;
+  padding-top: 10px; border-top: 1px dashed var(--gray-100);
+}
+.cev2-top3-actions {
+  display: flex; gap: 6px; margin-top: 10px;
+}
+.cev2-top3-action {
+  flex: 1;
+  background: var(--gray-50); border: 1px solid var(--gray-200);
+  color: var(--gray-700); border-radius: 6px;
+  padding: 5px 8px; font-size: var(--text-10); font-weight: 700;
+  cursor: pointer; font-family: 'Barlow Condensed', sans-serif;
+  text-transform: uppercase; letter-spacing: 0.3px;
+  display: inline-flex; align-items: center; justify-content: center; gap: 4px;
+  transition: all 0.12s;
+}
+.cev2-top3-action:hover { background: var(--blue-50); border-color: #BFDBFE; color: var(--blue); }
 
-/* ── Name cell layout ── */
-.comp-name-cell{display:flex;align-items:center;gap:8px}
-.comp-name-main{font-family:'Barlow Condensed',sans-serif;font-size:var(--text-base);font-weight:800;color:var(--navy);line-height:1.2;white-space:nowrap}
-.comp-name-sub{font-size:var(--text-2xs);color:var(--gray-400);margin-top:2px;white-space:nowrap}
+/* ── Draft outcome distribution strip ────────────────────────────────────── */
+.cev2-draftstrip {
+  background: white; border: 1px solid var(--gray-200);
+  border-radius: 10px; padding: 12px 14px; margin-bottom: 14px;
+  display: flex; flex-direction: column; gap: 8px;
+}
+.cev2-draftstrip-head {
+  display: flex; align-items: baseline; justify-content: space-between;
+}
+.cev2-draftstrip-title {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: var(--text-xs); font-weight: 800;
+  color: var(--gray-600); text-transform: uppercase; letter-spacing: 0.5px;
+}
+.cev2-draftstrip-title b { color: var(--navy); }
+.cev2-draftstrip-sub {
+  font-size: var(--text-10); color: var(--gray-400);
+}
+.cev2-draftstrip-bar {
+  display: flex; height: 22px; border-radius: 6px; overflow: hidden;
+  background: var(--gray-100);
+}
+.cev2-draftstrip-seg {
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: var(--text-10); font-weight: 800; color: white;
+  letter-spacing: 0.3px; min-width: 0;
+  transition: filter 0.15s;
+}
+.cev2-draftstrip-seg:hover { filter: brightness(1.1); }
+.cev2-draftstrip-seg.lottery { background: linear-gradient(135deg, #2C4569, #A855F7); }
+.cev2-draftstrip-seg.late1   { background: var(--navy); }
+.cev2-draftstrip-seg.sec     { background: var(--gray-500); }
+.cev2-draftstrip-seg.undraft { background: var(--gray-300); color: var(--gray-700); }
+.cev2-draftstrip-legend {
+  display: flex; gap: 12px; flex-wrap: wrap;
+  font-size: var(--text-10); color: var(--gray-500); font-weight: 600;
+}
+.cev2-draftstrip-legend .dot {
+  display: inline-block; width: 8px; height: 8px; border-radius: 2px; margin-right: 4px;
+  vertical-align: middle;
+}
 
-/* ── Stat value + delta ── */
-.ctd-missing{font-size:var(--text-xs);color:var(--gray-200)}
+/* ── Fingerprint dots (used in top3 + list) ──────────────────────────────── */
+.cev2-fp-dot {
+  width: 10px; height: 10px; border-radius: 50%;
+  background: var(--gray-200); flex-shrink: 0;
+  position: relative; cursor: help;
+}
+.cev2-fp-dot.match { background: #16A34A; }
+.cev2-fp-dot.close { background: #F59E0B; }
+.cev2-fp-dot.diff  { background: #EF4444; }
+.cev2-fp-dot.na    { background: var(--gray-200); }
+.cev2-fp-dot.neu   { background: var(--gray-400); }
+.cev2-fp-dot.sortable { cursor: pointer; transition: transform 0.1s; }
+.cev2-fp-dot.sortable:hover { transform: scale(1.4); }
 
-/* ── Sim score badge ── */
-.comp-sim-badge{display:inline-flex;flex-direction:column;align-items:center;border-radius:7px;padding:5px 10px;min-width:56px}
-.comp-sim-val{font-family:'Barlow Condensed',sans-serif;font-size:var(--text-20);font-weight:900;line-height:1}
-.comp-sim-lbl{font-size:var(--text-3xs);font-weight:700;text-transform:uppercase;letter-spacing:.4px;opacity:.7;margin-top:1px}
+/* ── Compact list (replaces wide table) ──────────────────────────────────── */
+.cev2-list {
+  background: white; border: 1px solid var(--gray-200);
+  border-radius: 12px; overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+.cev2-list-head {
+  display: grid;
+  grid-template-columns: 32px 1fr 90px 130px 80px 70px;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 14px;
+  background: var(--gray-50); border-bottom: 2px solid var(--gray-200);
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: var(--text-10); font-weight: 800;
+  color: var(--gray-500); text-transform: uppercase; letter-spacing: 0.5px;
+}
+.cev2-list-head .col-sortable { cursor: pointer; user-select: none; }
+.cev2-list-head .col-sortable:hover { color: var(--navy); }
+.cev2-list-head .col-sortable.active { color: var(--blue); }
+.cev2-list-head .col-sortable.active::after { content: ' ↓'; }
+.cev2-row {
+  display: grid;
+  grid-template-columns: 32px 1fr 90px 130px 80px 70px;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 14px;
+  border-bottom: 1px solid var(--gray-100);
+  transition: background 0.12s;
+  cursor: pointer;
+}
+.cev2-row:last-child { border-bottom: none; }
+.cev2-row:hover { background: var(--gray-50); }
+.cev2-row.expanded { background: var(--blue-50); }
+.cev2-row-idx {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: var(--text-base); font-weight: 900;
+  color: var(--gray-400); text-align: right;
+}
+.cev2-row.expanded .cev2-row-idx { color: var(--blue); }
+.cev2-row-info { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.cev2-row-name {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: var(--text-base); font-weight: 800; color: var(--navy);
+  line-height: 1.15;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.cev2-row-school {
+  font-size: var(--text-2xs); color: var(--gray-500);
+  margin-top: 1px; font-weight: 600;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.cev2-row-fp { display: flex; gap: 3px; align-items: center; }
+.cev2-row-sim {
+  display: flex; align-items: center; gap: 8px;
+}
+.cev2-row-sim-arc { width: 34px; height: 34px; flex-shrink: 0; }
+.cev2-row-sim-num {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: var(--text-base); font-weight: 900;
+  line-height: 1;
+}
+.cev2-row-sim-lbl {
+  font-size: 8px; font-weight: 700; color: var(--gray-400);
+  text-transform: uppercase; letter-spacing: 0.4px; margin-top: 1px;
+}
+.cev2-row-draft {
+  display: flex; justify-content: center;
+}
+.cev2-row-actions {
+  display: flex; gap: 4px; justify-content: flex-end;
+}
+.cev2-row-act {
+  background: transparent; border: 1px solid var(--gray-200);
+  border-radius: 5px; padding: 4px 7px;
+  color: var(--gray-500); cursor: pointer;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: var(--text-10); font-weight: 800;
+  transition: all 0.12s;
+}
+.cev2-row-act:hover { background: var(--blue-50); border-color: #BFDBFE; color: var(--blue); }
+.cev2-row-act.pivot:hover { background: rgba(212,168,48,0.15); border-color: rgba(212,168,48,0.4); color: var(--amber); }
 
-/* ── Add to Compare button ── */
-.comp-add-compare-btn{background:var(--blue-50);border:1px solid #BFDBFE;color:var(--blue);border-radius:6px;padding:3px 9px;font-size:var(--text-2xs);font-weight:700;cursor:pointer;white-space:nowrap;line-height:1.4;transition:all .15s;font-family:'Barlow Condensed',sans-serif;letter-spacing:.3px}
-.comp-add-compare-btn:hover{background:var(--blue-100);border-color:var(--blue-300)}
-.comp-add-compare-btn:active{background:#BFDBFE}
+/* Expanded detail row */
+.cev2-detail {
+  display: none;
+  padding: 12px 14px 14px 56px;
+  background: var(--gray-50);
+  border-bottom: 1px solid var(--gray-100);
+}
+.cev2-row.expanded + .cev2-detail { display: block; }
+.cev2-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(9, 1fr);
+  gap: 8px;
+}
+.cev2-detail-cell {
+  background: white; border: 1px solid var(--gray-200);
+  border-radius: 6px; padding: 6px 8px;
+  text-align: center;
+}
+.cev2-detail-lbl {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 9px; font-weight: 800;
+  color: var(--gray-400); text-transform: uppercase; letter-spacing: 0.4px;
+}
+.cev2-detail-val {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: var(--text-sm); font-weight: 800;
+  color: var(--navy); margin-top: 2px;
+}
+.cev2-detail-delta {
+  font-size: var(--text-10); font-weight: 700;
+  margin-top: 1px;
+}
+.cev2-detail-delta.pos { color: #15803d; }
+.cev2-detail-delta.neg { color: #B91C1C; }
+.cev2-detail-delta.neu { color: var(--gray-400); }
+
+/* Draft chip — reusable */
+.cev2-draftchip {
+  display: inline-flex; align-items: center; justify-content: center;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: var(--text-10); font-weight: 800; color: white;
+  padding: 2px 8px; border-radius: 4px; letter-spacing: 0.3px;
+  white-space: nowrap;
+}
+.cev2-draftchip.lottery { background: linear-gradient(135deg, #2C4569, #A855F7); }
+.cev2-draftchip.late1   { background: var(--navy); }
+.cev2-draftchip.sec     { background: var(--gray-500); }
+.cev2-draftchip.undraft { background: var(--gray-300); color: var(--gray-700); }
+
+.cev2-empty {
+  text-align: center; padding: 40px 24px;
+  color: var(--gray-400); font-size: var(--text-sm);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   RESPONSIVE: tablet (≤900px) — controls wrap, weights collapse to 3-col
+   ───────────────────────────────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .cev2-anchor { grid-template-columns: 1fr; gap: 12px; padding: 14px 16px; }
+  .cev2-anchor-metric { text-align: left; }
+  .cev2-anchor-metric-val { font-size: 34px; }
+  .cev2-picker-input { width: 100%; }
+  .cev2-weights {
+    border-left: 0; padding-left: 0;
+    border-top: 1px solid var(--gray-200); padding-top: 10px; margin-top: 4px;
+    width: 100%;
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
+  }
+  .cev2-weight { min-width: 0; }
+  .cev2-top3 { grid-template-columns: 1fr; }
+  .cev2-list-head, .cev2-row {
+    grid-template-columns: 28px 1fr 70px 90px 60px;
+  }
+  .cev2-list-head .col-actions, .cev2-row-actions { display: none; }
+  .cev2-detail-grid { grid-template-columns: repeat(3, 1fr); }
+  .cev2-detail { padding-left: 14px; }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   RESPONSIVE: mobile (≤640px) — tighter spacing, single-row controls
+   ───────────────────────────────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .cev2-anchor { padding: 12px 14px; border-radius: 12px; }
+  .cev2-anchor-name { font-size: 22px; }
+  .cev2-anchor-metric-val { font-size: 28px; }
+  .cev2-anchor-meta { font-size: var(--text-2xs); }
+  .cev2-controls { padding: 10px 12px; gap: 10px; }
+  .cev2-weights { grid-template-columns: repeat(2, 1fr); }
+  .cev2-list-head, .cev2-row {
+    grid-template-columns: 24px 1fr 68px 70px;
+  }
+  .cev2-list-head .col-fp, .cev2-row-fp { display: none; }
+  .cev2-row { padding: 10px 12px; }
+  .cev2-row-name { font-size: var(--text-sm); }
+  .cev2-section { margin: 14px 0 8px; }
+  .cev2-top3-card { padding: 12px; }
+  .cev2-top3-name { font-size: 17px; }
+  .cev2-eyetest { padding: 8px 10px; }
+}
 
 /* EMPTY */
 .empty{text-align:center;padding:48px;color:var(--gray-400)}
@@ -1882,42 +2409,6 @@ tr:hover td{background:var(--gray-50)}
   }
   .modal-close-bar button:active{background:var(--gray-200);transition:none}
 
-  /* Comp explorer: hide wide table on mobile, show card layout instead */
-  .comp-tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
-  /* On mobile the wide table is still available via scroll (for power users)
-     but the cards layout is shown first and is the primary affordance */
-  /* Single rule: !important on display beats the desktop .comp-mobile-cards{display:none} */
-  .comp-mobile-cards{display:flex !important;flex-direction:column;gap:8px;padding-top:4px}
-  /* Comp table: hint text above the scrollable wide table on mobile */
-  .comp-tbl-wrap::before{
-    content:'Full comparison table — scroll →';
-    display:block;
-    font-size:var(--text-10);color:var(--gray-400);
-    padding:6px 4px 4px;font-weight:600;
-    letter-spacing:.3px
-  }
-  .comp-tbl{min-width:700px}
-  .comp-mobile-card{
-    background:white;
-    border:1.5px solid var(--gray-200);
-    border-radius:10px;
-    padding:12px 14px;
-    display:flex;align-items:center;gap:12px;
-    cursor:pointer
-  }
-  .comp-mobile-card:active{background:var(--gray-50)}
-  .comp-mobile-sim{
-    font-family:'Barlow Condensed',sans-serif;
-    font-size:var(--text-22);font-weight:900;
-    min-width:48px;text-align:center;
-    line-height:1
-  }
-  .comp-mobile-sim-lbl{font-size:var(--text-8);text-transform:uppercase;letter-spacing:.4px;font-weight:600;display:block;margin-top:1px}
-  .comp-mobile-info{flex:1;min-width:0}
-  .comp-mobile-name{font-family:'Barlow Condensed',sans-serif;font-size:var(--text-base);font-weight:800;color:var(--navy);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .comp-mobile-meta{font-size:var(--text-2xs);color:var(--gray-500);margin-top:2px}
-  .comp-mobile-stats{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
-  .comp-mobile-stat{font-size:var(--text-10);background:var(--gray-50);border-radius:4px;padding:2px 6px;color:var(--gray-700);font-family:'Barlow Condensed',sans-serif;font-weight:700}
 
   /* Methodology hero */
   .mc-hero{padding:16px 16px}
@@ -2080,15 +2571,9 @@ tr:hover td{background:var(--gray-50)}
   }
   /* Intel link buttons, file items, future cards, upload items */
   .file-item:active{background:var(--gray-100) !important;transition:none}
-  .comp-mobile-card:active{background:var(--gray-100) !important;transition:none}
   /* View toggle buttons on mobile — clearer tap state */
   .view-btn{touch-action:manipulation}
   .view-btn:active:not(.active){background:var(--gray-300)!important;color:var(--navy)!important;transition:none}
-
-  /* ── CE-02: Comp explorer table labels — prevent wrapping ────────────── */
-  /* Comp stat labels in the results table — prevent ugly multi-line headers */
-  .comp-tbl th{white-space:nowrap;font-size:var(--text-2xs);padding:7px 9px}
-  .comp-tbl td{font-size:var(--text-sm);padding:7px 9px}
 
   /* ════════════════════════════════════════════════════════════
      CONSOLIDATED MOBILE CSS — merged from 21 orphan MQ blocks
@@ -2755,10 +3240,6 @@ tr:hover td{background:var(--gray-50)}
   .future-cards-grid{grid-template-columns:1fr;gap:10px}
 
   /* Comp explorer: compact */
-  .comp-search-card{padding:14px;border-radius:10px}
-  .comp-search-card > div > div > div:first-child{font-size:var(--text-md)}
-  .comp-search-card > div > div > div:last-child{font-size:var(--text-2xs);line-height:1.5}
-
   /* Empty states */
   .empty{padding:32px 20px}
   .empty-icon{font-size:var(--text-xl);margin-bottom:8px}
@@ -3077,7 +3558,6 @@ tr:hover td{background:var(--gray-50)}
   * { -webkit-print-color-adjust:exact !important; print-color-adjust:exact !important; }
 
   .mdc-actions,.mdc-pool-header .mdc-pool-filters,.mdc-select-btn,.mdc-unpick-btn,.mdc-active-indicator{display:none!important}
-  .comp-mobile-cards{display:none!important}  /* never print card layout */
   .mdc-wrap{height:auto!important;border:none!important;box-shadow:none!important}
   .mdc-pool{display:none!important}
   .mdc-board{width:100%!important}
@@ -6889,31 +7369,72 @@ ock Drafts table CSS ───────────────────�
   </div>
 </section>
 
-<!-- COMP EXPLORER -->
+<!-- ════════════════════════════════════════════════════════════════════════
+     COMP EXPLORER V2 — HTML panel
+     Replaces the ENTIRE existing <section id="tab-comps">…</section>
+     (currently lines ~6892-6917 in index.html).
+     The print-header is kept for screenshot/print parity.
+     ════════════════════════════════════════════════════════════════════════ -->
 <section class="tab-panel" id="tab-comps">
-  <div class="print-header"><div class="print-header-title">HoopsWill NBA Draft Board — Comp Explorer</div><div class="print-header-sub">Statistical Similarity Model · 2019–2026</div></div>
-  <div class="comp-search-card">
-    <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px">
-      <div>
-        <div style="font-family:'Barlow Condensed',sans-serif;font-size:var(--text-22);font-weight:800;color:var(--navy);margin-bottom:4px">🔍 Comp Explorer</div>
-        <div style="font-size:var(--text-xs);color:var(--gray-500);max-width:620px">Finds the closest historical matches using normalized distance across 9 stat dimensions — TS%, P+A/USG, Stl+Bl, A/TO, FTAr, 3PAr, Age, Ht and Wt. Position-agnostic. Lower score = closer statistical match. Only prospects with complete stat data are shown.</div>
+  <div class="print-header">
+    <div class="print-header-title">HoopsWill NBA Draft Board — Comp Explorer</div>
+    <div class="print-header-sub">Statistical Similarity Model · 2019–2026</div>
+  </div>
+
+  <!-- ANCHOR STRIP: prospect picker + selected anchor + HW metric -->
+  <div class="cev2-anchor" id="cev2Anchor">
+    <div class="cev2-anchor-left">
+      <div id="cev2AnchorAvatar"></div>
+      <div class="cev2-anchor-text" id="cev2AnchorText">
+        <div class="cev2-anchor-name">Select a prospect to begin</div>
+        <div class="cev2-anchor-meta">Statistical similarity across 9 dimensions · position-agnostic</div>
       </div>
     </div>
-    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;align-items:center">
-      <select class="filter-select" id="compProspectSelect" style="min-width:260px;font-size:var(--text-14)" onchange="showCompExplorer()">
-        <option value="">— Select a 2026 Prospect —</option>
-      </select>
-      <div style="display:flex;gap:6px;align-items:center">
-        <label style="font-size:var(--text-2xs);font-weight:700;color:var(--gray-500)">Show top:</label>
-        <select class="filter-select" id="compTopN" onchange="showCompExplorer()" style="font-size:var(--text-xs);min-width:70px">
-          <option value="10">10</option>
-          <option value="20" selected>20</option>
-          <option value="30">30</option>
-        </select>
+    <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+      <div class="cev2-picker" id="cev2Picker">
+        <svg class="cev2-picker-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5L14 14"/></svg>
+        <input
+          type="text"
+          class="cev2-picker-input"
+          id="cev2PickerInput"
+          placeholder="Search 2026 prospects…"
+          autocomplete="off"
+          spellcheck="false">
+        <div class="cev2-picker-dropdown" id="cev2PickerDropdown"></div>
+      </div>
+      <div class="cev2-anchor-metric" id="cev2AnchorMetric" style="display:none">
+        <div class="cev2-anchor-metric-val" id="cev2AnchorMetricVal">—</div>
+        <div class="cev2-anchor-metric-lbl">HW Metric</div>
       </div>
     </div>
   </div>
-  <div id="compExplorerResult"></div>
+
+  <!-- CONTROLS: lens + dimension weights + top-N -->
+  <div class="cev2-controls" id="cev2Controls" style="display:none">
+    <div class="cev2-ctrl-group">
+      <span class="cev2-ctrl-label">Lens</span>
+      <div class="cev2-lens" id="cev2Lens">
+        <button class="cev2-lens-btn active" data-lens="stat">Statistical</button>
+        <button class="cev2-lens-btn" data-lens="role">Role-Locked</button>
+        <button class="cev2-lens-btn" data-lens="pedigree">Pedigree</button>
+      </div>
+    </div>
+    <div class="cev2-ctrl-group">
+      <span class="cev2-ctrl-label">Top</span>
+      <div class="cev2-topn" id="cev2TopN">
+        <button class="cev2-topn-btn" data-n="10">10</button>
+        <button class="cev2-topn-btn active" data-n="20">20</button>
+        <button class="cev2-topn-btn" data-n="30">30</button>
+      </div>
+    </div>
+    <div class="cev2-weights" id="cev2Weights">
+      <!-- 6 sliders injected by JS -->
+    </div>
+    <button class="cev2-weight-reset" id="cev2WeightReset" title="Reset all weights to equal">↺ Reset</button>
+  </div>
+
+  <!-- RESULT AREA — populated by JS -->
+  <div id="cev2Result"></div>
 </section>
 
 <!-- MOCKS -->
@@ -10691,334 +11212,829 @@ function renderAnalytics() {
   });
 }
 
-// ── COMP EXPLORER ─────────────────────────────────────────
+// ════════════════════════════════════════════════════════════════════════════
+// COMP EXPLORER V2 — A+ Redesign
+// Replaces:
+//   - function populateCompSelect() (line ~10695)
+//   - function showCompExplorer()   (lines ~10713-11022)
+// And REMOVES the call sites' dependency on #compProspectSelect and #compTopN
+// (the new picker writes into module state directly).
+//
+// Keep the existing hwRenderTab() dispatcher line untouched — it calls
+// populateCompSelect() then showCompExplorer(); both names are preserved.
+// ════════════════════════════════════════════════════════════════════════════
+
+// ── State ───────────────────────────────────────────────────────────────────
+var _ceState = {
+  anchor: null,        // normalized player object (from 2026 board) or pivot target
+  anchorYear: '2026',  // '2026' for prospect anchor, or year string for pivoted historical
+  anchorIsPivot: false,
+  pivotOriginRank: null, // remembers original 2026 rank so "back to prospect" works
+  lens: 'stat',        // 'stat' | 'role' | 'pedigree'
+  topN: 20,
+  weights: { scoring: 1, shooting: 1, playmaking: 1, defense: 1, size: 1, age: 1 },
+  sortDim: null,       // null = by sim score; else stat key for single-dim sort
+  expanded: {},        // { 'name|year': true } for expanded rows
+};
+
+// Field family mapping (drives the 6 weight sliders)
+var _CE_FIELD_FAMILY = {
+  pa2_usg: 'scoring',
+  ts_pct:  'shooting',
+  tpar:    'shooting',
+  ftar:    'shooting',
+  ato:     'playmaking',
+  stl_bl:  'defense',
+  ht:      'size',
+  wt:      'size',
+  age:     'age',
+};
+var _CE_FIELD_ORDER  = ['age','ht','wt','pa2_usg','ftar','tpar','stl_bl','ato','ts_pct'];
+var _CE_FIELD_LABELS = {
+  age:'Age', ht:'Ht', wt:'Wt', pa2_usg:'P+A/USG',
+  ftar:'FTAr', tpar:'3PAr', stl_bl:'Stl+Bl', ato:'A/TO', ts_pct:'TS%', metric:'Metric'
+};
+var _CE_RANGES = {
+  ts_pct:0.3660, pa2_usg:140.3546, stl_bl:8.6250,
+  ato:3.8460, ftar:0.7710, tpar:0.7600,
+  age:6.5407, ht:16, wt:130
+};
+// Neutral fields — small deltas color neutral instead of red/green
+var _CE_NEUTRAL = { age:1, ht:1, wt:1, ftar:1, tpar:1 };
+var _CE_CLOSE_THRESHOLD = 0.05;
+var _CE_DIFF_THRESHOLD  = 0.15;
+
+// ── Entry point (preserves existing name) ───────────────────────────────────
+// hwRenderTab() calls populateCompSelect() then showCompExplorer().
+// We wire both: populateCompSelect builds the picker dataset; showCompExplorer
+// renders the result if an anchor exists.
 function populateCompSelect() {
-  var sel = document.getElementById('compProspectSelect');
-  if (!sel) return;
-  // Guard: DataService may not yet be initialized on very first call
   if (typeof DataService === 'undefined' || typeof DataService.getBoard !== 'function') return;
-  var eligible = DataService.getBoard('2026').filter(function(p){
-    return p.ts_pct && p.ts_pct > 0 && p.pa2_usg && p.pa2_usg > 0
-        && p.stl_bl && p.stl_bl > 0 && p.ato && p.ato > 0;
-  });
-  sel.innerHTML = '<option value="">— Select a prospect (' + eligible.length + ' with full stats) —</option>' +
-    eligible.map(function(p){
-      // SAFETY-1B: name flows into <option> innerText. value attr is the
-      // integer rank so it's safe; the displayed name needs escaping.
-      return '<option value="' + p.rank + '">' + p.rank + '. ' + escHtml(splitName(p.name)[0]) + '</option>';
-    }).join('');
+  _ceWireUI();  // idempotent
+  _ceRenderPicker('');
 }
 
-// ── COMP EXPLORER — STATISTICAL SIMILARITY MODEL ─────────────────────────────
 function showCompExplorer() {
-  // Will add mobile card rendering after computing results
-  var rankVal = document.getElementById('compProspectSelect').value;
-  if (!rankVal) return;
-  var rank   = parseInt(rankVal);
+  _ceWireUI();
+  _ceRender();
+}
+
+// ── One-time UI wiring (idempotent — re-callable safely) ────────────────────
+function _ceWireUI() {
+  if (_ceWireUI._done) return;
+  _ceWireUI._done = true;
+
+  // Build weight sliders
+  var weights = document.getElementById('cev2Weights');
+  if (weights) {
+    var fams = [
+      { k: 'scoring',    lbl: 'Scoring' },
+      { k: 'shooting',   lbl: 'Shooting' },
+      { k: 'playmaking', lbl: 'Playmaking' },
+      { k: 'defense',    lbl: 'Defense' },
+      { k: 'size',       lbl: 'Size' },
+      { k: 'age',        lbl: 'Age' },
+    ];
+    weights.innerHTML = fams.map(function(f) {
+      return '<div class="cev2-weight" data-fam="' + f.k + '">'
+        + '<div class="cev2-weight-lbl"><span>' + f.lbl + '</span>'
+        + '<span class="cev2-weight-val" id="cev2WV_' + f.k + '">1.0×</span></div>'
+        + '<input type="range" min="0" max="2" step="0.1" value="1" data-fam="' + f.k + '">'
+        + '</div>';
+    }).join('');
+    weights.querySelectorAll('input[type=range]').forEach(function(inp) {
+      inp.addEventListener('input', function() {
+        var v = parseFloat(this.value);
+        var fam = this.dataset.fam;
+        _ceState.weights[fam] = v;
+        var lbl = document.getElementById('cev2WV_' + fam);
+        if (lbl) {
+          lbl.textContent = v.toFixed(1) + '×';
+          lbl.className = 'cev2-weight-val' + (v < 0.4 ? ' dim' : v > 1.4 ? ' boost' : '');
+        }
+        _ceRender();
+      });
+    });
+  }
+
+  // Reset weights
+  var reset = document.getElementById('cev2WeightReset');
+  if (reset) {
+    reset.addEventListener('click', function() {
+      Object.keys(_ceState.weights).forEach(function(k) { _ceState.weights[k] = 1; });
+      document.querySelectorAll('#cev2Weights input[type=range]').forEach(function(i) { i.value = 1; });
+      document.querySelectorAll('#cev2Weights .cev2-weight-val').forEach(function(s) {
+        s.textContent = '1.0×'; s.className = 'cev2-weight-val';
+      });
+      _ceRender();
+    });
+  }
+
+  // Lens toggle
+  var lens = document.getElementById('cev2Lens');
+  if (lens) {
+    lens.addEventListener('click', function(e) {
+      var btn = e.target.closest('.cev2-lens-btn'); if (!btn) return;
+      _ceState.lens = btn.dataset.lens;
+      lens.querySelectorAll('.cev2-lens-btn').forEach(function(b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+      _ceRender();
+    });
+  }
+
+  // Top-N segmented
+  var topn = document.getElementById('cev2TopN');
+  if (topn) {
+    topn.addEventListener('click', function(e) {
+      var btn = e.target.closest('.cev2-topn-btn'); if (!btn) return;
+      _ceState.topN = parseInt(btn.dataset.n);
+      topn.querySelectorAll('.cev2-topn-btn').forEach(function(b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+      _ceRender();
+    });
+  }
+
+  // Searchable picker
+  var input = document.getElementById('cev2PickerInput');
+  var dd    = document.getElementById('cev2PickerDropdown');
+  var picker = document.getElementById('cev2Picker');
+  if (input && dd && picker) {
+    input.addEventListener('focus', function() {
+      _ceRenderPicker(input.value);
+      picker.classList.add('open');
+    });
+    input.addEventListener('input', function() {
+      _ceRenderPicker(input.value);
+      picker.classList.add('open');
+    });
+    input.addEventListener('keydown', function(e) {
+      var items = dd.querySelectorAll('.cev2-picker-item');
+      var focused = dd.querySelector('.cev2-picker-item.focused');
+      var idx = focused ? Array.prototype.indexOf.call(items, focused) : -1;
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        if (focused) focused.classList.remove('focused');
+        var n = items[Math.min(idx + 1, items.length - 1)];
+        if (n) { n.classList.add('focused'); n.scrollIntoView({ block: 'nearest' }); }
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        if (focused) focused.classList.remove('focused');
+        var p = items[Math.max(idx - 1, 0)];
+        if (p) { p.classList.add('focused'); p.scrollIntoView({ block: 'nearest' }); }
+      } else if (e.key === 'Enter') {
+        e.preventDefault();
+        var pick = focused || items[0];
+        if (pick) pick.click();
+      } else if (e.key === 'Escape') {
+        picker.classList.remove('open');
+        input.blur();
+      }
+    });
+    document.addEventListener('click', function(e) {
+      if (!picker.contains(e.target)) picker.classList.remove('open');
+    });
+  }
+}
+
+// ── Render the searchable dropdown ──────────────────────────────────────────
+function _ceRenderPicker(query) {
+  var dd = document.getElementById('cev2PickerDropdown');
+  if (!dd) return;
+  var q = (query || '').trim().toLowerCase();
+  var board = DataService.getBoard('2026') || [];
+  var eligible = board.filter(function(p) {
+    return p.ts_pct > 0 && p.pa2_usg > 0 && p.stl_bl > 0 && p.ato > 0;
+  });
+  var matches = q
+    ? eligible.filter(function(p) { return (p.name || '').toLowerCase().indexOf(q) >= 0; })
+    : eligible;
+  matches = matches.slice(0, 50);
+
+  if (!matches.length) {
+    dd.innerHTML = '<div class="cev2-picker-empty">No prospects match "' + escHtml(query) + '"</div>';
+    return;
+  }
+  dd.innerHTML = matches.map(function(p) {
+    var base = splitName(p.name)[0];
+    return '<div class="cev2-picker-item" data-rank="' + p.rank + '">'
+      + '<span class="cev2-picker-rank">' + p.rank + '</span>'
+      + '<span class="cev2-picker-name">' + escHtml(base) + '</span>'
+      + '<span class="cev2-picker-pos">' + escHtml(p.position || '') + '</span>'
+      + '</div>';
+  }).join('');
+  dd.querySelectorAll('.cev2-picker-item').forEach(function(item) {
+    item.addEventListener('click', function() {
+      var rank = parseInt(this.dataset.rank);
+      _ceSelectProspect(rank);
+    });
+  });
+}
+
+// ── Select a 2026 prospect as the anchor ────────────────────────────────────
+function _ceSelectProspect(rank) {
   var player = DataService.findByRank(rank, '2026');
   if (!player) return;
+  _ceState.anchor = player;
+  _ceState.anchorYear = '2026';
+  _ceState.anchorIsPivot = false;
+  _ceState.pivotOriginRank = null;
+  _ceState.sortDim = null;
+  _ceState.expanded = {};
+  var input = document.getElementById('cev2PickerInput');
+  if (input) input.value = '';
+  var picker = document.getElementById('cev2Picker');
+  if (picker) picker.classList.remove('open');
+  _ceRender();
+}
 
-  var topN = parseInt((document.getElementById('compTopN')||{value:'20'}).value)||20;
-  var base   = player.name.indexOf(' - ')>0 ? player.name.slice(0,player.name.indexOf(' - ')) : player.name;
-  var school = player.name.indexOf(' - ')>0 ? player.name.slice(player.name.indexOf(' - ')+3) : '';
-
-  // ── Field order (matches screenshot column order) ─────────────────────────
-  var FIELD_ORDER = ['age','ht','wt','pa2_usg','ftar','tpar','stl_bl','ato','ts_pct','metric'];
-  var FIELD_LABELS = {
-    age:'Age', ht:'Ht', wt:'Wt', pa2_usg:'P+A/USG',
-    ftar:'FTAr', tpar:'3PAr', stl_bl:'Stl+Bl', ato:'A/TO', ts_pct:'TS%', metric:'Metric'
-  };
-  // Ranges for normalized scoring (same as before)
-  // 'metric' intentionally excluded — it is a derived aggregate of these same
-  // stats; including it double-counts the underlying dimensions in the distance.
-  var RANGES = {
-    ts_pct:0.3660, pa2_usg:140.3546, stl_bl:8.6250,
-    ato:3.8460, ftar:0.7710, tpar:0.7600,
-    age:6.5407, ht:16, wt:130
-  };
-
-  function getVal(p, key) {
-    var v = p[key];
-    if (v===null||v===undefined||v===''||v===0) return null;
-    var n = parseFloat(v);
-    return (isNaN(n)||!isFinite(n)) ? null : n;
+// ── Pivot to a historical comp as the anchor ────────────────────────────────
+function _cePivotToComp(compBase, compYear) {
+  // Find the historical player object
+  var year = String(compYear);
+  var pool = (DATA.yoy || []);
+  var target = pool.find(function(c) {
+    var b = (c.name || '').indexOf(' - ') > 0
+      ? c.name.slice(0, c.name.indexOf(' - '))
+      : c.name;
+    return b.toLowerCase() === compBase.toLowerCase() &&
+           String(c.year || '') === year;
+  });
+  if (!target) return;
+  // Merge ht/wt from COMP_HT_WT if missing
+  var enriched = Object.assign({}, target);
+  if (!enriched.ht || !enriched.wt) {
+    var hw = (typeof COMP_HT_WT !== 'undefined' && COMP_HT_WT[compBase]) || null;
+    if (hw) { enriched.ht = enriched.ht || hw.ht; enriched.wt = enriched.wt || hw.wt; }
   }
-
-  function fmtVal(k, v) {
-    if (v===null||v===undefined) return null;
-    if (k==='ts_pct')  return (v*100).toFixed(1)+'%';
-    if (k==='pa2_usg') return Math.round(v)+'';
-    if (k==='age')     return v.toFixed(1);
-    if (k==='ht')      return Math.floor(v/12)+"'"+(Math.round(v%12))+'"';
-    if (k==='wt')      return Math.round(v)+'lb';
-    if (k==='metric')  return v.toFixed(1);
-    return v.toFixed(2);
+  enriched.rank = compBase; // display only
+  if (!_ceState.anchorIsPivot && _ceState.anchor) {
+    _ceState.pivotOriginRank = _ceState.anchor.rank;
   }
+  _ceState.anchor = enriched;
+  _ceState.anchorYear = year;
+  _ceState.anchorIsPivot = true;
+  _ceState.sortDim = null;
+  _ceState.expanded = {};
+  _ceRender();
+}
 
-  function fmtDelta(k, diff) {
-    // Raw difference, formatted with sign
-    if (k==='ts_pct')  return (diff>=0?'+':'')+( diff*100).toFixed(1)+'%';
-    if (k==='pa2_usg') return (diff>=0?'+':'')+Math.round(diff)+'';
-    if (k==='age')     return (diff>=0?'+':'')+diff.toFixed(1)+'y';
-    if (k==='ht')      return (diff>=0?'+':'')+Math.round(diff)+'"';
-    if (k==='wt')      return (diff>=0?'+':'')+Math.round(diff)+'lb';
-    if (k==='metric')  return (diff>=0?'+':'')+diff.toFixed(1);
-    return (diff>=0?'+':'')+diff.toFixed(2);
+function _ceBackToProspect() {
+  if (_ceState.pivotOriginRank != null) {
+    _ceSelectProspect(_ceState.pivotOriginRank);
+  } else {
+    _ceState.anchor = null;
+    _ceState.anchorIsPivot = false;
+    _ceRender();
   }
+}
 
-  // Prospect's values
-  var prospectVals = {};
-  FIELD_ORDER.forEach(function(k){ prospectVals[k] = getVal(player, k); });
-  var availFields = FIELD_ORDER.filter(function(k){ return prospectVals[k]!==null; });
+// ── Helpers ─────────────────────────────────────────────────────────────────
+function _ceGetVal(p, k) {
+  var v = p[k];
+  if (v === null || v === undefined || v === '' || v === 0) return null;
+  var n = parseFloat(v);
+  return (isNaN(n) || !isFinite(n)) ? null : n;
+}
+function _ceFmtVal(k, v) {
+  if (v === null || v === undefined) return '—';
+  if (k === 'ts_pct')  return (v * 100).toFixed(1) + '%';
+  if (k === 'pa2_usg') return Math.round(v) + '';
+  if (k === 'age')     return v.toFixed(1);
+  if (k === 'ht')      return Math.floor(v / 12) + "'" + Math.round(v % 12) + '"';
+  if (k === 'wt')      return Math.round(v) + 'lb';
+  if (k === 'metric')  return v.toFixed(1);
+  return v.toFixed(2);
+}
+function _ceFmtDelta(k, diff) {
+  if (k === 'ts_pct')  return (diff >= 0 ? '+' : '') + (diff * 100).toFixed(1) + '%';
+  if (k === 'pa2_usg') return (diff >= 0 ? '+' : '') + Math.round(diff);
+  if (k === 'age')     return (diff >= 0 ? '+' : '') + diff.toFixed(1) + 'y';
+  if (k === 'ht')      return (diff >= 0 ? '+' : '') + Math.round(diff) + '"';
+  if (k === 'wt')      return (diff >= 0 ? '+' : '') + Math.round(diff) + 'lb';
+  return (diff >= 0 ? '+' : '') + diff.toFixed(2);
+}
+function _cePosPenalty(a, b) {
+  if (!a || !b) return 0;
+  if (a === b) return 0;
+  var adj = { Guard: { Forward: 1 }, Forward: { Guard: 1, Center: 1 }, Center: { Forward: 1 } };
+  return (adj[a] && adj[a][b]) ? 8 : 20;
+}
+function _ceDraftBucket(dn) {
+  if (dn === 'UDFA' || dn === null || dn === undefined) return 'undraft';
+  var n = typeof dn === 'number' ? dn : parseInt(dn);
+  if (isNaN(n)) return 'undraft';
+  if (n <= 14) return 'lottery';
+  if (n <= 30) return 'late1';
+  if (n <= 60) return 'sec';
+  return 'undraft';
+}
+function _ceDraftLabel(dn) {
+  if (dn === 'UDFA') return 'UDFA';
+  if (dn === null || dn === undefined) return '—';
+  return '#' + dn;
+}
+// Convert distance score (0=identical, ~100=very different) to a 0-100 similarity %
+function _ceSimPct(simScore) {
+  // Empirically: scores ≤8 are excellent (~95%), 25 is moderate (~70%), 50 is weak (~40%)
+  var pct = Math.max(0, Math.min(100, 100 - simScore * 1.4));
+  return Math.round(pct);
+}
+function _ceSimColor(pct) {
+  if (pct >= 85) return '#16A34A';
+  if (pct >= 70) return '#F59E0B';
+  return '#94A3B8';
+}
 
-  // ── Score each yoy player ──────────────────────────────────────────────────
-  // Position penalty addends (added to simScore after stat distance is computed)
-  // Same pos=0, adjacent (G-F or F-C)=8, opposite (G-C)=20
-  function posPenalty(posA, posB) {
-    if (!posA || !posB) return 0; // no position data — no penalty
-    if (posA === posB) return 0;
-    var adj = {Guard:{Forward:true}, Forward:{Guard:true,Center:true}, Center:{Forward:true}};
-    return (adj[posA] && adj[posA][posB]) ? 8 : 20;
-  }
+// ── Score all comps against the current anchor ──────────────────────────────
+function _ceScoreAll() {
+  var anchor = _ceState.anchor;
+  if (!anchor) return { results: [], availFields: [], anchorVals: {} };
+
+  // Anchor values
+  var anchorVals = {};
+  _CE_FIELD_ORDER.forEach(function(k) {
+    if (k === 'ht' || k === 'wt') {
+      // For anchor from 2026 board, ht/wt are inline; for historical pivot already merged
+      anchorVals[k] = _ceGetVal(anchor, k);
+    } else {
+      anchorVals[k] = _ceGetVal(anchor, k);
+    }
+  });
+  var availFields = _CE_FIELD_ORDER.filter(function(k) { return anchorVals[k] !== null; });
 
   var scored = [];
-  (DATA.yoy||[]).forEach(function(comp) {
-    var compNameBase = (comp.name||'').indexOf(' - ')>0 ? comp.name.slice(0,comp.name.indexOf(' - ')) : (comp.name||'');
-    var htWt = COMP_HT_WT[compNameBase] || null;
-    // Exclude comps with no ht/wt — positional comparisons are unreliable without them
-    if (!htWt) return;
+  var pool = DATA.yoy || [];
+  pool.forEach(function(comp) {
+    // Don't compare anchor to itself if pivoted
+    if (_ceState.anchorIsPivot &&
+        (comp.name || '').toLowerCase() === (anchor.name || '').toLowerCase() &&
+        String(comp.year || '') === _ceState.anchorYear) {
+      return;
+    }
+    var compBase = (comp.name || '').indexOf(' - ') > 0
+      ? comp.name.slice(0, comp.name.indexOf(' - '))
+      : (comp.name || '');
+    var htWt = (typeof COMP_HT_WT !== 'undefined') ? (COMP_HT_WT[compBase] || null) : null;
+    if (!htWt && !(comp.ht && comp.wt)) return;
 
     var compVals = {};
-    FIELD_ORDER.forEach(function(k) {
-      compVals[k] = (k==='ht'||k==='wt') ? (htWt ? htWt[k] : null) : getVal(comp, k);
+    _CE_FIELD_ORDER.forEach(function(k) {
+      if (k === 'ht' || k === 'wt') {
+        compVals[k] = comp[k] || (htWt ? htWt[k] : null);
+      } else {
+        compVals[k] = _ceGetVal(comp, k);
+      }
     });
 
-    var totalDist=0, fieldCount=0, fieldDetails={};
+    // Role lock filter
+    if (_ceState.lens === 'role') {
+      if (!comp.torvik_role || !anchor.torvik_role) return;
+      if (comp.torvik_role !== anchor.torvik_role) return;
+    }
+
+    // Weighted distance
+    var totalDist = 0, totalWeight = 0, fieldCount = 0, fieldDetails = {};
     availFields.forEach(function(k) {
-      var a=prospectVals[k], b=compVals[k], rng=RANGES[k];
-      if (a===null||b===null||!rng) return;
-      var d=Math.abs(a-b)/rng;
-      totalDist+=d; fieldCount++;
-      fieldDetails[k]={a:a,b:b,d:d,diff:b-a};
+      var a = anchorVals[k], b = compVals[k], rng = _CE_RANGES[k];
+      if (a === null || b === null || !rng) return;
+      var d = Math.abs(a - b) / rng;
+      var fam = _CE_FIELD_FAMILY[k];
+      var w = _ceState.weights[fam] != null ? _ceState.weights[fam] : 1;
+      totalDist += d * w;
+      totalWeight += w;
+      fieldCount++;
+      fieldDetails[k] = { a: a, b: b, d: d, diff: b - a };
     });
-    if (fieldCount<4) return;
+    if (fieldCount < 4 || totalWeight === 0) return;
 
-    var statScore = totalDist/fieldCount*100;
-    var penalty   = posPenalty(player.position, comp.position);
-    var simScore  = statScore + penalty;
-    var compSchool = comp.name.indexOf(' - ')>0 ? comp.name.slice(comp.name.indexOf(' - ')+3) : '';
-    scored.push({comp:comp, compBase:compNameBase, compSchool:compSchool,
-      simScore:simScore, statScore:statScore, penalty:penalty,
-      fieldCount:fieldCount, fieldDetails:fieldDetails, compVals:compVals});
+    var statScore = (totalDist / totalWeight) * 100;
+    var penalty = _ceState.lens === 'role'
+      ? 0  // already filtered
+      : _cePosPenalty(anchor.position, comp.position);
+    var simScore = statScore + penalty;
+
+    // Pedigree lens: bias toward higher-pedigree historical comps (lower draft_no = better)
+    if (_ceState.lens === 'pedigree') {
+      var dn = comp.draft_no;
+      var pedBonus = 0;
+      if (typeof dn === 'number' && dn > 0) {
+        pedBonus = Math.max(0, (61 - dn) / 60); // 1.0 for #1, ~0 for #60
+      }
+      // Bonus shaves up to 25% off the score
+      simScore = simScore * (1 - 0.25 * pedBonus);
+    }
+
+    var compSchool = comp.name.indexOf(' - ') > 0
+      ? comp.name.slice(comp.name.indexOf(' - ') + 3) : '';
+
+    scored.push({
+      comp: comp, compBase: compBase, compSchool: compSchool,
+      simScore: simScore, statScore: statScore,
+      fieldCount: fieldCount, fieldDetails: fieldDetails, compVals: compVals
+    });
   });
 
-  scored.sort(function(a,b){ return a.simScore - b.simScore; });
-  var results = scored.slice(0, topN);
-
-  // ── Build HTML ─────────────────────────────────────────────────────────────
-  var h = '';
-
-  // ── Prospect header row ────────────────────────────────────────────────────
-  h += '<div class="comp-player-header">';
-  h += avatarHtml(player.name, player.position||'', '56px', '9px');
-  h += '<div class="comp-header-text">';
-  h += '<div class="comp-header-name">#'+player.rank+' '+base+'</div>';
-  h += '<div class="comp-header-sub">'+(school||'')+(player.torvik_role?' &middot; '+escHtml(player.torvik_role):'')+(player.position?' &middot; '+escHtml(player.position):'')+'</div>';
-  h += '</div>';
-  if (player.metric&&player.metric>0) {
-    h += '<div class="comp-header-metric">';
-    h += '<div class="comp-header-metric-val">'+player.metric.toFixed(1)+'</div>';
-    h += '<div class="comp-header-metric-lbl">HW Metric</div>';
-    h += '</div>';
-  }
-  h += '</div>';
-
-  // Manual comps
-  var compStr = player.comp || player.comp_tool;
-  if (compStr) {
-    h += '<div class="comp-section-title">Manual Comps <span>your scouting notes</span></div>';
-    h += '<div class="comps-list">';
-    compStr.split(/[/,]/).map(function(c){return c.trim();}).filter(Boolean).forEach(function(c){
-      h += '<div class="comp-chip">'+escHtml(c)+'</div>';
+  // Sort
+  if (_ceState.sortDim) {
+    // Sort by closeness on single dimension
+    scored.sort(function(a, b) {
+      var ad = a.fieldDetails[_ceState.sortDim];
+      var bd = b.fieldDetails[_ceState.sortDim];
+      var av = ad ? ad.d : 999;
+      var bv = bd ? bd.d : 999;
+      return av - bv;
     });
-    h += '</div>';
+  } else {
+    scored.sort(function(a, b) { return a.simScore - b.simScore; });
   }
 
-  // Section title
-  h += '<div class="comp-section-title">Statistical Comps';
-  h += '<span>'+availFields.length+' dimensions &middot; lower score = closer match</span></div>';
+  return { results: scored.slice(0, _ceState.topN), availFields: availFields, anchorVals: anchorVals };
+}
 
-  if (!results.length) {
-    h += '<div style="text-align:center;padding:30px;color:var(--gray-300)">No matches found with sufficient shared fields.</div>';
-    document.getElementById('compExplorerResult').innerHTML = h;
+// ── MAIN RENDER ─────────────────────────────────────────────────────────────
+function _ceRender() {
+  // Update anchor strip
+  var anchor = _ceState.anchor;
+  var anchorText = document.getElementById('cev2AnchorText');
+  var anchorAvatar = document.getElementById('cev2AnchorAvatar');
+  var anchorMetric = document.getElementById('cev2AnchorMetric');
+  var anchorMetricVal = document.getElementById('cev2AnchorMetricVal');
+  var controls = document.getElementById('cev2Controls');
+  var result = document.getElementById('cev2Result');
+
+  if (!anchor) {
+    if (anchorText) anchorText.innerHTML =
+      '<div class="cev2-anchor-name">Select a prospect to begin</div>' +
+      '<div class="cev2-anchor-meta">Statistical similarity across 9 dimensions · position-agnostic · 2019–2025 historical pool</div>';
+    if (anchorAvatar) anchorAvatar.innerHTML = '';
+    if (anchorMetric) anchorMetric.style.display = 'none';
+    if (controls) controls.style.display = 'none';
+    if (result) result.innerHTML = '';
     return;
   }
 
-  // ── TABLE ──────────────────────────────────────────────────────────────────
-  h += '<div class="comp-tbl-wrap"><table class="comp-tbl"><thead><tr>';
-  h += '<th>Player</th>';
-  FIELD_ORDER.forEach(function(k){
-    var missing = prospectVals[k]===null;
-    h += '<th class="stat-col"'+(missing?' style="opacity:.3"':'')+'>'+FIELD_LABELS[k]+'</th>';
-  });
-  h += '<th class="stat-col">Score</th>';
-  h += '<th class="stat-col">Draft</th>';
-  h += '<th class="stat-col"></th>';
-  h += '</tr></thead><tbody>';
+  var name = anchor.name || '';
+  var base = name.indexOf(' - ') > 0 ? name.slice(0, name.indexOf(' - ')) : name;
+  var school = name.indexOf(' - ') > 0 ? name.slice(name.indexOf(' - ') + 3) : '';
+  var pivotBanner = '';
+  if (_ceState.anchorIsPivot) {
+    pivotBanner = '<div class="cev2-pivot-banner">Pivoted to historical comp '
+      + '<button onclick="_ceBackToProspect()" title="Back to original prospect">← Back</button></div>';
+  }
+  if (anchorText) {
+    anchorText.innerHTML = pivotBanner
+      + '<div class="cev2-anchor-name">'
+      + (_ceState.anchorIsPivot ? '' : '#' + anchor.rank + ' ')
+      + escHtml(base) + '</div>'
+      + '<div class="cev2-anchor-meta">'
+      + escHtml(school || '')
+      + (anchor.torvik_role ? ' · <b>' + escHtml(anchor.torvik_role) + '</b>' : '')
+      + (anchor.position ? ' · ' + escHtml(anchor.position) : '')
+      + (_ceState.anchorIsPivot && anchor.year ? ' · \u2019' + String(anchor.year).slice(2) + ' class' : '')
+      + '</div>';
+  }
+  if (anchorAvatar) {
+    anchorAvatar.innerHTML = avatarHtml(name, anchor.position || '', '60px', '10px');
+  }
+  if (anchor.metric && anchor.metric > 0) {
+    if (anchorMetric) anchorMetric.style.display = '';
+    if (anchorMetricVal) anchorMetricVal.textContent = parseFloat(anchor.metric).toFixed(1);
+  } else {
+    if (anchorMetric) anchorMetric.style.display = 'none';
+  }
+  if (controls) controls.style.display = '';
 
-  // ── Prospect row (reference / pinned) ─────────────────────────────────────
-  h += '<tr class="prospect-row">';
-  h += '<td>';
-  h += '<div class="comp-name-cell">'+avatarHtml(player.name,player.position||'','30px','5px');
-  h += '<div><div class="comp-name-main">'+escHtml(base)+'</div>';
-  h += '<div class="comp-name-sub"><span class="prospect-label">Selected</span></div></div></div>';
-  h += '</td>';
-  FIELD_ORDER.forEach(function(k) {
-    var v = prospectVals[k];
-    h += '<td>';
-    if (v!==null) {
-      h += '<div class="ctd-stat"><span class="ctd-val">'+fmtVal(k,v)+'</span></div>';
-    } else {
-      h += '<span class="ctd-missing">&mdash;</span>';
-    }
-    h += '</td>';
-  });
-  h += '<td><span class="ctd-missing">&mdash;</span></td>';
-  h += '<td></td><td></td>';
-  h += '</tr>';
+  // Compute results
+  var data = _ceScoreAll();
+  var results = data.results;
+  var availFields = data.availFields;
+  var anchorVals = data.anchorVals;
 
-  // ── Comp rows ─────────────────────────────────────────────────────────────
-  var neutralKeys = {age:1,ht:1,wt:1,ftar:1,tpar:1};
-  var closeThreshold = 0.05;
+  if (!results.length) {
+    if (result) result.innerHTML = '<div class="cev2-empty">No matches found with sufficient shared fields. Try widening the lens or resetting weights.</div>';
+    return;
+  }
+
+  // Build output
+  var h = '';
+
+  // Eye-test reconciliation
+  h += _ceEyetestHtml(anchor, results);
+
+  // Top-3 headline cards
+  h += '<div class="cev2-section"><div class="cev2-section-title">Top Matches '
+    + '<span>The 3 closest historical comps · click any card for details</span></div></div>';
+  h += '<div class="cev2-top3">';
+  results.slice(0, 3).forEach(function(s, i) {
+    h += _ceTop3CardHtml(s, i, availFields, anchorVals);
+  });
+  h += '</div>';
+
+  // Draft outcome strip
+  h += _ceDraftStripHtml(results);
+
+  // Full list
+  h += '<div class="cev2-section"><div class="cev2-section-title">All Matches '
+    + '<span>' + results.length + ' shown · click a row to expand · click a dot to sort by that dimension</span></div></div>';
+  h += _ceListHtml(results, availFields, anchorVals);
+
+  if (result) result.innerHTML = h;
+
+  // Wire row clicks (expand/collapse, pivot, add-to-compare, sort-by-dot)
+  _ceWireResultEvents();
+}
+
+// ── Eye-test reconciliation ─────────────────────────────────────────────────
+function _ceEyetestHtml(anchor, results) {
+  if (_ceState.anchorIsPivot) return ''; // only meaningful for 2026 anchor
+  var manual = anchor.comp || anchor.comp_tool;
+  if (!manual) return '';
+  var names = manual.split(/[/,]/).map(function(n) { return n.trim(); }).filter(Boolean);
+  if (!names.length) return '';
+
+  // Build a quick rank map for all historical comps (top 100 by current sim score)
+  // Score the WHOLE pool for ranking (not just topN)
+  var oldTopN = _ceState.topN;
+  _ceState.topN = 200;
+  var fullData = _ceScoreAll();
+  _ceState.topN = oldTopN;
+  var fullResults = fullData.results;
+  var rankMap = {};
+  fullResults.forEach(function(s, i) {
+    rankMap[s.compBase.toLowerCase()] = i + 1;
+  });
+
+  var h = '<div class="cev2-eyetest">';
+  h += '<span class="cev2-eyetest-lbl">Your eye-test:</span>';
+  names.forEach(function(n) {
+    // Loose match — find any historical name that contains the manual comp string
+    var lower = n.toLowerCase();
+    var foundRank = null;
+    Object.keys(rankMap).forEach(function(k) {
+      if (foundRank) return;
+      if (k.indexOf(lower) >= 0 || lower.indexOf(k) >= 0) foundRank = rankMap[k];
+    });
+    var tag, cls;
+    if (foundRank === null) { tag = 'not in pool'; cls = 'miss'; }
+    else if (foundRank <= 10) { tag = '#' + foundRank; cls = 'hit'; }
+    else if (foundRank <= 30) { tag = '#' + foundRank; cls = ''; }
+    else { tag = '#' + foundRank; cls = 'miss'; }
+    h += '<span class="cev2-eyetest-chip">'
+      + escHtml(n)
+      + '<span class="rank-tag ' + cls + '">' + tag + '</span>'
+      + '</span>';
+  });
+  h += '</div>';
+  return h;
+}
+
+// ── Top-3 card ──────────────────────────────────────────────────────────────
+function _ceTop3CardHtml(s, idx, availFields, anchorVals) {
+  var c = s.comp;
+  var pct = _ceSimPct(s.simScore);
+  var color = _ceSimColor(pct);
+  var bucket = _ceDraftBucket(c.draft_no);
+  var draftLbl = _ceDraftLabel(c.draft_no);
+
+  // Arc: SVG ring
+  var r = 26, circ = 2 * Math.PI * r;
+  var offset = circ * (1 - pct / 100);
+  var arc = '<svg viewBox="0 0 64 64" class="cev2-arc-svg">'
+    + '<circle cx="32" cy="32" r="' + r + '" fill="none" stroke="#E5E7EB" stroke-width="6"/>'
+    + '<circle cx="32" cy="32" r="' + r + '" fill="none" stroke="' + color + '" stroke-width="6"'
+    + ' stroke-linecap="round" stroke-dasharray="' + circ + '" stroke-dashoffset="' + offset + '"'
+    + ' transform="rotate(-90 32 32)"/>'
+    + '</svg>';
+
+  // Fingerprint
+  var fp = '';
+  _CE_FIELD_ORDER.forEach(function(k) {
+    var fd = s.fieldDetails[k];
+    var cls = !fd ? 'na'
+      : _CE_NEUTRAL[k] && fd.d <= _CE_CLOSE_THRESHOLD ? 'neu'
+      : fd.d <= _CE_CLOSE_THRESHOLD ? 'match'
+      : fd.d <= _CE_DIFF_THRESHOLD ? 'close' : 'diff';
+    var title = _CE_FIELD_LABELS[k] + (fd ? ': ' + _ceFmtVal(k, fd.b) + ' vs ' + _ceFmtVal(k, fd.a) : ': —');
+    fp += '<div class="cev2-fp-dot ' + cls + '" title="' + escHtml(title) + '"></div>';
+  });
+
+  var year = c.year ? String(c.year) : '2025';
+  var accent = color;
+  var safeBase = escHtml(s.compBase).replace(/'/g, '&#39;');
+
+  var h = '<div class="cev2-top3-card" style="--card-accent:' + accent + '"'
+    + ' onclick="event.stopPropagation();openPlayerModalByName(\'' + safeBase + '\')">';
+  h += '<div class="cev2-top3-rank">#' + (idx + 1) + ' Match</div>';
+  h += '<div class="cev2-top3-head">';
+  h += '<div class="cev2-top3-arc">' + arc
+    + '<div class="cev2-top3-arc-pct">'
+    + '<div class="cev2-top3-arc-num" style="color:' + color + '">' + pct + '</div>'
+    + '<div class="cev2-top3-arc-sub">Similar</div>'
+    + '</div></div>';
+  h += '<div class="cev2-top3-info">';
+  h += '<div class="cev2-top3-name">' + escHtml(s.compBase) + '</div>';
+  h += '<div class="cev2-top3-school">'
+    + escHtml(s.compSchool || '')
+    + (c.year ? ' · \u2019' + String(c.year).slice(2) : '')
+    + (c.torvik_role ? ' · ' + escHtml(c.torvik_role) : '')
+    + '</div>';
+  h += '<div class="cev2-top3-chips">';
+  h += '<span class="cev2-top3-chip draft-' + bucket + '">' + draftLbl
+    + (bucket === 'lottery' ? ' · Lottery' : bucket === 'late1' ? ' · Late 1st' : bucket === 'sec' ? ' · 2nd Rd' : ' · Undrafted') + '</span>';
+  if (c.position) h += '<span class="cev2-top3-chip">' + escHtml(c.position) + '</span>';
+  h += '</div>';
+  h += '</div>';
+  h += '</div>';
+  h += '<div class="cev2-top3-fingerprint">' + fp + '</div>';
+  h += '<div class="cev2-top3-actions">';
+  h += '<button class="cev2-top3-action" onclick="event.stopPropagation();addCompToCompare(\'' + safeBase + '\',\'' + year + '\')">+ Compare</button>';
+  h += '<button class="cev2-top3-action" onclick="event.stopPropagation();_cePivotToComp(\'' + safeBase + '\',\'' + year + '\')" title="Anchor on this player">↻ Pivot</button>';
+  h += '</div>';
+  h += '</div>';
+  return h;
+}
+
+// ── Draft outcome distribution ──────────────────────────────────────────────
+function _ceDraftStripHtml(results) {
+  var counts = { lottery: 0, late1: 0, sec: 0, undraft: 0 };
+  results.forEach(function(s) {
+    counts[_ceDraftBucket(s.comp.draft_no)]++;
+  });
+  var total = results.length;
+  var pct = function(n) { return total ? (n / total * 100) : 0; };
+
+  var segs = [
+    { k: 'lottery', lbl: 'Lottery', n: counts.lottery },
+    { k: 'late1',   lbl: 'Late 1st', n: counts.late1 },
+    { k: 'sec',     lbl: '2nd Rd', n: counts.sec },
+    { k: 'undraft', lbl: 'Undraft/Unknown', n: counts.undraft },
+  ];
+
+  // Highlight stat: largest bucket
+  var topBucket = segs.reduce(function(a, b) { return b.n > a.n ? b : a; }, segs[0]);
+  var topPct = total ? Math.round(topBucket.n / total * 100) : 0;
+
+  var h = '<div class="cev2-draftstrip">';
+  h += '<div class="cev2-draftstrip-head">';
+  h += '<div class="cev2-draftstrip-title">Draft Outcome of Comps · '
+    + '<b>' + topPct + '% ' + topBucket.lbl + '</b></div>';
+  h += '<div class="cev2-draftstrip-sub">Of the top ' + total + ' statistical comps · historical draft pool 2019–2024</div>';
+  h += '</div>';
+  h += '<div class="cev2-draftstrip-bar">';
+  segs.forEach(function(s) {
+    if (s.n === 0) return;
+    h += '<div class="cev2-draftstrip-seg ' + s.k + '"'
+      + ' style="width:' + pct(s.n).toFixed(2) + '%"'
+      + ' title="' + s.lbl + ': ' + s.n + ' player' + (s.n === 1 ? '' : 's') + '">'
+      + (pct(s.n) >= 8 ? s.n : '')
+      + '</div>';
+  });
+  h += '</div>';
+  h += '<div class="cev2-draftstrip-legend">';
+  segs.forEach(function(s) {
+    var bg = s.k === 'lottery' ? 'linear-gradient(135deg,#2C4569,#A855F7)'
+      : s.k === 'late1' ? 'var(--navy)'
+      : s.k === 'sec' ? 'var(--gray-500)' : 'var(--gray-300)';
+    h += '<span><span class="dot" style="background:' + bg + '"></span>' + s.lbl + ' (' + s.n + ')</span>';
+  });
+  h += '</div>';
+  h += '</div>';
+  return h;
+}
+
+// ── Compact list ────────────────────────────────────────────────────────────
+function _ceListHtml(results, availFields, anchorVals) {
+  var h = '<div class="cev2-list">';
+
+  // Head with sortable fingerprint dots
+  h += '<div class="cev2-list-head">';
+  h += '<div></div>';
+  h += '<div class="col-sortable ' + (_ceState.sortDim === null ? 'active' : '') + '" data-sort="">Player</div>';
+  h += '<div class="col-fp">Fingerprint</div>';
+  h += '<div class="col-sim col-sortable ' + (_ceState.sortDim === null ? 'active' : '') + '">Similarity</div>';
+  h += '<div>Draft</div>';
+  h += '<div class="col-actions"></div>';
+  h += '</div>';
 
   results.forEach(function(s, i) {
     var c = s.comp;
-    var scoreColor = s.simScore<=12?'#15803d':s.simScore<=25?'#B45309':'#DC2626';
-    var scoreBg    = s.simScore<=12?'rgba(21,128,61,.1)':s.simScore<=25?'rgba(180,83,9,.1)':'rgba(220,38,38,.1)';
+    var pct = _ceSimPct(s.simScore);
+    var color = _ceSimColor(pct);
+    var bucket = _ceDraftBucket(c.draft_no);
+    var draftLbl = _ceDraftLabel(c.draft_no);
+    var year = c.year ? String(c.year) : '2025';
+    var safeBase = escHtml(s.compBase).replace(/'/g, '&#39;');
+    var rowKey = s.compBase + '|' + year;
+    var expanded = _ceState.expanded[rowKey];
 
-    var dn = c.draft_no;
-    var draftChip = dn==='UDFA' ? '<span class="draft-chip udfa">UDFA</span>'
-                  : (typeof dn==='number'&&dn<=14
-                     ? '<span class="draft-chip top">#'+dn+'</span>'
-                     : dn ? '<span class="draft-chip">#'+dn+'</span>' : '<span class="ctd-missing">&mdash;</span>');
-
-    h += '<tr class="comp-row-tr">';
-
-    h += '<td>';
-    h += '<div class="comp-name-cell">'+compAvatarHtml(c.name,c.position||'','30px','5px');
-    h += '<div><div class="comp-name-main">'+escHtml(s.compBase)+'</div>';
-    h += '<div class="comp-name-sub">'+escHtml(s.compSchool);
-    if (c.year) h += ' &middot; &rsquo;'+String(c.year).slice(2);
-    if (c.torvik_role) h += ' &middot; '+escHtml(c.torvik_role);
-    h += '</div></div></div></td>';
-
-    FIELD_ORDER.forEach(function(k) {
+    // Fingerprint dots (sortable)
+    var fp = '';
+    _CE_FIELD_ORDER.forEach(function(k) {
       var fd = s.fieldDetails[k];
-      h += '<td>';
-      if (fd) {
-        var norm = fd.d;
-        var isNeutral = !!neutralKeys[k];
-        var dCls;
-        if (isNeutral) {
-          dCls = 'neu';
-        } else {
-          dCls = norm<=closeThreshold ? 'pos' : (fd.diff>=0 ? 'pos' : 'neg');
-        }
-        h += '<div class="ctd-stat">';
-        h += '<span class="ctd-val">'+fmtVal(k,fd.b)+'</span>';
-        if (Math.abs(fd.diff)>0.001) {
-          h += '<span class="ctd-delta '+dCls+'">'+fmtDelta(k,fd.diff)+'</span>';
-        } else {
-          h += '<span class="ctd-delta neu">=</span>';
-        }
-        h += '</div>';
-      } else if (s.compVals[k]!==null) {
-        h += '<div class="ctd-stat"><span class="ctd-val" style="color:var(--gray-300)">'+fmtVal(k,s.compVals[k])+'</span></div>';
+      var cls = !fd ? 'na'
+        : _CE_NEUTRAL[k] && fd.d <= _CE_CLOSE_THRESHOLD ? 'neu'
+        : fd.d <= _CE_CLOSE_THRESHOLD ? 'match'
+        : fd.d <= _CE_DIFF_THRESHOLD ? 'close' : 'diff';
+      var title = _CE_FIELD_LABELS[k] + (fd ? ': ' + _ceFmtVal(k, fd.b) : ': —')
+        + ' (click to sort by ' + _CE_FIELD_LABELS[k] + ')';
+      fp += '<div class="cev2-fp-dot sortable ' + cls + '" data-sort-dim="' + k + '"'
+        + ' title="' + escHtml(title) + '"></div>';
+    });
+
+    // Mini arc
+    var r = 14, circ = 2 * Math.PI * r;
+    var offset = circ * (1 - pct / 100);
+    var arc = '<svg viewBox="0 0 34 34" class="cev2-row-sim-arc">'
+      + '<circle cx="17" cy="17" r="' + r + '" fill="none" stroke="#E5E7EB" stroke-width="3"/>'
+      + '<circle cx="17" cy="17" r="' + r + '" fill="none" stroke="' + color + '" stroke-width="3"'
+      + ' stroke-linecap="round" stroke-dasharray="' + circ + '" stroke-dashoffset="' + offset + '"'
+      + ' transform="rotate(-90 17 17)"/>'
+      + '</svg>';
+
+    h += '<div class="cev2-row ' + (expanded ? 'expanded' : '') + '" data-row-key="' + escHtml(rowKey) + '">';
+    h += '<div class="cev2-row-idx">' + (i + 1) + '</div>';
+    h += '<div class="cev2-row-info">';
+    h += compAvatarHtml(c.name, c.position || '', '28px', '4px');
+    h += '<div style="min-width:0">';
+    h += '<div class="cev2-row-name">' + escHtml(s.compBase) + '</div>';
+    h += '<div class="cev2-row-school">'
+      + escHtml(s.compSchool || '')
+      + (c.year ? ' · \u2019' + String(c.year).slice(2) : '')
+      + (c.torvik_role ? ' · ' + escHtml(c.torvik_role) : '')
+      + '</div>';
+    h += '</div>';
+    h += '</div>';
+    h += '<div class="cev2-row-fp">' + fp + '</div>';
+    h += '<div class="cev2-row-sim">' + arc
+      + '<div><div class="cev2-row-sim-num" style="color:' + color + '">' + pct + '%</div>'
+      + '<div class="cev2-row-sim-lbl">similar</div></div>'
+      + '</div>';
+    h += '<div class="cev2-row-draft"><span class="cev2-draftchip ' + bucket + '">' + draftLbl + '</span></div>';
+    h += '<div class="cev2-row-actions">';
+    h += '<button class="cev2-row-act" data-act="compare" data-name="' + safeBase + '" data-year="' + year + '" title="Add to Compare">+</button>';
+    h += '<button class="cev2-row-act pivot" data-act="pivot" data-name="' + safeBase + '" data-year="' + year + '" title="Anchor on this player">↻</button>';
+    h += '</div>';
+    h += '</div>';
+
+    // Detail row (always rendered, shown by CSS when row.expanded)
+    h += '<div class="cev2-detail">';
+    h += '<div class="cev2-detail-grid">';
+    _CE_FIELD_ORDER.forEach(function(k) {
+      var fd = s.fieldDetails[k];
+      var dCls = 'neu';
+      if (fd && !_CE_NEUTRAL[k]) {
+        dCls = fd.d <= _CE_CLOSE_THRESHOLD ? 'pos' : (fd.diff >= 0 ? 'pos' : 'neg');
+      }
+      h += '<div class="cev2-detail-cell">';
+      h += '<div class="cev2-detail-lbl">' + _CE_FIELD_LABELS[k] + '</div>';
+      h += '<div class="cev2-detail-val">' + (fd ? _ceFmtVal(k, fd.b) : '—') + '</div>';
+      if (fd && Math.abs(fd.diff) > 0.001) {
+        h += '<div class="cev2-detail-delta ' + dCls + '">' + _ceFmtDelta(k, fd.diff) + '</div>';
       } else {
-        h += '<span class="ctd-missing">&mdash;</span>';
+        h += '<div class="cev2-detail-delta neu">=</div>';
       }
-      h += '</td>';
-    });
-
-    h += '<td>';
-    h += '<div class="comp-sim-badge" style="background:'+scoreBg+'">';
-    h += '<span class="comp-sim-val" style="color:'+scoreColor+'">'+s.simScore.toFixed(1)+'</span>';
-    h += '<span class="comp-sim-lbl" style="color:'+scoreColor+'">sim</span>';
-    h += '</div></td>';
-
-    h += '<td>'+draftChip+'</td>';
-
-    var compYr = c.year ? String(c.year) : '2025';
-    var safeN  = escHtml(s.compBase).replace(/'/g,"\\'");
-    h += '<td>'
-      + '<button class="comp-add-compare-btn" title="Add to Compare" '
-      + 'onclick="addCompToCompare(\'' + safeN + '\',\'' + compYr + '\')">+</button>'
-      + '</td>';
-    h += '</tr>';
-  });
-
-  h += '</tbody></table></div>';
-
-
-  // ── MOBILE CARD LIST ──────────────────────────────────────────────────────
-  // On mobile (≤640px) we render a vertically-stacked card list instead of
-  // the 900px-min-width table. Cards show similarity score, name, draft year,
-  // and the 3 most-diagnostic stats (metric, ts_pct, pa2_usg).
-  // The table and cards are toggled by CSS media query:
-  //   desktop → table visible, cards hidden
-  //   mobile  → table hidden, cards visible
-  h += '<div class="comp-mobile-cards">';
-  results.forEach(function(s) {
-    var c = s.comp;
-    var scoreColor = s.simScore<15?'#16A34A':s.simScore<30?'#D97706':'#DC2626';
-    var scoreBg    = s.simScore<15?'rgba(22,163,74,.12)':s.simScore<30?'rgba(217,119,6,.12)':'rgba(220,38,38,.12)';
-    var dn = c.draft_no;
-    var draftStr = dn==='UDFA' ? 'UDFA'
-                 : (dn ? '#'+dn+' pick' : '—');
-    var yearStr = c.year ? "'"+String(c.year).slice(2)+" "+draftStr : draftStr;
-
-    // Pick 3 key stats for the card (metric + top 2 available fields)
-    var cardStats = [];
-    ['metric','ts_pct','pa2_usg','stl_bl','ato'].forEach(function(k) {
-      if (cardStats.length >= 3) return;
-      var fd = s.fieldDetails[k];
-      if (fd) {
-        cardStats.push({
-          lbl: FIELD_LABELS[k],
-          val: fmtVal(k, fd.b),
-          delta: fd.diff !== 0 ? fmtDelta(k, fd.diff) : null,
-          pos: fd.diff >= 0
-        });
-      }
-    });
-
-    // onclick: name is substituted at render time; &#39; makes apostrophes HTML-safe
-    var safeCompName = escHtml(s.compBase).replace(/'/g, '&#39;');
-    h += '<div class="comp-mobile-card" onclick="openPlayerModalByName(\'' + safeCompName + '\')">';
-    // Similarity score badge
-    h += '<div style="text-align:center;flex-shrink:0;min-width:52px">';
-    h += '<div class="comp-mobile-sim" style="color:'+scoreColor+';background:'+scoreBg+';border-radius:8px;padding:4px 6px">'+s.simScore.toFixed(1)+'</div>';
-    h += '<div class="comp-mobile-sim-lbl" style="color:'+scoreColor+'">sim</div>';
-    h += '</div>';
-    // Player info
-    h += '<div class="comp-mobile-info">';
-    h += '<div class="comp-mobile-name">'+escHtml(s.compBase)+'</div>';
-    h += '<div class="comp-mobile-meta">'+escHtml(s.compSchool)+' · '+yearStr+'</div>';
-    if (cardStats.length) {
-      h += '<div class="comp-mobile-stats">';
-      cardStats.forEach(function(st) {
-        h += '<div class="comp-mobile-stat">'+st.lbl+': '+st.val;
-        if (st.delta) h += ' <span style="color:'+(st.pos?'#16A34A':'#DC2626')+'">('+st.delta+')</span>';
-        h += '</div>';
-      });
       h += '</div>';
-    }
-    h += '</div>';
-    h += '</div>';
+    });
+    h += '</div></div>';
   });
-  h += '</div>'; // .comp-mobile-cards
 
-  document.getElementById('compExplorerResult').innerHTML = h;
+  h += '</div>';
+  return h;
+}
+
+// ── Wire delegated events on results ────────────────────────────────────────
+function _ceWireResultEvents() {
+  var result = document.getElementById('cev2Result');
+  if (!result) return;
+  // Row expand toggle
+  result.querySelectorAll('.cev2-row').forEach(function(row) {
+    row.addEventListener('click', function(e) {
+      if (e.target.closest('.cev2-row-act') || e.target.closest('.cev2-fp-dot.sortable')) return;
+      var key = row.dataset.rowKey;
+      _ceState.expanded[key] = !_ceState.expanded[key];
+      row.classList.toggle('expanded');
+    });
+  });
+  // Action buttons
+  result.querySelectorAll('.cev2-row-act').forEach(function(btn) {
+    btn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      var act = this.dataset.act;
+      var nm = this.dataset.name;
+      var yr = this.dataset.year;
+      if (act === 'compare') addCompToCompare(nm, yr);
+      else if (act === 'pivot') _cePivotToComp(nm, yr);
+    });
+  });
+  // Sortable fingerprint dots in the list
+  result.querySelectorAll('.cev2-list .cev2-fp-dot.sortable').forEach(function(dot) {
+    dot.addEventListener('click', function(e) {
+      e.stopPropagation();
+      var dim = this.dataset.sortDim;
+      _ceState.sortDim = (_ceState.sortDim === dim) ? null : dim;
+      _ceRender();
+    });
+  });
 }
 // ── Card-level "Add to Compare" — called from the ⊕ button on every player card ──
 function addCardToCompare(rank) {
