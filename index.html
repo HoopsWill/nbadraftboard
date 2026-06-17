@@ -507,16 +507,17 @@ button{transition:transform var(--dur-instant) var(--ease-out)}
 @media(pointer:coarse){.player-card:hover .card-avatar-img,.player-card:hover .card-avatar-wrap .avatar-fallback{transform:scale(1.05)}}
 /* ── Card identity: avatar + stacked name (top), full-width meta (below) ──── */
 .card-id-main{flex:1;min-width:0;display:flex;flex-direction:column;gap:7px}
-.card-id-top{display:flex;flex-direction:row;align-items:center;gap:8px;min-width:0}
+.card-id-top{display:flex;flex-direction:row;align-items:center;gap:7px;min-width:0}
 /* Name stacks first over last so each line stays short and reads large.
    align-items:flex-start keeps both lines left-aligned beside the photo. */
 .card-name{font-family:'Barlow Condensed',sans-serif;color:var(--navy);min-width:0;flex:1;
   display:flex;flex-direction:column;justify-content:center;line-height:.96;letter-spacing:-.3px}
-.card-name-first{font-size:clamp(11px,3.3cqw,14px);font-weight:600;color:var(--gray-500);
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:.2px;text-transform:none}
-.card-name-last{font-size:clamp(14px,5.1cqw,22px);font-weight:900;color:var(--navy);
+.card-name-first{font-size:clamp(12px,3.6cqw,17px);font-weight:600;color:var(--gray-500);
+  letter-spacing:.2px;text-transform:none;display:flex;align-items:center;gap:3px;min-width:0}
+.card-name-first-text{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.card-name-last{font-size:clamp(16px,5.7cqw,28px);font-weight:900;color:var(--navy);
   display:flex;align-items:baseline;gap:4px;min-width:0;margin-top:1px}
-.card-name-last-text{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.card-name-last-text{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;flex:1 1 auto}
 /* Full-width meta strip — uses the space beside/below the photo so school and
    role/position get room to breathe instead of being clipped. */
 .card-id-meta{display:flex;flex-direction:column;gap:3px;min-width:0}
@@ -974,21 +975,40 @@ tr:hover td{background:var(--gray-50)}
 .modal-overlay.open .modal{transform:translateY(0)}
 /* PROFILE-4: scouting masthead — left-aligned row (photo · identity · stat),
    replacing the centered poster stack. Mobile block below re-stacks it. */
-.modal-header{background:var(--navy);color:white;padding:18px 56px 16px 22px;border-radius:16px 16px 0 0;position:relative;display:flex;flex-direction:row;align-items:center;text-align:left;gap:16px;flex-shrink:0}
-.modal-head-stat{margin-left:auto;flex-shrink:0;text-align:right;padding-right:30px}
-.mhs-val{font-family:'Barlow Condensed',sans-serif;font-size:34px;font-weight:900;line-height:1;color:var(--amber-light)}
-.mhs-lbl{font-size:var(--text-8h);font-weight:800;letter-spacing:1.4px;text-transform:uppercase;color:rgba(255,255,255,.4);margin-top:3px}
+.modal-header{
+  background:
+    radial-gradient(120% 140% at 85% -20%, rgba(212,168,48,.14) 0%, rgba(212,168,48,0) 42%),
+    linear-gradient(135deg, #16294a 0%, #0e1c34 52%, #0b1628 100%);
+  color:white;padding:22px 60px 20px 24px;border-radius:16px 16px 0 0;
+  position:relative;display:flex;flex-direction:row;align-items:center;text-align:left;
+  gap:18px;flex-shrink:0;overflow:hidden;
+  box-shadow:inset 0 -1px 0 rgba(255,255,255,.06)}
+/* College flair — the school crest as a large, faint watermark anchored to the
+   right edge, tying the masthead to the player's program without clutter. */
+.modal-header-crest{position:absolute;right:-18px;top:50%;transform:translateY(-50%);
+  width:170px;height:170px;opacity:.07;pointer-events:none;z-index:0;
+  filter:grayscale(.2) drop-shadow(0 2px 8px rgba(0,0,0,.4))}
+.modal-header-crest img{width:100%;height:100%;object-fit:contain}
+.modal-header > *:not(.modal-header-crest){position:relative;z-index:1}
+.modal-head-stat{margin-left:auto;flex-shrink:0;text-align:right;padding-right:18px}
+.mhs-val{font-family:'Barlow Condensed',sans-serif;font-size:42px;font-weight:900;line-height:.92;
+  color:var(--amber-light);letter-spacing:-.5px;text-shadow:0 2px 12px rgba(212,168,48,.25);
+  font-variant-numeric:tabular-nums}
+.mhs-lbl{font-size:var(--text-8h);font-weight:800;letter-spacing:1.6px;text-transform:uppercase;
+  color:rgba(255,255,255,.42);margin-top:4px}
 .modal-nav-counter{display:none !important} /* PROFILE-4: counter → arrow tooltips */
-.modal-close{position:absolute;top:10px;right:10px;background:rgba(255,255,255,.1);border:none;color:white;width:44px;height:44px;min-width:44px;min-height:44px;border-radius:8px;cursor:pointer;font-size:var(--text-16);display:flex;align-items:center;justify-content:center;touch-action:manipulation}
+.modal-close{position:absolute;top:10px;right:10px;background:rgba(255,255,255,.1);border:none;color:white;width:44px;height:44px;min-width:44px;min-height:44px;border-radius:8px;cursor:pointer;font-size:var(--text-16);display:flex;align-items:center;justify-content:center;touch-action:manipulation;z-index:2}
 .modal-close:hover{background:rgba(255,255,255,.2)}
 /* Mobile close bar — sticky at bottom of sheet, easier thumb reach */
 .modal-close-bar{display:none}
-.modal-avatar{width:76px;height:76px;border-radius:12px;overflow:hidden;flex-shrink:0;border:2px solid rgba(255,255,255,.22);box-shadow:0 4px 20px rgba(0,0,0,.4)}
+.modal-avatar{width:92px;height:92px;border-radius:14px;overflow:hidden;flex-shrink:0;
+  border:2.5px solid rgba(255,255,255,.18);
+  box-shadow:0 6px 24px rgba(0,0,0,.45),0 0 0 1px rgba(212,168,48,.15),inset 0 0 0 1px rgba(255,255,255,.06)}
 .modal-avatar img{width:100%;height:100%;object-fit:cover;object-position:50% 15%}
-.modal-player-info{display:flex;flex-direction:column;align-items:flex-start;gap:2px;min-width:0;flex:1}
-.modal-rank-label{font-size:var(--text-10);font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--amber-light);opacity:.9;margin-bottom:2px;text-align:left}
-.modal-name{font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:900;letter-spacing:.3px;line-height:1.05;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
-.modal-meta{font-size:var(--text-xs);opacity:.65;margin-top:3px;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.modal-player-info{display:flex;flex-direction:column;align-items:flex-start;gap:1px;min-width:0;flex:1}
+.modal-rank-label{font-size:var(--text-10);font-weight:800;letter-spacing:2.2px;text-transform:uppercase;color:var(--amber-light);opacity:.92;margin-bottom:3px;text-align:left}
+.modal-name{font-family:'Barlow Condensed',sans-serif;font-size:34px;font-weight:900;letter-spacing:.2px;line-height:1.0;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.modal-meta{font-size:var(--text-sm);opacity:.7;margin-top:5px;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;font-weight:500;letter-spacing:.2px}
 .modal-body{padding:22px 26px}
 .modal-metrics-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(90px,1fr));gap:10px;margin-bottom:18px}
 .metric-box{background:var(--gray-50);border:1px solid var(--gray-100);border-radius:10px;padding:11px 14px;text-align:center;transition:background .2s}
@@ -1003,10 +1023,11 @@ tr:hover td{background:var(--gray-50)}
 .modal-section-label--bpm{margin-top:16px;color:var(--blue);opacity:.7}
 .modal-bpm-row{grid-template-columns:repeat(3,1fr) !important;max-width:320px}
 /* ── MODAL TAB BAR ── */
-.modal-tab-bar{display:flex;gap:0;background:var(--gray-100);border-radius:10px;padding:4px;margin-bottom:18px;border:1px solid #e2e8f0}
-.modal-tab{flex:1;padding:9px 16px;border:none;border-radius:7px;cursor:pointer;font-size:var(--text-xs);font-weight:700;letter-spacing:.6px;text-transform:uppercase;transition:all .18s;background:transparent;color:var(--gray-500);display:flex;align-items:center;justify-content:center;gap:6px}
-.modal-tab .tab-icon{font-size:var(--text-14)}
-.modal-tab.active{background:var(--navy);color:#fff;box-shadow:0 2px 8px rgba(10,22,40,.25)}
+.modal-tab-bar{display:flex;gap:0;background:var(--gray-100);border-radius:11px;padding:4px;margin-bottom:18px;border:1px solid #e2e8f0}
+.modal-tab{flex:1;padding:10px 16px;border:none;border-radius:8px;cursor:pointer;font-family:'Barlow Condensed',sans-serif;font-size:var(--text-sm);font-weight:800;letter-spacing:.8px;text-transform:uppercase;transition:all .18s;background:transparent;color:var(--gray-500);display:flex;align-items:center;justify-content:center;gap:7px}
+.modal-tab .tab-icon{font-size:var(--text-14);opacity:.9}
+.modal-tab.active{background:var(--navy);color:#fff;box-shadow:0 2px 10px rgba(10,22,40,.28)}
+.modal-tab.active .tab-icon{opacity:1}
 .modal-tab:not(.active):hover{background:var(--gray-200);color:var(--gray-700)}
 /* ── SHOT CHART PANEL ── */
 .shot-panel-wrap{display:flex;gap:18px;align-items:flex-start}
@@ -1436,7 +1457,7 @@ tr:hover td{background:var(--gray-50)}
   .pc-tier-bar{width:4px}
   .card-header-left{padding:11px 10px 10px;gap:8px}
   .card-rank-num{font-size:var(--text-lg)}
-  .card-name-last{font-size:clamp(15px,5.1cqw,23px)}
+  .card-name-last{font-size:clamp(17px,5.7cqw,28px)}
   .card-name-first{font-size:var(--text-sm)}
   .card-school-name{font-size:var(--text-2xs)}
   .card-role-line{font-size:var(--text-10);margin-top:2px}
@@ -2813,7 +2834,7 @@ tr:hover td{background:var(--gray-50)}
   .card-header-left{padding:9px 8px 8px;gap:7px}
   .card-rank-label{font-size:var(--text-7)}
   .card-rank-num{font-size:var(--text-20)}
-  .card-name-last{font-size:clamp(14px,5.1cqw,22px) !important}
+  .card-name-last{font-size:clamp(16px,5.7cqw,28px) !important}
   .card-school-name{font-size:var(--text-10)}
   .card-metric-panel{width:64px;padding:9px 6px 8px}
   .card-metric{font-size:var(--text-22)}
@@ -2896,7 +2917,7 @@ tr:hover td{background:var(--gray-50)}
   .cards-grid{grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px}
   .card-header-left{padding:14px 12px 12px;gap:10px}
   .card-rank-num{font-size:var(--text-xl)}
-  .card-name-first{font-size:clamp(11px,3.3cqw,14px)}
+  .card-name-first{font-size:clamp(12px,3.6cqw,17px)}
   .card-metric-panel{width:86px;padding:10px 10px 12px}
   .card-metric{font-size:34px}
   .card-metric-label{font-size:var(--text-7)}
@@ -7883,6 +7904,43 @@ const POS_HT_SORTED = {};
 // at this point in script execution. The initial build is triggered from the
 // Bootstrap IIFE at the bottom of the file, after all modules are initialized.
 
+// ── AGE COLORING ──────────────────────────────────────────────────────────
+// Age is the one stat where LOWER is better, so it can't use the generic
+// gradStyle (which maps high→green). These helpers map age on an ABSOLUTE
+// scale — younger always greener, older always redder — so the colors are
+// consistent across every player regardless of class. A 20-year-old always
+// reads greener than a 22-year-old, period. Kept subtle/professional: a soft
+// hue sweep, never neon. Calibrated to the prospect pool (≈18.7–25.8).
+//   AGE_GREEN (youngest, full green) .. AGE_RED (oldest, full red)
+var AGE_GREEN = 19.0;   // at/below this → greenest
+var AGE_RED   = 23.0;   // at/above this → reddest
+function _ageRatio(age) {
+  var a = parseFloat(age);
+  if (isNaN(a)) return null;
+  // 0 = youngest (green), 1 = oldest (red)
+  return Math.max(0, Math.min(1, (a - AGE_GREEN) / (AGE_RED - AGE_GREEN)));
+}
+// Text color only (for the card bio value). Subtle: desaturated, dark enough
+// to read on a light chip. ratio 0 → green, 1 → red, .5 → muted amber.
+function ageColor(age) {
+  var r = _ageRatio(age);
+  if (r === null) return '';
+  var hue = Math.round(135 - r * 135);          // 135 (green) → 0 (red)
+  var sat = 58 + Math.round(Math.abs(r - 0.5) * 18); // a touch more saturated at extremes
+  var light = 34;                                // consistent, readable depth
+  return 'color:hsl(' + hue + ',' + sat + '%,' + light + '%)';
+}
+// Full chip style (bg + text) matching gradStyle's look, for use anywhere age
+// is shown as a filled cell.
+function ageGradStyle(age) {
+  var r = _ageRatio(age);
+  if (r === null) return '';
+  var hue = Math.round(135 - r * 135);
+  var bgL = 95 - Math.round(Math.abs(r - 0.5) * 4); // barely tinted, professional
+  var fgL = 34;
+  return 'background:hsl(' + hue + ',55%,' + bgL + '%);color:hsl(' + hue + ',60%,' + fgL + '%);';
+}
+
 function gradStyle(value, statKey) {
   if(value === null || value === undefined || value === 0 || value === '') return '';
   var numVal = typeof value === 'number' ? value : parseFloat(value);
@@ -9537,17 +9595,18 @@ function buildPlayerCard(p, tierKey, _metricsSorted) {
       + '<div class="card-bio-lbl">Weight</div>'
       + '</div>';
   }
-  // Age — CONTEXT: age-for-class is a top-tier draft signal and both data
-  // points were sitting uncombined. Young-for-class reads scale-green,
-  // old-for-class warning-orange; tooltip spells it out.
+  // Age — colored on an ABSOLUTE scale (younger=green, older=red) via
+  // ageColor() so the colors are consistent across every player. The class
+  // context (young/old for class) is preserved in the tooltip, where it's a
+  // useful nuance without making the colors inconsistent player-to-player.
   if (p.age) {
     var _ageN = parseFloat(p.age) || 0;
     var _AGE_BANDS = { FR:[19.3,20.3], SO:[20.3,21.3], JR:[21.3,22.3], SR:[22.3,23.3] };
     var _band = _AGE_BANDS[clsAbbr] || null;
-    var _ageCol = '', _ageTip = '';
+    var _ageCol = ageColor(_ageN), _ageTip = '';
     if (_band && _ageN > 0) {
-      if (_ageN < _band[0])      { _ageCol = 'color:var(--green-dark)'; _ageTip = 'Young for class'; }
-      else if (_ageN > _band[1]) { _ageCol = 'color:#EA580C'; _ageTip = 'Old for class'; }
+      if (_ageN < _band[0])      { _ageTip = 'Young for class'; }
+      else if (_ageN > _band[1]) { _ageTip = 'Old for class'; }
     }
     bioItems += '<div class="card-bio-item"' + (_ageTip ? ' title="' + _ageTip + ' (' + clsAbbr + ')"' : '') + '>'
       + '<div class="card-bio-val" style="' + _ageCol + '">' + _ageN.toFixed(1) + '</div>'
@@ -9639,10 +9698,10 @@ function buildPlayerCard(p, tierKey, _metricsSorted) {
             + '<div class="card-id-top">'
               + avatarHtml(p.name, p.position || '', '52px', '10px', true)
               + '<div class="card-name">'
-                + '<span class="card-name-first">' + nameFirst + '</span>'
+                + '<span class="card-name-first"><span class="card-name-first-text">' + nameFirst + '</span>' + getBadgeHtml(p.name) + '</span>'
                 + (nameLast
-                    ? '<span class="card-name-last"><span class="card-name-last-text">' + nameLast + '</span>' + getBadgeHtml(p.name) + '</span>'
-                    : getBadgeHtml(p.name))
+                    ? '<span class="card-name-last"><span class="card-name-last-text">' + nameLast + '</span></span>'
+                    : '')
               + '</div>'
             + '</div>'
             + '<div class="card-id-meta">'
@@ -10152,6 +10211,20 @@ function openPlayerModal(rank, year) {
   document.getElementById('modalName').textContent = name;
   document.getElementById('modalMeta').textContent = [school, cls, torvik_role, position].filter(Boolean).join(' · ');
   document.getElementById('modalAvatar').innerHTML = avatarHtml(player.name, player.position, '100%', '12px');
+  // College flair — drop the school crest into the header as a faint watermark.
+  (function _setCrest(){
+    var hdr = document.getElementById('modalHeader');
+    if (!hdr) return;
+    var old = hdr.querySelector('.modal-header-crest');
+    if (old) old.remove();
+    var url = (typeof schoolLogoUrl === 'function') ? schoolLogoUrl(school) : '';
+    if (url) {
+      var crest = document.createElement('div');
+      crest.className = 'modal-header-crest';
+      crest.innerHTML = '<img src="' + url + '" alt="" onerror="this.parentNode.remove()">';
+      hdr.appendChild(crest);
+    }
+  })();
   // PROFILE-4: headline stat lockup
   var _hs = document.getElementById('modalHeadStat');
   if (_hs) {
@@ -11566,7 +11639,7 @@ function _renderFuture2027Table(players) {
     h += '<td style="font-size:var(--text-2xs);color:var(--gray-600)">'+(p.position||'—')+'</td>';
     h += '<td style="font-size:var(--text-2xs);white-space:nowrap">'+htStr+' / '+wtStr+'</td>';
     h += '<td style="font-size:var(--text-2xs)">'+(p.cls||'—')+'</td>';
-    h += '<td style="font-size:var(--text-2xs)">'+(p.age ? parseFloat(p.age).toFixed(1) : '—')+'</td>';
+    h += '<td style="font-size:var(--text-2xs);'+(p.age?ageColor(p.age):'')+'">'+(p.age ? parseFloat(p.age).toFixed(1) : '—')+'</td>';
     h += '<td style="font-size:var(--text-2xs);color:var(--gray-500)">'+(p.prior_teams ? escHtml(p.prior_teams) : '—')+'</td>';
     h += '<td style="font-size:var(--text-2xs);color:var(--gray-600);max-width:240px">'+noteStr+'</td>';
     h += '</tr>';
@@ -13769,6 +13842,25 @@ function bbSort(col) {
   if (isBoardActive()) renderBoard2026();
 }
 
+// SHARPNESS HELPER: html2canvas rasterizes whatever fonts are loaded at capture
+// time. If the web fonts (Barlow Condensed / DM Sans) haven't finished decoding,
+// the clone renders with fallback fonts that look soft and mis-spaced. Gating
+// every export on document.fonts.ready guarantees the real fonts are painted.
+// Falls back immediately on browsers without the Font Loading API.
+function _whenFontsReady(cb) {
+  try {
+    if (document.fonts && document.fonts.ready && typeof document.fonts.ready.then === 'function') {
+      var done = false;
+      var go = function(){ if (done) return; done = true; cb(); };
+      document.fonts.ready.then(go);
+      // Safety timeout so a stalled fonts.ready never blocks the export.
+      setTimeout(go, 1200);
+      return;
+    }
+  } catch (e) {}
+  cb();
+}
+
 function bbScreenshot() {
   var board = document.getElementById('bbBoard');
   if (!board) return;
@@ -13805,9 +13897,111 @@ function bbScreenshot() {
   var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
 
   function doShot() {
+    // RESOLUTION FIX: the export swaps each headshot to its full-resolution
+    // ESPN source (see onclone below). Those larger images must be in cache
+    // before html2canvas rasterizes, or the capture races the download and the
+    // photo comes out blank/blurry. Preload them all first, then capture.
+    var hiUrls = [];
+    try {
+      clone.querySelectorAll('.bb-row[data-rank]').forEach(function(row) {
+        var img = row.querySelector('.bb-av img');
+        if (!img) return;
+        var of = ''; try { of = (img.style && img.style.objectFit) || getComputedStyle(img).objectFit; } catch (e) {}
+        if (of !== 'cover') return;
+        try {
+          var rk = parseInt(row.getAttribute('data-rank'), 10);
+          var pl = (typeof DataService !== 'undefined' && DataService.findByRank)
+            ? DataService.findByRank(rk, '2026') : null;
+          if (pl && typeof getPhotoUrl === 'function') {
+            var hi = getPhotoUrl(pl.name);
+            if (hi) hiUrls.push(hi);
+          }
+        } catch (e) {}
+      });
+    } catch (e) {}
+
+    function _preload(urls) {
+      return new Promise(function(resolve) {
+        if (!urls.length) return resolve();
+        var left = urls.length, settled = false;
+        var done = function() { if (--left <= 0 && !settled) { settled = true; resolve(); } };
+        // Hard cap so a slow/blocked CDN never hangs the export.
+        setTimeout(function() { if (!settled) { settled = true; resolve(); } }, 6000);
+        urls.forEach(function(u) {
+          var im = new Image();
+          im.crossOrigin = 'anonymous';
+          im.onload = done; im.onerror = done;
+          im.src = u;
+        });
+      });
+    }
+
+    _preload(hiUrls).then(_runCapture);
+  }
+
+  function _runCapture() {
+    // SHARPNESS FIX: capture at a DPR-aware, oversampled scale instead of a
+    // fixed scale:2. On the live site text is rendered at devicePixelRatio
+    // (often 2–3x); a flat scale:2 under-samples on 3x phones and produces a
+    // soft PNG. We capture at max(2.5, 2×DPR) so the raster always carries more
+    // detail than the display needs, clamped to a 6000px ceiling for memory.
+    var rect = clone.getBoundingClientRect();
+    var dpr  = window.devicePixelRatio || 1;
+    var shotScale = Math.max(2.5, 2 * dpr);
+    var MAX_W = 6000;
+    if (rect.width * shotScale > MAX_W) shotScale = MAX_W / rect.width;
+    shotScale = Math.max(2, shotScale);
     html2canvas(clone, {
-      scale: 2, useCORS: true, allowTaint: false,
+      scale: shotScale, useCORS: true, allowTaint: false,
       backgroundColor: '#ffffff', logging: false,
+      imageTimeout: 8000,
+      width:  rect.width,
+      height: rect.height,
+      windowWidth:  rect.width,
+      windowHeight: rect.height,
+      onclone: function(clonedDoc) {
+        // PHOTO ASPECT + RESOLUTION FIX for html2canvas 1.4.1:
+        //  (a) It ignores `object-fit:cover` on <img>, so headshots render
+        //      stretched. Fix: paint the photo as a background-image with
+        //      background-size:cover (which it DOES honor) on the square box.
+        //  (b) The live <img> src is a SMALL thumbnail sized for the 44px box
+        //      (~88–132px). At the export's high capture scale that thumbnail
+        //      gets upscaled and looks blurry. Fix: swap to the full-resolution
+        //      ESPN headshot (getPhotoUrl with no cssPx) before painting it.
+        // The on-screen DOM is untouched — this only affects the clone.
+        try {
+          var rows = clonedDoc.querySelectorAll('.bb-row[data-rank]');
+          for (var r = 0; r < rows.length; r++) {
+            var row = rows[r];
+            var img = row.querySelector('.bb-av img');
+            if (!img) continue;
+            var of = '';
+            try { of = (img.style && img.style.objectFit) || getComputedStyle(img).objectFit; } catch (e) {}
+            if (of !== 'cover') continue;
+            var box = img.parentNode;
+            if (!box) continue;
+            // Resolve the player's full-res photo from the row's rank.
+            var src = img.getAttribute('src');
+            try {
+              var rk = parseInt(row.getAttribute('data-rank'), 10);
+              var pl = (typeof DataService !== 'undefined' && DataService.findByRank)
+                ? DataService.findByRank(rk, '2026') : null;
+              if (pl && typeof getPhotoUrl === 'function') {
+                var hi = getPhotoUrl(pl.name);   // no cssPx -> full resolution
+                if (hi) src = hi;
+              }
+            } catch (e) { /* keep thumbnail src */ }
+            if (!src) continue;
+            var pos = '';
+            try { pos = (img.style && img.style.objectPosition) || getComputedStyle(img).objectPosition; } catch (e) {}
+            box.style.backgroundImage    = 'url("' + src + '")';
+            box.style.backgroundSize     = 'cover';
+            box.style.backgroundPosition = pos || '50% 18%';
+            box.style.backgroundRepeat   = 'no-repeat';
+            img.style.opacity = '0';
+          }
+        } catch (e) { /* non-fatal: fall back to default rendering */ }
+      },
     }).then(function(canvas) {
       document.body.removeChild(clone);
 
@@ -13852,8 +14046,8 @@ function bbScreenshot() {
   if (typeof html2canvas === 'undefined') {
     var s = document.createElement('script');
     s.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
-    s.onload = doShot; document.head.appendChild(s);
-  } else { doShot(); }
+    s.onload = function(){ _whenFontsReady(doShot); }; document.head.appendChild(s);
+  } else { _whenFontsReady(doShot); }
 }
 
 
@@ -20820,9 +21014,9 @@ var FreeformExport = (function() {
 
   // Presets — width × height in CSS px, at 2× device pixel ratio for retina.
   var PRESETS = [
-    { id:'twitter',  name:'Twitter / X',  size:'1200 × 675',  w:1200, h:675  },
-    { id:'square',   name:'Square',       size:'1080 × 1080', w:1080, h:1080 },
-    { id:'full',     name:'Full Board',   size:'1600 × 2200', w:1600, h:2200 },
+    { id:'twitter',  name:'Twitter / X',  size:'1200 × 675 · 2×',  w:1200, h:675  },
+    { id:'square',   name:'Square',       size:'1080 × 1080 · 2×', w:1080, h:1080 },
+    { id:'full',     name:'Full Board',   size:'1600 × 2200 · 2×', w:1600, h:2200 },
   ];
 
   function _loadLib() {
@@ -20904,7 +21098,11 @@ var FreeformExport = (function() {
 
     _loadLib().then(function() {
       _setStatus(overlay, 'Rendering ' + preset.name + '…', true);
-      return _capture(shell, preset);
+      return new Promise(function(res){
+        (typeof _whenFontsReady === 'function' ? _whenFontsReady : function(cb){cb();})(function(){
+          res(_capture(shell, preset));
+        });
+      });
     }).then(function(canvas) {
       _setStatus(overlay, 'Downloading…', true);
       _download(canvas, preset);
@@ -20942,10 +21140,14 @@ var FreeformExport = (function() {
     // so there is always more detail than the output needs. Clamped to a 4000px
     // raster ceiling to stay within html2canvas's memory limits.
     var dpr = window.devicePixelRatio || 1;
-    var fillScale = (preset.w * 1.5) / rect.width;   // 1.5x oversample of the target
-    var dprScale  = 2 * dpr;
-    var targetScale = Math.max(2, fillScale, dprScale);
-    var MAX_CAPTURE_W = 4000;
+    // Capture at enough detail to feed the 2x-supersampled output frame:
+    //   • fill the preset width at 2x oversample (matches OUT_SS in _download),
+    //   • and at least 2.5x the on-screen DPR,
+    // so the final letterboxed PNG always has more real pixels than it shows.
+    var fillScale = (preset.w * 2.0) / rect.width;   // 2x oversample of the target
+    var dprScale  = Math.max(2.5, 2.5 * dpr);
+    var targetScale = Math.max(2.5, fillScale, dprScale);
+    var MAX_CAPTURE_W = 5200;                         // raised ceiling for memory
     if (rect.width * targetScale > MAX_CAPTURE_W) {
       targetScale = MAX_CAPTURE_W / rect.width;
     }
@@ -21084,25 +21286,45 @@ var FreeformExport = (function() {
       },
     }).then(function(srcCanvas) {
       if (layer) { layer.style.transform = prevTransform; layer.style.width = prevWidth; }
-      // Resize/letterbox into the preset frame.
+      // Resize/letterbox into the preset frame — but at a SUPERSAMPLED output
+      // resolution. The nominal presets (e.g. Twitter 1200×675) are too few
+      // pixels to hold 75 cards of fine text, so downscaling the capture into
+      // them is what made the export look soft. We render the final PNG at
+      // OUT_SS× the preset's dimensions (same aspect ratio, so it displays
+      // identically on Twitter/etc., just crisper), capped so we never exceed
+      // the source capture's real detail or a hard pixel ceiling.
+      var OUT_SS = 2;                              // supersample the output 2x
+      var MAX_OUT_W = 4096;                        // hard ceiling for memory
+      var outW = preset.w * OUT_SS, outH = preset.h * OUT_SS;
+      // Don't upscale beyond the actual captured detail (no fake sharpness),
+      // and don't blow past the pixel ceiling.
+      var capByW = srcCanvas.width  / preset.w;
+      var capByH = srcCanvas.height / preset.h;
+      var srcCap = Math.max(1, Math.min(capByW, capByH));   // how much real detail we have
+      var ssEff  = Math.min(OUT_SS, srcCap);
+      if (preset.w * ssEff > MAX_OUT_W) ssEff = MAX_OUT_W / preset.w;
+      ssEff = Math.max(1, ssEff);
+      outW = Math.round(preset.w * ssEff);
+      outH = Math.round(preset.h * ssEff);
+
       var out = document.createElement('canvas');
-      out.width = preset.w; out.height = preset.h;
+      out.width = outW; out.height = outH;
       var ctx = out.getContext('2d');
       // High-quality resampling so the oversampled capture downscales crisply
       // rather than with the browser's default nearest-ish interpolation.
       ctx.imageSmoothingEnabled = true;
       ctx.imageSmoothingQuality = 'high';
       ctx.fillStyle = '#060D1A';
-      ctx.fillRect(0, 0, preset.w, preset.h);
+      ctx.fillRect(0, 0, outW, outH);
       var sR = srcCanvas.width / srcCanvas.height;
-      var dR = preset.w / preset.h;
+      var dR = outW / outH;
       var dw, dh, dx, dy;
       if (sR > dR) {
-        dw = preset.w; dh = preset.w / sR;
-        dx = 0; dy = (preset.h - dh) / 2;
+        dw = outW; dh = outW / sR;
+        dx = 0; dy = (outH - dh) / 2;
       } else {
-        dh = preset.h; dw = preset.h * sR;
-        dy = 0; dx = (preset.w - dw) / 2;
+        dh = outH; dw = outH * sR;
+        dy = 0; dx = (outW - dw) / 2;
       }
       ctx.drawImage(srcCanvas, 0, 0, srcCanvas.width, srcCanvas.height, dx, dy, dw, dh);
       return out;
