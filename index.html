@@ -8,15 +8,21 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <!-- display=swap: browsers show fallback font immediately, swap when loaded — eliminates FOIT -->
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<!-- External libs from cdnjs. crossorigin+referrerpolicy hardening applied.
+     SECURITY TODO — add Subresource Integrity: append integrity="sha384-…" to each
+     tag below using the official hash shown on the cdnjs page for that exact file
+     (cdnjs.com → search lib → version → copy the SRI string). Hashes must match the
+     served .min.js byte-for-byte or the script is blocked, so copy them from cdnjs
+     rather than computing from another source. -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <!-- PR3: pinch-zoom + drag-pan + wheel-zoom on the scatter chart. hammerjs is
      required for touch gestures (chartjs-plugin-zoom checks for it and gates
      pinch support on its presence). Both loaded after Chart.js so the plugin
      can self-register; if either fails to load the chart still renders, just
      without zoom (handled by the typeof check in scRender chartConfig). -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-zoom/2.0.1/chartjs-plugin-zoom.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-zoom/2.0.1/chartjs-plugin-zoom.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <style>
 
 :root {
@@ -353,22 +359,35 @@ body{font-family:'DM Sans',sans-serif;background:var(--gray-50);color:var(--navy
 #tab-methodology .mc-hero-outer{padding:28px 16px 24px}
 
 /* CONTROLS */
-.controls-bar{display:flex;align-items:center;gap:6px;margin-bottom:10px;flex-wrap:wrap}
-.search-wrap{position:relative;flex:1;min-width:120px;max-width:320px}
-.search-input{width:100%;padding:8px 12px 8px 34px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:var(--text-sm);font-family:inherit;background:white;color:var(--navy);outline:none;transition:border-color .15s}
-.search-input:focus{border-color:var(--blue-light)}
-.search-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--gray-400);font-size:var(--text-sm);pointer-events:none}
-.filter-select{padding:6px 8px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:var(--text-16);font-family:inherit;background:white;color:var(--navy);outline:none;cursor:pointer;transition:border-color .15s,box-shadow .15s;min-width:90px;min-height:44px}
-.filter-select:focus{border-color:var(--blue-light)}
-.view-toggle{display:flex;width:auto;flex-shrink:0;background:var(--gray-100);border-radius:10px;padding:3px;gap:2px;border:1px solid var(--gray-200);box-shadow:inset 0 1px 2px rgba(10,22,40,.04)}
-.view-btn{display:flex;align-items:center;gap:5px;flex:1;text-align:center;padding:5px 7px;border-radius:7px;font-size:var(--text-11h);font-weight:700;cursor:pointer;transition:background .15s ease,color .15s ease,box-shadow .15s ease;border:none;background:transparent;color:var(--gray-500);font-family:'Barlow Condensed',sans-serif;letter-spacing:.5px;text-transform:uppercase;white-space:nowrap;position:relative}
-.view-btn:hover:not(.active){background:rgba(255,255,255,.07);color:rgba(255,255,255,.75)}
-.view-btn.active{background:white;color:var(--navy);box-shadow:0 1px 4px rgba(10,22,40,.12),0 0 0 1px rgba(10,22,40,.06);}
-.vb-icon{font-size:var(--text-xs);line-height:1;opacity:.65}
+.controls-bar{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+/* Search — primary action: light fill, clean SVG glyph, soft focus ring */
+.search-wrap{position:relative;flex:1;min-width:120px;max-width:300px}
+.search-input{width:100%;height:40px;padding:0 12px 0 38px;border:1.5px solid var(--gray-200);border-radius:9px;font-size:var(--text-sm);font-family:inherit;background:var(--gray-50);color:var(--navy);outline:none;transition:border-color .15s,box-shadow .15s,background .15s}
+.search-input::placeholder{color:var(--gray-400)}
+.search-input:hover{background:white}
+.search-input:focus{border-color:var(--blue-light);background:white;box-shadow:0 0 0 3px rgba(59,130,246,.12)}
+.search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--gray-400);display:flex;align-items:center;pointer-events:none;transition:color .15s}
+.search-input:focus + .search-icon,.search-wrap:focus-within .search-icon{color:var(--blue)}
+/* Filter group — secondary: two selects read as one tight cluster */
+.controls-bar-row2{display:flex;align-items:center;gap:8px}
+.filter-select{height:40px;padding:0 28px 0 11px;border:1.5px solid var(--gray-200);border-radius:9px;font-size:var(--text-sm);font-family:inherit;background:white;color:var(--navy);outline:none;cursor:pointer;transition:border-color .15s,box-shadow .15s;min-width:104px;
+  appearance:none;-webkit-appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6' fill='none' stroke='%2364748B' stroke-width='1.6' stroke-linecap='round'%3E%3Cpath d='M1 1l4 4 4-4'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 11px center}
+.filter-select:hover{border-color:var(--gray-300)}
+.filter-select:focus{border-color:var(--blue-light);box-shadow:0 0 0 3px rgba(59,130,246,.12)}
+/* View toggle — mode switch, the hero control: navy active state, brand pop */
+.view-toggle{display:flex;align-items:center;width:auto;flex-shrink:0;height:40px;background:var(--gray-100);border-radius:10px;padding:3px;gap:2px;border:1px solid var(--gray-200);box-shadow:inset 0 1px 2px rgba(10,22,40,.05)}
+.view-btn{display:flex;align-items:center;justify-content:center;gap:6px;text-align:center;padding:0 12px;height:100%;border-radius:7px;font-weight:700;cursor:pointer;transition:background .15s ease,color .15s ease,box-shadow .15s ease;border:none;background:transparent;color:var(--gray-500);font-family:'Barlow Condensed',sans-serif;letter-spacing:.5px;text-transform:uppercase;white-space:nowrap;position:relative}
+.view-btn:hover:not(.active){background:rgba(10,22,40,.05);color:var(--navy)}
+.view-btn.active{background:var(--navy);color:white;box-shadow:0 1px 5px rgba(10,22,40,.22)}
+.vb-icon{display:flex;align-items:center;line-height:1;opacity:.6}
 .view-btn.active .vb-icon{opacity:1}
+.view-btn.active .vb-icon svg{stroke:var(--amber)}
 .vb-label{font-size:var(--text-2xs);font-weight:700;letter-spacing:.5px}
 .vb-badge{font-size:var(--text-8);font-weight:900;letter-spacing:.8px;text-transform:uppercase;background:linear-gradient(135deg,#F59E0B,#D97706);color:var(--navy);padding:1px 4px;border-radius:3px;margin-left:1px;line-height:1.4}
-.count-badge{font-size:var(--text-2xs);color:var(--gray-500);font-weight:600;margin-left:auto;background:var(--gray-100);padding:3px 9px;border-radius:20px;border:1px solid var(--gray-200);letter-spacing:.01em;white-space:nowrap}
+/* Count — metadata: amber-tinted chip, anchored right */
+.count-badge{font-size:var(--text-2xs);color:var(--amber-dark);font-weight:700;margin-left:auto;background:rgba(212,168,48,.1);padding:0 12px;height:40px;display:inline-flex;align-items:center;border-radius:9px;border:1px solid rgba(212,168,48,.25);letter-spacing:.02em;white-space:nowrap;text-transform:uppercase;font-family:'Barlow Condensed',sans-serif}
 
 /* ── MOTION & TACTILE ENHANCEMENT LAYER ───────────────────────────────────
    Built on the elevation + motion token systems above. These add the
@@ -448,15 +467,59 @@ button{transition:transform var(--dur-instant) var(--ease-out)}
 
 /* TIER */
 .tier-section{margin-bottom:28px;content-visibility:auto;contain-intrinsic-size:0 800px}
-.tier-header{display:flex;align-items:center;gap:10px;margin-bottom:14px;padding-bottom:10px;border-bottom:2px solid rgba(10,22,40,.06)}
-.tier-pill{font-family:'Barlow Condensed',sans-serif;font-size:var(--text-10);font-weight:700;letter-spacing:1.2px;text-transform:uppercase;padding:3px 10px;border-radius:4px;color:white}
-.tier-pill.franchise{background:var(--amber)}
-.tier-pill.lottery{background:var(--tier-lottery)}
-.tier-pill.late1{background:var(--blue)}
-.tier-pill.second{background:var(--tier-second)}
-.tier-pill.udfa{background:var(--gray-500)}
-.tier-name{font-family:'Barlow Condensed',sans-serif;font-size:19px;font-weight:700;color:var(--navy)}
-.tier-ct{font-size:var(--text-xs);color:var(--gray-400)}
+/* Tier header — editorial chapter marker. A tier-colored gradient rule, a
+   gradient pill carrying a numeral + label, a stacked title/sub, and a tinted
+   count chip. Echoes the Big Board tier bands so both views feel authored. */
+.tier-header{display:flex;align-items:center;gap:13px;margin-bottom:16px;padding-bottom:12px;position:relative}
+.tier-header::after{content:'';position:absolute;left:0;right:0;bottom:0;height:2px;
+  background:linear-gradient(90deg,var(--tier-accent) 0%,rgba(10,22,40,.06) 38%,rgba(10,22,40,.06) 100%);
+  border-radius:2px}
+.tier-pill{display:inline-flex;align-items:center;gap:8px;font-family:'Barlow Condensed',sans-serif;
+  font-size:var(--text-sm);font-weight:800;letter-spacing:1.4px;text-transform:uppercase;
+  padding:6px 14px 6px 6px;border-radius:8px;color:white;line-height:1;flex-shrink:0;
+  box-shadow:0 2px 8px rgba(10,22,40,.18),inset 0 1px 0 rgba(255,255,255,.18)}
+.tier-pill-icon{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;
+  border-radius:6px;background:rgba(255,255,255,.2);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.22)}
+.tier-pill-icon svg{display:block}
+.tier-pill-txt{padding-top:1px}
+.tier-head-text{display:flex;flex-direction:column;gap:2px;line-height:1.05}
+.tier-name{font-family:'Barlow Condensed',sans-serif;font-size:21px;font-weight:800;color:var(--navy);letter-spacing:.2px}
+.tier-sub{font-family:'Barlow Condensed',sans-serif;font-size:var(--text-base);font-weight:700;
+  color:var(--navy);letter-spacing:.2px;line-height:1.1}
+.tier-range{font-family:'Barlow Condensed',sans-serif;font-size:var(--text-2xs);font-weight:700;
+  letter-spacing:.8px;text-transform:uppercase;color:var(--tier-accent);opacity:.9}
+/* Editorial rationale (mirrors the Big Board tier bands) — fills the open space
+   between the label block and the count chip. Muted, italic, with a tier-tinted
+   divider; clamps to 2 lines so a long line never bloats the header height. */
+.tier-desc{flex:1;min-width:0;align-self:center;
+  padding-left:15px;margin-left:3px;
+  border-left:2px solid color-mix(in srgb,var(--tier-accent) 35%,transparent);
+  border-left:2px solid var(--gray-200);
+  font-family:'DM Sans',system-ui,sans-serif;font-size:var(--text-xs);font-style:italic;
+  font-weight:400;line-height:1.35;color:var(--gray-500);
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.tier-ct{margin-left:auto;flex-shrink:0;font-family:'Barlow Condensed',sans-serif;font-size:var(--text-2xs);
+  font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--tier-accent);
+  background:var(--gray-100);
+  background:color-mix(in srgb,var(--tier-accent) 12%,white);
+  border:1px solid var(--gray-200);
+  border:1px solid color-mix(in srgb,var(--tier-accent) 28%,white);
+  padding:5px 11px;border-radius:20px;white-space:nowrap}
+.tier-ct strong{font-size:var(--text-sm);font-weight:900}
+/* Tier share button — generates a branded shareable image of the whole tier.
+   Subtle until hover, then fills with the tier accent. */
+.tier-share-btn{display:inline-flex;align-items:center;gap:5px;flex-shrink:0;cursor:pointer;
+  font-family:'Barlow Condensed',sans-serif;font-size:var(--text-2xs);font-weight:700;
+  letter-spacing:.5px;text-transform:uppercase;
+  color:var(--tier-accent);background:transparent;
+  border:1.5px solid color-mix(in srgb,var(--tier-accent) 30%,transparent);
+  border:1.5px solid var(--gray-200);
+  border-radius:8px;padding:6px 11px;transition:all .15s;line-height:1}
+.tier-share-btn:hover{background:var(--tier-accent);color:#fff;border-color:var(--tier-accent);
+  box-shadow:0 2px 8px color-mix(in srgb,var(--tier-accent) 35%,transparent)}
+.tier-share-btn svg{display:block}
+.tier-share-btn:focus-visible{outline:none;box-shadow:0 0 0 2px var(--navy),0 0 0 4px var(--amber)}
 
 /* ── PLAYER CARDS — Redesigned ─────────────────────────────────────────── */
 
@@ -498,7 +561,7 @@ button{transition:transform var(--dur-instant) var(--ease-out)}
 /* Tier-aware gradient number: navy core melting into the tier accent, with a
    soft tier-colored halo. Reuses the per-card --tier-glow triplet so the
    treatment stays in the same visual system as the avatar glow. */
-.card-rank-num{font-family:'Barlow Condensed',sans-serif;font-size:36px;font-weight:900;letter-spacing:-1.5px;line-height:1;margin-top:1px;
+.card-rank-num{font-family:'Barlow Condensed',sans-serif;font-size:36px;font-weight:900;letter-spacing:0;line-height:1;margin-top:1px;padding:0 3px;
   background:linear-gradient(155deg,var(--navy) 18%,rgb(var(--tier-glow)) 115%);
   -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:var(--navy);
   filter:drop-shadow(0 1px 6px rgba(var(--tier-glow),.22));
@@ -3403,10 +3466,17 @@ tr:hover td{background:var(--gray-50)}
   .stat-val{font-size:var(--text-16)}
   .stat-lbl{font-size:var(--text-9h);margin-top:3px;letter-spacing:.4px}
   .tier-section{margin-bottom:20px}
-  .tier-header{margin-bottom:8px;padding-bottom:6px;gap:8px}
-  .tier-name{font-size:var(--text-16)}
-  .tier-pill{font-size:var(--text-3xs);padding:2px 8px}
-  .tier-ct{font-size:var(--text-2xs)}
+  .tier-header{margin-bottom:10px;padding-bottom:8px;gap:9px}
+  .tier-sub{font-size:var(--text-sm)}
+  .tier-range{font-size:var(--text-3xs)}
+  .tier-desc{display:none}
+  .tier-share-btn span{display:none}
+  .tier-share-btn{padding:6px 8px}
+  .tier-pill{font-size:var(--text-2xs);letter-spacing:1px;padding:4px 10px 4px 4px;gap:6px}
+  .tier-pill-icon{width:20px;height:20px}
+  .tier-pill-icon svg{width:12px;height:12px}
+  .tier-ct{font-size:var(--text-3xs);padding:3px 8px}
+  .tier-ct strong{font-size:var(--text-2xs)}
 
   /* Controls bar — font sizing for iOS zoom prevention */
   .search-input{font-size:var(--text-16);padding:8px 10px 8px 32px;letter-spacing:.01em;min-height:38px;border-radius:8px}
@@ -4394,10 +4464,11 @@ tr:hover td{background:var(--gray-50)}
 #board2026Content .bb-board.bb-tw .bb-stat-cell{min-height:32px;margin:3px 2px}
 
 /* ── TIER EDITOR ─────────────────────────────────────────────────────────── */
-.tier-customize-btn{background:rgba(10,22,40,.07);color:var(--gray-600);
-  border:1.5px solid var(--gray-200);border-radius:7px;padding:6px 12px;
+.tier-customize-btn{display:inline-flex;align-items:center;gap:5px;background:white;color:var(--gray-600);
+  border:1.5px solid var(--gray-200);border-radius:9px;height:40px;padding:0 13px;
   font-size:var(--text-2xs);font-weight:700;font-family:'Barlow Condensed',sans-serif;
-  letter-spacing:.5px;cursor:pointer;white-space:nowrap;transition:all .15s}
+  letter-spacing:.5px;text-transform:uppercase;cursor:pointer;white-space:nowrap;transition:all .15s}
+.tier-customize-btn:hover{border-color:var(--gray-300);color:var(--navy)}
 .tier-customize-btn.on{background:var(--navy);color:white;border-color:var(--navy)}
 .tier-editor{display:none}
 .tier-editor.visible{display:block}
@@ -7533,11 +7604,11 @@ ock Drafts table CSS ───────────────────�
   <div class="print-header"><div class="print-header-title">HoopsWill NBA Draft Board — 2026 Draft Board</div><div class="print-header-sub">Analytics Model · 2019–2027 · hoopswill.com</div></div>
   <div class="controls-bar">
     <div class="search-wrap">
-      <span class="search-icon">🔍</span>
+      <span class="search-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.5" y2="16.5"></line></svg></span>
       <input class="search-input" id="search2026" placeholder="Search player, school, role…">
     </div>
     <div style="position:relative">
-      <button class="tier-customize-btn" id="tierCustomBtn" onclick="toggleTierEditor()" style="background:rgba(10,22,40,.07);border-color:var(--gray-200);color:var(--gray-600);font-size:var(--text-2xs)" title="Customize tier cutoffs">✦ <span class="tier-btn-label">Tiers</span></button>
+      <button class="tier-customize-btn" id="tierCustomBtn" onclick="toggleTierEditor()" title="Customize tier cutoffs"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px"><line x1="4" y1="6" x2="20" y2="6"></line><circle cx="9" cy="6" r="2.2" fill="currentColor"></circle><line x1="4" y1="12" x2="20" y2="12"></line><circle cx="15" cy="12" r="2.2" fill="currentColor"></circle><line x1="4" y1="18" x2="20" y2="18"></line><circle cx="11" cy="18" r="2.2" fill="currentColor"></circle></svg> <span class="tier-btn-label">Tiers</span></button>
       <div class="tier-editor" id="tierEditor" style="position:absolute;top:calc(100% + 8px);right:0;z-index:500;background:var(--navy);border-radius:9px;padding:10px 14px;box-shadow:0 8px 32px rgba(0,0,0,.25);min-width:520px">
         <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
           <span class="tier-ed-label" style="color:rgba(255,255,255,.5)">Tier Cutoffs</span>
@@ -7569,17 +7640,17 @@ ock Drafts table CSS ───────────────────�
       </select>
       <div class="view-toggle">
         <button class="view-btn active" id="viewCards" onclick="setView('cards')">
-          <span class="vb-icon">⊞</span><span class="vb-label">Cards</span>
+          <span class="vb-icon"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"></rect><rect x="14" y="3" width="7" height="7" rx="1.5"></rect><rect x="3" y="14" width="7" height="7" rx="1.5"></rect><rect x="14" y="14" width="7" height="7" rx="1.5"></rect></svg></span><span class="vb-label">Cards</span>
         </button>
         <button class="view-btn" id="viewFreeform" onclick="setView('freeform')">
-          <span class="vb-icon">⬡</span><span class="vb-label">Freeform</span>
+          <span class="vb-icon"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.5l8.5 4.9v9.2L12 21.5l-8.5-4.9V7.4z"></path></svg></span><span class="vb-label">Freeform</span>
           <span class="vb-badge">NEW</span>
         </button>
         <button class="view-btn" id="viewTable" onclick="setView('table')">
-          <span class="vb-icon">☰</span><span class="vb-label">Table</span>
+          <span class="vb-icon"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"></line><line x1="4" y1="12" x2="20" y2="12"></line><line x1="4" y1="18" x2="20" y2="18"></line></svg></span><span class="vb-label">Table</span>
         </button>
         <button class="view-btn" id="viewBigboard" onclick="setView('bigboard')">
-          <span class="vb-icon">🏆</span><span class="vb-label">Big Board</span>
+          <span class="vb-icon"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="21" x2="5" y2="11"></line><line x1="12" y1="21" x2="12" y2="5"></line><line x1="19" y1="21" x2="19" y2="14"></line><line x1="3" y1="21" x2="21" y2="21"></line></svg></span><span class="vb-label">Big Board</span>
         </button>
       </div>
       <span class="count-badge" id="boardCount"></span>
@@ -10635,7 +10706,9 @@ function buildPlayerCard(p, tierKey, _metricsSorted) {
   }
 
   // ── CARD HTML ────────────────────────────────────────────────────────
-  return '<div class="player-card ' + tierKey + '" onclick="openPlayerModal(' + p.rank + ')" data-rank="' + p.rank + '"'
+  return '<div class="player-card ' + tierKey + '" role="button" tabindex="0"'
+    + ' aria-label="' + escHtml((p.name||'Prospect').replace(' - ',', ')) + ', rank ' + p.rank + '. Open profile."'
+    + ' onclick="openPlayerModal(' + p.rank + ')" data-rank="' + p.rank + '"'
     + ' style="--tier-glow:' + _tierGlow + ';">'
 
     + '<div class="pc-tier-bar"></div>'
@@ -10714,7 +10787,28 @@ function renderBoardCards(players) {
   ];
 
   var html = '';
-  var icons = {franchise:'⭐', lottery:'🎰', late1:'1️⃣', second:'2️⃣', udfa:'🆓'};
+  // Per-tier visual identity — mirrors the Big Board tier gradients so both
+  // views read as one product. accent = solid color for the count chip + rule;
+  // grad = pill gradient; sub = editorial one-liner that gives the section voice.
+  var TIER_VIS = {
+    franchise:{grad:'linear-gradient(135deg,#92400E,#B45309,#D97706)', accent:'#B45309', sub:'Cornerstone prospects', desc:'Project as future All-NBA candidates with star upside — the rare prospects worth building a franchise around.'},
+    lottery:  {grad:'linear-gradient(135deg,#3B0764,#5B21B6,#7C3AED)', accent:'#6D28D9', sub:'All-Star ceilings', desc:'High-end starters with All-Star ceilings — the talent gradient where elite skill or physical tools separate every name.'},
+    late1:    {grad:'linear-gradient(135deg,#1E3A8A,#1D4ED8,#3B82F6)', accent:'#1D4ED8', sub:'First-round targets', desc:'Starter outcomes with rotation-piece floors — guaranteed contracts justified by clear translatable skills.'},
+    second:   {grad:'linear-gradient(135deg,#134E4A,#0D9488,#14B8A6)', accent:'#0D9488', sub:'Value prospects', desc:'Rotation upside if development clicks — bets on specific archetypal skills or late-blooming physical profiles.'},
+    udfa:     {grad:'linear-gradient(135deg,#334155,#475569,#64748B)', accent:'#475569', sub:'Camp invites & sleepers', desc:'Two-way and camp-invite candidates — long-shot bets on a standout tool, motor, or specialist role to stick.'}
+  };
+  // Upscaled tier glyphs — clean inline SVG replacing the emojis. currentColor
+  // inherits white from the pill. Star = franchise elite; faceted gem = lottery
+  // (luck + value); "I"/"II" round numerals = late-first / second round; rising
+  // chevrons = UDFA sleepers climbing the board.
+  var _svg = function(p){ return '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + p + '</svg>'; };
+  var TIER_ICONS = {
+    franchise: _svg('<path d="M12 3l2.6 5.3 5.9.9-4.25 4.1 1 5.8L12 17.8 6.75 19.2l1-5.8L3.5 9.2l5.9-.9z" fill="currentColor" stroke="none"/>'),
+    lottery:   _svg('<path d="M6 3h12l3 5-9 13L3 8z"/><path d="M3 8h18M9 3l-3 5 6 13 6-13-3-5"/>'),
+    late1:     _svg('<circle cx="12" cy="12" r="9"/><path d="M11 8.5l1.6-1v8M10.5 15.5h3.5" stroke-width="1.8"/>'),
+    second:    _svg('<circle cx="12" cy="12" r="9"/><path d="M9.6 9.4a2.4 2.4 0 1 1 3.6 2.1c-1 .7-3.2 1.9-3.2 4h5" stroke-width="1.8"/>'),
+    udfa:      _svg('<path d="M5 13l7-7 7 7M5 19l7-7 7 7"/>')
+  };
 
   // P-3: Pre-compute sorted metrics array ONCE for all cards (was inside buildPlayerCard per-call)
   var _allMetricsSorted = DataService.getBoard('2026')
@@ -10727,11 +10821,27 @@ function renderBoardCards(players) {
     var tp   = players.filter(function(p){ return p.rank >= tier.min && p.rank <= tier.max; });
     if (!tp.length) continue;
 
-    html += '<div class="tier-section">'
+    var vis = TIER_VIS[tier.key] || TIER_VIS.udfa;
+    var firstRk = tp[0].rank, lastRk = tp[tp.length - 1].rank;
+    var rangeStr = tier.key === 'udfa'
+        ? 'Picks ' + firstRk + '+'
+        : (firstRk === lastRk ? 'Pick ' + firstRk : 'Picks ' + firstRk + '\u2013' + lastRk);
+    html += '<div class="tier-section" style="--tier-accent:' + vis.accent + '">'
           +   '<div class="tier-header">'
-          +     '<span class="tier-pill ' + tier.key + '">' + icons[tier.key] + ' ' + tier.key.toUpperCase() + '</span>'
-          +     '<span class="tier-name">'  + tier.label  + '</span>'
-          +     '<span class="tier-ct">'    + tp.length + ' prospects</span>'
+          +     '<span class="tier-pill ' + tier.key + '" style="background:' + vis.grad + '">'
+          +       '<span class="tier-pill-icon">' + TIER_ICONS[tier.key] + '</span>'
+          +       '<span class="tier-pill-txt">' + escHtml(tier.label) + '</span>'
+          +     '</span>'
+          +     '<div class="tier-head-text">'
+          +       '<span class="tier-sub">'   + vis.sub  + '</span>'
+          +       '<span class="tier-range">' + rangeStr + '</span>'
+          +     '</div>'
+          +     (vis.desc ? '<span class="tier-desc">' + vis.desc + '</span>' : '')
+          +     '<button class="tier-share-btn" title="Share this tier as an image" aria-label="Share ' + escHtml(tier.label) + ' tier as an image" onclick="event.stopPropagation();shareTierCard(\'' + tier.key + '\')">'
+          +       '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.6" y1="13.5" x2="15.4" y2="17.5"/><line x1="15.4" y1="6.5" x2="8.6" y2="10.5"/></svg>'
+          +       '<span>Share</span>'
+          +     '</button>'
+          +     '<span class="tier-ct"><strong>' + tp.length + '</strong> prospects</span>'
           +   '</div>'
           +   '<div class="cards-grid">';
 
@@ -11749,13 +11859,20 @@ document.addEventListener('keydown', function(e) {
   }
 });
 
-function closeModal(id) {
-  var el = document.getElementById(id);
-  if (el) el.classList.remove('open');
-  // Service handles ref counting — body unlocks automatically when this
-  // modal was the last holder. Other open modals retain their locks.
-  ScrollLockService.release('modal:' + id);
-}
+// A11y: keyboard activation for clickable non-button elements. Player cards and
+// board rows carry role="button" + tabindex="0"; this delegates Enter/Space to a
+// click so keyboard and screen-reader users can open profiles. One listener
+// covers all current and re-rendered cards (delegation survives innerHTML swaps).
+document.addEventListener('keydown', function(e) {
+  if (e.key !== 'Enter' && e.key !== ' ' && e.key !== 'Spacebar') return;
+  var el = e.target;
+  if (!el || el.getAttribute('role') !== 'button') return;
+  // Don't hijack real <button>/<a> or form fields — they handle keys natively.
+  var tag = el.tagName;
+  if (tag === 'BUTTON' || tag === 'A' || tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+  e.preventDefault();          // stop Space from scrolling the page
+  el.click();
+});
 function handleOverlayClick(e, id) {
   if (e.target === document.getElementById(id)) closeModal(id);
 }
@@ -17345,7 +17462,7 @@ function renderTweetCardModal(p) {
   var logoUrl  = schoolLogoUrl(school);
 
   var photoHtml = photoUrl
-    ? '<img id="tcHeadshot" src="' + photoUrl + '" style="width:100%;height:100%;object-fit:cover;object-position:top" onerror="this.style.display=\'none\';document.getElementById(\'tcInitials\').style.display=\'flex\'">'
+    ? '<img id="tcHeadshot" alt="' + escHtml((p && p.name) || 'Player') + ' headshot" src="' + photoUrl + '" style="width:100%;height:100%;object-fit:cover;object-position:top" onerror="this.style.display=\'none\';document.getElementById(\'tcInitials\').style.display=\'flex\'">'
     : '';
 
   var STAT_KEYS_TWEET = [
@@ -17418,7 +17535,7 @@ function renderTweetCardModal(p) {
     + '<div style="font-family:Barlow Condensed,sans-serif;font-size:26px;font-weight:900;color:' + tierColor + ';opacity:.9">#' + p.rank + '</div>'
     + '</div>'
     + '<div style="display:flex;align-items:center;gap:5px;margin-top:4px">'
-    + (logoUrl ? '<img src="' + logoUrl + '" style="width:16px;height:16px;object-fit:contain" onerror="this.style.display=\'none\'">' : '')
+    + (logoUrl ? '<img src="' + logoUrl + '" alt="" style="width:16px;height:16px;object-fit:contain" onerror="this.style.display=\'none\'">' : '')
     + '<span style="font-size:var(--text-xs);color:var(--gray-500);font-weight:500">' + (school || '') + '</span>'
     + '</div>'
     + '<div style="display:flex;gap:5px;margin-top:7px;flex-wrap:wrap">' + roleTagHtml + posTagHtml + clsTagHtml + '</div>'
@@ -17435,7 +17552,7 @@ function renderTweetCardModal(p) {
     // Footer
     + '<div style="display:flex;align-items:center;justify-content:space-between;padding:9px 18px;background:var(--navy)">'
     + '<div style="display:flex;align-items:center;gap:7px">'
-    + '<img src="' + document.querySelector('.header-logo-img').src + '" style="width:24px;height:24px;object-fit:contain">'
+    + '<img src="' + document.querySelector('.header-logo-img').src + '" alt="HoopsWill" style="width:24px;height:24px;object-fit:contain">'
     + '<span style="font-family:Barlow Condensed,sans-serif;font-size:var(--text-sm);font-weight:800;color:var(--amber-light)">HoopsWill</span>'
     + '<span style="font-size:var(--text-2xs);color:rgba(255,255,255,.5)">NBA Draft Board</span>'
     + '</div>'
@@ -17476,6 +17593,202 @@ function downloadTweetCard() {
   } else {
     alert('Right-click the card above and choose "Save image as" to download it.');
   }
+}
+
+// ── ONE-TAP SHAREABLE TIER CARD ─────────────────────────────────────────────
+// Builds a branded, dark-theme image of an entire tier (all its prospects as
+// compact rows) and previews it in a modal with a Download button. Reuses the
+// same capture pipeline as the Big Board screenshot: lazy-loaded html2canvas,
+// font-ready gating, hi-res ESPN headshot preload, DPR-aware oversampling.
+var TIER_CARD_META = {
+  franchise:{label:'Franchise', sub:'Cornerstone Prospects', grad:'linear-gradient(135deg,#92400E,#B45309,#D97706)', accent:'#F59E0B'},
+  lottery:  {label:'Lottery',   sub:'Top-14 Prospects',      grad:'linear-gradient(135deg,#3B0764,#5B21B6,#7C3AED)', accent:'#A78BFA'},
+  late1:    {label:'Late First',sub:'First-Round Targets',   grad:'linear-gradient(135deg,#1E3A8A,#1D4ED8,#3B82F6)', accent:'#60A5FA'},
+  second:   {label:'Second Round',sub:'Value Prospects',     grad:'linear-gradient(135deg,#134E4A,#0D9488,#14B8A6)', accent:'#2DD4BF'},
+  udfa:     {label:'UDFA',      sub:'Camp Invites & Sleepers',grad:'linear-gradient(135deg,#334155,#475569,#64748B)', accent:'#94A3B8'}
+};
+
+function _tierCardRowHtml(p, accent) {
+  var dash = (p.name || '').indexOf(' - ');
+  var base = dash > 0 ? p.name.slice(0, dash) : (p.name || '');
+  var school = p.school || (dash > 0 ? p.name.slice(dash + 3) : '');
+  var cls = (p.cls || '').trim();
+  if      (cls === 'Freshman' || cls === 'Fresh') cls = 'Fr';
+  else if (cls === 'Sophomore') cls = 'So';
+  else if (cls === 'Junior')    cls = 'Jr';
+  else if (cls === 'Senior')    cls = 'Sr';
+  var photo = (typeof getPhotoUrl === 'function') ? getPhotoUrl(p.name) : '';
+  var inits = (typeof getInitials === 'function') ? getInitials(p.name).toUpperCase() : '';
+  var metric = (p.metric != null && p.metric > 0) ? (Math.round(p.metric * 10) / 10).toFixed(1) : '—';
+  // PHOTO INTEGRITY: html2canvas 1.4.1 ignores object-fit:cover on <img> and
+  // stretches the headshot vertically. Paint it as a background-image instead —
+  // background-size:cover IS honored by html2canvas, so the photo crops to the
+  // square box without distortion in both the live preview and the export.
+  // Falls back to the colored initials box when no photo resolves.
+  var avatar = photo
+    ? '<div role="img" aria-label="' + escHtml((p.name || 'player').split(' - ')[0]) + '" style="width:46px;height:46px;border-radius:9px;flex-shrink:0;background-color:#1e2d4a;background-image:url(&quot;' + photo + '&quot;);background-size:cover;background-position:50% 18%;background-repeat:no-repeat"></div>'
+    : '<div style="width:46px;height:46px;border-radius:9px;flex-shrink:0;background:#1e2d4a;display:flex;align-items:center;justify-content:center;font-family:Barlow Condensed,sans-serif;font-weight:800;font-size:16px;color:' + accent + '">' + escHtml(inits) + '</div>';
+  return '<div style="display:flex;align-items:center;gap:12px;padding:9px 16px;border-bottom:1px solid rgba(255,255,255,.06)">'
+    +   '<div style="width:38px;padding-right:4px;text-align:right;font-family:Barlow Condensed,sans-serif;font-weight:900;font-size:24px;color:' + accent + ';line-height:1;flex-shrink:0;overflow:visible">' + p.rank + '</div>'
+    +   avatar
+    +   '<div style="flex:1;min-width:0">'
+    +     '<div style="font-family:Barlow Condensed,sans-serif;font-weight:800;font-size:18px;color:#fff;line-height:1.05;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + escHtml(base) + '</div>'
+    +     '<div style="font-family:DM Sans,sans-serif;font-size:11px;color:rgba(255,255,255,.5);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + escHtml(school) + (cls ? ' &middot; ' + escHtml(cls) : '') + '</div>'
+    +   '</div>'
+    +   '<div style="text-align:right;flex-shrink:0">'
+    +     '<div style="font-family:Barlow Condensed,sans-serif;font-weight:900;font-size:19px;color:' + accent + ';line-height:1">' + metric + '</div>'
+    +     '<div style="font-family:Barlow Condensed,sans-serif;font-size:8px;font-weight:700;letter-spacing:.8px;color:rgba(255,255,255,.4);text-transform:uppercase;margin-top:2px">HW Metric</div>'
+    +   '</div>'
+    + '</div>';
+}
+
+function _buildTierCardNode(tierKey) {
+  var meta = TIER_CARD_META[tierKey];
+  if (!meta) return null;
+  var cuts = (typeof TIER_CUTS !== 'undefined') ? TIER_CUTS : {franchise:3, lottery:14, lateFirst:30, second:60};
+  var bounds = {
+    franchise:[1, cuts.franchise],
+    lottery:[cuts.franchise + 1, cuts.lottery],
+    late1:[cuts.lottery + 1, cuts.lateFirst],
+    second:[cuts.lateFirst + 1, cuts.second],
+    udfa:[cuts.second + 1, 9999]
+  }[tierKey];
+  var board = (typeof DataService !== 'undefined') ? DataService.getBoard('2026') : (DATA.board2026 || []);
+  var rows = board.filter(function(p){ return p.rank >= bounds[0] && p.rank <= bounds[1]; })
+                  .sort(function(a, b){ return a.rank - b.rank; });
+  if (!rows.length) return null;
+  var first = rows[0].rank, last = rows[rows.length - 1].rank;
+  var rangeStr = first === last ? ('Pick ' + first) : ('Picks ' + first + '\u2013' + last);
+
+  var node = document.createElement('div');
+  node.id = 'tierCardCapture';
+  node.style.cssText = 'width:560px;background:#0A1628;border-radius:18px;overflow:hidden;font-family:DM Sans,system-ui,sans-serif';
+  node.innerHTML =
+      // Tier banner
+      '<div style="background:' + meta.grad + ';padding:18px 20px;position:relative">'
+    +   '<div style="display:flex;align-items:center;justify-content:space-between;gap:12px">'
+    +     '<div>'
+    +       '<div style="font-family:Barlow Condensed,sans-serif;font-weight:900;font-size:30px;letter-spacing:1.5px;text-transform:uppercase;color:#fff;line-height:1">' + escHtml(meta.label) + '</div>'
+    +       '<div style="font-family:Barlow Condensed,sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.78);margin-top:3px">' + escHtml(meta.sub) + '</div>'
+    +     '</div>'
+    +     '<div style="text-align:right;font-family:Barlow Condensed,sans-serif">'
+    +       '<div style="font-size:13px;font-weight:800;letter-spacing:.5px;color:#fff">' + rangeStr + '</div>'
+    +       '<div style="font-size:11px;font-weight:700;color:rgba(255,255,255,.7);text-transform:uppercase;letter-spacing:.6px;margin-top:2px">' + rows.length + ' Prospects</div>'
+    +     '</div>'
+    +   '</div>'
+    + '</div>'
+      // Rows
+    + '<div style="background:#0A1628">'
+    +   rows.map(function(p){ return _tierCardRowHtml(p, meta.accent); }).join('')
+    + '</div>'
+      // Footer brand bar
+    + '<div style="display:flex;align-items:center;justify-content:space-between;padding:12px 20px;background:#06101f;border-top:1px solid rgba(255,255,255,.07)">'
+    +   '<div style="font-family:Barlow Condensed,sans-serif;font-weight:900;font-size:16px;letter-spacing:.5px;color:#fff">HoopsWill <span style="color:#C9971A">Analytics</span></div>'
+    +   '<div style="font-family:Barlow Condensed,sans-serif;font-size:11px;font-weight:700;letter-spacing:.8px;color:rgba(255,255,255,.45);text-transform:uppercase">2026 NBA Draft Big Board</div>'
+    + '</div>';
+  return node;
+}
+
+function shareTierCard(tierKey) {
+  var meta = TIER_CARD_META[tierKey];
+  if (!meta) return;
+  var node = _buildTierCardNode(tierKey);
+  if (!node) { alert('No prospects in this tier to share.'); return; }
+
+  // Modal shell
+  var modal = document.createElement('div');
+  modal.id = 'tierCardModal';
+  modal.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(6,16,31,.82);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:20px;overflow:auto';
+  modal.onclick = function(e){ if (e.target === modal) modal.remove(); };
+
+  var inner = document.createElement('div');
+  inner.style.cssText = 'display:flex;flex-direction:column;align-items:center;gap:14px;max-width:100%';
+
+  var preview = document.createElement('div');
+  preview.style.cssText = 'max-width:100%;box-shadow:0 24px 64px rgba(0,0,0,.5);border-radius:18px;overflow:hidden';
+  preview.appendChild(node);
+
+  var controls = document.createElement('div');
+  controls.style.cssText = 'display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center';
+  controls.innerHTML =
+      '<button id="tierCardDownloadBtn" style="background:var(--blue,#2563EB);color:#fff;border:none;border-radius:9px;padding:11px 22px;font-size:14px;font-weight:700;font-family:Barlow Condensed,sans-serif;letter-spacing:.4px;cursor:pointer">&#8595; Download Image</button>'
+    + '<button id="tierCardCopyBtn" style="background:rgba(255,255,255,.08);color:#fff;border:1px solid rgba(255,255,255,.22);border-radius:9px;padding:11px 18px;font-size:14px;font-weight:600;font-family:Barlow Condensed,sans-serif;cursor:pointer">Copy to Clipboard</button>'
+    + '<button id="tierCardCloseBtn" style="background:none;color:rgba(255,255,255,.6);border:1px solid rgba(255,255,255,.2);border-radius:9px;padding:11px 16px;font-size:14px;cursor:pointer;font-family:Barlow Condensed,sans-serif">Close</button>';
+
+  inner.appendChild(preview);
+  inner.appendChild(controls);
+  modal.appendChild(inner);
+  document.body.appendChild(modal);
+
+  document.getElementById('tierCardCloseBtn').onclick = function(){ modal.remove(); };
+
+  function _capture(cb) {
+    function run() {
+      var dpr = window.devicePixelRatio || 1;
+      var scale = Math.max(2.5, 2 * dpr);
+      html2canvas(node, { scale: scale, useCORS: true, allowTaint: false, backgroundColor: '#0A1628', logging: false, imageTimeout: 8000 })
+        .then(function(canvas){ cb(canvas); })
+        .catch(function(){ alert('Image generation failed. Try a different browser.'); });
+    }
+    // Preload the headshots (CORS-enabled) so the background-image paints are in
+    // cache before html2canvas rasterizes — otherwise photos race and come out
+    // blank. Hard timeout so a slow/blocked CDN never hangs the export.
+    function preloadThenRun() {
+      var urls = [];
+      node.querySelectorAll('[role="img"]').forEach(function(box){
+        var m = (box.style.backgroundImage || '').match(/url\(["']?(.*?)["']?\)/);
+        if (m && m[1]) urls.push(m[1]);
+      });
+      if (!urls.length) { run(); return; }
+      var left = urls.length, settled = false;
+      var done = function(){ if (--left <= 0 && !settled) { settled = true; run(); } };
+      setTimeout(function(){ if (!settled) { settled = true; run(); } }, 6000);
+      urls.forEach(function(u){
+        var im = new Image();
+        im.crossOrigin = 'anonymous';
+        im.onload = done; im.onerror = done;
+        im.src = u;
+      });
+    }
+    if (typeof html2canvas === 'undefined') {
+      var s = document.createElement('script');
+      s.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+      s.crossOrigin = 'anonymous';
+      s.onload = function(){ _whenFontsReady(preloadThenRun); };
+      s.onerror = function(){ alert('Could not load the image library (offline?).'); };
+      document.head.appendChild(s);
+    } else { _whenFontsReady(preloadThenRun); }
+  }
+
+  var dlBtn = document.getElementById('tierCardDownloadBtn');
+  dlBtn.onclick = function() {
+    dlBtn.textContent = 'Generating…'; dlBtn.disabled = true;
+    _capture(function(canvas){
+      var a = document.createElement('a');
+      a.download = 'HoopsWill_' + meta.label.replace(/\s+/g, '') + '_Tier.png';
+      a.href = canvas.toDataURL('image/png');
+      a.click();
+      dlBtn.textContent = '\u2193 Download Image'; dlBtn.disabled = false;
+    });
+  };
+
+  var copyBtn = document.getElementById('tierCardCopyBtn');
+  copyBtn.onclick = function() {
+    if (!navigator.clipboard || !window.ClipboardItem) {
+      copyBtn.textContent = 'Use Download instead'; return;
+    }
+    copyBtn.textContent = 'Copying…'; copyBtn.disabled = true;
+    _capture(function(canvas){
+      canvas.toBlob(function(blob){
+        try {
+          navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]).then(function(){
+            copyBtn.textContent = 'Copied \u2713';
+            setTimeout(function(){ copyBtn.textContent = 'Copy to Clipboard'; copyBtn.disabled = false; }, 1800);
+          }).catch(function(){ copyBtn.textContent = 'Use Download instead'; copyBtn.disabled = false; });
+        } catch (e) { copyBtn.textContent = 'Use Download instead'; copyBtn.disabled = false; }
+      });
+    });
+  };
 }
 
 // ── SCATTER PLOT ───────────────────────────────────────────────────────────
@@ -25116,7 +25429,7 @@ function simShowResults() {
     h+='<div style="position:absolute;top:-20px;right:-20px;width:100px;height:100px;border-radius:50%;border:1.5px solid rgba(212,168,48,.12)"></div>';
     h+='<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;position:relative;z-index:1">';
     h+='<div style="display:flex;align-items:center;gap:16px">';
-    if(logoUrl) h+='<img src="'+logoUrl+'" style="width:56px;height:56px;object-fit:contain;filter:drop-shadow(0 2px 8px rgba(0,0,0,.3))" onerror="this.style.display=\'none\'">';
+    if(logoUrl) h+='<img src="'+logoUrl+'" alt="" style="width:56px;height:56px;object-fit:contain;filter:drop-shadow(0 2px 8px rgba(0,0,0,.3))" onerror="this.style.display=\'none\'">';
     h+='<div>';
     h+='<div style="font-size:var(--text-10);font-weight:700;color:rgba(212,168,48,.7);text-transform:uppercase;letter-spacing:1.2px;font-family:Barlow Condensed,sans-serif;margin-bottom:3px">2026 NBA Draft Recap</div>';
     h+='<div style="font-family:Barlow Condensed,sans-serif;font-size:28px;font-weight:900;color:white;line-height:1;letter-spacing:.3px">'+escHtml(sName)+'</div>';
