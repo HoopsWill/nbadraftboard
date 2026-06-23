@@ -7948,18 +7948,26 @@ ock Drafts table CSS ───────────────────�
   position:relative;
   display:flex;
   flex-direction:column;
-  gap:16px;
+  /* FLAT STACKING MODEL (definitive hit-test fix):
+     The previous design used preserve-3d + per-tier translateZ/rotateX to fake
+     depth. That is fundamentally incompatible with reliable pointer hit-testing
+     for STACKED, VARIABLE-HEIGHT panels: a raked/translated deck projects over
+     its neighbours in screen space by an amount that grows with the deck's
+     height (card count), so taller tiers always end up occluding the decks
+     below them and stealing their clicks. No Z/gap tuning fixes it for all card
+     counts. So depth is now conveyed with NON-GEOMETRIC cues only (scale,
+     opacity, blur, glow per tier — see .holo-deck[data-tier]). Every deck stays
+     on one flat plane, so what you see is exactly what you can click. */
+  gap:22px;
   align-items:center;
-  padding:30px 40px 50px;
+  padding:30px 40px 60px;
   min-height:100%;
   box-sizing:border-box;
-  perspective:1800px;
-  perspective-origin:50% 30%;
-  transform-style:preserve-3d;
 }
 
 /* Individual deck — one per tier. Translucent glass panel with cyan border.
-   Different Z translation per tier so they layer in depth. */
+   Depth between tiers is conveyed by opacity + z-index only (set per-tier
+   below) — no transforms or filters that would alter geometry or hit-testing. */
 .holo-deck{
   position:relative;
   width:min(1200px, 96%);
@@ -7973,9 +7981,7 @@ ock Drafts table CSS ───────────────────�
     0 0 0 1px rgba(0, 229, 255, .08),
     0 0 30px rgba(0, 229, 255, .12),
     inset 0 1px 0 rgba(255, 255, 255, .05);
-  transform-style:preserve-3d;
-  transition:transform .5s cubic-bezier(.2,.7,.2,1), box-shadow .4s ease, border-color .4s ease;
-  /* Tier Z layering — most important closest to viewer. Set per-tier below. */
+  transition:box-shadow .35s ease, border-color .35s ease, opacity .35s ease;
 }
 .holo-deck::before{
   /* Top accent line — tier-colored gradient bar */
@@ -7986,24 +7992,34 @@ ock Drafts table CSS ───────────────────�
   border-radius:10px 10px 0 0;
   opacity:.85;
 }
+/* Hover: brighter glow + border only. No transform, no filter — nothing that
+   alters geometry or creates a containing block that could shift hit-testing.
+   The hovered deck simply brightens; depth ordering is fixed by z-index below. */
 .holo-deck:hover{
   border-color:rgba(0, 229, 255, .55);
   box-shadow:
     0 0 0 1px rgba(0, 229, 255, .18),
     0 0 50px rgba(0, 229, 255, .28),
     inset 0 1px 0 rgba(255, 255, 255, .08);
-  transform:translateZ(40px) rotateX(0deg);
+  opacity:1 !important;
 }
 
-/* Per-tier accent + initial Z stagger — front-most = Franchise (highest priority).
-   With the constant breathing animation removed, the Z stagger is the entire
-   depth story, so it's slightly stronger than before. rotateX increases as we
-   recede so the lower tiers rake away — like decks of a console. */
-.holo-deck[data-tier="0"]{ transform:translateZ(60px)   rotateX(-1deg); --holo-deck-accent:#FFB547; }
-.holo-deck[data-tier="1"]{ transform:translateZ(20px)   rotateX(2deg);  --holo-deck-accent:#B388FF; }
-.holo-deck[data-tier="2"]{ transform:translateZ(-30px)  rotateX(5deg);  --holo-deck-accent:#4FC3F7; }
-.holo-deck[data-tier="3"]{ transform:translateZ(-80px)  rotateX(8deg);  --holo-deck-accent:#26D7AE; }
-.holo-deck[data-tier="4"]{ transform:translateZ(-130px) rotateX(10deg); --holo-deck-accent:#64748B; }
+/* Per-tier FAUX-DEPTH — conveyed with OPACITY + ascending Z-INDEX ONLY.
+   ───────────────────────────────────────────────────────────────────────────
+   Why not transform:scale()/filter:blur()? Both create a new stacking context
+   AND (for filter/transform) a new containing block. With variable-height decks
+   stacked in a scroll container, that interacted with the canvas/overlay layers
+   so that only the first cards stayed hit-testable. Opacity also creates a
+   stacking context, but — crucially — it does NOT change geometry or the
+   element's hit region, so every card stays clickable exactly where it's drawn.
+   Front tier (0) is fully opaque and highest z-index; deeper tiers fade and sit
+   lower, which reads as recession without any geometric trickery. */
+.holo-deck{ position:relative; }
+.holo-deck[data-tier="0"]{ opacity:1;    z-index:6; --holo-deck-accent:#FFB547; }
+.holo-deck[data-tier="1"]{ opacity:.97;  z-index:5; --holo-deck-accent:#B388FF; }
+.holo-deck[data-tier="2"]{ opacity:.94;  z-index:4; --holo-deck-accent:#4FC3F7; }
+.holo-deck[data-tier="3"]{ opacity:.91;  z-index:3; --holo-deck-accent:#26D7AE; }
+.holo-deck[data-tier="4"]{ opacity:.88;  z-index:2; --holo-deck-accent:#64748B; }
 
 /* Deck header — tier label + counter + rationale. Mono + spaced caps. */
 .holo-deck-head{
@@ -8179,7 +8195,7 @@ ock Drafts table CSS ───────────────────�
 /* Player figure — central headshot panel with rim glow and subtle Y-axis rotation. */
 .holo-proj-figure{
   position:relative;
-  width:240px;height:340px;
+  width:230px;height:330px;
   border-radius:10px;
   background:linear-gradient(180deg, rgba(8, 26, 48, .9) 0%, rgba(2, 10, 22, .96) 100%);
   border:1.5px solid var(--holo-cyan);
@@ -8188,13 +8204,11 @@ ock Drafts table CSS ───────────────────�
     0 0 60px rgba(0, 229, 255, .35),
     0 0 120px rgba(0, 229, 255, .15);
   overflow:hidden;
-  transform-style:preserve-3d;
-  animation:holo-figure-rotate 14s ease-in-out infinite;
-  z-index:5;
-}
-@keyframes holo-figure-rotate{
-  0%, 100% { transform:rotateY(-6deg); }
-  50%      { transform:rotateY( 6deg); }
+  /* Photo is centered on the flat helix plane, above the strand SVG (z1) and
+     below the nodes (z3) — but since nodes are pinned to the sides, nothing
+     overlaps the photo. The figure does not rotate. */
+  z-index:2;
+  flex:0 0 auto;
 }
 .holo-proj-figure-photo{
   position:absolute;inset:0;
@@ -8231,9 +8245,12 @@ ock Drafts table CSS ───────────────────�
 .holo-proj-identity{
   position:absolute;
   top:50%;left:50%;
-  transform:translate(-50%, calc(-50% - 230px));
+  /* Raised to -300px (was -230) so the name clears the topmost orbit nodes.
+     The orbit's top sector is now kept clear in _holoStatOrbitConfig so the
+     two never collide. */
+  transform:translate(-50%, calc(-50% - 300px));
   text-align:center;
-  z-index:6;
+  z-index:7;
   min-width:380px;
 }
 .holo-proj-rank{
@@ -8258,45 +8275,70 @@ ock Drafts table CSS ───────────────────�
   color:rgba(230, 248, 255, .7);
 }
 
-/* Orbiting stat nodes — radial placement around the figure */
-.holo-proj-orbit{
+/* ── SIDE-LOCKED DOUBLE HELIX (flat, no z-depth) ────────────────────────────
+   A single flat plane holds: the strand SVG (woven sine waves + rungs), the
+   player photo centered, and the stat nodes pinned to the OUTER crests so they
+   always sit to the LEFT or RIGHT of the photo — never in front of or behind it.
+   No perspective, no 3D layers, no rotation: the coil read comes entirely from
+   the continuous strand the nodes ride on. */
+.holo-helix{
   position:absolute;
   top:50%;left:50%;
-  width:560px;height:560px;
-  transform:translate(-50%, -50%);
-  pointer-events:none;
+  width:760px;height:560px;
+  transform:translate(-50%,-50%);
+  pointer-events:none;        /* nodes re-enable below */
   z-index:4;
+  display:flex;align-items:center;justify-content:center;
 }
-.holo-proj-orbit-ring{
+/* Strand SVG spans the full helix box, sitting behind the photo + nodes. The
+   strands visibly pass behind the photo (lower z) for the woven look. */
+.holo-helix-svg{
   position:absolute;inset:0;
-  border:1px dashed rgba(0, 229, 255, .25);
-  border-radius:50%;
+  width:100%;height:100%;
+  pointer-events:none;
+  z-index:1;
+  filter:drop-shadow(0 0 7px rgba(0,229,255,.3));
 }
-.holo-proj-orbit-ring.outer{ inset:-60px; border-style:dotted; opacity:.5; }
-.holo-proj-stat-node{
+/* Photo sits above the strands; nodes sit above the photo but are placed to the
+   sides, so nothing meaningful is ever occluded. */
+.holo-helix .holo-proj-figure{ z-index:2; }
+.holo-helix-nodes{
+  position:absolute;inset:0;
+  z-index:3;
+  pointer-events:none;        /* individual nodes opt back in */
+}
+
+/* Individual helix node, pinned by --nx/--ny to its strand's outer crest.
+   Anchored so the node's INNER edge meets the strand and it extends outward,
+   away from the photo (side-r extends right, side-l extends left). */
+.holo-helix-node{
   position:absolute;
   top:50%;left:50%;
   pointer-events:auto;
-  /* Each node positioned via --angle and --radius custom props */
-  --angle:0deg;
-  --radius:280px;
-  transform:translate(-50%, -50%) rotate(var(--angle)) translate(var(--radius)) rotate(calc(-1 * var(--angle)));
-  padding:8px 12px;
-  background:rgba(4, 14, 28, .82);
-  border:1px solid rgba(0, 229, 255, .45);
-  border-radius:6px;
-  backdrop-filter:blur(6px);
-  -webkit-backdrop-filter:blur(6px);
-  box-shadow:0 0 16px rgba(0, 229, 255, .25), inset 0 0 0 1px rgba(0,229,255,.08);
+  padding:7px 13px;
+  border:1px solid rgba(0,229,255,.45);
+  border-radius:8px;
+  backdrop-filter:blur(5px);
+  -webkit-backdrop-filter:blur(5px);
   min-width:96px;
   text-align:center;
-  animation:holo-node-bob 5s ease-in-out infinite;
+  transition:transform .18s cubic-bezier(.2,.7,.2,1), box-shadow .18s ease;
+  will-change:transform;
 }
-.holo-proj-stat-node.alt{ border-color:rgba(255, 45, 156, .5); box-shadow:0 0 16px rgba(255, 45, 156, .22), inset 0 0 0 1px rgba(255,45,156,.08); }
-.holo-proj-stat-node.alt .holo-stat-val{ color:#FF6BB5; text-shadow:0 0 6px rgba(255,45,156,.55); }
-@keyframes holo-node-bob{
-  0%, 100% { transform:translate(-50%, -50%) rotate(var(--angle)) translate(var(--radius)) rotate(calc(-1 * var(--angle))) translateY(0); }
-  50%      { transform:translate(-50%, -50%) rotate(var(--angle)) translate(var(--radius)) rotate(calc(-1 * var(--angle))) translateY(-4px); }
+/* Right-side nodes: anchor left edge at the crest x, extend rightward. */
+.holo-helix-node.side-r{
+  transform:translate(0, -50%) translate(var(--nx,0), var(--ny,0));
+}
+.holo-helix-node.side-l{
+  transform:translate(-100%, -50%) translate(var(--nx,0), var(--ny,0));
+}
+.holo-helix-node.side-r:hover{
+  transform:translate(0, -50%) translate(var(--nx,0), var(--ny,0)) scale(1.08);
+  z-index:20;
+}
+.holo-helix-node.side-l:hover{
+  transform:translate(-100%, -50%) translate(var(--nx,0), var(--ny,0)) scale(1.08);
+  z-index:20;
 }
 .holo-stat-lbl{
   font-family:var(--holo-mono);
@@ -8394,6 +8436,349 @@ ock Drafts table CSS ───────────────────�
   box-shadow:0 0 36px rgba(0, 229, 255, .5);
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   HOLO DOSSIER — full player profile, expand-in-place from the projection.
+   Lives inside the same .holo-projection takeover layer. When open, the
+   projection's figure/orbit fade and the dossier scrolls into the same space:
+   command-console header, then three panels — shot-zone heat map, measurables,
+   scouting report. One continuous holographic space.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.holo-dossier{
+  position:absolute;
+  inset:0;
+  z-index:10;
+  display:flex;
+  flex-direction:column;
+  opacity:0;
+  pointer-events:none;
+  transform:scale(1.04);
+  transition:opacity .45s ease, transform .45s cubic-bezier(.2,.7,.2,1);
+  overflow:hidden;
+}
+.holo-projection.dossier-open .holo-dossier{
+  opacity:1;
+  pointer-events:auto;
+  transform:scale(1);
+}
+/* When the dossier is open, dim+shrink the projection's figure/orbit/bio so the
+   morph reads as the projection "expanding" into the dossier, not a hard cut. */
+.holo-projection.dossier-open .holo-helix,
+.holo-projection.dossier-open .holo-proj-bio,
+.holo-projection.dossier-open .holo-proj-identity,
+.holo-projection.dossier-open .holo-proj-cta{
+  opacity:0;
+  pointer-events:none;
+  transform:translate(-50%, -50%) scale(.82);
+  transition:opacity .35s ease, transform .45s ease;
+}
+
+/* Dossier header — sticky command bar with player identity + back control. */
+.holo-dossier-header{
+  flex:0 0 auto;
+  display:flex;align-items:center;gap:16px;
+  padding:18px 28px;
+  background:linear-gradient(180deg, rgba(6,18,36,.95) 0%, rgba(4,12,24,.78) 100%);
+  border-bottom:1px solid rgba(0,229,255,.28);
+  backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);
+}
+.holo-dossier-back{
+  flex:0 0 auto;
+  width:40px;height:40px;
+  background:rgba(0,229,255,.1);
+  border:1px solid rgba(0,229,255,.4);
+  border-radius:8px;
+  color:var(--holo-cyan);
+  font-size:18px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .2s ease;
+  text-shadow:var(--holo-text-glow);
+}
+.holo-dossier-back:hover{
+  background:rgba(0,229,255,.2);
+  box-shadow:0 0 18px rgba(0,229,255,.35);
+  transform:translateX(-3px);
+}
+.holo-dossier-headshot{
+  flex:0 0 auto;
+  width:54px;height:54px;border-radius:10px;
+  background:#0A1628 center 16% / cover no-repeat;
+  border:1.5px solid rgba(0,229,255,.5);
+  box-shadow:0 0 16px rgba(0,229,255,.3);
+  position:relative;overflow:hidden;
+}
+.holo-dossier-headshot::after{
+  content:'';position:absolute;inset:0;
+  background:repeating-linear-gradient(0deg,transparent 0,transparent 2px,rgba(0,229,255,.1) 2px,rgba(0,229,255,.1) 3px);
+}
+.holo-dossier-id{ flex:1 1 auto;min-width:0; }
+.holo-dossier-name{
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:30px;font-weight:800;color:#fff;
+  line-height:1;letter-spacing:.02em;
+  text-shadow:0 0 10px rgba(0,229,255,.45);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.holo-dossier-sub{
+  font-family:var(--holo-mono);
+  font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;
+  color:rgba(230,248,255,.62);
+  margin-top:4px;
+}
+.holo-dossier-rankchip{
+  flex:0 0 auto;
+  display:flex;flex-direction:column;align-items:center;
+  padding:6px 16px;
+  background:rgba(0,229,255,.12);
+  border:1px solid rgba(0,229,255,.4);
+  border-radius:8px;
+}
+.holo-dossier-rankchip .lbl{
+  font-family:var(--holo-mono);font-size:8.5px;letter-spacing:.18em;
+  color:rgba(230,248,255,.6);text-transform:uppercase;
+}
+.holo-dossier-rankchip .val{
+  font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:800;
+  color:var(--holo-cyan);line-height:1;text-shadow:var(--holo-text-glow);
+}
+
+/* Scrollable body holding the three panels in a responsive grid. */
+.holo-dossier-body{
+  flex:1 1 auto;
+  overflow-y:auto;
+  overflow-x:hidden;
+  padding:22px 28px 40px;
+  display:grid;
+  grid-template-columns:minmax(0, 380px) minmax(0, 1fr);
+  grid-template-areas:
+    'shot measur'
+    'report report';
+  gap:18px;
+  scrollbar-color:rgba(0,229,255,.5) rgba(0,12,24,.4);
+  scrollbar-width:thin;
+}
+.holo-dossier-body::-webkit-scrollbar{ width:8px; }
+.holo-dossier-body::-webkit-scrollbar-thumb{
+  background:linear-gradient(180deg,rgba(0,229,255,.6),rgba(0,229,255,.3));
+  border-radius:4px;
+}
+.holo-panel{
+  background:linear-gradient(180deg, rgba(6,18,36,.62) 0%, rgba(3,10,20,.78) 100%);
+  border:1px solid rgba(0,229,255,.26);
+  border-radius:12px;
+  padding:16px 18px 18px;
+  position:relative;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.04), 0 0 24px rgba(0,229,255,.06);
+}
+.holo-panel::before{
+  content:'';position:absolute;left:14px;right:14px;top:-1px;height:2px;
+  background:linear-gradient(90deg,transparent,var(--holo-cyan),transparent);
+  opacity:.6;
+}
+.holo-panel-title{
+  font-family:var(--holo-mono);
+  font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--holo-cyan);
+  text-shadow:var(--holo-text-glow);
+  margin-bottom:14px;
+  display:flex;align-items:center;gap:8px;
+}
+.holo-panel-title::after{
+  content:'';flex:1 1 auto;height:1px;
+  background:linear-gradient(90deg,rgba(0,229,255,.35),transparent);
+}
+.holo-panel-shot{ grid-area:shot; }
+.holo-panel-measur{ grid-area:measur; }
+.holo-panel-report{ grid-area:report; }
+
+/* ── Shot-zone heat map ─────────────────────────────────────────────────── */
+.holo-court-wrap{
+  position:relative;
+  width:100%;
+  display:flex;flex-direction:column;align-items:center;
+}
+.holo-court{
+  width:100%;
+  max-width:320px;
+  height:auto;
+  filter:drop-shadow(0 0 12px rgba(0,229,255,.18));
+}
+.holo-court-zone{
+  cursor:default;
+  transition:opacity .2s ease;
+}
+.holo-court-zone:hover{ opacity:.85; }
+.holo-zone-label{
+  font-family:var(--holo-mono);
+  font-size:8.5px;
+  fill:#E6F8FF;
+  text-anchor:middle;
+  letter-spacing:.04em;
+  pointer-events:none;
+}
+.holo-zone-pct{
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:15px;font-weight:800;
+  fill:#fff;
+  text-anchor:middle;
+  pointer-events:none;
+}
+.holo-court-legend{
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  margin-top:12px;
+  font-family:var(--holo-mono);
+  font-size:9px;letter-spacing:.1em;text-transform:uppercase;
+  color:rgba(230,248,255,.6);
+}
+.holo-legend-bar{
+  width:120px;height:8px;border-radius:4px;
+  background:linear-gradient(90deg,#173a52,#1c6f8e,#22b3a6,#5fe0a8,#c8f9d4);
+  border:1px solid rgba(0,229,255,.25);
+}
+.holo-shot-note{
+  margin-top:12px;
+  font-family:var(--holo-mono);
+  font-size:9px;line-height:1.6;letter-spacing:.04em;
+  color:rgba(230,248,255,.45);
+  text-align:center;
+}
+
+/* Shot-profile summary chips beneath the court */
+.holo-shot-chips{
+  display:flex;gap:8px;margin-top:14px;width:100%;
+}
+.holo-shot-chip{
+  flex:1 1 0;
+  background:rgba(4,14,28,.7);
+  border:1px solid rgba(0,229,255,.3);
+  border-radius:7px;
+  padding:8px 6px;text-align:center;
+}
+.holo-shot-chip .lbl{
+  font-family:var(--holo-mono);font-size:8px;letter-spacing:.1em;
+  color:rgba(230,248,255,.55);text-transform:uppercase;
+}
+.holo-shot-chip .val{
+  font-family:'Barlow Condensed',sans-serif;font-size:19px;font-weight:800;
+  color:#fff;line-height:1.1;text-shadow:0 0 6px rgba(0,229,255,.4);
+}
+
+/* ── Measurables panel ──────────────────────────────────────────────────── */
+.holo-measur-grid{
+  display:grid;grid-template-columns:repeat(2,1fr);gap:10px;
+  margin-bottom:16px;
+}
+.holo-measur-cell{
+  background:rgba(4,14,28,.6);
+  border:1px solid rgba(0,229,255,.22);
+  border-radius:8px;
+  padding:10px 12px;
+}
+.holo-measur-cell .lbl{
+  font-family:var(--holo-mono);font-size:8.5px;letter-spacing:.12em;
+  color:rgba(230,248,255,.55);text-transform:uppercase;margin-bottom:3px;
+}
+.holo-measur-cell .val{
+  font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:800;
+  color:#fff;line-height:1;
+}
+.holo-measur-cell .val .unit{ font-size:12px;color:rgba(230,248,255,.6);margin-left:2px; }
+/* Production bars — each stat as a labeled bar vs class context */
+.holo-bars{ display:flex;flex-direction:column;gap:9px;margin-top:4px; }
+.holo-bar-row{ display:grid;grid-template-columns:84px 1fr 44px;align-items:center;gap:10px; }
+.holo-bar-lbl{
+  font-family:var(--holo-mono);font-size:9px;letter-spacing:.08em;
+  color:rgba(230,248,255,.65);text-transform:uppercase;text-align:right;
+}
+.holo-bar-track{
+  height:9px;border-radius:5px;
+  background:rgba(0,229,255,.08);
+  border:1px solid rgba(0,229,255,.16);
+  overflow:hidden;position:relative;
+}
+.holo-bar-fill{
+  height:100%;border-radius:5px;
+  background:linear-gradient(90deg,#1c6f8e,#22b3a6,#5fe0a8);
+  box-shadow:0 0 8px rgba(0,229,255,.4);
+  width:0;
+  transition:width .8s cubic-bezier(.2,.7,.2,1);
+}
+.holo-bar-val{
+  font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:800;
+  color:#fff;text-align:left;
+}
+
+/* ── Scouting report panel ──────────────────────────────────────────────── */
+.holo-report-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:14px;
+}
+.holo-report-col{ display:flex;flex-direction:column;gap:8px; }
+.holo-report-col-head{
+  font-family:var(--holo-mono);
+  font-size:10px;letter-spacing:.14em;text-transform:uppercase;
+  padding-bottom:6px;border-bottom:1px solid rgba(0,229,255,.2);
+  display:flex;align-items:center;gap:6px;
+}
+.holo-report-col.strengths .holo-report-col-head{ color:#5fe0a8; }
+.holo-report-col.concerns  .holo-report-col-head{ color:#ff8abf; }
+.holo-report-col.developing .holo-report-col-head{ color:#ffce6b; }
+.holo-report-item{
+  font-family:'DM Sans',sans-serif;
+  font-size:12.5px;line-height:1.45;
+  color:rgba(230,248,255,.82);
+  padding:7px 10px 7px 22px;
+  background:rgba(4,14,28,.5);
+  border:1px solid rgba(0,229,255,.14);
+  border-radius:6px;
+  position:relative;
+}
+.holo-report-item::before{
+  content:'';position:absolute;left:9px;top:13px;
+  width:5px;height:5px;border-radius:50%;
+}
+.holo-report-col.strengths .holo-report-item::before{ background:#5fe0a8;box-shadow:0 0 6px #5fe0a8; }
+.holo-report-col.concerns  .holo-report-item::before{ background:#ff8abf;box-shadow:0 0 6px #ff8abf; }
+.holo-report-col.developing .holo-report-item::before{ background:#ffce6b;box-shadow:0 0 6px #ffce6b; }
+.holo-report-empty{
+  font-family:var(--holo-mono);font-size:10px;letter-spacing:.06em;
+  color:rgba(230,248,255,.3);font-style:italic;padding:6px 0;
+}
+/* Comp + outlook row across the bottom of the report */
+.holo-outlook{
+  grid-column:1 / -1;
+  display:grid;grid-template-columns:repeat(4,1fr);gap:12px;
+  margin-top:16px;padding-top:16px;
+  border-top:1px solid rgba(0,229,255,.18);
+}
+.holo-outlook-cell .lbl{
+  font-family:var(--holo-mono);font-size:8.5px;letter-spacing:.12em;
+  color:rgba(230,248,255,.5);text-transform:uppercase;margin-bottom:4px;
+}
+.holo-outlook-cell .val{
+  font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;
+  color:#E6F8FF;line-height:1.3;
+}
+.holo-outlook-cell .val.accent{ color:var(--holo-cyan);text-shadow:0 0 6px rgba(0,229,255,.35); }
+
+/* ── Dossier responsive ─────────────────────────────────────────────────── */
+@media (max-width: 900px){
+  .holo-dossier-body{
+    grid-template-columns:1fr;
+    grid-template-areas:'shot' 'measur' 'report';
+    padding:16px 14px 32px;
+  }
+  .holo-dossier-name{ font-size:24px; }
+  .holo-dossier-header{ padding:14px 16px;gap:12px; }
+  .holo-report-grid{ grid-template-columns:1fr; }
+  .holo-outlook{ grid-template-columns:repeat(2,1fr); }
+  .holo-court{ max-width:280px; }
+}
+@media (max-width: 520px){
+  .holo-measur-grid{ grid-template-columns:1fr 1fr; }
+  .holo-outlook{ grid-template-columns:1fr; }
+  .holo-dossier-headshot{ display:none; }
+}
+
 /* Materialize/dematerialize animations */
 .holo-stage.is-fading{
   animation:holo-dematerialize .35s ease forwards;
@@ -8415,8 +8800,8 @@ ock Drafts table CSS ───────────────────�
   animation:holo-card-in .5s cubic-bezier(.2,.7,.2,1) backwards;
 }
 @keyframes holo-card-in{
-  0%   { opacity:0; transform:translateY(20px) translateZ(-80px); }
-  100% { opacity:1; transform:translateY(0)    translateZ(0); }
+  0%   { opacity:0; transform:translateY(16px); }
+  100% { opacity:1; transform:translateY(0); }
 }
 
 /* ─── Mobile / small viewport adaptation ─────────────────────────────────── */
@@ -8432,16 +8817,16 @@ ock Drafts table CSS ───────────────────�
   }
   .holo-deck-stack{
     padding:20px 14px 40px;
-    /* Reduce perspective on mobile so the rake doesn't push lower tiers off-screen */
-    perspective:1200px;
-    perspective-origin:50% 20%;
   }
   .holo-deck{
     width:100%;
-    /* Flatten Z stagger on mobile — keep the visual deck stack but readable. */
-    transform:translateZ(0) rotateX(0deg) !important;
+    /* On mobile, render every deck at full size/opacity — the faux-depth scale
+       cues add no value on a narrow single-column scroll and only cost clarity. */
+    transform:none !important;
+    opacity:1 !important;
+    filter:none !important;
   }
-  .holo-deck:hover{ transform:translateZ(0) rotateX(0deg) !important; }
+  .holo-deck:hover{ opacity:1 !important; }
   .holo-card{ width:calc(50% - 5px); }
   .holo-grid-floor{ display:none; } /* perf + clarity on small screens */
   .holo-hud-corner{ font-size:9px; padding:6px 10px; }
@@ -8451,20 +8836,45 @@ ock Drafts table CSS ───────────────────�
   .holo-proj-name{ font-size:32px; }
   .holo-proj-identity{ transform:translate(-50%, calc(-50% - 180px)); min-width:280px; }
   .holo-proj-bio{ transform:translate(-50%, calc(-50% + 160px)); flex-wrap:wrap;justify-content:center; }
-  .holo-proj-orbit{ width:340px;height:340px; }
-  .holo-proj-stat-node{ --radius:170px;min-width:78px;padding:6px 8px; }
+  /* Tablet: shrink the helix box + node offsets so the side nodes stay on-screen
+     (the flat coil scales down cleanly; nodes remain locked to the sides). */
+  .holo-helix{ width:560px;height:480px; }
+  .holo-helix-node{ min-width:84px; padding:6px 10px; }
   .holo-stat-val{ font-size:18px; }
 }
-@media (max-width: 520px){
-  .holo-card{ width:100%; }
-  .holo-proj-orbit{ display:none; } /* stat nodes overlap on tiny screens */
-  .holo-proj-stage{ flex-direction:column;gap:14px; }
+@media (max-width: 600px){
+  /* MOBILE: a side-locked coil needs ~760px of width to keep nodes clear of the
+     photo. On a phone that doesn't exist, so collapse to a clean, tap-first
+     stack — photo on top, stat nodes in a 2-col grid below — keeping the holo
+     styling + percentile colors but dropping the coil geometry entirely. */
+  .holo-proj-stage{ flex-direction:column; gap:14px; height:auto; }
+  .holo-helix{
+    position:relative; top:auto; left:auto;
+    width:100%; height:auto; transform:none;
+    flex-direction:column; align-items:center; gap:16px;
+  }
+  .holo-helix-svg{ display:none; }      /* coil makes no sense once flattened */
+  .holo-helix-nodes{
+    position:relative; inset:auto;
+    display:grid; grid-template-columns:1fr 1fr; gap:10px; width:100%;
+  }
+  .holo-proj-figure{ width:170px; height:240px; order:-1; }
+  .holo-helix-node,
+  .holo-helix-node.side-r,
+  .holo-helix-node.side-l{
+    position:relative; top:auto; left:auto;
+    transform:none !important;
+    min-width:0; width:100%;
+  }
+  .holo-helix-node.side-r:hover,
+  .holo-helix-node.side-l:hover{ transform:scale(1.03) !important; }
+  .holo-stat-val{ font-size:18px; }
 }
 
 /* Reduced-motion: kill the constant animations, keep static look */
 @media (prefers-reduced-motion: reduce){
   .holo-grid-floor, .holo-proj-figure,
-  .holo-proj-stat-node, .holo-proj-figure-line, .holo-card{
+  .holo-helix-node, .holo-proj-figure-line, .holo-card{
     animation:none !important;
   }
   .holo-hud-dot{ animation:none !important; opacity:1; }
@@ -16875,7 +17285,7 @@ function bbApplyRange() {
     var f = document.getElementById('bbRangeFrom');
     var t = document.getElementById('bbRangeTo');
     var from = f ? Math.max(1,  parseInt(f.value, 10) || 1)  : bbRangeFrom;
-    var to   = t ? Math.min(60, parseInt(t.value, 10) || 60) : bbRangeTo;
+    var to   = t ? Math.min(75, parseInt(t.value, 10) || 75) : bbRangeTo;
     if (from > to) { var tmp = from; from = to; to = tmp; }
     bbRangeFrom = from;
     bbRangeTo   = to;
@@ -17194,22 +17604,52 @@ function bbScreenshot() {
 //        so range filtering carries across the Big Board and Holo views.
 // ═════════════════════════════════════════════════════════════════════════════
 
-// Pre-compute orbital placement for stat nodes. Even angular distribution
-// around the central figure; outer ring for measurables, inner for production.
+// Percentile-driven hue for a stat node, mirroring bbGlowStyle's median-anchored
+// red→green ramp EXACTLY so the helix nodes read on the same scale as every other
+// board. Returns {hue, t, hasData}. t in 0..1 (0=worst in class, 1=best).
+// Uses the live STAT_RANGES {mn, med, mx} per stat key — same source the Big
+// Board cells use — so a node's color means the same thing here as there.
+function _holoStatPctileHue(key, val) {
+  var rng = (typeof STAT_RANGES !== 'undefined') ? STAT_RANGES[key] : null;
+  if (!rng || val == null || val === 0 || isNaN(val) || rng.mx === rng.mn) {
+    return { hue: null, t: null, hasData: false };
+  }
+  var t;
+  if (val <= rng.med) {
+    t = rng.med === rng.mn ? 0.5 : 0.5 * (val - rng.mn) / (rng.med - rng.mn);
+  } else {
+    t = rng.mx === rng.med ? 0.5 : 0.5 + 0.5 * (val - rng.med) / (rng.mx - rng.med);
+  }
+  t = Math.max(0, Math.min(1, t));
+  // Same hue span as bbGlowStyle: 10°(orange-red) → 128°(green).
+  return { hue: Math.round(10 + t * 118), t: t, hasData: true };
+}
+
+// DNA double-helix placement. The 8 stat nodes ride two intertwined strands that
+// Side-locked DOUBLE-HELIX placement. Two strands run vertically down the LEFT
+// and RIGHT of the photo as offset sine waves. Stat nodes are pinned to the
+// OUTER crest of each wave — so every node sits clearly to the SIDE of the
+// photo, never in front of or behind it. 4 nodes on the right strand, 4 on the
+// left, interleaved vertically so the rungs (cross-links) ladder evenly down.
+// No z-depth: the coil illusion comes from the continuous SVG strand the nodes
+// ride on, not from front/back stacking.
 function _holoStatOrbitConfig() {
-  // 8 nodes around a 280px radius ring (inner) + 4 on outer if needed.
-  // Production stats (cyan): Metric, TS%, P+A/USG, BPM
-  // Skill stats (cyan):     A/TO, STL+BL
-  // Shooting (magenta):     FTAR, 3PAR
+  // One node on each side per row = 4 base-pair rows. Right + left nodes at the
+  // same height sit where the two strands reach their opposite crests, so each
+  // node lands exactly on a strand. 8 stats → 4 rows × 2 sides.
   return [
-    { angle:-90,  radius:280, key:'metric',  label:'METRIC',  fmt:'n2',  cls:'' },
-    { angle:-45,  radius:280, key:'ts_pct',  label:'TS%',     fmt:'pct', cls:'' },
-    { angle:  0,  radius:280, key:'pa2_usg', label:'P+A/USG', fmt:'n2',  cls:'' },
-    { angle: 45,  radius:280, key:'bpm',     label:'BPM',     fmt:'n2',  cls:'' },
-    { angle: 90,  radius:280, key:'ato',     label:'A/TO',    fmt:'n2',  cls:'' },
-    { angle: 135, radius:280, key:'stl_bl',  label:'STL+BL',  fmt:'n2',  cls:'' },
-    { angle: 180, radius:280, key:'ftar',    label:'FTAR',    fmt:'n3',  cls:'alt' },
-    { angle:-135, radius:280, key:'tpar',    label:'3PAR',    fmt:'n3',  cls:'alt' },
+    // row 0
+    { side:'R', row:0, key:'metric',  label:'METRIC',  fmt:'n1' },
+    { side:'L', row:0, key:'ts_pct',  label:'TS%',     fmt:'pct' },
+    // row 1
+    { side:'R', row:1, key:'pa2_usg', label:'P+A/USG', fmt:'n1' },
+    { side:'L', row:1, key:'bpm',     label:'BPM',     fmt:'n1' },
+    // row 2
+    { side:'R', row:2, key:'stl_bl',  label:'STL+BL',  fmt:'n2' },
+    { side:'L', row:2, key:'ato',     label:'A/TO',    fmt:'n2' },
+    // row 3
+    { side:'R', row:3, key:'ftar',    label:'FTAR',    fmt:'n3' },
+    { side:'L', row:3, key:'tpar',    label:'3PAR',    fmt:'n3' },
   ];
 }
 
@@ -17362,14 +17802,120 @@ function holoOpenProjection(rank) {
   var wt  = (player.wt != null && !isNaN(player.wt)) ? Math.round(Number(player.wt)) + ' lb' : '—';
   var age = (player.age != null && !isNaN(player.age)) ? Number(player.age).toFixed(1) : '—';
 
-  var orbitNodes = _holoStatOrbitConfig().map(function(node) {
-    var raw = player[node.key];
-    var val = _holoFmt(raw, node.fmt);
-    return '<div class="holo-proj-stat-node ' + node.cls + '" style="--angle:' + node.angle + 'deg;--radius:' + node.radius + 'px">'
+  // ── SIDE-LOCKED DOUBLE-HELIX placement ─────────────────────────────────
+  // Flat 2D model (no z-depth): two sine strands run down the LEFT and RIGHT of
+  // the photo, 180° out of phase. Each stat node is pinned to its strand's OUTER
+  // crest, so it always sits clear to the SIDE of the photo — never in front of
+  // or behind it. The strands cross over the photo (linked by rungs) to give the
+  // DNA read, but data is only ever placed at the outer extremes.
+  var HELIX = {
+    nodeX:   292,   // |x| of a node at its outer crest (photo half-width ~115, so well clear)
+    strandX: 250,   // |x| the SVG strand reaches at its crest (slightly inside the node)
+    top:    -210,   // y of row 0 (kept within the figure height so nodes never hit the bio plates)
+    bottom:  210,   // y of row 3
+    rowOffset: 0,   // sides share row heights → nodes pair up like DNA base pairs
+  };
+  var cfg = _holoStatOrbitConfig();
+  function rowY(side, row) {
+    // Left side is offset half a row down so the two strands stagger like base pairs.
+    var rUnit = (HELIX.bottom - HELIX.top) / 3;
+    var off = (side === 'L') ? HELIX.rowOffset * rUnit : 0;
+    return HELIX.top + row * rUnit + off;
+  }
+  var nodeData = cfg.map(function(node) {
+    var x = (node.side === 'R') ? HELIX.nodeX : -HELIX.nodeX;
+    var y = rowY(node.side, node.row);
+    var hueInfo = _holoStatPctileHue(node.key, player[node.key]);
+    return { node: node, x: x, y: y, hue: hueInfo };
+  });
+
+  function _holoNodeHtml(d) {
+    var node = d.node;
+    var val = _holoFmt(player[node.key], node.fmt);
+    var glowH = d.hue.hasData ? d.hue.hue : null;
+    var bg, bd, valCol, glow;
+    if (glowH != null) {
+      // Dark holo base tinted toward the percentile hue; border + value + glow
+      // carry the hue so red(low) → green(high) reads instantly, same as boards.
+      bg     = _hslHex(glowH, 55, 12);
+      bd     = _hslHex(glowH, 85, 55);
+      valCol = _hslHex(glowH, 90, 72);
+      glow   = _hslHex(glowH, 90, 50);
+    } else {
+      bg = '#0a1622'; bd = 'rgba(0,229,255,.4)'; valCol = '#cfeffb'; glow = 'rgba(0,229,255,.5)';
+    }
+    // Node anchors from the photo edge so it reads as "hanging off" its strand:
+    // right-side nodes anchor their LEFT edge near the strand; left-side mirror.
+    var sideCls = (node.side === 'R') ? ' side-r' : ' side-l';
+    var style = '--nx:' + d.x.toFixed(1) + 'px;'
+      + '--ny:' + d.y.toFixed(1) + 'px;'
+      + 'background-color:' + bg + ';'
+      + 'border-color:' + bd + ';'
+      + 'box-shadow:0 0 20px ' + glow + '55, 0 0 5px ' + glow + '99, inset 0 0 0 1px ' + bd + '33;';
+    return '<div class="holo-helix-node' + sideCls + '" style="' + style + '">'
       +   '<div class="holo-stat-lbl">' + node.label + '</div>'
-      +   '<div class="holo-stat-val">' + val + '</div>'
+      +   '<div class="holo-stat-val" style="color:' + valCol + ';text-shadow:0 0 8px ' + glow + 'aa">' + val + '</div>'
       + '</div>';
-  }).join('');
+  }
+
+  // ── Helix strand + rung SVG ────────────────────────────────────────────
+  // The strands are built to pass THROUGH the real node anchor points (mapped
+  // into the SVG viewBox), so the coil and the nodes are guaranteed to align.
+  // Right strand weaves right-crest → center → left and back; the left strand is
+  // its 180° mirror. Smooth Catmull-Rom-ish curve via quadratic segments. Rungs
+  // ladder across at each row where the strands are on opposite sides.
+  function _holoHelixSvg() {
+    var W = 760, H = 560, cx = W / 2;
+    // Map a figure-space (x,y) to SVG coords. Figure y spans ±280 → 0..560.
+    function sx(x){ return cx + x; }
+    function sy(y){ return H/2 + y; }
+    // Node rows in figure-y:
+    var rowsY = [HELIX.top, HELIX.top + (HELIX.bottom-HELIX.top)/3,
+                 HELIX.top + 2*(HELIX.bottom-HELIX.top)/3, HELIX.bottom];
+    var crest = HELIX.strandX;
+    // A strand is a vertical sine that crests alternately R/L each half-row, so
+    // across the 4 rows it visits: +crest, -crest, +crest, -crest (right strand)
+    // and the mirror for the left. Build as a smooth polyline sampled densely.
+    function strandPath(sign) {
+      // sign +1 = "right-first" strand, -1 = "left-first" (mirror).
+      var topY = sy(rowsY[0]) - 40, botY = sy(rowsY[3]) + 40;
+      var span = botY - topY;
+      // 1.5 cycles across the row band makes crests land on rows 0..3 alternately.
+      var cycles = 1.5, steps = 120, d = '';
+      for (var s = 0; s <= steps; s++) {
+        var f = s / steps;
+        var th = sign * (Math.PI/2 + f * cycles * 2 * Math.PI);
+        var x = cx + Math.sin(th) * crest;
+        var y = topY + span * f;
+        d += (s === 0 ? 'M' : 'L') + x.toFixed(1) + ' ' + y.toFixed(1) + ' ';
+      }
+      return d;
+    }
+    // Rungs at each of the 4 rows, spanning from the right crest to the left crest.
+    var rungs = '';
+    rowsY.forEach(function(ry){
+      var y = sy(ry);
+      rungs += '<line x1="' + sx(crest).toFixed(1) + '" y1="' + y.toFixed(1)
+        + '" x2="' + sx(-crest).toFixed(1) + '" y2="' + y.toFixed(1)
+        + '" stroke="rgba(120,210,255,.16)" stroke-width="1.5" stroke-dasharray="2 4"/>';
+    });
+    return '<svg class="holo-helix-svg" viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">'
+      + '<defs>'
+      +   '<linearGradient id="holoStrandA" x1="0" y1="0" x2="0" y2="1">'
+      +     '<stop offset="0" stop-color="rgba(0,229,255,.10)"/><stop offset="0.5" stop-color="rgba(0,229,255,.7)"/><stop offset="1" stop-color="rgba(0,229,255,.10)"/>'
+      +   '</linearGradient>'
+      +   '<linearGradient id="holoStrandB" x1="0" y1="0" x2="0" y2="1">'
+      +     '<stop offset="0" stop-color="rgba(179,136,255,.10)"/><stop offset="0.5" stop-color="rgba(179,136,255,.62)"/><stop offset="1" stop-color="rgba(179,136,255,.10)"/>'
+      +   '</linearGradient>'
+      + '</defs>'
+      + '<g>' + rungs + '</g>'
+      + '<path d="' + strandPath(1)  + '" fill="none" stroke="url(#holoStrandA)" stroke-width="2.5" stroke-linecap="round"/>'
+      + '<path d="' + strandPath(-1) + '" fill="none" stroke="url(#holoStrandB)" stroke-width="2.5" stroke-linecap="round"/>'
+      + '</svg>';
+  }
+
+  // Single flat layer — all nodes on one plane beside the photo (no front/behind).
+  var allNodes = nodeData.map(_holoNodeHtml).join('');
 
   proj.innerHTML = ''
     + '<div class="holo-grid-floor"></div>'
@@ -17382,16 +17928,17 @@ function holoOpenProjection(rank) {
     +     '<div class="holo-proj-school">' + school + (pos ? ' \u2022 ' + pos.toUpperCase() : '') + (cls ? ' \u2022 ' + cls.toUpperCase() : '') + '</div>'
     +   '</div>'
 
-    +   '<div class="holo-proj-figure">'
-    +     '<div class="holo-proj-figure-photo"' + (photo ? ' style="background-image:url(\'' + photo + '\')"' : '') + '></div>'
-    +     '<div class="holo-proj-figure-scan"></div>'
-    +     '<div class="holo-proj-figure-line"></div>'
-    +   '</div>'
-
-    +   '<div class="holo-proj-orbit">'
-    +     '<div class="holo-proj-orbit-ring"></div>'
-    +     '<div class="holo-proj-orbit-ring outer"></div>'
-    +     orbitNodes
+    // Side-locked double helix: the strand SVG and all stat nodes live on a
+    // single flat plane around the photo. Strands weave behind the photo; nodes
+    // are always at the outer crests (left/right), never over the photo.
+    +   '<div class="holo-helix" id="holoHelix">'
+    +     _holoHelixSvg()
+    +     '<div class="holo-proj-figure">'
+    +       '<div class="holo-proj-figure-photo"' + (photo ? ' style="background-image:url(\'' + photo + '\')"' : '') + '></div>'
+    +       '<div class="holo-proj-figure-scan"></div>'
+    +       '<div class="holo-proj-figure-line"></div>'
+    +     '</div>'
+    +     '<div class="holo-helix-nodes">' + allNodes + '</div>'
     +   '</div>'
 
     +   '<div class="holo-proj-bio">'
@@ -17400,7 +17947,13 @@ function holoOpenProjection(rank) {
     +     '<div class="holo-bio-plate"><div class="holo-bio-lbl">AGE</div><div class="holo-bio-val">' + age + '</div></div>'
     +   '</div>'
     + '</div>'
-    + '<button class="holo-proj-cta" onclick="holoOpenFullProfile(' + player.rank + ')">[ OPEN FULL PROFILE ]</button>';
+    + '<button class="holo-proj-cta" onclick="holoOpenDossier(' + player.rank + ')">[ OPEN FULL PROFILE ]</button>'
+    // Dossier mount — populated lazily on first open, then revealed via class.
+    + '<div class="holo-dossier" id="holoDossier"></div>';
+
+  // Remember which player the projection is showing so the dossier can build
+  // from it without re-resolving (and so ESC knows what state we're in).
+  proj.setAttribute('data-rank', player.rank);
 
   // Dematerialize the ambient board, then raise the projection.
   if (stage) {
@@ -17418,6 +17971,12 @@ function holoCloseProjection() {
   var stage = document.getElementById('holoStage');
   var proj  = document.getElementById('holoProjection');
   if (!proj) return;
+  // If the dossier is open, ESC/close should step back to the projection first,
+  // not tear the whole thing down — one layer at a time feels less jarring.
+  if (proj.classList.contains('dossier-open')) {
+    holoCloseDossier();
+    return;
+  }
   proj.classList.remove('is-open');
   proj.setAttribute('aria-hidden', 'true');
   // After projection finishes fading, re-materialize the ambient board.
@@ -17430,21 +17989,300 @@ function holoCloseProjection() {
       setTimeout(function(){ stage.classList.remove('is-rematerializing'); }, 450);
     }
     proj.innerHTML = ''; // free the projection DOM
+    proj.removeAttribute('data-rank');
   }, 280);
 }
 
-// CTA hand-off — open the existing player profile modal so users can deep-dive
-// from the holo view without re-implementing the profile.
-function holoOpenFullProfile(rank) {
-  holoCloseProjection();
-  setTimeout(function(){
-    if (typeof openPlayerProfile === 'function') {
-      openPlayerProfile(rank, '2026');
-    } else if (typeof DataService !== 'undefined' && DataService.findByRank) {
-      var p = DataService.findByRank(rank, '2026');
-      if (p && typeof showPlayerModal === 'function') showPlayerModal(p);
+// ═══════════════════════════════════════════════════════════════════════════
+// HOLO DOSSIER — full player profile that expands in place from the projection.
+// Three data-true panels: zone heat-map shot chart (driven by real TS%/3PAR/
+// FTAR), measurables + production bars, and a scouting report from the player's
+// real strengths/concerns/developing notes + NBA comp + outlook.
+// ═══════════════════════════════════════════════════════════════════════════
+
+// Percentile of a value within the 2026 pool for a given stat key (0..1).
+// Used to scale production bars so they read as "where this guy sits in the class".
+var _holoPctileCache = {};
+function _holoPctile(key, val) {
+  if (val == null || isNaN(val)) return null;
+  if (!_holoPctileCache[key]) {
+    var vals = [];
+    try {
+      var board = (DATA && DATA.board2026) ? DATA.board2026 : [];
+      for (var i = 0; i < board.length; i++) {
+        var v = board[i][key];
+        if (v != null && !isNaN(v)) vals.push(Number(v));
+      }
+      vals.sort(function(a, b){ return a - b; });
+    } catch (e) {}
+    _holoPctileCache[key] = vals;
+  }
+  var arr = _holoPctileCache[key];
+  if (!arr.length) return null;
+  var below = 0;
+  for (var j = 0; j < arr.length; j++) { if (arr[j] < val) below++; }
+  return below / arr.length;
+}
+
+// Heat color along the holo cyan→green scale for a 0..1 intensity.
+function _holoHeat(t) {
+  t = Math.max(0, Math.min(1, t));
+  // Interpolate across 5 stops: deep slate → teal → cyan → mint → bright mint.
+  var stops = [
+    [23, 58, 82],    // #173a52
+    [28, 111, 142],  // #1c6f8e
+    [34, 179, 166],  // #22b3a6
+    [95, 224, 168],  // #5fe0a8
+    [200, 249, 212], // #c8f9d4
+  ];
+  var seg = t * (stops.length - 1);
+  var i = Math.floor(seg);
+  if (i >= stops.length - 1) i = stops.length - 2;
+  var f = seg - i;
+  var a = stops[i], b = stops[i + 1];
+  var r = Math.round(a[0] + (b[0] - a[0]) * f);
+  var g = Math.round(a[1] + (b[1] - a[1]) * f);
+  var bl = Math.round(a[2] + (b[2] - a[2]) * f);
+  return 'rgb(' + r + ',' + g + ',' + bl + ')';
+}
+
+// Build the zone-intensity model from a player's real shooting profile.
+// We DON'T have shot-location data, so each zone's intensity is derived from
+// translatable signals: 3PAR drives perimeter zones, FTAR drives rim/paint,
+// TS% lifts overall efficiency. This is explicitly a *tendency* map, labeled
+// as such — not a claim of per-shot accuracy.
+function _holoShotZones(player) {
+  var tpar = (player.tpar != null && !isNaN(player.tpar)) ? Number(player.tpar) : null;
+  var ftar = (player.ftar != null && !isNaN(player.ftar)) ? Number(player.ftar) : null;
+  var ts   = (player.ts_pct != null && !isNaN(player.ts_pct)) ? Number(player.ts_pct) : null;
+
+  // Normalize each driver to ~0..1 against sensible college ranges.
+  var perimeter = tpar != null ? Math.max(0, Math.min(1, tpar / 0.75)) : 0.4;     // 3-point rate
+  var rim       = ftar != null ? Math.max(0, Math.min(1, ftar / 0.75)) : 0.4;     // FT rate ≈ rim pressure
+  var eff       = ts   != null ? Math.max(0, Math.min(1, (ts - 0.45) / 0.25)) : 0.5; // efficiency lift
+
+  // Each zone gets a base tendency blended with the efficiency lift.
+  function mk(base) { return Math.max(0.05, Math.min(1, base * 0.72 + eff * 0.28)); }
+
+  // Mid-range is the inverse of being a rim+3 specialist (the "in-between").
+  var midBias = Math.max(0.12, 1 - (perimeter * 0.55 + rim * 0.45));
+
+  return {
+    rim:       mk(rim),
+    paintL:    mk(rim * 0.85 + 0.1),
+    paintR:    mk(rim * 0.85 + 0.1),
+    midL:      mk(midBias),
+    midC:      mk(midBias * 0.9),
+    midR:      mk(midBias),
+    cornerL:   mk(perimeter * 0.9),
+    cornerR:   mk(perimeter * 0.9),
+    wingL:     mk(perimeter),
+    wingR:     mk(perimeter),
+    top3:      mk(perimeter * 1.05),
+  };
+}
+
+// Render the half-court SVG with zones shaded by intensity. Coordinates are a
+// simplified half court, 300 wide × 280 tall, hoop at top-center.
+function _holoCourtSvg(player) {
+  var z = _holoShotZones(player);
+  function zone(d, intensity, cx, cy, label) {
+    var fill = _holoHeat(intensity);
+    var pct = Math.round(intensity * 100);
+    var s = '<path class="holo-court-zone" d="' + d + '" fill="' + fill + '" '
+      + 'fill-opacity="0.82" stroke="rgba(0,229,255,0.35)" stroke-width="1"></path>';
+    if (cx != null) {
+      s += '<text class="holo-zone-pct" x="' + cx + '" y="' + cy + '">' + pct + '</text>';
     }
-  }, 380);
+    return s;
+  }
+  // Court is drawn with hoop at top. Bands from baseline (top) outward (bottom).
+  var svg = '<svg class="holo-court" viewBox="0 0 300 290" xmlns="http://www.w3.org/2000/svg">'
+    // court backdrop
+    + '<rect x="2" y="2" width="296" height="286" rx="6" fill="rgba(3,12,24,0.6)" stroke="rgba(0,229,255,0.25)" stroke-width="1"></rect>'
+    // RIM / restricted area (top center arc)
+    + zone('M120 18 A30 30 0 0 1 180 18 L180 48 A30 30 0 0 0 120 48 Z', z.rim, 150, 40, 'RIM')
+    // Paint left & right (the key)
+    + zone('M108 18 L120 18 L120 92 L108 92 Z', z.paintL, null)
+    + zone('M180 18 L192 18 L192 92 L180 92 Z', z.paintR, null)
+    + zone('M120 48 L180 48 L180 92 L120 92 Z', z.midC, 150, 76, 'PAINT')
+    // Mid-range left / right
+    + zone('M40 18 L108 18 L108 110 L40 110 Z', z.midL, 74, 70, 'MID')
+    + zone('M192 18 L260 18 L260 110 L192 110 Z', z.midR, 226, 70, 'MID')
+    // Corners (3)
+    + zone('M8 18 L40 18 L40 120 L8 120 Z', z.cornerL, 24, 100, '3')
+    + zone('M260 18 L292 18 L292 120 L260 120 Z', z.cornerR, 276, 100, '3')
+    // Wings (3)
+    + zone('M16 120 L120 120 L120 200 L16 230 Z', z.wingL, 64, 168, 'WING')
+    + zone('M180 120 L284 120 L284 230 L180 200 Z', z.wingR, 236, 168, 'WING')
+    // Top of key (3)
+    + zone('M120 120 L180 120 L180 200 L150 214 L120 200 Z', z.top3, 150, 168, 'TOP')
+    // 3-point arc overlay (visual reference, not a zone)
+    + '<path d="M40 18 L40 96 A130 130 0 0 0 260 96 L260 18" fill="none" stroke="rgba(0,229,255,0.45)" stroke-width="1.5" stroke-dasharray="3 3"></path>'
+    // hoop marker
+    + '<circle cx="150" cy="22" r="5" fill="none" stroke="var(--holo-cyan)" stroke-width="2"></circle>'
+    + '<line x1="135" y1="14" x2="165" y2="14" stroke="var(--holo-cyan)" stroke-width="2.5"></line>'
+    + '</svg>';
+  return svg;
+}
+
+function holoOpenDossier(rank) {
+  var proj = document.getElementById('holoProjection');
+  var mount = document.getElementById('holoDossier');
+  if (!proj || !mount) return;
+  var player = (typeof DataService !== 'undefined' && DataService.findByRank)
+    ? DataService.findByRank(rank, '2026') : null;
+  if (!player) return;
+
+  var nameNoSchool = (player.name || '').split(' - ')[0];
+  var school = player.school || ((player.name || '').indexOf(' - ') > -1 ? (player.name || '').split(' - ')[1] : '');
+  var pos = player.position || '';
+  var cls = player.cls || '';
+  var role = (player.report && player.report.role) ? player.report.role : (player.torvik_role || '');
+  var photo = (typeof getPhotoUrl === 'function') ? (getPhotoUrl(player.name, 120) || '') : '';
+
+  // ── Measurables
+  var ht = _holoHtFt(player.ht);
+  var wt = (player.wt != null && !isNaN(player.wt)) ? Math.round(Number(player.wt)) : null;
+  var ws = _holoHtFt(player.wingspan);
+  var reach = _holoHtFt(player.standing_reach);
+  var age = (player.age != null && !isNaN(player.age)) ? Number(player.age).toFixed(1) : '—';
+  // Wingspan differential (a key scouting signal): wingspan − height in inches.
+  var wsDiff = (player.wingspan != null && player.ht != null && !isNaN(player.wingspan) && !isNaN(player.ht))
+    ? (Number(player.wingspan) - Number(player.ht)) : null;
+  var wsDiffStr = wsDiff != null ? (wsDiff >= 0 ? '+' : '') + wsDiff.toFixed(1) + '"' : '—';
+
+  // ── Production bars (value + class percentile)
+  var barKeys = [
+    { key:'metric',  label:'METRIC',  fmt:'n1' },
+    { key:'ts_pct',  label:'TS%',     fmt:'pct' },
+    { key:'bpm',     label:'BPM',     fmt:'n1' },
+    { key:'ato',     label:'A/TO',    fmt:'n2' },
+    { key:'stl_bl',  label:'STL+BL',  fmt:'n2' },
+    { key:'pa2_usg', label:'P+A/USG', fmt:'n1' },
+  ];
+  var barsHtml = barKeys.map(function(b) {
+    var raw = player[b.key];
+    var pct = _holoPctile(b.key, raw);
+    var w = pct != null ? Math.round(pct * 100) : 0;
+    var valStr = _holoFmt(raw, b.fmt);
+    return '<div class="holo-bar-row">'
+      + '<div class="holo-bar-lbl">' + b.label + '</div>'
+      + '<div class="holo-bar-track"><div class="holo-bar-fill" data-w="' + w + '"></div></div>'
+      + '<div class="holo-bar-val">' + valStr + '</div>'
+      + '</div>';
+  }).join('');
+
+  // ── Scouting report columns
+  var rep = player.report || {};
+  function col(items, cls, head) {
+    var inner = (items && items.length)
+      ? items.map(function(s){ return '<div class="holo-report-item">' + _holoEsc(s) + '</div>'; }).join('')
+      : '<div class="holo-report-empty">No notes on file</div>';
+    return '<div class="holo-report-col ' + cls + '">'
+      + '<div class="holo-report-col-head">' + head + '</div>'
+      + inner + '</div>';
+  }
+  var reportCols = col(rep.strengths, 'strengths', '\u25B2 STRENGTHS')
+    + col(rep.concerns, 'concerns', '\u25BC CONCERNS')
+    + col(rep.developing, 'developing', '\u25C6 DEVELOPING');
+
+  // ── Outlook row
+  var comp = player.comp || '\u2014';
+  var compTool = player.comp_tool || '\u2014';
+  var ceiling = rep.ceiling || '\u2014';
+  var floor = rep.floor || '\u2014';
+
+  // ── Shot-profile summary chips
+  var tsStr = _holoFmt(player.ts_pct, 'pct');
+  var tparStr = _holoFmt(player.tpar, 'n3');
+  var ftarStr = _holoFmt(player.ftar, 'n3');
+
+  mount.innerHTML = ''
+    + '<div class="holo-dossier-header">'
+    +   '<button class="holo-dossier-back" onclick="holoCloseDossier()" aria-label="Back to projection">\u2039</button>'
+    +   '<div class="holo-dossier-headshot"' + (photo ? ' style="background-image:url(\'' + photo + '\')"' : '') + '></div>'
+    +   '<div class="holo-dossier-id">'
+    +     '<div class="holo-dossier-name">' + _holoEsc(nameNoSchool) + '</div>'
+    +     '<div class="holo-dossier-sub">' + _holoEsc(school) + (pos ? ' \u2022 ' + pos.toUpperCase() : '') + (cls ? ' \u2022 ' + cls.toUpperCase() : '') + (role ? ' \u2022 ' + role.toUpperCase() : '') + '</div>'
+    +   '</div>'
+    +   '<div class="holo-dossier-rankchip"><span class="lbl">RANK</span><span class="val">' + player.rank + '</span></div>'
+    + '</div>'
+
+    + '<div class="holo-dossier-body">'
+    // Shot-zone panel
+    +   '<div class="holo-panel holo-panel-shot">'
+    +     '<div class="holo-panel-title">Shot Profile \u2014 Zone Tendency</div>'
+    +     '<div class="holo-court-wrap">'
+    +       _holoCourtSvg(player)
+    +       '<div class="holo-court-legend"><span>Low</span><div class="holo-legend-bar"></div><span>High</span></div>'
+    +       '<div class="holo-shot-chips">'
+    +         '<div class="holo-shot-chip"><div class="lbl">TS%</div><div class="val">' + tsStr + '</div></div>'
+    +         '<div class="holo-shot-chip"><div class="lbl">3P RATE</div><div class="val">' + tparStr + '</div></div>'
+    +         '<div class="holo-shot-chip"><div class="lbl">FT RATE</div><div class="val">' + ftarStr + '</div></div>'
+    +       '</div>'
+    +       '<div class="holo-shot-note">Zone shading reflects shot-selection tendency derived from 3P rate, FT rate &amp; efficiency \u2014 not per-shot accuracy.</div>'
+    +     '</div>'
+    +   '</div>'
+    // Measurables panel
+    +   '<div class="holo-panel holo-panel-measur">'
+    +     '<div class="holo-panel-title">Measurables &amp; Production</div>'
+    +     '<div class="holo-measur-grid">'
+    +       '<div class="holo-measur-cell"><div class="lbl">Height</div><div class="val">' + ht + '</div></div>'
+    +       '<div class="holo-measur-cell"><div class="lbl">Weight</div><div class="val">' + (wt != null ? wt + '<span class="unit">lb</span>' : '\u2014') + '</div></div>'
+    +       '<div class="holo-measur-cell"><div class="lbl">Wingspan</div><div class="val">' + ws + '</div></div>'
+    +       '<div class="holo-measur-cell"><div class="lbl">WS Differential</div><div class="val">' + wsDiffStr + '</div></div>'
+    +       '<div class="holo-measur-cell"><div class="lbl">Standing Reach</div><div class="val">' + reach + '</div></div>'
+    +       '<div class="holo-measur-cell"><div class="lbl">Draft Age</div><div class="val">' + age + '</div></div>'
+    +     '</div>'
+    +     '<div class="holo-panel-title" style="margin-top:6px">Production vs Class</div>'
+    +     '<div class="holo-bars">' + barsHtml + '</div>'
+    +   '</div>'
+    // Scouting report panel
+    +   '<div class="holo-panel holo-panel-report">'
+    +     '<div class="holo-panel-title">Scouting Report</div>'
+    +     '<div class="holo-report-grid">' + reportCols
+    +       '<div class="holo-outlook">'
+    +         '<div class="holo-outlook-cell"><div class="lbl">NBA Comp</div><div class="val accent">' + _holoEsc(comp) + '</div></div>'
+    +         '<div class="holo-outlook-cell"><div class="lbl">Tool Comp</div><div class="val">' + _holoEsc(compTool) + '</div></div>'
+    +         '<div class="holo-outlook-cell"><div class="lbl">Ceiling</div><div class="val accent">' + _holoEsc(ceiling) + '</div></div>'
+    +         '<div class="holo-outlook-cell"><div class="lbl">Floor</div><div class="val">' + _holoEsc(floor) + '</div></div>'
+    +       '</div>'
+    +     '</div>'
+    +   '</div>'
+    + '</div>';
+
+  // Reveal with the morph, then animate production bars to their widths.
+  proj.classList.add('dossier-open');
+  requestAnimationFrame(function(){
+    requestAnimationFrame(function(){
+      var fills = mount.querySelectorAll('.holo-bar-fill');
+      for (var i = 0; i < fills.length; i++) {
+        fills[i].style.width = (fills[i].getAttribute('data-w') || 0) + '%';
+      }
+    });
+  });
+  // Scroll the dossier body to top in case a prior open left it scrolled.
+  var body = mount.querySelector('.holo-dossier-body');
+  if (body) body.scrollTop = 0;
+}
+
+function holoCloseDossier() {
+  var proj = document.getElementById('holoProjection');
+  if (!proj) return;
+  proj.classList.remove('dossier-open');
+  // Leave the dossier DOM in place (cheap) so re-opening is instant; it's
+  // hidden via opacity/pointer-events when the class is removed.
+}
+
+// Lightweight HTML escaper for any user-facing text injected into the dossier.
+function _holoEsc(s) {
+  if (s == null) return '';
+  return String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
 }
 
 
