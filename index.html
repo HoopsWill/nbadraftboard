@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <!-- display=swap: browsers show fallback font immediately, swap when loaded — eliminates FOIT -->
-  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=DM+Sans:wght@300;400;500;600;700&family=Inter:wght@500;600;700;800;900&family=JetBrains+Mono:wght@500;600;700;800&display=swap" rel="stylesheet">
   <!-- JetBrains Mono: tabular, legibility-tuned numerals for the stat grid (analytics feel). -->
   <style>:root{--font-mono:'JetBrains Mono',ui-monospace,'SF Mono',Menlo,monospace}</style>
 <!-- External libs from cdnjs. crossorigin+referrerpolicy hardening applied.
@@ -16,15 +16,15 @@
      (cdnjs.com → search lib → version → copy the SRI string). Hashes must match the
      served .min.js byte-for-byte or the script is blocked, so copy them from cdnjs
      rather than computing from another source. -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <!-- PR3: pinch-zoom + drag-pan + wheel-zoom on the scatter chart. hammerjs is
      required for touch gestures (chartjs-plugin-zoom checks for it and gates
      pinch support on its presence). Both loaded after Chart.js so the plugin
      can self-register; if either fails to load the chart still renders, just
      without zoom (handled by the typeof check in scRender chartConfig). -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-zoom/2.0.1/chartjs-plugin-zoom.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-zoom/2.0.1/chartjs-plugin-zoom.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <style>
 
 :root {
@@ -163,6 +163,16 @@
   --weight-bold:    700;
   --weight-extra:   800;
   --weight-black:   900;
+
+  /* Numeric data face — Inter with tabular figures (tnum). Proportional, not
+     monospaced, so it reads like a modern product UI (Linear/Stripe) while its
+     fixed-width digits still column-align for effortless cross-player
+     comparison. Used for DATA numbers (stat cells, metric boxes, bio values,
+     percentile chips). The big HERO display numbers (rank glyph, 38px metric)
+     intentionally stay Barlow Condensed — there they read as graphics, not
+     data. Three deliberate roles: Barlow = display, Inter = data, DM Sans =
+     body. `--font-num-feat` carries the tnum feature for consumers. */
+  --font-num: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
 
   /* ── DESIGN-10: Motion tokens ───────────────────────────────────────────
      One easing curve (Material's standard "decelerate" — appropriate for
@@ -558,7 +568,7 @@ button{transition:transform var(--dur-instant) var(--ease-out)}
 .player-card.udfa      .pc-tier-bar{background:linear-gradient(180deg,#047857,#10B981,#6EE7B7)}
 .pc-inner{flex:1;min-width:0;display:flex;flex-direction:column}
 .card-header{display:flex;flex-direction:row;align-items:stretch;gap:0;padding:0}
-.card-header-left{display:flex;flex-direction:row;align-items:flex-start;gap:7px;padding:13px 11px 12px;flex:1;min-width:0}
+.card-header-left{display:flex;flex-direction:row;align-items:flex-start;gap:8px;padding:14px 12px 12px;flex:1;min-width:0}
 .card-rank-badge{display:flex;flex-direction:column;align-items:center;justify-content:flex-start;flex-shrink:0;text-align:center;padding-top:2px;min-width:34px}
 .card-rank-label{font-family:'Barlow Condensed',sans-serif;font-size:var(--text-2xs);font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(var(--tier-glow),.85);line-height:1;transition:letter-spacing 260ms cubic-bezier(.22,1,.36,1),color 260ms ease}
 /* Tier-aware gradient number: navy core melting into the tier accent, with a
@@ -574,7 +584,7 @@ button{transition:transform var(--dur-instant) var(--ease-out)}
 .player-card:active .card-rank-num{transform:translateY(-1px) scale(1.02);transition-duration:80ms}
 @media(pointer:coarse){.player-card:hover .card-rank-num{transform:translateY(-1px) scale(1.03)}}
 .card-rank-crown{font-size:var(--text-14);line-height:1;margin-top:3px;display:block}
-.card-avatar-wrap{overflow:visible !important;isolation:isolate;transition:box-shadow 280ms cubic-bezier(.22,1,.36,1),transform 220ms cubic-bezier(.22,1,.36,1)}
+.card-avatar-wrap{overflow:visible !important;isolation:isolate;transition:box-shadow 280ms cubic-bezier(.22,1,.36,1),transform 220ms cubic-bezier(.22,1,.36,1);box-shadow:inset 0 0 0 1px rgba(10,22,40,.06)}
 .card-avatar-img{border-radius:inherit;display:block;transition:transform 320ms cubic-bezier(.22,1,.36,1);transform-origin:50% 40%;image-rendering:auto;-webkit-backface-visibility:hidden;backface-visibility:hidden}
 .card-avatar-wrap .avatar-fallback{border-radius:inherit;transition:transform 320ms cubic-bezier(.22,1,.36,1)}
 .player-card:hover .card-avatar-wrap{box-shadow:0 0 0 2.5px rgba(var(--tier-glow),.28),0 0 14px 4px rgba(var(--tier-glow),.16),0 0 28px 8px rgba(var(--tier-glow),.06)}
@@ -583,28 +593,70 @@ button{transition:transform var(--dur-instant) var(--ease-out)}
 .player-card:active .card-avatar-img,.player-card:active .card-avatar-wrap .avatar-fallback{transform:scale(1.02);transition-duration:80ms}
 @media(pointer:coarse){.player-card:hover .card-avatar-img,.player-card:hover .card-avatar-wrap .avatar-fallback{transform:scale(1.05)}}
 /* ── Card identity: avatar + stacked name (top), full-width meta (below) ──── */
-.card-id-main{flex:1;min-width:0;display:flex;flex-direction:column;gap:7px}
-.card-id-top{display:flex;flex-direction:row;align-items:center;gap:7px;min-width:0}
+.card-id-main{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px}
+.card-id-top{display:flex;flex-direction:row;align-items:center;gap:8px;min-width:0}
 /* Name stacks first over last so each line stays short and reads large.
    align-items:flex-start keeps both lines left-aligned beside the photo. */
 .card-name{font-family:'Barlow Condensed',sans-serif;color:var(--navy);min-width:0;flex:1;
   display:flex;flex-direction:column;justify-content:center;line-height:.96;letter-spacing:-.3px}
-.card-name-first{font-size:clamp(12px,3.6cqw,17px);font-weight:600;color:var(--gray-500);
+.card-name-first{font-size:clamp(12px,4.0cqw,19px);font-weight:600;color:var(--gray-500);
   letter-spacing:.2px;text-transform:none;display:flex;align-items:center;gap:3px;min-width:0}
 .card-name-first-text{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
-.card-name-last{font-size:clamp(16px,5.7cqw,28px);font-weight:900;color:var(--navy);
+.card-name-last{font-size:clamp(17px,6.4cqw,32px);font-weight:900;color:var(--navy);
   display:flex;align-items:baseline;gap:4px;min-width:0;margin-top:1px}
 .card-name-last-text{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;flex:1 1 auto}
-/* Full-width meta strip — uses the space beside/below the photo so school and
-   role/position get room to breathe instead of being clipped. */
-.card-id-meta{display:flex;flex-direction:column;gap:3px;min-width:0}
-.card-school-row{display:flex;align-items:center;gap:6px;min-width:0}
-.card-school-logo{display:flex;align-items:center}
-.card-logo-ring{width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;border-radius:3px;background:rgba(10,22,40,.04)}
+/* Scouting role now sits TIGHT under the name (out of the meta strip), so the
+   identity block reads top-down: first → LAST → role. Freeing it from the meta
+   row lets the school + NBA logos own a full-width row of their own below. */
+.card-role-line{margin-top:4px;font-family:'Barlow Condensed',sans-serif;font-size:var(--text-2xs);
+  font-weight:700;line-height:1;letter-spacing:.04em;text-transform:uppercase;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.card-role-line .role-name{display:inline-flex;align-items:center;color:var(--green-dark);
+  font-weight:800;background:rgba(5,150,105,.10);border:1px solid rgba(5,150,105,.20);
+  border-radius:5px;padding:2px 7px;letter-spacing:.05em}
+/* ── Identity destination block ────────────────────────────────────────────
+   Two STACKED rows — COLLEGE (school crest + school name) on top, DRAFT (NBA
+   crest + team name + pick) below. Vertical stacking is what fixes the prior
+   overlap + missing-name bug: side-by-side, a long NBA team name starved the
+   school name of width and the two crests collided. Each row now spans the
+   full card width, so both names always show in full and the crests can never
+   overlap. A hairline rule separates the two rows. */
+.card-id-meta{display:flex;flex-direction:column;gap:0;min-width:0;margin-top:5px}
+/* School caption tucked directly under the role line inside the name column —
+   reads top-down First / LAST / role / school with no floating gap. */
+.card-school-inline{display:flex;align-items:center;gap:7px;min-width:0;margin-top:6px}
+.card-dest-unit{display:flex;align-items:center;gap:7px;min-width:0;padding:3px 0}
+/* The DRAFT row is the headline fact on a results card (where he's going), so
+   it's weighted above the college row: a soft navy band, a rule above it, and
+   the pick rendered as a solid navy chip instead of faint gray text. The
+   college row (where he came from) stays plain so the two read as a clear
+   "from → to" rather than two identical stripes. */
+.card-dest-unit.card-drafted{margin-top:4px;padding:8px 0 4px;gap:9px;border-top:1px solid rgba(10,22,40,.08)}
+.card-school-logo{display:flex;align-items:center;flex-shrink:0}
+.card-logo-ring{width:22px;height:22px;display:inline-flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;border-radius:5px;background:rgba(10,22,40,.04)}
 .card-logo-ring img{width:100%;height:100%;object-fit:contain}
-.card-school-name{font-size:var(--text-sm);font-weight:600;color:var(--gray-600);letter-spacing:.01em;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
-.card-role-line{font-size:var(--text-xs);font-weight:600;color:var(--gray-500);line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
-.card-role-line .role-name{color:var(--green-dark);font-weight:800}
+.card-dest-unit .nba-team-logo{flex-shrink:0;filter:drop-shadow(0 1px 1.5px rgba(10,22,40,.18))}
+.card-dest-text{display:flex;flex-direction:row;align-items:center;gap:7px;min-width:0;flex:1 1 auto}
+/* School/team NAME — the primary identifier. Barlow Condensed is condensed so
+   long names ("North Carolina", "Charlotte Hornets") fit on one line in most
+   columns; when a name is too long it wraps to a SECOND FULL LINE (word-level
+   wrapping, never mid-word). The PICK chip is now a sibling of this text box,
+   not a child, so it reserves its own column and the name wraps inside the
+   remaining width — the two can never overlap regardless of name length. */
+.card-dest-name{font-family:'Barlow Condensed',sans-serif;font-size:var(--text-base);font-weight:700;
+  color:var(--gray-700);letter-spacing:.01em;line-height:1.02;min-width:0;flex:1 1 auto;
+  overflow-wrap:normal;word-break:keep-all;text-wrap:balance}
+.card-drafted .card-dest-name{font-weight:800;font-size:var(--text-base)}
+/* Draft pick position — just the number, in plain navy/black text (no pill).
+   A direct flex child of the row so its width is reserved and the name column
+   shrinks around it. */
+.card-dest-sub{display:inline-flex;align-items:center;
+  font-family:'Barlow Condensed',sans-serif;font-size:var(--text-md);font-weight:900;
+  color:var(--navy);line-height:1;font-variant-numeric:tabular-nums;
+  white-space:nowrap;flex-shrink:0;align-self:center;letter-spacing:0}
+.nba-team-logo-fb{display:inline-flex;align-items:center;justify-content:center;
+  font-family:var(--font-mono);font-weight:800;font-size:11px;color:var(--gray-600);
+  background:rgba(10,22,40,.06);flex-shrink:0}
 .card-school{display:flex;align-items:center;gap:5px;font-size:var(--text-10);color:var(--gray-500);font-weight:500;margin-top:2px}
 .tag{display:inline-flex;align-items:center;font-family:'Barlow Condensed',sans-serif;font-size:var(--text-9h);font-weight:800;line-height:1;padding:3px 7px;border-radius:4px;letter-spacing:.05em;text-transform:uppercase;white-space:nowrap}
 .tag.pos{border:1.5px solid currentColor}
@@ -613,23 +665,35 @@ button{transition:transform var(--dur-instant) var(--ease-out)}
 .tag.pos.center{background:#ECFEFF;color:#0E7490;border-color:#A5F3FC}
 .tag.role{background:var(--gray-100);color:var(--gray-600);border:1.5px solid #CBD5E1}
 .tag.age,.tag.ht{font-family:'Barlow Condensed',sans-serif;font-size:var(--text-2xs);font-weight:800;letter-spacing:-.1px;border-radius:5px;padding:2px 6px}
-.card-metric-panel{display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;width:86px;padding:10px 10px 12px;text-align:center;border-left:1px solid rgba(10,22,40,.06)}
+.card-metric-panel{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;flex-shrink:0;width:84px;padding:12px 8px 13px;text-align:center;border-left:1px solid rgba(10,22,40,.07)}
+/* Subtle top accent: a short centered tick in the panel's own ink, signalling
+   "this is the headline number" without a heavy rule. */
+.card-metric-panel::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);
+  width:30px;height:3px;border-radius:0 0 4px 4px;background:currentColor;opacity:.5}
 .card-metric-chip{display:none}
-.card-metric{font-family:'Barlow Condensed',sans-serif;font-size:34px;font-weight:900;line-height:1;color:inherit;letter-spacing:-1px}
+/* Eyebrow label ABOVE the number so the panel reads top-down: what it is →
+   the value → how it ranks. */
+.card-metric-label{font-family:'Barlow Condensed',sans-serif;font-size:var(--text-9h);font-weight:800;
+  text-transform:uppercase;letter-spacing:.14em;opacity:.75;color:inherit;line-height:1}
+.card-metric{font-family:var(--font-num);font-size:28px;font-weight:800;line-height:.92;color:inherit;letter-spacing:-1.2px;font-variant-numeric:tabular-nums}
 .card-metric.elite{color:inherit}
-.card-metric-label{font-size:var(--text-8h);font-weight:800;text-transform:uppercase;letter-spacing:1.2px;opacity:.75;color:inherit;margin-top:4px}
-.card-metric-pct{font-size:var(--text-2xs);font-weight:700;color:inherit;margin-top:6px;opacity:.82;line-height:1.3;text-align:center}
-.card-metric-pct sup{font-size:var(--text-7);vertical-align:super;line-height:0}
+/* Percentile as quiet inline text under the number — one ranked fact, no
+   bordered pill competing with the value above it. */
+.card-metric-pct{display:inline-flex;align-items:baseline;gap:3px;margin-top:4px;
+  font-family:var(--font-num);line-height:1;opacity:.85}
+.card-metric-pct-num{font-family:var(--font-num);font-size:var(--text-xs);font-weight:700;color:inherit;font-variant-numeric:tabular-nums;letter-spacing:-.1px}
+.card-metric-pct-num sup{font-size:var(--text-7);vertical-align:super;line-height:0;font-weight:700}
+.card-metric-pct-lbl{font-size:var(--text-8h);font-weight:700;text-transform:uppercase;letter-spacing:.06em;opacity:.6;color:inherit}
 .card-measurables{display:flex;align-items:stretch;padding:0;background:var(--gray-50);border-top:1px solid rgba(10,22,40,.06);border-bottom:1px solid rgba(10,22,40,.06)}
-.card-bio-item{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;min-width:0;padding:7px 4px;position:relative;text-align:center}
+.card-bio-item{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;min-width:0;padding:8px 4px;position:relative;text-align:center}
 .card-bio-item+.card-bio-item::before{content:'';position:absolute;left:0;top:20%;bottom:20%;width:1px;background:rgba(10,22,40,.07)}
-.card-bio-val{font-family:'Barlow Condensed',sans-serif;font-size:var(--text-16);font-weight:800;color:var(--navy);white-space:nowrap;line-height:1;letter-spacing:.2px;font-variant-numeric:tabular-nums}
+.card-bio-val{font-family:var(--font-num);font-size:16px;font-weight:700;color:var(--navy);white-space:nowrap;line-height:1;letter-spacing:-.6px;font-variant-numeric:tabular-nums}
 /* Corner percentile chip for the height cell — mirrors .stat-pos-pct so the
    height value can center over its label instead of being pushed by an
    inline superscript. */
-.card-bio-corner-pct{position:absolute;top:4px;right:6px;font-family:'Barlow Condensed',sans-serif;font-size:var(--text-9h);font-weight:900;line-height:1;color:var(--gray-500);font-variant-numeric:tabular-nums}
+.card-bio-corner-pct{position:absolute;top:4px;right:5px;font-family:var(--font-num);font-size:8px;font-weight:700;line-height:1;color:var(--gray-400);opacity:.85;font-variant-numeric:tabular-nums;letter-spacing:-.2px}
 .card-bio-corner-pct sup{font-size:6.5px;font-weight:800;vertical-align:super;line-height:0}
-.card-bio-lbl{font-size:var(--text-10h);font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--gray-500);margin-top:3px}
+.card-bio-lbl{font-size:var(--text-10h);font-weight:800;text-transform:uppercase;letter-spacing:.7px;color:var(--gray-500);margin-top:3px}
 .bio-pill{font-family:'Barlow Condensed',sans-serif;font-size:var(--text-xs);font-weight:700;letter-spacing:.01em;white-space:nowrap;background:white;border:1px solid rgba(10,22,40,.09);border-radius:5px;padding:2px 8px;color:var(--gray-700);flex-shrink:0;line-height:1.4}
 .bio-pill.cls-pill{background:#EEF2FF;border-color:#C7D2FE;color:#3730A3;font-size:var(--text-2xs);letter-spacing:.06em;text-transform:uppercase}
 .bio-ht-pct{font-family:'Barlow Condensed',sans-serif;font-size:var(--text-xs);font-weight:800;border-radius:4px;padding:2px 6px;flex-shrink:0}
@@ -638,29 +702,46 @@ button{transition:transform var(--dur-instant) var(--ease-out)}
 .meas-item{font-family:'Barlow Condensed',sans-serif;font-size:var(--text-sm);font-weight:700;color:var(--gray-700);letter-spacing:-.1px;flex-shrink:0}
 .meas-pct{display:inline-flex;align-items:baseline;font-family:'Barlow Condensed',sans-serif;font-size:var(--text-xs);font-weight:800;border-radius:3px;padding:1px 5px;flex-shrink:0}
 .meas-pct sup{font-size:var(--text-7);font-weight:700;vertical-align:super;line-height:0;letter-spacing:0}
-.card-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;padding:10px 12px 11px}
-.stat-cell{position:relative;text-align:center;background:rgba(10,22,40,.03);border-radius:10px;padding:9px 4px 7px}
-/* CONTEXT: explicit positional-percentile ordinal — replaces the corner ring */
+.card-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;padding:12px 12px}
+/* Uniform tabular figures across the entire data layer — applied at the
+   container level so every number (values, percentile chips, bio cells) shares
+   fixed-width digits and stops the subtle width-jitter as values change. */
+.card-stats,.card-measurables,.modal-metrics-row,.meas-grid,.card-metric-panel{font-variant-numeric:tabular-nums}
+.card-stats *,.card-measurables *,.modal-metrics-row *,.meas-grid *{font-variant-numeric:inherit}
+.stat-cell{position:relative;text-align:center;background:rgba(10,22,40,.03);border-radius:10px;padding:10px 4px 11px;overflow:hidden}
+/* CONTEXT: positional percentile now reads as ONE thing — a track along the
+   bottom edge of the cell. Previously a thin floating bar AND a corner ordinal
+   chip both encoded the same number; the floating bar is gone and the corner
+   chip is reduced to a quiet number (no rd/th/st suffix) so the cell states
+   its percentile once, scannably, as a fill. */
 .stat-pos-pct{
-  position:absolute;top:4px;right:5px;
-  font-family:'Barlow Condensed',sans-serif;
-  font-size:var(--text-10h);font-weight:900;line-height:1;
-  font-variant-numeric:tabular-nums;
+  position:absolute;top:5px;right:6px;
+  font-family:var(--font-num);
+  font-size:var(--text-9h);font-weight:700;line-height:1;opacity:.7;
+  font-variant-numeric:tabular-nums;letter-spacing:-.1px;
 }
-.stat-pos-pct sup{font-size:7px;font-weight:800}
+.stat-pos-pct sup{display:none}
+/* Bottom-edge percentile track: a faint full-width groove with a colored fill
+   to the percentile width. Turns nine numbers into nine instantly-comparable
+   bars and gives the stat grid a layer of visual texture it lacked. */
+.stat-track{position:absolute;left:0;right:0;bottom:0;height:3px;background:rgba(10,22,40,.07)}
+.stat-track-fill{height:100%;background:currentColor;opacity:.55;border-radius:0 2px 2px 0}
 /* BPM row: same gradient cells, one size down — keeps the card height
    reasonable while the box-score row reads clearly. */
-.stat-cell--bpm{padding:6px 4px 5px}
-.stat-cell--bpm .stat-val{font-size:var(--text-16)}
+.stat-cell--bpm{padding:8px 4px 9px}
+.stat-cell--bpm .stat-val{font-size:15px}
 .stat-cell--bpm .stat-lbl{margin-top:3px}
 /* (pos-ring CSS removed — ring replaced by explicit ordinal chip) */
-.stat-val{font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900;color:inherit;line-height:1;letter-spacing:.2px;font-variant-numeric:tabular-nums}
-.stat-bar{height:2px;border-radius:1px;margin:4px auto 0;opacity:.35;min-width:3px}
-.stat-lbl{font-size:var(--text-11h);color:inherit;opacity:.85;text-transform:uppercase;letter-spacing:.6px;font-weight:800;display:block;margin-top:5px}
-.card-comp{display:flex;align-items:center;gap:4px;flex-wrap:wrap;padding:6px 12px 9px;border-top:1px solid rgba(10,22,40,.06);margin-top:auto}
+.stat-val{font-family:var(--font-num);font-size:15px;font-weight:700;color:inherit;line-height:1;letter-spacing:-.4px;font-variant-numeric:tabular-nums}
+.stat-bar{display:none}
+.stat-lbl{font-size:var(--text-11h);color:inherit;opacity:.8;text-transform:uppercase;letter-spacing:.5px;font-weight:800;display:block;margin-top:6px}
+.card-comp{display:flex;align-items:center;gap:5px;flex-wrap:nowrap;overflow:hidden;padding:8px 12px 12px;border-top:1px solid rgba(10,22,40,.06);margin-top:auto}
 .card-comp-label{font-size:var(--text-3xs);font-weight:800;text-transform:uppercase;letter-spacing:.09em;color:var(--gray-500);flex-shrink:0}
-.card-comp-pill{display:inline-flex;align-items:center;gap:4px;background:var(--gray-50);border:1px solid rgba(10,22,40,.08);border-radius:20px;padding:2px 7px 2px 3px}
-.card-comp-name{font-size:var(--text-2xs);font-weight:700;color:var(--gray-700);white-space:nowrap}
+.card-comp-pill{display:inline-flex;align-items:center;gap:5px;background:var(--gray-50);border:1px solid rgba(10,22,40,.08);border-radius:20px;padding:3px 9px 3px 7px;min-width:0;flex-shrink:0}
+.card-comp-dot{width:5px;height:5px;border-radius:50%;background:rgb(var(--tier-glow));flex-shrink:0;opacity:.85}
+.card-comp-name{font-size:var(--text-2xs);font-weight:700;color:var(--gray-700);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+/* "+N" overflow chip — signals additional comps exist without a 2nd line. */
+.card-comp-more{padding:3px 8px;font-family:'Barlow Condensed',sans-serif;font-size:var(--text-2xs);font-weight:800;color:var(--gray-500);background:transparent;border-color:rgba(10,22,40,.12);letter-spacing:.02em}
 .card-comp strong{color:var(--blue);font-weight:600}
 
 /* ── Championship trophy badge ─────────────────────────────────────────── */
@@ -1106,9 +1187,10 @@ tr:hover td{background:var(--gray-50)}
 .modal-rank-label .tier-pill-hero .star{font-size:10px;line-height:1}
 
 .modal-name{font-family:'Barlow Condensed',sans-serif;font-weight:900;
-  font-size:30px;line-height:1.02;letter-spacing:.1px;color:#fff;
-  text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-  max-width:100%;margin-bottom:4px;text-shadow:0 1px 10px rgba(0,0,0,.3)}
+  font-size:30px;line-height:1.0;letter-spacing:.1px;color:#fff;
+  text-align:left;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+  max-width:100%;margin-bottom:3px;text-shadow:0 1px 10px rgba(0,0,0,.3)}
 .modal-meta{font-size:var(--text-xs);color:rgba(255,255,255,.66);
   text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
   max-width:100%;font-weight:500;letter-spacing:.2px}
@@ -1116,21 +1198,59 @@ tr:hover td{background:var(--gray-50)}
 
 /* "Plays like…" comp line */
 .modal-comp-line{font-size:var(--text-xs);color:rgba(255,255,255,.55);
-  margin-top:7px;font-style:italic;letter-spacing:.1px;display:none;
+  margin-top:6px;font-style:italic;letter-spacing:.1px;display:none;
   max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .modal-comp-line.shown{display:block}
 .modal-comp-line .comp-icon{color:#f5d98a;margin-right:5px;font-style:normal;font-size:var(--text-2xs)}
 .modal-comp-line .comp-names{color:rgba(255,255,255,.88);font-weight:600;font-style:normal}
 
+/* Drafted destination — the prominent franchise lockup in the identity column.
+   Larger now that the trait chips moved under the photo. Logo sits on a light
+   "coin" disc so every team mark (including dark ones) stays visible. */
+.modal-drafted{display:none;align-items:center;gap:10px;margin-top:13px;
+  padding:10px 12px 10px 10px;border-radius:13px;max-width:100%;
+  background:linear-gradient(135deg,rgba(255,255,255,.10),rgba(255,255,255,.045));
+  border:1px solid rgba(255,255,255,.14);
+  box-shadow:0 3px 14px rgba(0,0,0,.22),inset 0 1px 0 rgba(255,255,255,.07);
+  backdrop-filter:blur(6px)}
+.modal-drafted.shown{display:flex;width:100%;max-width:400px}
+/* Light coin behind the logo — guarantees contrast for ALL teams. */
+.modal-drafted-coin{display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;
+  width:42px;height:42px;border-radius:50%;
+  background:radial-gradient(circle at 38% 32%,#ffffff 0%,#f1f4f8 100%);
+  box-shadow:0 2px 8px rgba(0,0,0,.28),inset 0 0 0 1px rgba(10,22,40,.10)}
+.modal-drafted-coin .nba-team-logo{width:30px !important;height:30px !important}
+.modal-drafted-coin .nba-team-logo-fb{width:30px;height:30px;color:var(--navy);background:transparent;
+  font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:12px}
+.modal-drafted-txt{display:flex;flex-direction:column;line-height:1.1;min-width:0;gap:2px;flex:1 1 auto}
+.modal-drafted-label{font-family:'Barlow Condensed',sans-serif;font-size:var(--text-9h,9px);
+  font-weight:800;letter-spacing:1.4px;text-transform:uppercase;color:rgba(255,255,255,.45)}
+.modal-drafted-team{font-family:'Barlow Condensed',sans-serif;font-size:var(--text-md);font-weight:800;color:#fff;
+  letter-spacing:.2px;line-height:1.0;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.modal-drafted-pick{display:flex;flex-direction:column;align-items:center;justify-content:center;
+  margin-left:5px;padding-left:11px;border-left:1px solid rgba(255,255,255,.16);
+  flex-shrink:0;line-height:1.1}
+.modal-drafted-pick .mdp-lbl{font-family:'Barlow Condensed',sans-serif;font-size:var(--text-8h);
+  font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:rgba(255,255,255,.45)}
+.modal-drafted-pick b{font-family:'Barlow Condensed',sans-serif;font-size:var(--text-lg);color:#f5d98a;font-weight:900;letter-spacing:-.3px}
+.modal-drafted-via{color:rgba(255,255,255,.5);font-size:var(--text-2xs);font-weight:600;margin-top:1px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.modal-drafted-undrafted{font-size:var(--text-xs);font-weight:600;color:rgba(255,255,255,.55);font-style:italic}
+
 /* Trait chips — labeled strength/weakness pills */
-.modal-trait-chips{display:none;flex-wrap:wrap;align-items:center;gap:5px;margin-top:9px;max-width:100%}
+/* Trait chips — now positioned UNDER the photo (moved out of the identity
+   column to free space for the prominent drafted lockup). Centered to the
+   portrait width, wrapping. */
+.modal-trait-chips{display:none;flex-wrap:wrap;align-items:center;justify-content:center;
+  gap:4px;margin-top:10px;width:100%}
 .modal-trait-chips.shown{display:flex}
 .modal-trait-chips .tc-caption{
-  font-family:'Barlow Condensed',sans-serif;font-size:var(--text-9h);font-weight:800;
-  letter-spacing:1.2px;text-transform:uppercase;color:rgba(255,255,255,.40);
-  margin-right:2px}
+  font-family:'Barlow Condensed',sans-serif;font-size:var(--text-8h);font-weight:800;
+  letter-spacing:1.4px;text-transform:uppercase;color:rgba(255,255,255,.38);
+  width:100%;text-align:center;margin-bottom:1px}
 .modal-trait-chip{font-family:'Barlow Condensed',sans-serif;font-size:var(--text-9h);
-  font-weight:800;padding:3px 9px;border-radius:4px;letter-spacing:.6px;
+  font-weight:800;padding:3px 8px;border-radius:4px;letter-spacing:.5px;
   text-transform:uppercase;white-space:nowrap;line-height:1.2;
   display:inline-flex;align-items:center;gap:4px}
 .modal-trait-chip::before{content:'';width:5px;height:5px;border-radius:50%;flex-shrink:0}
@@ -1139,32 +1259,40 @@ tr:hover td{background:var(--gray-50)}
 .modal-trait-chip.weakness{background:rgba(239,68,68,.13);color:#fca5a5;border:1px solid rgba(239,68,68,.28)}
 .modal-trait-chip.weakness::before{background:#ef4444}
 
-/* ── Metric tower (middle) ── */
+/* ── Metric tower (middle) ── A self-contained premium lockup: ring with the
+   score inside, the percentile caption pulled tight beneath it so the unit
+   reads as one object instead of three floating pieces. */
 .modal-head-stat{flex-shrink:0;display:flex;flex-direction:column;align-items:center;
-  gap:5px;align-self:center}
-.modal-head-stat .mhs-ring-wrap{position:relative;width:96px;height:96px;display:none}
+  gap:8px;align-self:center}
+.modal-head-stat .mhs-ring-wrap{position:relative;width:96px;height:96px;display:none;
+  filter:drop-shadow(0 4px 14px rgba(212,168,48,.18))}
 .modal-head-stat .mhs-ring-wrap.shown{display:block}
 .modal-head-stat .mhs-ring-svg{width:100%;height:100%;transform:rotate(-90deg)}
-.modal-head-stat .mhs-ring-track{stroke:rgba(255,255,255,.10);fill:none;stroke-width:7}
-.modal-head-stat .mhs-ring-prog{stroke:url(#mhsGrad);fill:none;stroke-width:7;stroke-linecap:round;
+.modal-head-stat .mhs-ring-track{stroke:rgba(255,255,255,.08);fill:none;stroke-width:6}
+.modal-head-stat .mhs-ring-prog{stroke:url(#mhsGrad);fill:none;stroke-width:6;stroke-linecap:round;
   transition:stroke-dashoffset 1s cubic-bezier(0.4,0,0.2,1)}
 .modal-head-stat .mhs-ring-inner{position:absolute;inset:0;display:flex;flex-direction:column;
-  align-items:center;justify-content:center}
+  align-items:center;justify-content:center;gap:1px}
 .modal-head-stat .mhs-val{font-family:'Barlow Condensed',sans-serif;font-weight:900;
-  font-size:27px;line-height:.92;color:#f5d98a;letter-spacing:-.5px;
-  font-variant-numeric:tabular-nums;text-shadow:0 2px 10px rgba(212,168,48,.3)}
-.modal-head-stat .mhs-lbl{font-size:var(--text-8h);font-weight:800;letter-spacing:1.4px;
-  text-transform:uppercase;color:rgba(255,255,255,.45);margin-top:2px}
+  font-size:28px;line-height:.9;color:#f5d98a;letter-spacing:-.5px;
+  font-variant-numeric:tabular-nums;text-shadow:0 2px 12px rgba(212,168,48,.35)}
+.modal-head-stat .mhs-lbl{font-size:var(--text-7);font-weight:800;letter-spacing:2px;
+  text-transform:uppercase;color:rgba(255,255,255,.4);margin-top:1px}
 .modal-head-stat .mhs-percentile{font-family:'Barlow Condensed',sans-serif;
-  font-size:var(--text-10);font-weight:800;letter-spacing:.8px;text-transform:uppercase;
-  color:#f5d98a;display:none;text-align:center}
+  font-size:var(--text-9h);font-weight:800;letter-spacing:.8px;text-transform:uppercase;
+  color:#e8c876;display:none;text-align:center;line-height:1.1;
+  padding:3px 10px;border-radius:20px;background:rgba(212,168,48,.12);
+  border:1px solid rgba(212,168,48,.28)}
 .modal-head-stat .mhs-percentile.shown{display:block}
 
 /* ── Portrait (right) ── */
-.modal-hero-photo{position:relative;flex-shrink:0}
+.modal-hero-photo{position:relative;flex-shrink:0;display:flex;flex-direction:column;align-items:center}
+.modal-trait-chips{max-width:100%}
+.modal-avatar-frame{position:relative;display:inline-flex}
 .modal-avatar{width:92px;height:92px;border-radius:14px;overflow:hidden;flex-shrink:0;
-  border:2.5px solid rgba(255,255,255,.18);
-  box-shadow:0 8px 28px rgba(0,0,0,.5),0 0 0 1px rgba(212,168,48,.2),inset 0 0 0 1px rgba(255,255,255,.07)}
+  border:2px solid rgba(245,217,138,.22);
+  background:linear-gradient(160deg,#1b2c4d 0%,#0f1d35 100%);
+  box-shadow:0 10px 32px rgba(0,0,0,.55),0 0 0 1px rgba(212,168,48,.25),inset 0 1px 0 rgba(255,255,255,.1)}
 .modal-avatar img{width:100%;height:100%;object-fit:cover;object-position:50% 14%}
 
 /* ── Header photo as a holographic projection (modal header only) ──
@@ -1268,28 +1396,45 @@ tr:hover td{background:var(--gray-50)}
 .modal-school-mark.shown{opacity:1}
 .modal-school-mark img{width:21px;height:21px;object-fit:contain}
 
+/* Clean (default) headshot wrapper inside the hero photo box. */
+.modal-avatar .holo-av-clean{width:100%;height:100%}
+.modal-avatar .holo-av-clean > div,.modal-avatar .holo-av-clean img{width:100%;height:100%;border-radius:inherit}
+/* Hologram toggle — small glassy chip at the photo's top-right corner. */
+/* Holo toggle — anchored to the BOTTOM-LEFT corner of the portrait. The
+   top-right is reserved for the modal close (X) button and the bottom-right
+   holds the school crest, so bottom-left is the one free corner; it keeps the
+   control on the photo it affects while never colliding with either. */
+.holo-toggle{position:absolute;bottom:-7px;left:-7px;width:26px;height:26px;z-index:4;
+  display:flex;align-items:center;justify-content:center;cursor:pointer;
+  border-radius:50%;border:1.5px solid rgba(255,255,255,.22);color:rgba(255,255,255,.82);
+  background:rgba(12,24,48,.74);backdrop-filter:blur(4px);
+  box-shadow:0 2px 8px rgba(0,0,0,.4);transition:all .18s ease}
+.holo-toggle:hover{color:#fff;border-color:rgba(120,220,255,.6);background:rgba(12,24,48,.92);transform:scale(1.08)}
+.holo-toggle.active{color:#7fe9ff;border-color:rgba(120,220,255,.85);
+  box-shadow:0 2px 8px rgba(0,0,0,.4),0 0 12px rgba(120,220,255,.5)}
+
 /* ── Measurables band (integrated into header bottom) ── */
 /* Sits on the dark header gradient. Reads as an intentional "stat ledger"
    panel: a faint elevated surface with a hairline amber top-accent, brighter
    legible labels, and tabular values. Replaces the old flat near-black strip
    with washed-out 40%-opacity labels. */
 .modal-meas-strip{position:relative;z-index:1;
-  background:linear-gradient(180deg, rgba(255,255,255,.05) 0%, rgba(0,0,0,.18) 100%);
-  border-top:1px solid rgba(212,168,48,.28);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.06);
-  padding:11px 18px 12px;display:none;grid-template-columns:repeat(6,1fr);gap:0}
+  background:linear-gradient(180deg, rgba(255,255,255,.045) 0%, rgba(0,0,0,.22) 100%);
+  border-top:1px solid rgba(212,168,48,.22);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.05);
+  padding:13px 18px 14px;display:none;grid-template-columns:repeat(6,1fr);gap:0}
 .modal-meas-strip.shown{display:grid}
-.modal-meas-tile{text-align:center;padding:1px 10px;position:relative}
+.modal-meas-tile{text-align:center;padding:2px 10px;position:relative}
 .modal-meas-tile::after{content:'';position:absolute;right:0;top:50%;transform:translateY(-50%);
-  height:30px;width:1px;background:linear-gradient(180deg,transparent,rgba(255,255,255,.14),transparent)}
+  height:26px;width:1px;background:linear-gradient(180deg,transparent,rgba(255,255,255,.12),transparent)}
 .modal-meas-tile:last-child::after{display:none}
 .modal-meas-tile .meas-lbl{font-family:'Barlow Condensed',sans-serif;font-size:var(--text-2xs);
-  font-weight:700;color:rgba(212,168,48,.85);letter-spacing:.7px;text-transform:uppercase;
-  margin-bottom:4px;white-space:nowrap}
+  font-weight:800;color:rgba(245,217,138,.95);letter-spacing:1.2px;text-transform:uppercase;
+  margin-bottom:5px;white-space:nowrap}
 .modal-meas-tile .meas-val{font-family:'Barlow Condensed',sans-serif;font-size:var(--text-lg);
-  font-weight:900;color:#fff;line-height:1;letter-spacing:-.2px;font-variant-numeric:tabular-nums;
+  font-weight:900;color:#fff;line-height:1;letter-spacing:.2px;font-variant-numeric:tabular-nums;
   display:inline-flex;align-items:center;gap:6px;justify-content:center;
-  text-shadow:0 1px 2px rgba(0,0,0,.35)}
+  text-shadow:0 1px 3px rgba(0,0,0,.4)}
 .modal-meas-tile .meas-val.dim{color:rgba(255,255,255,.3);text-shadow:none}
 .modal-meas-tile .meas-delta{font-family:'Barlow Condensed',sans-serif;font-size:var(--text-10);
   font-weight:800;letter-spacing:.2px;padding:2px 6px;border-radius:5px;line-height:1;
@@ -1402,9 +1547,9 @@ tr:hover td{background:var(--gray-50)}
 }
 .modal-metrics-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(90px,1fr));gap:10px;margin-bottom:18px}
 .metric-box{background:var(--gray-50);border:1px solid var(--gray-100);border-radius:10px;padding:11px 14px;text-align:center;transition:background .2s}
-.metric-box .val{font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:900;color:inherit}
+.metric-box .val{font-family:var(--font-num);font-size:23px;font-weight:700;color:inherit;letter-spacing:-1px;font-variant-numeric:tabular-nums}
 .metric-box .val.hi{color:var(--blue)}.metric-box .val.gold{color:var(--amber)}
-.metric-box .lbl{font-size:var(--text-2xs);color:inherit;opacity:.75;text-transform:uppercase;letter-spacing:.4px;font-weight:700;margin-top:3px}
+.metric-box .lbl{font-size:var(--text-2xs);color:inherit;opacity:.75;text-transform:uppercase;letter-spacing:.7px;font-weight:700;margin-top:3px}
 .metric-box .rank-ctx{font-size:var(--text-3xs);color:inherit;opacity:.55;margin-top:4px;letter-spacing:.2px;font-weight:500;line-height:1.3}
 .modal-section{margin-bottom:14px}
 .modal-section-label{font-size:var(--text-2xs);font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:var(--gray-500);margin-bottom:10px;margin-top:4px;display:flex;align-items:center;gap:8px}
@@ -1520,29 +1665,36 @@ tr:hover td{background:var(--gray-50)}
 @media(max-width:600px){.shot-panel-wrap{flex-direction:column}.shot-court-col{width:100%}}
 /* PROFILE-5: one section idiom — caps label · hairline rule. Matches the
    editorial round-divider system used across the product. */
-.modal-sec-title{font-size:var(--text-2xs);font-weight:800;color:var(--gray-500);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:10px;display:flex;align-items:center;gap:8px}
-.modal-sec-title::after{content:'';flex:1;height:1px;background:var(--gray-200)}
+.modal-sec-title{font-size:var(--text-2xs);font-weight:800;color:var(--gray-600);text-transform:uppercase;letter-spacing:1.6px;margin-bottom:12px;display:flex;align-items:center;gap:9px}
+.modal-sec-title::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--gray-200),rgba(10,22,40,0))}
 .modal-sec-title svg{color:var(--gray-400)}
-.notes-text{font-size:var(--text-sm);color:var(--gray-700);line-height:1.65;background:var(--gray-50);padding:12px 14px;border-radius:8px;border:1px solid var(--gray-100)}
+.notes-text{font-size:14px;color:var(--gray-700);line-height:1.65;background:var(--gray-50);padding:12px 14px;border-radius:8px;border:1px solid var(--gray-100)}
 /* Why Here — editorial positioning blurb (priority #1).
    Distinctive amber accent + serif-leaning weight signals this is editorial
    reasoning, not raw notes. Sits visually between scouting report and comps. */
 .why-here-text{
-  font-size:13.5px;color:#1E293B;line-height:1.55;
+  font-size:14px;color:#1E293B;line-height:1.6;
   background:linear-gradient(180deg,#FFFBEB 0%,#FEF3C7 100%);
   padding:14px 16px;border-radius:8px;
   border:1px solid #FCD34D;
   border-left:3px solid #D97706;
   font-weight:500;letter-spacing:.05px;
 }
-.sw-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+/* Narrative-first ordering: trim the lead section's top margin so it sits
+   flush under the tab/header without a dead gap. */
+.modal-body > .modal-section--why:first-child,
+.modal-body > .modal-section--scout:first-child{margin-top:0}
+.sw-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .sw-grid.has-neutral{grid-template-columns:1fr 1fr 1fr}
-.sw-col{background:var(--gray-50);border:1px solid var(--gray-100);border-radius:8px;padding:12px 14px}
-.sw-col-title{font-size:var(--text-10);font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px;display:flex;align-items:center;gap:5px}
+.sw-col{background:var(--gray-50);border:1px solid var(--gray-100);border-radius:10px;padding:13px 15px}
+.sw-col.str{background:linear-gradient(180deg,rgba(22,163,74,.04),rgba(22,163,74,.015));border-color:rgba(22,163,74,.14)}
+.sw-col.wkn{background:linear-gradient(180deg,rgba(220,38,38,.035),rgba(220,38,38,.01));border-color:rgba(220,38,38,.13)}
+.sw-col.ntr{background:linear-gradient(180deg,rgba(202,138,4,.04),rgba(202,138,4,.012));border-color:rgba(202,138,4,.14)}
+.sw-col-title{font-size:var(--text-10);font-weight:800;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;display:flex;align-items:center;gap:6px}
 .sw-col-title.str{color:var(--green-dark)}.sw-col-title.wkn{color:var(--red-dark)}.sw-col-title.ntr{color:var(--amber-dark)}
-.sw-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:5px}
-.sw-list li{font-size:12.5px;color:var(--gray-700);line-height:1.5;padding-left:14px;position:relative}
-.sw-list li::before{position:absolute;left:0;font-size:var(--text-10)}
+.sw-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:7px}
+.sw-list li{font-size:13.5px;color:var(--gray-700);line-height:1.5;padding-left:18px;position:relative}
+.sw-list li::before{position:absolute;left:0;top:1px;font-size:var(--text-11h);font-weight:800}
 .sw-list.str li::before{content:"✓";color:var(--green-dark)}.sw-list.wkn li::before{content:"✗";color:var(--red-dark)}.sw-list.ntr li::before{content:"→";color:var(--amber-dark)}
 .role-badge{display:inline-flex;align-items:center;gap:4px;background:rgba(44,69,105,.12);color:#7c3aed;border:1px solid rgba(44,69,105,.2);border-radius:20px;font-size:var(--text-2xs);font-weight:700;padding:3px 10px;font-family:'Barlow Condensed',sans-serif;letter-spacing:.3px}
 @media(max-width:700px){.sw-grid,.sw-grid.has-neutral{grid-template-columns:1fr}}
@@ -1563,8 +1715,9 @@ tr:hover td{background:var(--gray-50)}
   letter-spacing:1px;font-weight:800;order:-1;margin-bottom:4px;
 }
 .meas-item .val{
-  font-family:'Barlow Condensed',sans-serif;
-  font-size:26px;font-weight:900;color:var(--navy);line-height:1;
+  font-family:var(--font-num);
+  font-size:23px;font-weight:700;color:var(--navy);line-height:1;letter-spacing:-1px;
+  font-variant-numeric:tabular-nums;
 }
 .meas-val-row{display:flex;align-items:baseline;gap:7px;min-width:0}
 .meas-val-row .combine-sub{margin-top:0}
@@ -1573,7 +1726,7 @@ tr:hover td{background:var(--gray-50)}
 .meas-bar-wrap{display:flex;align-items:center;gap:7px;margin-top:9px}
 .meas-bar{flex:1;height:5px;background:var(--gray-100);border-radius:3px;overflow:hidden;min-width:26px}
 .meas-bar-fill{display:block;height:100%;border-radius:3px}
-.meas-bar-num{font-size:var(--text-2xs);font-weight:800;flex-shrink:0}
+.meas-bar-num{font-family:var(--font-num);font-size:var(--text-2xs);font-weight:700;flex-shrink:0;font-variant-numeric:tabular-nums;letter-spacing:-.2px}
 
 /* ── Combine percentile pills (light theme, inside meas-grid) ─────────── */
 .meas-item .combine-pct{
@@ -2461,23 +2614,30 @@ tr:hover td{background:var(--gray-50)}
   .pc-tier-bar{width:4px}
   .card-header-left{padding:11px 10px 10px;gap:8px}
   .card-rank-num{font-size:var(--text-lg)}
-  .card-name-last{font-size:clamp(17px,5.7cqw,28px)}
+  .card-name-last{font-size:clamp(17px,6.4cqw,32px)}
   .card-name-first{font-size:var(--text-sm)}
-  .card-school-name{font-size:var(--text-2xs)}
-  .card-role-line{font-size:var(--text-10);margin-top:2px}
+  .card-dest-name{font-size:var(--text-base)}
+  .card-dest-sub{font-size:var(--text-base)}
+  .card-role-line{font-size:var(--text-9h);margin-top:3px}
+  .card-logo-ring{width:20px;height:20px}
+  .card-id-meta{gap:0;margin-top:5px}
+  .card-school-inline{margin-top:5px;gap:6px}
+  .card-dest-unit{padding:5px 0;gap:8px}
   .tag{font-size:var(--text-8h);padding:2px 6px}
-  .card-metric-panel{width:72px;padding:8px 7px 10px}
+  .card-metric-panel{width:78px;padding:9px 7px 10px;gap:2px}
   .card-metric{font-size:26px}
-  .card-metric-label{font-size:6px}
-      .card-metric-pct{font-size:var(--text-3xs);margin-top:4px}
+  .card-metric-label{font-size:var(--text-8h);letter-spacing:.1em}
+  .card-metric-pct{margin-top:2px}
+  .card-metric-pct-num{font-size:var(--text-2xs)}
+  .card-metric-pct-lbl{font-size:var(--text-7)}
+  .card-metric-panel::before{width:24px}
   .card-bio-item{padding:6px 3px}
   .card-bio-val{font-size:var(--text-sm)}
     .card-bio-lbl{font-size:var(--text-7)}
   .card-stats{gap:4px;padding:8px 10px 9px}
   /* .stat-cell, .stat-val, .stat-lbl — consolidated later in this MQ block */
-  .stat-bar{display:block !important;opacity:.38;height:2px;margin-top:3px}
   .stat-cell--secondary{display:none}
-  .card-comp-pill{padding:2px 6px 2px 2px;gap:3px}
+  .card-comp-pill{padding:3px 8px 3px 6px;gap:4px}
     .card-comp-name{font-size:var(--text-3xs)}
 
   /* Table: sticky rank + player columns — background must track the row colour.
@@ -2838,7 +2998,7 @@ tr:hover td{background:var(--gray-50)}
   .modal-meas-tile{padding:2px 6px}
   /* Drop the vertical divider on every 3rd tile (end of each row) */
   .modal-meas-tile:nth-child(3n)::after{display:none}
-  .modal-meas-tile .meas-lbl{font-size:var(--text-3xs);letter-spacing:.6px;margin-bottom:3px}
+  .modal-meas-tile .meas-lbl{font-size:var(--text-10);letter-spacing:.7px;margin-bottom:3px;color:rgba(245,217,138,.92)}
   .modal-meas-tile .meas-val{font-size:var(--text-md)}
   /* Nav prev/next: reposition for horizontal layout */
   .modal-nav-btn{top:30px;transform:none}
@@ -2855,6 +3015,16 @@ tr:hover td{background:var(--gray-50)}
 
   /* Modal body: slightly more padding than before */
   .modal-body{padding:12px 14px 8px}
+
+  /* Drafted lockup — compact on mobile so the team name keeps room */
+  .modal-drafted{margin-top:8px;padding:7px 11px 7px 8px;gap:9px}
+  .modal-drafted.shown{min-width:0}
+  .modal-drafted-coin{width:38px;height:38px}
+  .modal-drafted-coin .nba-team-logo{width:27px !important;height:27px !important}
+  .modal-drafted-team{font-size:var(--text-sm)}
+  .modal-drafted-pick{margin-left:4px;padding-left:9px}
+  .modal-drafted-pick b{font-size:var(--text-base)}
+  .modal-drafted-pick .mdp-lbl{font-size:var(--text-7)}
 
   /* Tab bar: more compact */
   .modal-tab-bar{padding:3px;gap:0;margin-bottom:10px}
@@ -3280,9 +3450,6 @@ tr:hover td{background:var(--gray-50)}
     align-self:stretch;
     overflow:hidden;
   }
-  .card-metric{font-size:var(--text-md);letter-spacing:-.5px}
-  .card-metric.elite{font-size:19px}
-  .card-metric-label{font-size:5.5px;letter-spacing:.8px}
       /* Identity: clip long content so it never pushes into metric */
   .card-identity{min-width:0;overflow:hidden}
 
@@ -3665,7 +3832,7 @@ tr:hover td{background:var(--gray-50)}
 
   /* Stat cells: slightly taller in 2-col layout */
   .stat-cell{padding:8px 4px 7px;border-radius:8px}
-  .stat-val{font-size:var(--text-16)}
+  .stat-val{font-size:var(--text-xs)}
   .stat-lbl{font-size:var(--text-9h);margin-top:3px;letter-spacing:.4px}
   .tier-section{margin-bottom:20px}
   .tier-header{margin-bottom:10px;padding-bottom:8px;gap:9px}
@@ -3815,11 +3982,18 @@ tr:hover td{background:var(--gray-50)}
   .card-header-left{padding:9px 8px 8px;gap:7px}
   .card-rank-label{font-size:var(--text-3xs)}
   .card-rank-num{font-size:var(--text-20)}
-  .card-name-last{font-size:clamp(16px,5.7cqw,28px) !important}
-  .card-school-name{font-size:var(--text-10)}
-  .card-metric-panel{width:64px;padding:9px 6px 8px}
+  .card-name-last{font-size:clamp(16px,6.4cqw,32px) !important}
+  .card-dest-name{font-size:var(--text-sm)}
+  .card-dest-sub{font-size:var(--text-sm)}
+  .card-logo-ring{width:22px;height:22px}
+  .card-dest-unit{padding:4px 0;gap:7px}
+  .card-metric-panel{width:70px;padding:9px 6px 9px;gap:2px}
   .card-metric{font-size:var(--text-22)}
-  .card-metric-pct{font-size:var(--text-8);margin-top:3px}
+  .card-metric-pct{margin-top:2px}
+  .card-metric-pct-num{font-size:var(--text-2xs)}
+  .card-metric-pct-lbl{font-size:6px}
+  .card-metric-label{font-size:var(--text-7)}
+  .card-metric-panel::before{width:22px;height:2.5px}
   .bio-pill{font-size:var(--text-10) !important;padding:1px 5px !important}
   .bio-pill.cls-pill{font-size:var(--text-3xs) !important}
   .tag{font-size:7.5px !important;padding:1px 3px !important}
@@ -3898,24 +4072,26 @@ tr:hover td{background:var(--gray-50)}
   .cards-grid{grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px}
   .card-header-left{padding:14px 12px 12px;gap:10px}
   .card-rank-num{font-size:var(--text-xl)}
-  .card-name-first{font-size:clamp(12px,3.6cqw,17px)}
-  .card-metric-panel{width:86px;padding:10px 10px 12px}
-  .card-metric{font-size:34px}
-  .card-metric-label{font-size:var(--text-7)}
-      .card-metric-pct{font-size:var(--text-10);margin-top:6px}
+  .card-name-first{font-size:clamp(12px,4.0cqw,19px)}
+  .card-metric-panel{width:84px;padding:12px 8px 13px;gap:3px}
+  .card-metric{font-size:28px}
+  .card-metric-label{font-size:var(--text-9h);letter-spacing:.14em}
+  .card-metric-pct{margin-top:4px}
+  .card-metric-pct-num{font-size:var(--text-xs)}
+  .card-metric-pct-lbl{font-size:var(--text-8h)}
   .card-bio-item{padding:7px 4px}
-  .card-bio-val{font-size:var(--text-15)}
+  .card-bio-val{font-size:16px}
   .card-bio-lbl{font-size:var(--text-9h);letter-spacing:.7px;opacity:.92}
   .card-stats{gap:6px;padding:11px 12px 12px}
   .stat-cell{padding:10px 4px 8px}
-  /* Stat value: a touch larger + tabular figures so columns of numbers align
-     cleanly and read as data, not text. */
-  .stat-val{font-size:var(--text-18);letter-spacing:-.2px;font-variant-numeric:tabular-nums}
+  /* Stat value kept a touch SMALLER than the measurables value so the
+     measurement strip stays the denser reference row; tabular figures align. */
+  .stat-val{font-size:15px;letter-spacing:-.3px;font-variant-numeric:tabular-nums}
   /* Stat label: the headline ask — bumped 8.5 -> 11px, fuller weight and
      contrast so TS% / P+A/USG / STL+BL are legible at a glance instead of
      squinted at. Slightly more tracking gives the small caps room to breathe. */
-  .stat-lbl{font-size:var(--text-2xs);font-weight:800;letter-spacing:.7px;opacity:.95;margin-top:5px}
-  .stat-cell--bpm .stat-val{font-size:var(--text-md)}
+  .stat-lbl{font-size:var(--text-2xs);font-weight:800;letter-spacing:.5px;opacity:.95;margin-top:5px}
+  .stat-cell--bpm .stat-val{font-size:15px}
   .stat-cell--bpm .stat-lbl{font-size:var(--text-9h)}
   .stat-cell--secondary{display:block}
   /* Restore compare button on desktop */
@@ -3946,8 +4122,8 @@ tr:hover td{background:var(--gray-50)}
     flex-shrink:unset;
   }
   /* DESKTOP HERO V3 — enlarge the flex-row pieces */
-  .modal-hero-row{padding:20px 30px 16px 24px;gap:20px;min-height:150px}
-  .modal-name{font-size:42px;line-height:.95;letter-spacing:-.5px;margin-bottom:6px}
+  .modal-hero-row{padding:20px 26px 16px 24px;gap:14px;min-height:150px}
+  .modal-name{font-size:30px;line-height:.98;letter-spacing:-.2px;margin-bottom:5px}
   .modal-rank-label{margin-bottom:9px}
   .modal-rank-label .rank-num-big{font-size:22px;padding:3px 10px}
   .modal-rank-label .tier-pill-hero{font-size:var(--text-10);padding:4px 12px}
@@ -3957,10 +4133,13 @@ tr:hover td{background:var(--gray-50)}
 
   /* Metric tower — bigger ring on desktop */
   .modal-head-stat{gap:6px}
-  .modal-head-stat .mhs-ring-wrap{width:108px;height:108px}
+  .modal-head-stat .mhs-ring-wrap{width:100px;height:100px}
   .modal-head-stat .mhs-val{font-size:30px}
 
-  /* Portrait — the visual anchor, promoted on desktop */
+  /* Portrait — the visual anchor, promoted on desktop. Column width capped so
+     the trait chips below wrap within ~2 lines instead of expanding the column
+     and starving the identity/name column of width. */
+  .modal-hero-photo{width:172px}
   .modal-avatar{
     width:118px !important;height:148px !important;
     border-radius:14px;border-width:3px;
@@ -3978,7 +4157,7 @@ tr:hover td{background:var(--gray-50)}
   /* Restore metrics row */
   .modal-metrics-row{gap:10px;margin-bottom:18px}
   .metric-box{padding:11px 14px;border-radius:10px}
-  .metric-box .val{font-size:26px}
+  .metric-box .val{font-size:23px}
   .metric-box .lbl{font-size:var(--text-2xs);margin-top:3px}
   .metric-box .rank-ctx{font-size:var(--text-3xs)}
   /* Tab bar */
@@ -8072,7 +8251,10 @@ ock Drafts table CSS ───────────────────�
   pointer-events:auto;
   user-select:none;
   -webkit-user-select:none;
-  will-change:transform;
+  /* NOTE: will-change is intentionally NOT set here. With up to ~75 cards on
+     screen, a permanent will-change:transform pins that many compositor layers
+     in GPU memory at all times. It's promoted transiently on :hover instead,
+     so only the card actually being interacted with gets a layer. */
 }
 .holo-card::before{
   /* Cyan corner brackets — sci-fi UI hallmark. Four absolute-positioned L-shapes. */
@@ -8090,6 +8272,7 @@ ock Drafts table CSS ───────────────────�
   opacity:.7;
 }
 .holo-card:hover{
+  will-change:transform;
   border-color:var(--holo-cyan);
   box-shadow:
     0 0 0 1px rgba(0, 229, 255, .4),
@@ -8161,6 +8344,10 @@ ock Drafts table CSS ───────────────────�
 .holo-projection{
   position:fixed;inset:0;
   z-index:9000;
+  /* --holo-tier defaults to cyan; JS overrides it per-rank on open so that
+     decorative chrome reflects tier (FRANCHISE = amber, PROSPECT = violet,
+     etc) while data-critical elements keep their consistent cyan. */
+  --holo-tier: var(--holo-cyan);
   display:flex;align-items:center;justify-content:center;
   background:
     radial-gradient(ellipse at 50% 50%, rgba(0, 229, 255, .12) 0%, transparent 60%),
@@ -8175,6 +8362,30 @@ ock Drafts table CSS ───────────────────�
 }
 .holo-projection.is-open{
   opacity:1;pointer-events:auto;
+}
+
+/* Tier accent applied to select decorative elements only — chrome and
+   atmospheric glow, NOT data-critical surfaces. Cyan-tier picks become no-ops
+   (var resolves to cyan); amber/violet tiers visually flag the player class
+   without hurting legibility of stat values, helix nodes, or shot zones. */
+.holo-projection .holo-proj-frame .hpf-corner{
+  border-color:var(--holo-tier);
+  filter:drop-shadow(0 0 6px var(--holo-tier));
+}
+.holo-projection .holo-proj-eyebrow{
+  color:var(--holo-tier);
+}
+.holo-projection .holo-proj-eyebrow::before,
+.holo-projection .holo-proj-eyebrow::after{
+  background:linear-gradient(90deg, transparent, var(--holo-tier));
+}
+.holo-projection .holo-proj-eyebrow::after{
+  background:linear-gradient(90deg, var(--holo-tier), transparent);
+}
+.holo-projection .holo-proj-name{
+  text-shadow:
+    0 0 12px color-mix(in srgb, var(--holo-tier) 55%, transparent),
+    0 0 32px color-mix(in srgb, var(--holo-tier) 25%, transparent);
 }
 
 /* Re-uses the floor/scanlines look inside the projection layer */
@@ -8192,11 +8403,75 @@ ock Drafts table CSS ───────────────────�
   display:flex;align-items:center;justify-content:center;
 }
 
-/* Player figure — central headshot panel with rim glow and subtle Y-axis rotation. */
+/* ── STAGE HUD FRAME — corner brackets + telemetry rail ─────────────────────
+   Anchored, decorative chrome that frames the whole projection so it reads as a
+   targeting console rather than a floating card. Pointer-transparent. */
+.holo-proj-frame{
+  position:absolute; inset:0; z-index:6; pointer-events:none;
+}
+.holo-proj-frame .hpf-corner{
+  position:absolute; width:46px; height:46px;
+  border:2px solid rgba(0,229,255,.55);
+  filter:drop-shadow(0 0 6px rgba(0,229,255,.4));
+  opacity:0; animation:hpf-corner-in .6s ease forwards;
+}
+.holo-proj-frame .hpf-tl{ top:18px; left:18px; border-right:none; border-bottom:none; border-radius:6px 0 0 0; animation-delay:.05s; }
+.holo-proj-frame .hpf-tr{ top:18px; right:18px; border-left:none; border-bottom:none; border-radius:0 6px 0 0; animation-delay:.12s; }
+.holo-proj-frame .hpf-bl{ bottom:18px; left:18px; border-right:none; border-top:none; border-radius:0 0 0 6px; animation-delay:.18s; }
+.holo-proj-frame .hpf-br{ bottom:18px; right:18px; border-left:none; border-top:none; border-radius:0 0 6px 0; animation-delay:.24s; }
+@keyframes hpf-corner-in{ from{ opacity:0; transform:scale(1.4); } to{ opacity:1; transform:scale(1); } }
+/* Live telemetry strip pinned bottom-left — pure flavor, sells the "console". */
+.holo-proj-frame .hpf-telemetry{
+  position:absolute; left:30px; bottom:30px;
+  font-family:var(--holo-mono); font-size:9px; letter-spacing:.16em;
+  color:rgba(0,229,255,.5); text-transform:uppercase; line-height:1.7;
+}
+.holo-proj-frame .hpf-telemetry b{ color:rgba(230,248,255,.85); font-weight:700; }
+.holo-proj-frame .hpf-telemetry .blink{ animation:holo-pulse 1.4s ease-in-out infinite; }
+
+/* ── RANK COMMAND BADGE — anchored top-LEFT, fully clear of the close control ──
+   Replaces the old top-center rank string. A circular telemetry medallion with
+   an animated sweep ring; the tier color is driven inline from rank. */
+.holo-proj-rankbadge{
+  position:absolute; top:26px; left:26px; z-index:12;
+  width:84px; height:84px;
+  display:flex; align-items:center; justify-content:center;
+  pointer-events:none;
+  opacity:0; animation:hpf-corner-in .55s ease .25s forwards;
+}
+.holo-proj-rankbadge svg{ position:absolute; inset:0; width:100%; height:100%; }
+.holo-proj-rankbadge .rb-ring{
+  fill:none; stroke:var(--holo-cyan); stroke-width:1.5;
+  opacity:.35;
+}
+.holo-proj-rankbadge .rb-sweep{
+  fill:none; stroke:var(--holo-cyan); stroke-width:2.5; stroke-linecap:round;
+  stroke-dasharray:60 220; transform-origin:50% 50%;
+  filter:drop-shadow(0 0 4px var(--holo-cyan));
+  animation:rb-spin 3.2s linear infinite;
+}
+@keyframes rb-spin{ to{ transform:rotate(360deg); } }
+.holo-proj-rankbadge .rb-core{
+  position:relative; text-align:center; line-height:1;
+}
+.holo-proj-rankbadge .rb-lbl{
+  font-family:var(--holo-mono); font-size:7px; letter-spacing:.22em;
+  color:rgba(230,248,255,.6); text-transform:uppercase; display:block; margin-bottom:1px;
+}
+.holo-proj-rankbadge .rb-num{
+  font-family:'Barlow Condensed',sans-serif; font-weight:800; font-size:34px;
+  color:#fff; text-shadow:0 0 12px var(--holo-cyan); display:block;
+}
+.holo-proj-rankbadge .rb-tier{
+  font-family:var(--holo-mono); font-size:6.5px; letter-spacing:.18em;
+  color:var(--holo-cyan); text-transform:uppercase; display:block; margin-top:1px;
+}
+
+/* Player figure — central headshot panel with rim glow + targeting reticle. */
 .holo-proj-figure{
   position:relative;
   width:230px;height:330px;
-  border-radius:10px;
+  border-radius:12px;
   background:linear-gradient(180deg, rgba(8, 26, 48, .9) 0%, rgba(2, 10, 22, .96) 100%);
   border:1.5px solid var(--holo-cyan);
   box-shadow:
@@ -8204,12 +8479,29 @@ ock Drafts table CSS ───────────────────�
     0 0 60px rgba(0, 229, 255, .35),
     0 0 120px rgba(0, 229, 255, .15);
   overflow:hidden;
-  /* Photo is centered on the flat helix plane, above the strand SVG (z1) and
-     below the nodes (z3) — but since nodes are pinned to the sides, nothing
-     overlaps the photo. The figure does not rotate. */
   z-index:2;
   flex:0 0 auto;
+  transform:translateZ(0);
+  transition:transform .25s cubic-bezier(.2,.7,.2,1);
 }
+/* Targeting reticle ring behind the figure — slow counter-rotating dashed rings. */
+.holo-proj-reticle{
+  position:absolute; top:50%; left:50%;
+  width:520px; height:520px;
+  transform:translate(-50%,-50%);
+  z-index:1; pointer-events:none; opacity:.5;
+}
+.holo-proj-reticle svg{ width:100%; height:100%; }
+.holo-proj-reticle .rt-ring{ fill:none; stroke:rgba(0,229,255,.25); stroke-width:1; }
+.holo-proj-reticle .rt-dash{
+  fill:none; stroke:rgba(0,229,255,.4); stroke-width:1.5; stroke-dasharray:4 10;
+  transform-origin:50% 50%; animation:rb-spin 22s linear infinite;
+}
+.holo-proj-reticle .rt-dash2{
+  fill:none; stroke:rgba(179,136,255,.32); stroke-width:1; stroke-dasharray:2 16;
+  transform-origin:50% 50%; animation:rb-spin 30s linear infinite reverse;
+}
+.holo-proj-reticle .rt-tick{ stroke:rgba(0,229,255,.5); stroke-width:1.5; }
 .holo-proj-figure-photo{
   position:absolute;inset:0;
   background-color:#0A1628;
@@ -8253,6 +8545,20 @@ ock Drafts table CSS ───────────────────�
   z-index:7;
   min-width:380px;
 }
+.holo-proj-eyebrow{
+  font-family:var(--holo-mono);
+  font-size:9.5px;letter-spacing:.34em;text-transform:uppercase;
+  color:var(--holo-cyan);
+  text-shadow:var(--holo-text-glow);
+  margin-bottom:8px;
+  display:flex;align-items:center;justify-content:center;gap:10px;
+}
+.holo-proj-eyebrow::before,
+.holo-proj-eyebrow::after{
+  content:'';width:42px;height:1px;
+  background:linear-gradient(90deg,transparent,var(--holo-cyan));
+}
+.holo-proj-eyebrow::after{ background:linear-gradient(90deg,var(--holo-cyan),transparent); }
 .holo-proj-rank{
   font-family:var(--holo-mono);
   font-size:11px;letter-spacing:.2em;
@@ -8262,17 +8568,29 @@ ock Drafts table CSS ───────────────────�
 }
 .holo-proj-name{
   font-family:'Barlow Condensed', sans-serif;
-  font-size:46px;font-weight:800;
+  font-size:50px;font-weight:800;
   color:#fff;
-  letter-spacing:.04em;
+  letter-spacing:.03em;
   line-height:1;
   text-shadow:0 0 12px rgba(0, 229, 255, .55), 0 0 32px rgba(0, 229, 255, .25);
-  margin-bottom:6px;
+  margin-bottom:9px;
+  animation:holo-name-in .7s cubic-bezier(.2,.7,.2,1) backwards;
+}
+@keyframes holo-name-in{
+  0%   { opacity:0; letter-spacing:.32em; filter:blur(6px); }
+  60%  { opacity:1; filter:blur(0); }
+  100% { letter-spacing:.03em; }
 }
 .holo-proj-school{
   font-family:var(--holo-mono);
   font-size:11px;letter-spacing:.18em;text-transform:uppercase;
   color:rgba(230, 248, 255, .7);
+  display:inline-flex;align-items:center;gap:9px;
+  padding:5px 14px;border-radius:20px;
+  border:1px solid rgba(0,229,255,.22);
+  background:rgba(4,14,28,.55);
+  backdrop-filter:blur(6px);
+  -webkit-backdrop-filter:blur(6px);
 }
 
 /* ── SIDE-LOCKED DOUBLE HELIX (flat, no z-depth) ────────────────────────────
@@ -8310,7 +8628,14 @@ ock Drafts table CSS ───────────────────�
 
 /* Individual helix node, pinned by --nx/--ny to its strand's outer crest.
    Anchored so the node's INNER edge meets the strand and it extends outward,
-   away from the photo (side-r extends right, side-l extends left). */
+   away from the photo (side-r extends right, side-l extends left).
+   
+   PERF: backdrop-filter on 8 simultaneously animated, transformed nodes is
+   the heaviest cost on this screen. We only apply it on hover-capable
+   pointers (where the user gets the parallax/scale interaction that the
+   glassy effect complements) AND when the user hasn't asked for reduced
+   motion. On touch/coarse devices the nodes fall back to their opaque inline
+   background, which still reads cleanly against the dark holo plane. */
 .holo-helix-node{
   position:absolute;
   top:50%;left:50%;
@@ -8318,12 +8643,17 @@ ock Drafts table CSS ───────────────────�
   padding:7px 13px;
   border:1px solid rgba(0,229,255,.45);
   border-radius:8px;
-  backdrop-filter:blur(5px);
-  -webkit-backdrop-filter:blur(5px);
   min-width:96px;
   text-align:center;
   transition:transform .18s cubic-bezier(.2,.7,.2,1), box-shadow .18s ease;
-  will-change:transform;
+  /* will-change promoted on :hover only (see side-r/side-l :hover) so the 8
+     nodes don't each hold a compositor layer for the whole projection. */
+}
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference){
+  .holo-helix-node{
+    backdrop-filter:blur(5px);
+    -webkit-backdrop-filter:blur(5px);
+  }
 }
 /* Right-side nodes: anchor left edge at the crest x, extend rightward. */
 .holo-helix-node.side-r{
@@ -8334,10 +8664,12 @@ ock Drafts table CSS ───────────────────�
 }
 .holo-helix-node.side-r:hover{
   transform:translate(0, -50%) translate(var(--nx,0), var(--ny,0)) scale(1.08);
+  will-change:transform;
   z-index:20;
 }
 .holo-helix-node.side-l:hover{
   transform:translate(-100%, -50%) translate(var(--nx,0), var(--ny,0)) scale(1.08);
+  will-change:transform;
   z-index:20;
 }
 .holo-stat-lbl{
@@ -8388,28 +8720,37 @@ ock Drafts table CSS ───────────────────�
   line-height:1;
 }
 
-/* Close affordance */
+/* Close affordance — console control, top-right, with hairline ESC hint. */
 .holo-proj-close{
   position:absolute;
   top:24px;right:24px;
   z-index:20;
-  width:42px;height:42px;
+  width:46px;height:46px;
   background:rgba(4, 14, 28, .8);
   border:1px solid rgba(0, 229, 255, .45);
-  border-radius:50%;
+  border-radius:12px;
   color:var(--holo-cyan);
   font-size:18px;
   cursor:pointer;
   display:flex;align-items:center;justify-content:center;
   transition:all .2s ease;
   text-shadow:var(--holo-text-glow);
+  box-shadow:0 0 18px rgba(0,229,255,.12), inset 0 0 0 1px rgba(0,229,255,.1);
+}
+.holo-proj-close::after{
+  content:'ESC';
+  position:absolute; top:calc(100% + 6px); right:2px;
+  font-family:var(--holo-mono); font-size:7.5px; letter-spacing:.18em;
+  color:rgba(0,229,255,.5);
+  opacity:0; transition:opacity .2s ease;
 }
 .holo-proj-close:hover{
   background:rgba(0, 229, 255, .15);
   border-color:var(--holo-cyan);
-  box-shadow:0 0 20px rgba(0, 229, 255, .4);
+  box-shadow:0 0 24px rgba(0, 229, 255, .45);
   transform:rotate(90deg);
 }
+.holo-proj-close:hover::after{ opacity:1; }
 
 /* "Click to view full profile" call-to-action */
 .holo-proj-cta{
@@ -8417,23 +8758,32 @@ ock Drafts table CSS ───────────────────�
   bottom:32px;left:50%;
   transform:translateX(-50%);
   z-index:20;
-  padding:10px 24px;
-  background:rgba(0, 229, 255, .14);
+  padding:13px 30px;
+  background:linear-gradient(180deg, rgba(0,229,255,.2), rgba(0,229,255,.08));
   border:1px solid var(--holo-cyan);
-  border-radius:4px;
+  border-radius:6px;
   color:#fff;
   font-family:var(--holo-mono);
   font-size:11px;
-  letter-spacing:.18em;
+  font-weight:700;
+  letter-spacing:.22em;
   text-transform:uppercase;
   cursor:pointer;
   text-shadow:var(--holo-text-glow);
-  box-shadow:0 0 24px rgba(0, 229, 255, .25);
-  transition:all .2s ease;
+  box-shadow:0 0 24px rgba(0, 229, 255, .25), inset 0 1px 0 rgba(255,255,255,.12);
+  transition:all .22s ease;
+  display:flex;align-items:center;gap:10px;
+  overflow:hidden;
+}
+.holo-proj-cta::before{
+  content:''; width:7px;height:7px;border-radius:50%;
+  background:var(--holo-cyan); box-shadow:0 0 8px var(--holo-cyan);
+  animation:holo-pulse 1.5s ease-in-out infinite;
 }
 .holo-proj-cta:hover{
-  background:rgba(0, 229, 255, .25);
-  box-shadow:0 0 36px rgba(0, 229, 255, .5);
+  background:linear-gradient(180deg, rgba(0,229,255,.32), rgba(0,229,255,.16));
+  box-shadow:0 0 40px rgba(0, 229, 255, .55), inset 0 1px 0 rgba(255,255,255,.18);
+  transform:translateX(-50%) translateY(-2px);
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -8471,12 +8821,29 @@ ock Drafts table CSS ───────────────────�
   transform:translate(-50%, -50%) scale(.82);
   transition:opacity .35s ease, transform .45s ease;
 }
+/* The targeting frame + telemetry strip + rank badge are projection chrome;
+   the dossier is its own full surface, so hide them while it's open (they were
+   bleeding through at the corners behind the dossier). */
+.holo-projection.dossier-open .holo-proj-frame,
+.holo-projection.dossier-open .holo-proj-rankbadge,
+.holo-projection.dossier-open .holo-grid-floor,
+.holo-projection.dossier-open .holo-scanlines{
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .3s ease;
+}
+/* Perf: don't composite/animate the hidden chrome layers under the dossier. */
+.holo-projection.dossier-open .holo-proj-frame *,
+.holo-projection.dossier-open .holo-proj-rankbadge *,
+.holo-projection.dossier-open .holo-scanlines{
+  animation-play-state:paused !important;
+}
 
 /* Dossier header — sticky command bar with player identity + back control. */
 .holo-dossier-header{
   flex:0 0 auto;
   display:flex;align-items:center;gap:16px;
-  padding:18px 28px;
+  padding:18px 84px 18px 28px;   /* extra right pad clears the top-right close control */
   background:linear-gradient(180deg, rgba(6,18,36,.95) 0%, rgba(4,12,24,.78) 100%);
   border-bottom:1px solid rgba(0,229,255,.28);
   backdrop-filter:blur(10px);
@@ -8527,35 +8894,76 @@ ock Drafts table CSS ───────────────────�
 }
 .holo-dossier-rankchip{
   flex:0 0 auto;
-  display:flex;flex-direction:column;align-items:center;
-  padding:6px 16px;
-  background:rgba(0,229,255,.12);
-  border:1px solid rgba(0,229,255,.4);
-  border-radius:8px;
+  position:relative;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  width:64px;height:64px;
+  background:radial-gradient(circle at 50% 40%, rgba(0,229,255,.18), rgba(0,229,255,.06));
+  border:1px solid rgba(0,229,255,.5);
+  border-radius:14px;
+  box-shadow:0 0 20px rgba(0,229,255,.22), inset 0 0 0 1px rgba(0,229,255,.12);
+}
+.holo-dossier-rankchip::before{
+  content:''; position:absolute; inset:-1px; border-radius:14px;
+  border:1px solid transparent;
+  background:linear-gradient(135deg, var(--holo-cyan), transparent 40%, transparent 60%, var(--holo-cyan)) border-box;
+  -webkit-mask:linear-gradient(#000 0 0) padding-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor; mask-composite:exclude;
+  opacity:.6; pointer-events:none;
 }
 .holo-dossier-rankchip .lbl{
-  font-family:var(--holo-mono);font-size:8.5px;letter-spacing:.18em;
+  font-family:var(--holo-mono);font-size:7.5px;letter-spacing:.18em;
   color:rgba(230,248,255,.6);text-transform:uppercase;
 }
 .holo-dossier-rankchip .val{
-  font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:800;
-  color:var(--holo-cyan);line-height:1;text-shadow:var(--holo-text-glow);
+  font-family:'Barlow Condensed',sans-serif;font-size:30px;font-weight:800;
+  color:#fff;line-height:1;text-shadow:0 0 12px var(--holo-cyan);
 }
 
-/* Scrollable body holding the three panels in a responsive grid. */
+/* Scrollable body holding the three panels in a responsive grid.
+ *
+ * Layout rationale, by viewport:
+ *   • ≥1280px → 3 cols (shot | measur | report). Report gets its own column
+ *     so its 3 sub-columns (strengths/concerns/developing) read at natural
+ *     widths instead of getting buried in a row-spanning slab.
+ *   • 901–1279px → 2 cols (shot | measur), with report spanning underneath.
+ *     This was the old default; it's the sweet spot for tablets/laptops where
+ *     a 3rd column would be too cramped.
+ *   • ≤900px → fully stacked single column. (Defined in the @media below.)
+ *
+ * The measur column uses an auto-fit cell grid so on the wide layout it
+ * doesn't sprawl into one giant 2-col block; cells flow into whatever space
+ * is available without leaving big dead zones.
+ */
 .holo-dossier-body{
   flex:1 1 auto;
   overflow-y:auto;
   overflow-x:hidden;
   padding:22px 28px 40px;
   display:grid;
-  grid-template-columns:minmax(0, 380px) minmax(0, 1fr);
+  grid-template-columns:minmax(0, 360px) minmax(0, 1fr);
   grid-template-areas:
     'shot measur'
     'report report';
   gap:18px;
   scrollbar-color:rgba(0,229,255,.5) rgba(0,12,24,.4);
   scrollbar-width:thin;
+}
+/* Wide layout: 3 columns so report no longer has to span the full width. */
+@media (min-width: 1280px){
+  .holo-dossier-body{
+    grid-template-columns:minmax(0, 360px) minmax(0, 1fr) minmax(0, 1.15fr);
+    grid-template-areas:'shot measur report';
+  }
+  /* In 3-col mode the panels become equal-height children of the grid row;
+     enable internal scroll on each so a long report never blows out the row. */
+  .holo-dossier-body > .holo-panel{
+    max-height:calc(100vh - 200px);
+    overflow-y:auto;
+  }
+  /* The 3-col report no longer needs to host the outlook as a full-width
+     footer — give it back as a normal block stacked at the bottom of the
+     report column. */
+  .holo-panel-report .holo-outlook{ grid-column:auto; }
 }
 .holo-dossier-body::-webkit-scrollbar{ width:8px; }
 .holo-dossier-body::-webkit-scrollbar-thumb{
@@ -8591,56 +8999,105 @@ ock Drafts table CSS ───────────────────�
 .holo-panel-measur{ grid-area:measur; }
 .holo-panel-report{ grid-area:report; }
 
-/* ── Shot-zone heat map ─────────────────────────────────────────────────── */
+/* ── Shot chart (REAL per-zone data, mirrors the player-card chart) ───────── */
 .holo-court-wrap{
   position:relative;
   width:100%;
-  display:flex;flex-direction:column;align-items:center;
+  display:flex;flex-direction:column;align-items:stretch;
 }
 .holo-court{
   width:100%;
-  max-width:320px;
+  /* Floor: the SVG plate text bottoms out at ~5px rendered if the court
+     shrinks below 260px wide. Refuse to go that small — let it overflow the
+     panel slightly if needed (very rare; the parent flex column has room). */
+  min-width:260px;
+  max-width:380px;
+  align-self:center;
   height:auto;
-  filter:drop-shadow(0 0 12px rgba(0,229,255,.18));
+  filter:drop-shadow(0 0 14px rgba(0,229,255,.16));
 }
-.holo-court-zone{
-  cursor:default;
-  transition:opacity .2s ease;
+/* Editorial-style verdict strip — the chart concludes, not just displays */
+.holo-shot-verdict{
+  display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;
+  background:rgba(0,229,255,.06);
+  border:1px solid rgba(0,229,255,.22);
+  border-left:3px solid var(--holo-cyan);
+  border-radius:8px;
+  padding:8px 12px;margin-bottom:12px;
 }
-.holo-court-zone:hover{ opacity:.85; }
-.holo-zone-label{
-  font-family:var(--holo-mono);
-  font-size:8.5px;
-  fill:#E6F8FF;
-  text-anchor:middle;
-  letter-spacing:.04em;
-  pointer-events:none;
+.holo-shot-verdict-tag{
+  font-family:var(--holo-mono);font-size:8px;font-weight:700;
+  letter-spacing:.16em;text-transform:uppercase;color:rgba(0,229,255,.7);flex-shrink:0;
 }
-.holo-zone-pct{
-  font-family:'Barlow Condensed',sans-serif;
-  font-size:15px;font-weight:800;
-  fill:#fff;
-  text-anchor:middle;
-  pointer-events:none;
+.holo-shot-verdict-head{
+  font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:800;
+  color:#fff;letter-spacing:.01em;text-shadow:0 0 8px rgba(0,229,255,.3);
 }
-.holo-court-legend{
-  display:flex;align-items:center;justify-content:center;gap:10px;
-  margin-top:12px;
-  font-family:var(--holo-mono);
-  font-size:9px;letter-spacing:.1em;text-transform:uppercase;
-  color:rgba(230,248,255,.6);
+.holo-shot-verdict-detail{
+  font-family:var(--holo-mono);font-size:9px;letter-spacing:.03em;
+  color:rgba(230,248,255,.6);line-height:1.5;
 }
-.holo-legend-bar{
-  width:120px;height:8px;border-radius:4px;
-  background:linear-gradient(90deg,#173a52,#1c6f8e,#22b3a6,#5fe0a8,#c8f9d4);
-  border:1px solid rgba(0,229,255,.25);
+/* Real per-zone stat table — fixed grid so values sit under their headers */
+.holo-sct-table{ width:100%;margin-top:14px; }
+.holo-sct-head,.holo-sct-row{
+  display:grid;
+  grid-template-columns:46px 56px minmax(48px,1fr) 40px 44px;
+  column-gap:8px;align-items:center;
+  font-variant-numeric:tabular-nums;
 }
-.holo-shot-note{
-  margin-top:12px;
-  font-family:var(--holo-mono);
-  font-size:9px;line-height:1.6;letter-spacing:.04em;
-  color:rgba(230,248,255,.45);
-  text-align:center;
+.holo-sct-head{
+  padding:0 0 7px;
+  border-bottom:1px solid rgba(0,229,255,.22);
+  font-family:var(--holo-mono);font-size:8px;font-weight:700;
+  letter-spacing:.1em;text-transform:uppercase;color:rgba(230,248,255,.5);
+}
+.holo-sct-head span:nth-child(n+2){ text-align:right; }
+.holo-sct-head span:nth-child(3){ text-align:left;padding-left:2px; }
+.holo-sct-row{
+  padding:9px 0;
+  border-bottom:1px solid rgba(0,229,255,.08);
+}
+.holo-sct-row:last-child{ border-bottom:none; }
+.holo-sct-zone{
+  display:inline-flex;align-items:center;gap:6px;
+  font-family:var(--holo-mono);font-size:10px;font-weight:700;
+  letter-spacing:.06em;text-transform:uppercase;color:rgba(230,248,255,.85);
+}
+.holo-sct-zone i{ width:8px;height:8px;border-radius:2.5px;flex-shrink:0;display:inline-block; }
+.holo-sct-fg{
+  font-family:'Barlow Condensed',sans-serif;font-size:21px;font-weight:800;
+  color:#fff;text-align:right;line-height:1;
+}
+.holo-sct-fg i{ font-style:normal;font-size:10px;font-weight:700;color:rgba(230,248,255,.5);margin-left:1px; }
+.holo-sct-pctl{ display:flex;align-items:center;gap:7px;min-width:0; }
+.holo-sct-bar{
+  flex:1;height:6px;min-width:24px;border-radius:3px;overflow:hidden;
+  background:rgba(0,229,255,.1);
+}
+.holo-sct-bar span{ display:block;height:100%;border-radius:3px; }
+.holo-sct-pn{ font-family:var(--holo-mono);font-size:9px;font-weight:700;flex-shrink:0;min-width:30px;text-align:right; }
+.holo-sct-vol{ font-family:var(--holo-mono);font-size:11px;color:rgba(230,248,255,.7);text-align:right; }
+.holo-sct-ua{ font-family:var(--holo-mono);font-size:11px;font-weight:700;color:rgba(230,248,255,.85);text-align:right; }
+.holo-shot-source{
+  margin-top:10px;
+  font-family:var(--holo-mono);font-size:8.5px;letter-spacing:.04em;
+  color:rgba(230,248,255,.4);text-align:right;
+}
+/* Graceful "no data" state */
+.holo-shot-empty{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;padding:34px 18px;gap:10px;
+  border:1px dashed rgba(0,229,255,.22);border-radius:10px;
+  background:rgba(3,11,22,.4);
+}
+.holo-shot-empty svg{ width:52px;height:52px;opacity:.8; }
+.holo-shot-empty-h{
+  font-family:var(--holo-mono);font-size:11px;font-weight:700;
+  letter-spacing:.14em;color:rgba(0,229,255,.75);text-transform:uppercase;
+}
+.holo-shot-empty-s{
+  font-family:var(--holo-mono);font-size:9px;line-height:1.6;letter-spacing:.03em;
+  color:rgba(230,248,255,.5);max-width:260px;
 }
 
 /* Shot-profile summary chips beneath the court */
@@ -8663,9 +9120,16 @@ ock Drafts table CSS ───────────────────�
   color:#fff;line-height:1.1;text-shadow:0 0 6px rgba(0,229,255,.4);
 }
 
-/* ── Measurables panel ──────────────────────────────────────────────────── */
+/* ── Measurables panel ──────────────────────────────────────────────────────
+ * auto-fit minmax(110px,1fr): cells flow into available width without ever
+ * getting absurdly wide. At ~600px the grid lays out 5 across; at ~360px it's
+ * 3 across; at ~240px it's 2. The old fixed `repeat(2,1fr)` produced huge
+ * stretched cells whenever the measurables panel had more horizontal room
+ * than expected (everything between 901px and the wide breakpoint). */
 .holo-measur-grid{
-  display:grid;grid-template-columns:repeat(2,1fr);gap:10px;
+  display:grid;
+  grid-template-columns:repeat(auto-fit, minmax(110px, 1fr));
+  gap:10px;
   margin-bottom:16px;
 }
 .holo-measur-cell{
@@ -8708,11 +9172,27 @@ ock Drafts table CSS ───────────────────�
   color:#fff;text-align:left;
 }
 
-/* ── Scouting report panel ──────────────────────────────────────────────── */
+/* ── Scouting report panel ──────────────────────────────────────────────────
+ * Inner grid is auto-fit so when the report panel is in its own 3rd column
+ * (wide layout) the strengths/concerns/developing flow into 1 column at the
+ * panel's narrow width; on the medium layout where report spans full-width,
+ * they spread into 3 columns naturally. No JS or breakpoint coupling. */
 .holo-report-grid{
-  display:grid;grid-template-columns:repeat(3,1fr);gap:14px;
+  display:grid;
+  grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));
+  gap:14px;
 }
-.holo-report-col{ display:flex;flex-direction:column;gap:8px; }
+/* Each column sits at the top of its grid cell so a short list (1 item) next
+   to a long list (8 items) doesn't get vertically stretched into empty space.
+   The grid still aligns headers across all three columns for scanability. */
+.holo-report-col{
+  display:flex;flex-direction:column;gap:8px;
+  align-self:start;
+}
+/* Reduce visual weight of columns with no items so they don't draw the eye —
+   the header stays muted, the empty-state copy stays small. JS sets data-empty
+   on cols that built from a falsy/empty list. */
+.holo-report-col[data-empty="true"] .holo-report-col-head{ opacity:.5; }
 .holo-report-col-head{
   font-family:var(--holo-mono);
   font-size:10px;letter-spacing:.14em;text-transform:uppercase;
@@ -8769,14 +9249,14 @@ ock Drafts table CSS ───────────────────�
   }
   .holo-dossier-name{ font-size:24px; }
   .holo-dossier-header{ padding:14px 16px;gap:12px; }
-  .holo-report-grid{ grid-template-columns:1fr; }
   .holo-outlook{ grid-template-columns:repeat(2,1fr); }
-  .holo-court{ max-width:280px; }
+  .holo-court{ max-width:320px; }   /* was 280px — give it more room so plate text is legible */
+  /* report grid auto-fits to single column naturally at narrow widths */
 }
 @media (max-width: 520px){
-  .holo-measur-grid{ grid-template-columns:1fr 1fr; }
   .holo-outlook{ grid-template-columns:1fr; }
   .holo-dossier-headshot{ display:none; }
+  /* measur grid auto-fits naturally; no need for a hard column override */
 }
 
 /* Materialize/dematerialize animations */
@@ -8836,6 +9316,17 @@ ock Drafts table CSS ───────────────────�
   .holo-proj-name{ font-size:32px; }
   .holo-proj-identity{ transform:translate(-50%, calc(-50% - 180px)); min-width:280px; }
   .holo-proj-bio{ transform:translate(-50%, calc(-50% + 160px)); flex-wrap:wrap;justify-content:center; }
+  /* Compact the HUD chrome so it doesn't crowd a narrow viewport. */
+  .holo-proj-rankbadge{ top:16px; left:16px; width:64px; height:64px; }
+  .holo-proj-rankbadge .rb-num{ font-size:26px; }
+  .holo-proj-frame .hpf-corner{ width:30px; height:30px; }
+  .holo-proj-frame .hpf-tl,.holo-proj-frame .hpf-tr{ top:12px; }
+  .holo-proj-frame .hpf-bl,.holo-proj-frame .hpf-br{ bottom:12px; }
+  .holo-proj-frame .hpf-tl,.holo-proj-frame .hpf-bl{ left:12px; }
+  .holo-proj-frame .hpf-tr,.holo-proj-frame .hpf-br{ right:12px; }
+  .holo-proj-frame .hpf-telemetry{ display:none; }
+  .holo-proj-reticle{ width:380px; height:380px; }
+  .holo-proj-close{ top:16px; right:16px; }
   /* Tablet: shrink the helix box + node offsets so the side nodes stay on-screen
      (the flat coil scales down cleanly; nodes remain locked to the sides). */
   .holo-helix{ width:560px;height:480px; }
@@ -8854,6 +9345,7 @@ ock Drafts table CSS ───────────────────�
     flex-direction:column; align-items:center; gap:16px;
   }
   .holo-helix-svg{ display:none; }      /* coil makes no sense once flattened */
+  .holo-proj-reticle{ display:none; }   /* targeting rings only read on the coil plane */
   .holo-helix-nodes{
     position:relative; inset:auto;
     display:grid; grid-template-columns:1fr 1fr; gap:10px; width:100%;
@@ -8874,9 +9366,14 @@ ock Drafts table CSS ───────────────────�
 /* Reduced-motion: kill the constant animations, keep static look */
 @media (prefers-reduced-motion: reduce){
   .holo-grid-floor, .holo-proj-figure,
-  .holo-helix-node, .holo-proj-figure-line, .holo-card{
+  .holo-helix-node, .holo-proj-figure-line, .holo-card,
+  .holo-proj-rankbadge .rb-sweep, .holo-proj-reticle .rt-dash,
+  .holo-proj-reticle .rt-dash2, .holo-proj-name,
+  .holo-proj-frame .hpf-corner, .holo-proj-rankbadge,
+  .holo-proj-cta::before, .holo-proj-frame .hpf-telemetry .blink{
     animation:none !important;
   }
+  .holo-proj-rankbadge, .holo-proj-frame .hpf-corner{ opacity:1 !important; }
   .holo-hud-dot{ animation:none !important; opacity:1; }
 }
 
@@ -9821,7 +10318,7 @@ ock Drafts table CSS ───────────────────�
           <div class="modal-name" id="modalName"></div>
           <div class="modal-meta" id="modalMeta"></div>
           <div class="modal-comp-line" id="modalCompLine"></div>
-          <div class="modal-trait-chips" id="modalTraitChips"></div>
+          <div class="modal-drafted" id="modalDrafted"></div>
         </div>
 
         <!-- STAT TOWER -->
@@ -9829,8 +10326,11 @@ ock Drafts table CSS ───────────────────�
 
         <!-- HERO PHOTO -->
         <div class="modal-hero-photo">
-          <div class="modal-avatar" id="modalAvatar"></div>
-          <div class="modal-school-mark" id="modalSchoolMark"></div>
+          <div class="modal-avatar-frame">
+            <div class="modal-avatar" id="modalAvatar"></div>
+            <div class="modal-school-mark" id="modalSchoolMark"></div>
+          </div>
+          <div class="modal-trait-chips" id="modalTraitChips"></div>
         </div>
       </div>
 
@@ -9881,10 +10381,50 @@ ock Drafts table CSS ───────────────────�
 // Writes:  DATA, DASHBOARD_VERSION, StorageService, AppState,
 //          ScrollLockService, and ~243 top-level functions on window.
 //          See section banners below for the feature-area breakdown.
-// Depends: Chart.js, hammerjs, chartjs-plugin-zoom, SheetJS (CDN imports
-//          loaded before this block).
+// Depends: Chart.js, hammerjs, chartjs-plugin-zoom, SheetJS (CDN imports,
+//          now loaded with `defer` — they execute after this block parses
+//          but before DOMContentLoaded, so they're available to every
+//          handler. Nothing in this block touches them at parse time.).
 // ─────────────────────────────────────────────────────────────────────
 const DASHBOARD_VERSION = "10";
+
+// ══ STABILITY: global error boundary ════════════════════════════════════════
+// Single-file SPA with no framework error boundary: an uncaught exception in
+// any render path would otherwise abort silently and leave the UI half-built
+// with no diagnostic trail. This net (a) logs genuine app errors so they're
+// observable, and (b) suppresses the known, non-actionable noise — CDN/image
+// load failures and ResizeObserver loop warnings — so the console stays
+// signal-rich. It does NOT swallow errors during development debugging beyond
+// logging; it never alters control flow of the throwing code.
+(function installErrorBoundary() {
+  'use strict';
+  function isNoise(msg, src) {
+    msg = String(msg || '');
+    src = String(src || '');
+    // ResizeObserver loop notices are benign browser chatter, not bugs.
+    if (msg.indexOf('ResizeObserver loop') !== -1) return true;
+    // Cross-origin <script>/<img> load failures surface as opaque
+    // "Script error." with no stack — not actionable here, and the app
+    // already degrades gracefully via typeof guards on the CDN libs.
+    if (msg === 'Script error.' && !src) return true;
+    return false;
+  }
+  window.addEventListener('error', function(e) {
+    // Resource (img/script/link) load errors bubble as error events with a
+    // target element but no `message`; treat those as non-fatal noise.
+    if (e && e.target && e.target !== window && (e.target.tagName === 'IMG'
+        || e.target.tagName === 'SCRIPT' || e.target.tagName === 'LINK')) {
+      return; // handled per-element (onerror fallbacks) or simply optional
+    }
+    if (isNoise(e && e.message, e && e.filename)) return;
+    try { console.error('[hoopswill] Uncaught error:', e && (e.error || e.message), e && e.filename, e && e.lineno); } catch (_) {}
+  }, true);
+  window.addEventListener('unhandledrejection', function(e) {
+    var reason = e && e.reason;
+    if (isNoise(reason && reason.message)) return;
+    try { console.error('[hoopswill] Unhandled promise rejection:', reason); } catch (_) {}
+  });
+})();
 
 // ══ ARCHITECTURE LAYER 1: StorageService ════════════════════════════════════
 // Single point of contact for ALL localStorage. No other module uses
@@ -10193,6 +10733,71 @@ const DATA = {"board2026":[{"rank": 1, "name": "Cameron Boozer - Duke", "positio
     }
   }
 })();
+
+
+// ── 2026 DRAFT RESULTS — ACTUAL (Round 1, June 23 2026) ──────────────────────
+// Source: official pick-by-pick results (Hoops Rumors / NBC Sports / CBS).
+// `team` is the franchise the player ACTUALLY LANDS WITH (the acquiring team on
+// any draft-night trade); `via` names the team that made the pick when it was
+// later traded, surfaced as context in the UI. Keyed by the exact board2026
+// `name`. Only Round 1 selections that map to a board prospect are listed —
+// Round 2 (picks 31–60) had not been conducted when this data was compiled, so
+// those prospects remain "Undrafted" until results are available.
+const DRAFT_2026 = {
+  "AJ Dybantsa - BYU":                 { pick: 1,  team: "WAS" },
+  "Darryn Peterson - Kansas":          { pick: 2,  team: "UTA" },
+  "Cameron Boozer - Duke":             { pick: 3,  team: "MEM" },
+  "Caleb Wilson - North Carolina":     { pick: 4,  team: "CHI" },
+  "Keaton Wagler - Illinois":          { pick: 5,  team: "LAC", via: "IND" },
+  "Mikel Brown Jr. - Louisville":      { pick: 6,  team: "BKN" },
+  "Darius Acuff Jr. - Arkansas":       { pick: 7,  team: "SAC" },
+  "Kingston Flemings - Houston":       { pick: 8,  team: "ATL", via: "NOP" },
+  "Morez Johnson - Michigan":          { pick: 9,  team: "DAL" },
+  "Brayden Burries - Arizona":         { pick: 10, team: "MIL" },
+  "Yaxel Lendeborg - Michigan":        { pick: 11, team: "GSW" },
+  "Aday Mara - Michigan":              { pick: 12, team: "OKC", via: "LAC" },
+  "Nate Ament - Tennessee":            { pick: 13, team: "MIL", via: "MIA" },
+  "Hannes Steinbach - Washington":     { pick: 14, team: "CHA" },
+  "Dailyn Swain - Texas":              { pick: 15, team: "CHI", via: "POR" },
+  "Bennett Stirtz - Iowa":             { pick: 16, team: "OKC", via: "MEM" },
+  "Ebuka Okorie - Stanford":           { pick: 17, team: "DET", via: "OKC" },
+  "Christian Anderson - Texas Tech":   { pick: 18, team: "CHA", via: "ORL" },
+  "Allen Graves - Santa Clara":        { pick: 19, team: "TOR" },
+  "Jayden Quaintance - Kentucky":      { pick: 20, team: "SAS", via: "ATL" },
+  "Karim Lopez - NZ Breakers":         { pick: 21, team: "MEM", via: "DET" },
+  "Labaron Philon - Alabama":          { pick: 22, team: "PHI", via: "HOU" },
+  "Zuby Ejiofor - St. Johns":          { pick: 23, team: "ATL", via: "CLE" },
+  "Cameron Carr - Baylor":             { pick: 24, team: "LAL", via: "NYK" },
+  "Sergio De Larrea - Valencia Basket":{ pick: 25, team: "DAL", via: "LAL" },
+  "Tarris Reed - UConn":               { pick: 26, team: "SAS", via: "DEN" },
+  "Chris Cenac Jr. - Houston":         { pick: 27, team: "BOS" },
+  "Joshua Jefferson - Iowa State":     { pick: 28, team: "BKN", via: "MIN" },
+  "Alex Karaban - UConn":              { pick: 29, team: "SAC", via: "CLE" }
+};
+
+// Stamp draft_no (pick number), draft_team (landing franchise code), and
+// draft_via (original drafting team on a traded pick, or null) onto each 2026
+// board player from DRAFT_2026. Idempotent and defensive: only writes when a
+// match exists; leaves undrafted prospects with null fields so the UI cleanly
+// shows "Undrafted". Re-runnable after a spreadsheet re-import.
+function applyDraftResults2026(board) {
+  if (!Array.isArray(board)) return;
+  board.forEach(function(p) {
+    if (!p || !p.name) return;
+    var d = DRAFT_2026[p.name];
+    if (d) {
+      p.draft_no   = d.pick;
+      p.draft_team = d.team;        // landing franchise, e.g. "OKC"
+      p.draft_via  = d.via || null; // original drafter if traded, else null
+    } else {
+      if (p.draft_no   == null) p.draft_no   = null;
+      if (p.draft_team == null) p.draft_team = null;
+      if (p.draft_via  == null) p.draft_via  = null;
+    }
+  });
+}
+try { if (DATA && DATA.board2026) applyDraftResults2026(DATA.board2026); }
+catch (e) { if (typeof console !== 'undefined' && console.warn) console.warn('[Draft2026] enrichment skipped:', e); }
 
 
 // ╔══════════════════════════════════════════════════════════════════════
@@ -11221,6 +11826,43 @@ var NBA_TEAM_ALIASES = {
   'washington':'WAS','wizards':'WAS',
 };
 
+// Canonical 3-letter code -> full franchise name. Used wherever we surface a
+// drafted destination in human-readable form (cards, profile). Keyed by the
+// same codes as NBA_TEAM_IDS so normalizeTeamCode() output maps 1:1.
+var NBA_TEAM_NAMES = {
+  'ATL':'Atlanta Hawks','BKN':'Brooklyn Nets','BOS':'Boston Celtics',
+  'CHA':'Charlotte Hornets','CHI':'Chicago Bulls','CLE':'Cleveland Cavaliers',
+  'DAL':'Dallas Mavericks','DEN':'Denver Nuggets','DET':'Detroit Pistons',
+  'GSW':'Golden State Warriors','HOU':'Houston Rockets','IND':'Indiana Pacers',
+  'LAC':'LA Clippers','LAL':'Los Angeles Lakers','MEM':'Memphis Grizzlies',
+  'MIA':'Miami Heat','MIL':'Milwaukee Bucks','MIN':'Minnesota Timberwolves',
+  'NOP':'New Orleans Pelicans','NYK':'New York Knicks','OKC':'Oklahoma City Thunder',
+  'ORL':'Orlando Magic','PHI':'Philadelphia 76ers','PHX':'Phoenix Suns',
+  'POR':'Portland Trail Blazers','SAC':'Sacramento Kings','SAS':'San Antonio Spurs',
+  'TOR':'Toronto Raptors','UTA':'Utah Jazz','WAS':'Washington Wizards'
+};
+
+// nbaTeamLogoHtml: circular crisp NBA team logo, mirroring schoolLogoHtml's
+// contract (raw team string in, sized <img> out; empty string if unresolved).
+// Falls back to a text badge of the code when ESPN has no logo id. `code`
+// may be a raw Excel string ("ATL (NOP)") or a clean code — both normalize.
+function nbaTeamLogoHtml(code, size, borderRadius) {
+  var c = normalizeTeamCode(code);
+  if (!c) return '';
+  var px = size || '18px';
+  var br = borderRadius || '50%';
+  var id = NBA_TEAM_IDS[c];
+  if (id) {
+    return '<img class="nba-team-logo" loading="lazy" '
+      + 'src="https://a.espncdn.com/i/teamlogos/nba/500/' + id + '.png" '
+      + 'alt="' + escHtml(NBA_TEAM_NAMES[c] || c) + '" '
+      + 'style="width:' + px + ';height:' + px + ';border-radius:' + br + ';object-fit:contain;display:block" '
+      + 'onerror="this.style.display=\'none\'">';
+  }
+  return '<span class="nba-team-logo-fb" style="width:' + px + ';height:' + px
+    + ';border-radius:' + br + '">' + escHtml(c) + '</span>';
+}
+
 function normalizeTeamCode(raw) {
   if (!raw) return '';
   // Strip trade via notation: "ATL (BOS)" -> "ATL"
@@ -11321,7 +11963,15 @@ function avatarHtml(playerName, position, size='52px', borderRadius='10px', spot
     ? `<img${imgClass} src="${url}" onload="${loadChk}" onerror="${errChk}" alt="" loading="lazy" decoding="async" style="width:100%;height:100%;object-fit:cover;object-position:50% 18%;image-rendering:auto;-webkit-backface-visibility:hidden;transform:translateZ(0)">`
     : '';
   const fbDisplay = url ? 'none' : 'flex';
-  return `<div${wrapClass} style="width:${size};height:${size};border-radius:${borderRadius};overflow:hidden;flex-shrink:0;position:relative;background:${color}">
+  // VISUAL: card avatars (spotlight=true) sit on ONE neutral slate gradient so a
+  // row of headshots reads as a single designed system instead of a patchwork of
+  // per-position blues/oranges/greens showing through transparent photo edges.
+  // The fallback initials badge keeps the position color (it's a solid tile, so
+  // consistency isn't an issue and the color adds useful position signal).
+  const boxBg = spotlight
+    ? 'linear-gradient(160deg,#EEF2F7 0%,#DBE2EC 55%,#C9D3E0 100%)'
+    : color;
+  return `<div${wrapClass} style="width:${size};height:${size};border-radius:${borderRadius};overflow:hidden;flex-shrink:0;position:relative;background:${boxBg}">
     ${imgTag}
     <div class="avatar-fallback" style="display:${fbDisplay};background:${color};width:100%;height:100%;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:${parseInt(size)*0.4}px;color:white;position:${url?'absolute':'relative'};inset:0">${initials}</div>
   </div>`;
@@ -11511,6 +12161,8 @@ var DataService = (function() {
       prior_teams: _str(raw.prior_teams),
       team:        _str(raw.team),
       draft_no:    _int(raw.draft_no),
+      draft_team:  _str(raw.draft_team),
+      draft_via:   _str(raw.draft_via),
       draft_diff:  _int(raw.draft_diff),
       // PERF-1A derived fields ────────────────────────────────────────────
       _searchBoard: (rawName + '|' + rawSchool + '|' + rawRole).toLowerCase(),
@@ -11597,7 +12249,7 @@ var DataService = (function() {
     if (typeof schoolLogoUrl === 'function') schoolLogoUrl._cache = null;
     if (typeof _schoolLogoUrlMemo !== 'undefined') _schoolLogoUrlMemo = {};
     // _statRankCache is rebuilt via rebuildStatRanges() at the end of this function.
-    if (parsed.board2026)  { DATA.board2026  = parsed.board2026; hwInvalidateRankMap(); }
+    if (parsed.board2026)  { DATA.board2026  = parsed.board2026; try { applyDraftResults2026(DATA.board2026); } catch(e){} hwInvalidateRankMap(); }
     if (parsed.board2027)  DATA.board2027  = parsed.board2027;
     if (parsed.historical) DATA.historical = parsed.historical;
     if (parsed.yoy)        DATA.yoy        = parsed.yoy;
@@ -11878,14 +12530,14 @@ function buildSchoolLogoHtml(school) {
   var url = schoolLogoUrl(school);
   if (!url) {
     // Fallback: colour-keyed initials badge, same size as the ring
-    return '<div class="card-logo-ring">' + schoolInitialsBadge(school, '16px', '50%') + '</div>';
+    return '<div class="card-logo-ring">' + schoolInitialsBadge(school, '28px', '50%') + '</div>';
   }
   var schoolAlt = escHtml(school);
   var swap = "this.style.display='none';this.nextElementSibling.style.display='flex';";
   var loadChk = "if(this.naturalWidth<16||this.naturalHeight<16){" + swap + "}";
   return '<div class="card-logo-ring">'
     + '<img src="' + url + '" loading="lazy" onload="' + loadChk + '" onerror="' + swap + '" alt="' + schoolAlt + '">'
-    + '<span style="display:none">' + schoolInitialsBadge(school, '16px', '50%') + '</span>'
+    + '<span style="display:none">' + schoolInitialsBadge(school, '28px', '50%') + '</span>'
     + '</div>';
 }
 
@@ -11977,6 +12629,27 @@ function buildPlayerCard(p, tierKey, _metricsSorted) {
   // ── School logo ──────────────────────────────────────────────────────
   var logoHtml = buildSchoolLogoHtml(schoolRaw);
 
+  // ── Drafted destination (2026 results) ───────────────────────────────
+  // Shows the NBA team logo + pick number for prospects who were selected.
+  // draft_team is the landing franchise; draft_via (if present) is the team
+  // that originally made the pick before a draft-night trade. Un-drafted
+  // prospects render nothing.
+  var draftedHtml = '';
+  if (p.draft_no && p.draft_team) {
+    var _dcode = normalizeTeamCode(p.draft_team);
+    var _dname = NBA_TEAM_NAMES[_dcode] || _dcode;
+    var _via   = p.draft_via ? normalizeTeamCode(p.draft_via) : '';
+    var _tip   = 'Pick ' + p.draft_no + ' — ' + _dname
+               + (_via ? ' (via ' + (NBA_TEAM_NAMES[_via] || _via) + ')' : '');
+    draftedHtml = '<span class="card-dest-unit card-drafted" title="' + escHtml(_tip) + '">'
+      + nbaTeamLogoHtml(p.draft_team, '34px', '50%')
+      + '<span class="card-dest-text">'
+      +   '<span class="card-dest-name">' + escHtml(_dname) + '</span>'
+      + '</span>'
+      + '<span class="card-dest-sub">' + p.draft_no + '</span>'
+      + '</span>';
+  }
+
   // ── Class abbreviation ───────────────────────────────────────────────
   // PERF-1A: prefer p._clsAbbr precomputed at normalize time. The fallback
   // re-derives the abbreviation only when an un-normalized object somehow
@@ -12033,19 +12706,19 @@ function buildPlayerCard(p, tierKey, _metricsSorted) {
   var metPctHtml = '';
   if (metPct !== null) {
     metPctHtml = '<div class="card-metric-pct">'
-      + metPct + '<sup>' + ordSfx(metPct) + '</sup><br>PERCENTILE'
+      + '<span class="card-metric-pct-num">' + metPct + '<sup>' + ordSfx(metPct) + '</sup></span>'
+      + '<span class="card-metric-pct-lbl">pctl</span>'
       + '</div>';
   }
 
   // CALM: ELITE pip removed — the tier bar + glow already carry tier; the
   // metric block now states one fact (value + percentile) once, plainly.
 
-  // ── Role line (torvik_role · position) ───────────────────────────────
-  var roleParts = [];
-  if (p.torvik_role) roleParts.push('<span class="role-name">' + escHtml(p.torvik_role) + '</span>');
-  if (p.position)    roleParts.push(escHtml(p.position));
-  var roleLineHtml = roleParts.length
-    ? '<div class="card-role-line">' + roleParts.join(' <span style="opacity:.4">·</span> ') + '</div>'
+  // ── Role line — scouting role only ───────────────────────────────────
+  // Position (Guard/Forward/Center) dropped: the torvik_role ("Scoring PG")
+  // already encodes it, so showing both was redundant and cost a line.
+  var roleLineHtml = p.torvik_role
+    ? '<div class="card-role-line"><span class="role-name">' + escHtml(p.torvik_role) + '</span></div>'
     : '';
 
   // ── Bio strip: class / height+%ile / weight / age ────────────────────
@@ -12106,17 +12779,17 @@ function buildPlayerCard(p, tierKey, _metricsSorted) {
   function statCellHtml(value, key, disp, label, extraCls) {
     var pp   = posPct(value, key, p.position);
     var barW = pp != null ? Math.max(4, pp) : null;
-    var bar  = barW != null
-      ? '<div class="stat-bar" style="width:' + barW + '%;background:currentColor"></div>'
-      : statBarHtml(value, key);  // fallback: global range when no pos data
+    var track = barW != null
+      ? '<div class="stat-track"><div class="stat-track-fill" style="width:' + barW + '%;color:' + posPctInk(pp) + '"></div></div>'
+      : '';
     var chip = pp != null
-      ? '<span class="stat-pos-pct" style="color:' + posPctInk(pp) + '" title="' + pp + ordSfx(pp) + ' percentile among ' + escHtml(p.position || '') + 's">' + pp + '<sup>' + ordSfx(pp) + '</sup></span>'
+      ? '<span class="stat-pos-pct" style="color:' + posPctInk(pp) + '" title="' + pp + ordSfx(pp) + ' percentile among ' + escHtml(p.position || '') + 's">' + pp + '</span>'
       : '';
     return '<div class="stat-cell' + (extraCls ? ' ' + extraCls : '') + '" style="' + gradStyle(value, key) + '">'
       + '<div class="stat-val">' + disp + '</div>'
-      + bar
       + '<div class="stat-lbl">' + label + '</div>'
       + chip
+      + track
       + '</div>';
   }
   // FLUENCY: box-score conventions — rate stats drop the leading zero.
@@ -12146,15 +12819,22 @@ function buildPlayerCard(p, tierKey, _metricsSorted) {
   var compHtml = '';
   if (p.comp || p.comp_tool) {
     var compStr = p.comp || p.comp_tool;
-    var compParts = compStr.split(/[\/,·+]/).map(function(s){ return s.trim(); }).filter(Boolean).slice(0,4);
-    // CALM: initials avatars dropped — they duplicated the first letter of
-    // the name beside them. Plain pills + a tooltip clarifying these are
-    // statistical archetypes, not direct player comparisons.
-    var pills = compParts.map(function(n) {
+    var compAll = compStr.split(/[\/,·+]/).map(function(s){ return s.trim(); }).filter(Boolean);
+    // VISUAL: cap to ONE line — show at most 3 archetypes, and if more exist
+    // append a compact "+N" chip rather than wrapping to a second row (which
+    // made card heights uneven across the grid). nowrap on the container keeps
+    // the row rigid; the +N preserves the information that more comps exist.
+    var compShown = compAll.slice(0, 3);
+    var compExtra = compAll.length - compShown.length;
+    var pills = compShown.map(function(n) {
       return '<span class="card-comp-pill">'
+        + '<span class="card-comp-dot"></span>'
         + '<span class="card-comp-name">' + escHtml(n) + '</span>'
         + '</span>';
     }).join('');
+    if (compExtra > 0) {
+      pills += '<span class="card-comp-pill card-comp-more">+' + compExtra + '</span>';
+    }
     compHtml = '<div class="card-comp" title="Statistical archetype comps \u2014 similar production profiles, not direct player comparisons">'
       + '<span class="card-comp-label">Comp Archetypes</span>'
       + pills
@@ -12181,28 +12861,29 @@ function buildPlayerCard(p, tierKey, _metricsSorted) {
 
           + '<div class="card-id-main">'
             + '<div class="card-id-top">'
-              + avatarHtml(p.name, p.position || '', '64px', '12px', true)
+              + avatarHtml(p.name, p.position || '', '70px', '14px', true)
               + '<div class="card-name">'
                 + '<span class="card-name-first"><span class="card-name-first-text">' + nameFirst + '</span>' + getBadgeHtml(p.name) + '</span>'
                 + (nameLast
                     ? '<span class="card-name-last"><span class="card-name-last-text">' + nameLast + '</span></span>'
                     : '')
+                + roleLineHtml
+                + '<div class="card-school-inline">'
+                  + (logoHtml ? '<div class="card-school-logo">' + logoHtml + '</div>' : '')
+                  + '<span class="card-dest-name">' + (school || '—') + '</span>'
+                + '</div>'
               + '</div>'
             + '</div>'
-            + '<div class="card-id-meta">'
-              + '<div class="card-school-row">'
-                + (logoHtml ? '<div class="card-school-logo">' + logoHtml + '</div>' : '')
-                + '<span class="card-school-name">' + (school || '—') + '</span>'
-              + '</div>'
-              + roleLineHtml
-            + '</div>'
+            + (draftedHtml
+                ? '<div class="card-id-meta">' + draftedHtml + '</div>'
+                : '')
           + '</div>'
 
         + '</div>'
 
         + '<div class="card-metric-panel" style="' + panelStyle + '">'
-          + '<div class="card-metric' + (isElite ? ' elite' : '') + '">' + mv + '</div>'
           + '<div class="card-metric-label">HW Metric</div>'
+          + '<div class="card-metric' + (isElite ? ' elite' : '') + '">' + mv + '</div>'
           + metPctHtml
         + '</div>'
 
@@ -12741,21 +13422,20 @@ function openPlayerModal(rank, year) {
 
   document.getElementById('modalName').textContent = name;
   document.getElementById('modalMeta').innerHTML =
-    [school ? '<b>' + escHtml(school) + '</b>' : '', cls, torvik_role, position]
+    [school ? '<b>' + escHtml(school) + '</b>' : '', cls, torvik_role]
       .filter(Boolean).join(' · ');
-  // Header photo defaults to a holographic projection of the player's real
-  // headshot: a scoped cyan-duotone treatment + scanline/scan-sweep/glitch
-  // overlays layered over the standard avatar. Scoped to the modal header only
-  // (class `holo-on`) so avatarHtml stays unchanged everywhere else (cards,
-  // big board). The overlays are siblings of the photo box inside .modal-avatar.
+  // Header photo shows a CLEAN headshot by default. A small corner toggle on
+  // the hero photo flips a holographic projection (scoped cyan-duotone +
+  // scanline/scan-sweep/glitch overlays) on or off, replacing the old
+  // always-on distortion AND the redundant full-width hologram body section.
+  // Scoped to the modal header (class `holo-on`) so avatarHtml stays unchanged
+  // everywhere else (cards, big board).
   (function _setHeaderHolo() {
     var av = document.getElementById('modalAvatar');
-    av.classList.add('holo-on');
+    if (!av) return;
+    av.classList.remove('holo-on');              // clean by default
     var photo = avatarHtml(player.name, player.position, '100%', '12px');
-    // One-time inline SVG filter for the "projection instability" warp: animated
-    // feTurbulence drives a feDisplacementMap (watery wobble) and a soft
-    // feGaussianBlur bloom — smoother than CSS box-shadow. Injected once into the
-    // document; the holo image passes reference it via filter:url(#holoWarp).
+    // One-time inline SVG filter for the "projection instability" warp.
     if (!document.getElementById('holoWarpSvg')) {
       var svgNS = 'http://www.w3.org/2000/svg';
       var holder = document.createElement('div');
@@ -12778,16 +13458,43 @@ function openPlayerModal(rank, year) {
         + '</defs></svg>';
       document.body.appendChild(holder);
     }
-    av.innerHTML =
-        '<div class="holo-av-rgb holo-av-rgb-r" aria-hidden="true">' + photo + '</div>'
-      + '<div class="holo-av-rgb holo-av-rgb-b" aria-hidden="true">' + photo + '</div>'
-      + '<div class="holo-av-main">' + photo + '</div>'
-      + '<div class="holo-av-bloom" aria-hidden="true"></div>'
-      + '<div class="holo-av-scan" aria-hidden="true"></div>'
-      + '<div class="holo-av-scanmove" aria-hidden="true"></div>'
-      + '<div class="holo-av-interfere" aria-hidden="true"></div>'
-      + '<div class="holo-av-glitch" aria-hidden="true"></div>'
-      + '<div class="holo-av-vignette" aria-hidden="true"></div>';
+    // Clean photo by default; holo layers added/removed by the toggle.
+    av.innerHTML = '<div class="holo-av-clean">' + photo + '</div>';
+
+    // Corner toggle anchored to the avatar FRAME (so it sits on the photo's
+    // bottom-left corner, not below the trait chips). Rebuilt per open.
+    var wrap = av.closest('.modal-avatar-frame') || av.closest('.modal-hero-photo');
+    if (wrap) {
+      var oldBtn = wrap.querySelector('.holo-toggle');
+      if (oldBtn) oldBtn.remove();
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'holo-toggle';
+      btn.setAttribute('aria-pressed', 'false');
+      btn.title = 'Toggle hologram projection';
+      btn.innerHTML =
+        '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" '
+        + 'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" '
+        + 'style="width:13px;height:13px"><path d="M8 1.5l5.5 3.2v6.6L8 14.5 2.5 11.3V4.7z"/>'
+        + '<path d="M8 1.5v13M2.5 4.7L8 8l5.5-3.3"/></svg>';
+      btn.onclick = function() {
+        var on = av.classList.toggle('holo-on');
+        btn.classList.toggle('active', on);
+        btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+        av.innerHTML = on
+          ? ('<div class="holo-av-rgb holo-av-rgb-r" aria-hidden="true">' + photo + '</div>'
+            + '<div class="holo-av-rgb holo-av-rgb-b" aria-hidden="true">' + photo + '</div>'
+            + '<div class="holo-av-main">' + photo + '</div>'
+            + '<div class="holo-av-bloom" aria-hidden="true"></div>'
+            + '<div class="holo-av-scan" aria-hidden="true"></div>'
+            + '<div class="holo-av-scanmove" aria-hidden="true"></div>'
+            + '<div class="holo-av-interfere" aria-hidden="true"></div>'
+            + '<div class="holo-av-glitch" aria-hidden="true"></div>'
+            + '<div class="holo-av-vignette" aria-hidden="true"></div>')
+          : ('<div class="holo-av-clean">' + photo + '</div>');
+      };
+      wrap.appendChild(btn);
+    }
   })();
 
   // ── HERO V2: tier rank label = compact #rank chip + tier pill ──
@@ -12839,6 +13546,34 @@ function openPlayerModal(rank, year) {
     el.innerHTML = '<span class="comp-icon">★</span>Plays like <span class="comp-names">'
       + escHtml(parts.join(' / ')) + '</span>';
     el.classList.add('shown');
+  })();
+
+  // ── Drafted destination (2026 results): team logo + full name + pick ──
+  (function _setDrafted() {
+    var el = document.getElementById('modalDrafted');
+    if (!el) return;
+    if (player.draft_no && player.draft_team) {
+      var dcode = normalizeTeamCode(player.draft_team);
+      var dname = NBA_TEAM_NAMES[dcode] || dcode;
+      var via   = player.draft_via ? normalizeTeamCode(player.draft_via) : '';
+      // LOGO VISIBILITY: every NBA logo is wrapped in a light "coin" disc.
+      // ESPN's 500px logos are authored to sit on white, so dark marks (Jazz
+      // navy, Spurs black, Bulls red on dark) vanish on the dark hero. A
+      // consistent near-white disc with a thin ring gives ALL teams reliable
+      // contrast — the broadcast-graphics convention.
+      el.innerHTML =
+          '<span class="modal-drafted-coin">' + nbaTeamLogoHtml(player.draft_team, '34px', '50%') + '</span>'
+        + '<span class="modal-drafted-txt">'
+        +   '<span class="modal-drafted-label">Drafted</span>'
+        +   '<span class="modal-drafted-team">' + escHtml(dname) + '</span>'
+        +   (via ? '<span class="modal-drafted-via">via ' + escHtml(via) + '</span>' : '')
+        + '</span>'
+        + '<span class="modal-drafted-pick"><span class="mdp-lbl">Pick</span><b>#' + player.draft_no + '</b></span>';
+      el.classList.add('shown');
+    } else {
+      el.innerHTML = '<span class="modal-drafted-undrafted">Undrafted</span>';
+      el.classList.add('shown');
+    }
   })();
 
   // ── HERO V3: auto-derived trait chips (top strengths + notable weaknesses) ──
@@ -13068,7 +13803,15 @@ function openPlayerModal(rank, year) {
     ? '<div id="modalShotPanel" style="display:none;margin-bottom:18px">' + shotResult.html + '</div>'
     : '';
 
-  let body = tabBar + statsPanel + shotPanel;
+  // PROFILE REORDER: lead with the qualitative scouting read (Why #rank +
+  // Scouting Report), THEN the stat wall, then comps/background/outcome/
+  // resources. Sections are collected into named strings and composed in
+  // priority order at the end of this function (see `body =` assembly), rather
+  // than appended in build order.
+  var statsBlock = tabBar + statsPanel + shotPanel;
+  var whyBlock = '';
+  var scoutBlock = '';
+  let body = '';
 
   // MEASURABLES moved to the header strip (HERO V3). The richer body section
   // below is retained but disabled to avoid duplication per design review.
@@ -13156,7 +13899,7 @@ function openPlayerModal(rank, year) {
   if (typeof bbWhyHere === 'function') {
     var whyText = bbWhyHere(player);
     if (whyText) {
-      body += '<div class="modal-section">'
+      whyBlock = '<div class="modal-section modal-section--why">'
         + '<div class="modal-sec-title"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:12px;height:12px;flex-shrink:0"><circle cx="8" cy="8" r="5.5"/><circle cx="8" cy="8" r="1.6" fill="currentColor" stroke="none"/></svg><span>Why #' + player.rank + '</span></div>'
         + '<div class="why-here-text">' + escHtml(whyText) + '</div>'
         + '</div>';
@@ -13182,57 +13925,57 @@ function openPlayerModal(rank, year) {
       ? '<span class="role-badge">🏀 ' + escHtml(player.torvik_role) + '</span>'
       : '';
     var swl = parseSwl(player.notes);
-    body += '<div class="modal-section">';
-    body += '<div class="modal-sec-title">📝 Scouting Report ' + roleBadge + '</div>';
+    scoutBlock += '<div class="modal-section modal-section--scout">';
+    scoutBlock += '<div class="modal-sec-title">📝 Scouting Report ' + roleBadge + '</div>';
     if (swl && (swl.strengths.length || swl.neutral.length || swl.weaknesses.length)) {
       var hasNeutral = swl.neutral.length > 0;
-      body += '<div class="sw-grid' + (hasNeutral ? ' has-neutral' : '') + '">';
+      scoutBlock += '<div class="sw-grid' + (hasNeutral ? ' has-neutral' : '') + '">';
 
       // Strengths column
-      body += '<div class="sw-col">';
-      body += '<div class="sw-col-title str">💪 Strengths</div>';
+      scoutBlock += '<div class="sw-col str">';
+      scoutBlock += '<div class="sw-col-title str">💪 Strengths</div>';
       if (swl.strengths.length) {
-        body += '<ul class="sw-list str">';
-        swl.strengths.forEach(function(s) { body += '<li>' + escHtml(s) + '</li>'; });
-        body += '</ul>';
+        scoutBlock += '<ul class="sw-list str">';
+        swl.strengths.forEach(function(s) { scoutBlock += '<li>' + escHtml(s) + '</li>'; });
+        scoutBlock += '</ul>';
       } else {
-        body += '<p style="font-size:var(--text-xs);color:var(--gray-400);font-style:italic">None noted</p>';
+        scoutBlock += '<p style="font-size:var(--text-xs);color:var(--gray-400);font-style:italic">None noted</p>';
       }
-      body += '</div>';
+      scoutBlock += '</div>';
 
       // Neutral / Developing column (only shown when there's content)
       if (hasNeutral) {
-        body += '<div class="sw-col">';
-        body += '<div class="sw-col-title ntr"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:11px;height:11px;flex-shrink:0"><path d="M2 8a6 6 0 1 0 1.76-4.24M2 3v3h3"/></svg> Developing</div>';
-        body += '<ul class="sw-list ntr">';
-        swl.neutral.forEach(function(n) { body += '<li>' + escHtml(n) + '</li>'; });
-        body += '</ul>';
-        body += '</div>';
+        scoutBlock += '<div class="sw-col ntr">';
+        scoutBlock += '<div class="sw-col-title ntr"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:11px;height:11px;flex-shrink:0"><path d="M2 8a6 6 0 1 0 1.76-4.24M2 3v3h3"/></svg> Developing</div>';
+        scoutBlock += '<ul class="sw-list ntr">';
+        swl.neutral.forEach(function(n) { scoutBlock += '<li>' + escHtml(n) + '</li>'; });
+        scoutBlock += '</ul>';
+        scoutBlock += '</div>';
       }
 
       // Weaknesses column
-      body += '<div class="sw-col">';
-      body += '<div class="sw-col-title wkn">⚠️ Weaknesses</div>';
+      scoutBlock += '<div class="sw-col wkn">';
+      scoutBlock += '<div class="sw-col-title wkn">⚠️ Weaknesses</div>';
       if (swl.weaknesses.length) {
-        body += '<ul class="sw-list wkn">';
-        swl.weaknesses.forEach(function(w) { body += '<li>' + escHtml(w) + '</li>'; });
-        body += '</ul>';
+        scoutBlock += '<ul class="sw-list wkn">';
+        swl.weaknesses.forEach(function(w) { scoutBlock += '<li>' + escHtml(w) + '</li>'; });
+        scoutBlock += '</ul>';
       } else {
-        body += '<p style="font-size:var(--text-xs);color:var(--gray-400);font-style:italic">None noted</p>';
+        scoutBlock += '<p style="font-size:var(--text-xs);color:var(--gray-400);font-style:italic">None noted</p>';
       }
-      body += '</div>';
+      scoutBlock += '</div>';
 
-      body += '</div>'; // sw-grid
+      scoutBlock += '</div>'; // sw-grid
     } else if (player.notes && player.notes !== '0') {
       // Plain-text notes (no structured S/W parsing result)
-      body += '<div class="notes-text">' + escHtml(player.notes) + '</div>';
+      scoutBlock += '<div class="notes-text">' + escHtml(player.notes) + '</div>';
     } else {
       // No scouting data available
-      body += '<div style="font-size:var(--text-xs);color:var(--gray-400);font-style:italic;padding:8px 0">'
+      scoutBlock += '<div style="font-size:var(--text-xs);color:var(--gray-400);font-style:italic;padding:8px 0">'
            + 'No scouting notes on file for this prospect.'
            + '</div>';
     }
-    body += '</div>';
+    scoutBlock += '</div>';
   }
 
   if (yr !== '2026' && (player.team || player.draft_no)) {
@@ -13252,44 +13995,9 @@ function openPlayerModal(rank, year) {
   // with zero network dependency — the pages a scout actually opens.
   body += buildScoutingResources(name, school);
 
-  // ── HOLOGRAM PROJECTION PANEL ───────────────────────────────────────────────
-  // A dedicated Star Wars-style holo projector for the player's real headshot.
-  // Off by default; "Project Hologram" toggles the strong-cyan treatment
-  // (duotone filter + scanlines + flicker + glitch + beam + float/rotate) over
-  // the actual ESPN photo. Degrades to the initials avatar if no photo resolves.
-  (function(){
-    var _photo = (typeof getPhotoUrl === 'function') ? getPhotoUrl(player.name) : '';
-    var _ini   = (typeof getInitials === 'function') ? getInitials(player.name).toUpperCase() : '';
-    var _figure = _photo
-      ? '<img src="' + _photo + '" alt="' + escHtml(name) + ' holographic projection" class="holo-img" onerror="this.style.display=\'none\';var f=this.parentNode.querySelector(\'.holo-ini\');if(f)f.style.display=\'flex\'">'
-        + '<div class="holo-ini" style="display:none">' + _ini + '</div>'
-      : '<div class="holo-ini" style="display:flex">' + _ini + '</div>';
-    body += '<div class="holo-cta">'
-      + '<button type="button" class="holo-btn" aria-pressed="false" onclick="toggleHologram(this)">'
-        + '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:15px;height:15px;flex-shrink:0"><path d="M8 1.5l5.5 3.2v6.6L8 14.5 2.5 11.3V4.7z"/><path d="M8 1.5v13M2.5 4.7L8 8l5.5-3.3"/></svg>'
-        + '<span class="holo-btn-label">Project Hologram</span>'
-      + '</button>'
-      + '<div class="holo-stage" hidden>'
-        + '<div class="holo-status"><span class="holo-dot"></span>Holo-Projection &middot; Live</div>'
-        + '<div class="holo-frame">'
-          + '<div class="holo-beam" aria-hidden="true"></div>'
-          + '<div class="holo-float">'
-            + '<div class="holo-rotate">'
-              + '<div class="holo-figure">' + _figure
-                + '<div class="holo-scan" aria-hidden="true"></div>'
-                + '<div class="holo-scanmove" aria-hidden="true"></div>'
-                + '<div class="holo-glitch" aria-hidden="true"></div>'
-                + '<div class="holo-glitch2" aria-hidden="true"></div>'
-              + '</div>'
-            + '</div>'
-          + '</div>'
-          + '<div class="holo-base" aria-hidden="true"></div>'
-          + '<div class="holo-emitter" aria-hidden="true"></div>'
-        + '</div>'
-        + '<div class="holo-name">' + escHtml(name) + '</div>'
-      + '</div>'
-    + '</div>';
-  })();
+  // (Hologram projection is now a toggle on the hero photo — see _setHeaderHolo.
+  // The former full-width body panel was a redundant second render of the same
+  // headshot and was removed to reclaim vertical space for scouting value.)
 
   // ── SHARE CARD ACTION ──────────────────────────────────────────────────────
   // Entry point for the exportable single-player share card (square PNG with
@@ -13305,6 +14013,14 @@ function openPlayerModal(rank, year) {
       + '<div class="modal-share-hint">Exportable card with stats, measurables' + (((typeof buildShotChart==='function') && buildShotChart(player.name).hasShotData) ? ', shot chart' : '') + ' &amp; scouting report</div>'
       + '</div>';
   }
+
+  // FINAL COMPOSITION — priority order for a scout's read:
+  //   1. Why #rank  (the analyst's thesis)
+  //   2. Scouting Report (strengths / developing / weaknesses)
+  //   3. Stats (model metric, rate stats, BPM, shot-chart tab)
+  //   4. everything already in `body`: Comps, Background, Draft Outcome,
+  //      Scouting Resources, Share card.
+  body = whyBlock + scoutBlock + statsBlock + body;
 
   document.getElementById('modalBody').innerHTML = body;
   openModal('playerModal');
@@ -17751,9 +18467,9 @@ function renderBoardHolo(players) {
         +     '<span class="holo-card-rk">' + p.rank + '</span>'
         +     '<div class="holo-card-photo"' + (photo ? ' style="background-image:url(\'' + photo + '\')"' : '') + '></div>'
         +   '</div>'
-        +   '<div class="holo-card-name" title="' + nameNoSchool + '">' + nameNoSchool + '</div>'
+        +   '<div class="holo-card-name" title="' + _holoEsc(nameNoSchool) + '">' + _holoEsc(nameNoSchool) + '</div>'
         +   '<div class="holo-card-meta">'
-        +     '<span class="holo-card-school" title="' + school + '">' + school + '</span>'
+        +     '<span class="holo-card-school" title="' + _holoEsc(school) + '">' + _holoEsc(school) + '</span>'
         +     '<span class="holo-card-met">' + metric + '</span>'
         +   '</div>'
         + '</div>';
@@ -17770,20 +18486,69 @@ function renderBoardHolo(players) {
   html += '<div class="holo-projection" id="holoProjection" aria-hidden="true"></div>';
 
   el.innerHTML = html;
-
-  // Keyboard: ESC closes projection. Bind once.
-  if (!window._holoKeyBound) {
-    document.addEventListener('keydown', function(e){
-      if (e.key === 'Escape') {
-        var proj = document.getElementById('holoProjection');
-        if (proj && proj.classList.contains('is-open')) holoCloseProjection();
-      }
-    });
-    window._holoKeyBound = true;
-  }
 }
 
 // ─── Projection: full-takeover holographic player view ─────────────────────
+
+// Global ESC handler for the Holo projection / dossier. Bound once at script
+// eval (IIFE) so it works regardless of whether renderBoardHolo has run yet —
+// deep-links and programmatic opens are covered. Uses capture phase so we win
+// over the page's many other ESC listeners (player modal, global search,
+// glossary, etc.), and only acts when the projection layer is actually open.
+// Then stopPropagation so those other handlers stay idle for this keystroke.
+(function(){
+  if (window._holoEscBound) return;
+  window._holoEscBound = true;
+  document.addEventListener('keydown', function(e){
+    if (e.key !== 'Escape') return;
+    var proj = document.getElementById('holoProjection');
+    if (!proj || !proj.classList.contains('is-open')) return;
+    // holoCloseProjection internally steps back through dossier → projection,
+    // so a single ESC always does the right "one layer at a time" thing.
+    e.preventDefault();
+    e.stopPropagation();
+    holoCloseProjection();
+  }, true);
+})();
+
+// Single source of truth for the helix node X-offset (CSS px from helix-box
+// center). The strand SVG auto-scales via preserveAspectRatio, but the nodes
+// are positioned in absolute px via --nx, so their scale must be derived from
+// the live viewport width. Centralizing it here means the open path and the
+// resize handler can never disagree about where a node should sit.
+function _holoHelixNodeX() {
+  var vw = (typeof window !== 'undefined' && window.innerWidth) ? window.innerWidth : 1280;
+  var boxW = (vw <= 900) ? 560 : 760;
+  return 292 * (boxW / 760);
+}
+
+// Keep nodes locked to their strands across viewport changes. Node Y is fixed
+// (tied to figure height), so only --nx needs recomputing when the width-driven
+// scale changes. Bound once; no-op unless a projection is actually open. Below
+// 600px the CSS stacks the nodes into a grid and ignores --nx, so we skip.
+(function(){
+  if (window._holoResizeBound) return;
+  window._holoResizeBound = true;
+  var raf = null;
+  function reposition() {
+    raf = null;
+    var proj = document.getElementById('holoProjection');
+    if (!proj || !proj.classList.contains('is-open')) return;
+    if (window.innerWidth <= 600) return;
+    var nodeX = _holoHelixNodeX();
+    var nodes = proj.querySelectorAll('.holo-helix-node');
+    for (var i = 0; i < nodes.length; i++) {
+      var n = nodes[i];
+      var x = n.classList.contains('side-r') ? nodeX : -nodeX;
+      n.style.setProperty('--nx', x.toFixed(1) + 'px');
+    }
+  }
+  window.addEventListener('resize', function(){
+    if (raf) return;                 // coalesce bursts into one rAF tick
+    raf = requestAnimationFrame(reposition);
+  });
+})();
+
 function holoOpenProjection(rank) {
   var stage = document.getElementById('holoStage');
   var proj  = document.getElementById('holoProjection');
@@ -17808,12 +18573,30 @@ function holoOpenProjection(rank) {
   // crest, so it always sits clear to the SIDE of the photo — never in front of
   // or behind it. The strands cross over the photo (linked by rungs) to give the
   // DNA read, but data is only ever placed at the outer extremes.
+  //
+  // RESPONSIVE NODE POSITIONING:
+  // The CSS shrinks `.holo-helix` to 560×480 below 900px and stacks it entirely
+  // below 600px. The strand SVG has viewBox="0 0 760 560" + preserveAspectRatio
+  // "meet", so its content auto-scales to whatever container size CSS gives it.
+  // But the NODES are positioned in absolute CSS pixels via `--nx`/`--ny` —
+  // they don't scale automatically with their container. So we compute a scale
+  // factor from the viewport width and apply it to node `nodeX` only. The
+  // `strandX` value stays in raw viewBox units (the SVG handles the scaling).
+  //
+  // The ≤600px case isn't handled here because the CSS overrides node
+  // positioning to a stacked grid and ignores `--nx`/`--ny` entirely.
+  // Node X comes from the shared helper so the open path and the resize
+  // handler always compute the same value.
   var HELIX = {
-    nodeX:   292,   // |x| of a node at its outer crest (photo half-width ~115, so well clear)
-    strandX: 250,   // |x| the SVG strand reaches at its crest (slightly inside the node)
+    // Node X in CSS pixels from helix-box center, scaled to actual box width.
+    nodeX:   _holoHelixNodeX(),
+    // Strand X in raw viewBox units — SVG's preserveAspectRatio scales this
+    // automatically to match _helixNodeScale, so the strand crest visually
+    // lands at the same scaled position as the node anchors.
+    strandX: 250,
     top:    -210,   // y of row 0 (kept within the figure height so nodes never hit the bio plates)
     bottom:  210,   // y of row 3
-    rowOffset: 0,   // sides share row heights → nodes pair up like DNA base pairs
+    rowOffset: 0,
   };
   var cfg = _holoStatOrbitConfig();
   function rowY(side, row) {
@@ -17917,23 +18700,93 @@ function holoOpenProjection(rank) {
   // Single flat layer — all nodes on one plane beside the photo (no front/behind).
   var allNodes = nodeData.map(_holoNodeHtml).join('');
 
+  // Rank → tier label + accent hue for the command badge. Top picks glow amber,
+  // lottery cyan, everything else a cool slate-cyan, so rank carries meaning.
+  var _r = Number(player.rank) || 99;
+  var tierLabel, tierAccent;
+  if (_r <= 4)       { tierLabel = 'FRANCHISE'; tierAccent = '#FFB547'; }
+  else if (_r <= 14) { tierLabel = 'LOTTERY';   tierAccent = '#00E5FF'; }
+  else if (_r <= 30) { tierLabel = 'FIRST RND'; tierAccent = '#4FD1E8'; }
+  else               { tierLabel = 'PROSPECT';  tierAccent = '#B388FF'; }
+  // Push tier accent to the projection layer as `--holo-tier` so any
+  // decorative element (frame corners, identity eyebrow, CTA glow, telemetry
+  // text accents) can pick it up while data-critical elements (helix node
+  // borders, bio plates, panel separators) stay cyan for legibility.
+  // The badge keeps its own `--holo-cyan` override for the sweep ring color.
+  proj.style.setProperty('--holo-tier', tierAccent);
+
+  // Reticle SVG — concentric targeting rings behind the figure.
+  var reticleSvg = '<div class="holo-proj-reticle"><svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">'
+    + '<circle class="rt-ring" cx="100" cy="100" r="96"/>'
+    + '<circle class="rt-dash" cx="100" cy="100" r="80"/>'
+    + '<circle class="rt-dash2" cx="100" cy="100" r="62"/>'
+    + '<line class="rt-tick" x1="100" y1="2" x2="100" y2="12"/>'
+    + '<line class="rt-tick" x1="100" y1="188" x2="100" y2="198"/>'
+    + '<line class="rt-tick" x1="2" y1="100" x2="12" y2="100"/>'
+    + '<line class="rt-tick" x1="188" y1="100" x2="198" y2="100"/>'
+    + '</svg></div>';
+
+  // Rank command badge SVG — anchored top-left, clear of the close control.
+  var badge = '<div class="holo-proj-rankbadge" style="--holo-cyan:' + tierAccent + '">'
+    + '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">'
+    +   '<circle class="rb-ring" cx="50" cy="50" r="46"/>'
+    +   '<circle class="rb-sweep" cx="50" cy="50" r="46"/>'
+    + '</svg>'
+    + '<div class="rb-core">'
+    +   '<span class="rb-lbl">RANK</span>'
+    +   '<span class="rb-num">' + player.rank + '</span>'
+    +   '<span class="rb-tier">' + tierLabel + '</span>'
+    + '</div>'
+    + '</div>';
+
+  // Real telemetry — pulls from the player's actual data instead of placeholder
+  // flavor text. Three lines, mono caps, fixed widths so the rail reads as a
+  // consistent HUD strip across all players. Each value falls back to '—' when
+  // the source field is missing so the layout never collapses.
+  //
+  //   Line 1: live SIGNAL pulse + tier (already in proj's --holo-tier color)
+  //   Line 2: SCOUT shorthand — class / role / age, the metadata that drives ranking
+  //   Line 3: triple stat readout — BPM · USG · TS%, the three numbers a scout
+  //           wants to see at a glance
+  var _telBpm = (player.bpm != null && !isNaN(player.bpm))
+    ? (player.bpm >= 0 ? '+' : '') + Number(player.bpm).toFixed(1) : '—';
+  var _telUsg = (player.usg != null && !isNaN(player.usg))
+    ? Number(player.usg).toFixed(1) : '—';
+  var _telTs  = (player.ts_pct != null && !isNaN(player.ts_pct))
+    ? (Number(player.ts_pct) * 100).toFixed(1) + '%' : '—';
+  var _telCls = _holoEsc((player.cls || '').toUpperCase()) || '—';
+  var _telRole = _holoEsc(((player.report && player.report.role) || player.torvik_role || '').toUpperCase()) || '—';
+  var _telAge = (player.age != null && !isNaN(player.age))
+    ? Number(player.age).toFixed(1) : '—';
+
   proj.innerHTML = ''
     + '<div class="holo-grid-floor"></div>'
     + '<div class="holo-scanlines"></div>'
+    + '<div class="holo-proj-frame">'
+    +   '<span class="hpf-corner hpf-tl"></span><span class="hpf-corner hpf-tr"></span>'
+    +   '<span class="hpf-corner hpf-bl"></span><span class="hpf-corner hpf-br"></span>'
+    +   '<div class="hpf-telemetry">'
+    +     '<div><span class="blink">\u25CF</span> TIER <b>' + tierLabel + '</b></div>'
+    +     '<div>' + _telCls + ' \u00B7 ' + _telRole + ' \u00B7 AGE <b>' + _telAge + '</b></div>'
+    +     '<div>BPM <b>' + _telBpm + '</b> \u00B7 USG <b>' + _telUsg + '</b> \u00B7 TS <b>' + _telTs + '</b></div>'
+    +   '</div>'
+    + '</div>'
+    + badge
     + '<button class="holo-proj-close" onclick="holoCloseProjection()" aria-label="Close projection">\u2715</button>'
     + '<div class="holo-proj-stage">'
     +   '<div class="holo-proj-identity">'
-    +     '<div class="holo-proj-rank">PROJECTION // RANK #' + player.rank + '</div>'
-    +     '<div class="holo-proj-name">' + nameNoSchool + '</div>'
-    +     '<div class="holo-proj-school">' + school + (pos ? ' \u2022 ' + pos.toUpperCase() : '') + (cls ? ' \u2022 ' + cls.toUpperCase() : '') + '</div>'
+    +     '<div class="holo-proj-eyebrow">HOLO PROJECTION</div>'
+    +     '<div class="holo-proj-name">' + _holoEsc(nameNoSchool) + '</div>'
+    +     '<div class="holo-proj-school">' + _holoEsc(school) + (pos ? ' \u2022 ' + pos.toUpperCase() : '') + (cls ? ' \u2022 ' + cls.toUpperCase() : '') + '</div>'
     +   '</div>'
 
     // Side-locked double helix: the strand SVG and all stat nodes live on a
     // single flat plane around the photo. Strands weave behind the photo; nodes
     // are always at the outer crests (left/right), never over the photo.
     +   '<div class="holo-helix" id="holoHelix">'
+    +     reticleSvg
     +     _holoHelixSvg()
-    +     '<div class="holo-proj-figure">'
+    +     '<div class="holo-proj-figure" id="holoProjFigure">'
     +       '<div class="holo-proj-figure-photo"' + (photo ? ' style="background-image:url(\'' + photo + '\')"' : '') + '></div>'
     +       '<div class="holo-proj-figure-scan"></div>'
     +       '<div class="holo-proj-figure-line"></div>'
@@ -17947,7 +18800,7 @@ function holoOpenProjection(rank) {
     +     '<div class="holo-bio-plate"><div class="holo-bio-lbl">AGE</div><div class="holo-bio-val">' + age + '</div></div>'
     +   '</div>'
     + '</div>'
-    + '<button class="holo-proj-cta" onclick="holoOpenDossier(' + player.rank + ')">[ OPEN FULL PROFILE ]</button>'
+    + '<button class="holo-proj-cta" onclick="holoOpenDossier(' + player.rank + ')">OPEN FULL DOSSIER</button>'
     // Dossier mount — populated lazily on first open, then revealed via class.
     + '<div class="holo-dossier" id="holoDossier"></div>';
 
@@ -17960,11 +18813,43 @@ function holoOpenProjection(rank) {
     stage.classList.remove('is-rematerializing');
     stage.classList.add('is-fading');
   }
+  // Lock body scroll so wheel/touch behind the fixed overlay doesn't scroll
+  // the board underneath. Uses the ref-counted ScrollLockService so it plays
+  // nicely with other modals that might be open. Guarded for older builds
+  // that may not have the service loaded yet.
+  if (typeof ScrollLockService !== 'undefined') {
+    ScrollLockService.acquire('holoProjection');
+  }
   // Allow the fade to start before bringing the projection in.
   setTimeout(function(){
     proj.classList.add('is-open');
     proj.setAttribute('aria-hidden', 'false');
   }, 120);
+
+  // ── Pointer-parallax: the figure subtly tilts toward the cursor, giving the
+  //    flat headshot a sense of depth on the helix plane. Disabled for reduced
+  //    motion and on coarse (touch) pointers where there is no hover cursor.
+  //
+  //    Bookkeeping: attach/detach are idempotent (gated by `_holoTiltBound`)
+  //    so the dossier-open / dossier-close / projection-close paths can call
+  //    them freely without double-binding or removing a handler that's already
+  //    detached.
+  var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var coarse = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
+  if (!reduceMotion && !coarse) {
+    var fig = document.getElementById('holoProjFigure');
+    if (fig) {
+      proj._holoTilt = function(e){
+        var r = proj.getBoundingClientRect();
+        var dx = (e.clientX - (r.left + r.width / 2)) / r.width;   // -0.5..0.5
+        var dy = (e.clientY - (r.top + r.height / 2)) / r.height;
+        fig.style.transform = 'perspective(900px) rotateY(' + (dx * 12).toFixed(2)
+          + 'deg) rotateX(' + (-dy * 12).toFixed(2) + 'deg)';
+      };
+      proj.addEventListener('mousemove', proj._holoTilt);
+      proj._holoTiltBound = true;
+    }
+  }
 }
 
 function holoCloseProjection() {
@@ -17979,6 +18864,19 @@ function holoCloseProjection() {
   }
   proj.classList.remove('is-open');
   proj.setAttribute('aria-hidden', 'true');
+  // Release the body scroll lock acquired on open. Ref-counted, so if another
+  // modal is still up the body stays locked — only the holo token is freed.
+  if (typeof ScrollLockService !== 'undefined') {
+    ScrollLockService.release('holoProjection');
+  }
+  // Detach the parallax handler so it doesn't fire against a torn-down figure.
+  // Guarded by the bound flag so the call is safe regardless of whether the
+  // dossier had already suspended it.
+  if (proj._holoTilt && proj._holoTiltBound) {
+    proj.removeEventListener('mousemove', proj._holoTilt);
+    proj._holoTiltBound = false;
+  }
+  proj._holoTilt = null;
   // After projection finishes fading, re-materialize the ambient board.
   setTimeout(function(){
     if (stage) {
@@ -18002,6 +18900,13 @@ function holoCloseProjection() {
 
 // Percentile of a value within the 2026 pool for a given stat key (0..1).
 // Used to scale production bars so they read as "where this guy sits in the class".
+//
+// PERF: The cached `arr` is already sorted ascending, so finding how many values
+// fall below `val` is a binary-search bisect, not a linear scan. With ~75 players
+// × 6 bars per dossier open, the old O(n) loop was ~450 comparisons; bsearch
+// drops it to ~36 (log₂ 75 ≈ 6.2). Tiny win in isolation, but the function is
+// hot during animation kickoff so the cleaner algorithmic shape is the right
+// structural fix.
 var _holoPctileCache = {};
 function _holoPctile(key, val) {
   if (val == null || isNaN(val)) return null;
@@ -18019,111 +18924,188 @@ function _holoPctile(key, val) {
   }
   var arr = _holoPctileCache[key];
   if (!arr.length) return null;
-  var below = 0;
-  for (var j = 0; j < arr.length; j++) { if (arr[j] < val) below++; }
-  return below / arr.length;
-}
-
-// Heat color along the holo cyan→green scale for a 0..1 intensity.
-function _holoHeat(t) {
-  t = Math.max(0, Math.min(1, t));
-  // Interpolate across 5 stops: deep slate → teal → cyan → mint → bright mint.
-  var stops = [
-    [23, 58, 82],    // #173a52
-    [28, 111, 142],  // #1c6f8e
-    [34, 179, 166],  // #22b3a6
-    [95, 224, 168],  // #5fe0a8
-    [200, 249, 212], // #c8f9d4
-  ];
-  var seg = t * (stops.length - 1);
-  var i = Math.floor(seg);
-  if (i >= stops.length - 1) i = stops.length - 2;
-  var f = seg - i;
-  var a = stops[i], b = stops[i + 1];
-  var r = Math.round(a[0] + (b[0] - a[0]) * f);
-  var g = Math.round(a[1] + (b[1] - a[1]) * f);
-  var bl = Math.round(a[2] + (b[2] - a[2]) * f);
-  return 'rgb(' + r + ',' + g + ',' + bl + ')';
-}
-
-// Build the zone-intensity model from a player's real shooting profile.
-// We DON'T have shot-location data, so each zone's intensity is derived from
-// translatable signals: 3PAR drives perimeter zones, FTAR drives rim/paint,
-// TS% lifts overall efficiency. This is explicitly a *tendency* map, labeled
-// as such — not a claim of per-shot accuracy.
-function _holoShotZones(player) {
-  var tpar = (player.tpar != null && !isNaN(player.tpar)) ? Number(player.tpar) : null;
-  var ftar = (player.ftar != null && !isNaN(player.ftar)) ? Number(player.ftar) : null;
-  var ts   = (player.ts_pct != null && !isNaN(player.ts_pct)) ? Number(player.ts_pct) : null;
-
-  // Normalize each driver to ~0..1 against sensible college ranges.
-  var perimeter = tpar != null ? Math.max(0, Math.min(1, tpar / 0.75)) : 0.4;     // 3-point rate
-  var rim       = ftar != null ? Math.max(0, Math.min(1, ftar / 0.75)) : 0.4;     // FT rate ≈ rim pressure
-  var eff       = ts   != null ? Math.max(0, Math.min(1, (ts - 0.45) / 0.25)) : 0.5; // efficiency lift
-
-  // Each zone gets a base tendency blended with the efficiency lift.
-  function mk(base) { return Math.max(0.05, Math.min(1, base * 0.72 + eff * 0.28)); }
-
-  // Mid-range is the inverse of being a rim+3 specialist (the "in-between").
-  var midBias = Math.max(0.12, 1 - (perimeter * 0.55 + rim * 0.45));
-
-  return {
-    rim:       mk(rim),
-    paintL:    mk(rim * 0.85 + 0.1),
-    paintR:    mk(rim * 0.85 + 0.1),
-    midL:      mk(midBias),
-    midC:      mk(midBias * 0.9),
-    midR:      mk(midBias),
-    cornerL:   mk(perimeter * 0.9),
-    cornerR:   mk(perimeter * 0.9),
-    wingL:     mk(perimeter),
-    wingR:     mk(perimeter),
-    top3:      mk(perimeter * 1.05),
-  };
-}
-
-// Render the half-court SVG with zones shaded by intensity. Coordinates are a
-// simplified half court, 300 wide × 280 tall, hoop at top-center.
-function _holoCourtSvg(player) {
-  var z = _holoShotZones(player);
-  function zone(d, intensity, cx, cy, label) {
-    var fill = _holoHeat(intensity);
-    var pct = Math.round(intensity * 100);
-    var s = '<path class="holo-court-zone" d="' + d + '" fill="' + fill + '" '
-      + 'fill-opacity="0.82" stroke="rgba(0,229,255,0.35)" stroke-width="1"></path>';
-    if (cx != null) {
-      s += '<text class="holo-zone-pct" x="' + cx + '" y="' + cy + '">' + pct + '</text>';
-    }
-    return s;
+  // Bisect-left: first index whose value is >= val. Everything before it is
+  // strictly less, which matches the old loop's `arr[j] < val` semantics.
+  var lo = 0, hi = arr.length;
+  while (lo < hi) {
+    var mid = (lo + hi) >>> 1;
+    if (arr[mid] < val) lo = mid + 1;
+    else hi = mid;
   }
-  // Court is drawn with hoop at top. Bands from baseline (top) outward (bottom).
-  var svg = '<svg class="holo-court" viewBox="0 0 300 290" xmlns="http://www.w3.org/2000/svg">'
-    // court backdrop
-    + '<rect x="2" y="2" width="296" height="286" rx="6" fill="rgba(3,12,24,0.6)" stroke="rgba(0,229,255,0.25)" stroke-width="1"></rect>'
-    // RIM / restricted area (top center arc)
-    + zone('M120 18 A30 30 0 0 1 180 18 L180 48 A30 30 0 0 0 120 48 Z', z.rim, 150, 40, 'RIM')
-    // Paint left & right (the key)
-    + zone('M108 18 L120 18 L120 92 L108 92 Z', z.paintL, null)
-    + zone('M180 18 L192 18 L192 92 L180 92 Z', z.paintR, null)
-    + zone('M120 48 L180 48 L180 92 L120 92 Z', z.midC, 150, 76, 'PAINT')
-    // Mid-range left / right
-    + zone('M40 18 L108 18 L108 110 L40 110 Z', z.midL, 74, 70, 'MID')
-    + zone('M192 18 L260 18 L260 110 L192 110 Z', z.midR, 226, 70, 'MID')
-    // Corners (3)
-    + zone('M8 18 L40 18 L40 120 L8 120 Z', z.cornerL, 24, 100, '3')
-    + zone('M260 18 L292 18 L292 120 L260 120 Z', z.cornerR, 276, 100, '3')
-    // Wings (3)
-    + zone('M16 120 L120 120 L120 200 L16 230 Z', z.wingL, 64, 168, 'WING')
-    + zone('M180 120 L284 120 L284 230 L180 200 Z', z.wingR, 236, 168, 'WING')
-    // Top of key (3)
-    + zone('M120 120 L180 120 L180 200 L150 214 L120 200 Z', z.top3, 150, 168, 'TOP')
-    // 3-point arc overlay (visual reference, not a zone)
-    + '<path d="M40 18 L40 96 A130 130 0 0 0 260 96 L260 18" fill="none" stroke="rgba(0,229,255,0.45)" stroke-width="1.5" stroke-dasharray="3 3"></path>'
-    // hoop marker
-    + '<circle cx="150" cy="22" r="5" fill="none" stroke="var(--holo-cyan)" stroke-width="2"></circle>'
-    + '<line x1="135" y1="14" x2="165" y2="14" stroke="var(--holo-cyan)" stroke-width="2.5"></line>'
+  return lo / arr.length;
+}
+
+// ── Holo shot chart — REAL per-zone shooting data ─────────────────────────
+// Mirrors the editorial player-card chart (buildShotChart): same court
+// geometry and the same real RIM/MID/3PT/FT splits out of _SHOT_INDEX, but
+// re-skinned into the holo aesthetic (dark surface, cyan hairlines, glowing
+// percentile-keyed zone fills, mono labels). No fabricated "tendency" — every
+// number on screen is the player's actual per-100 shooting profile.
+// Returns { hasShotData, html }.
+// Monotonic counter for per-render SVG-local IDs (clipPath/filter) in the shot
+// chart. Guarantees uniqueness across opens without depending on Date.now()
+// (which can collide if two charts build within the same millisecond).
+var _holoShotChartUid = 0;
+function _holoRealShotChart(player) {
+  var d = (typeof _SHOT_INDEX !== 'undefined' && typeof _canonShotName === 'function')
+    ? _SHOT_INDEX[_canonShotName(player.name)] : null;
+
+  var req = ['rp','ra','mp','ma','tp','ta','fp','fa'];
+  var ok = !!d;
+  if (ok) { for (var i = 0; i < req.length; i++) { if (d[req[i]] == null || isNaN(d[req[i]])) { ok = false; break; } } }
+
+  if (!ok) {
+    // Graceful holo "no data" state — clean, on-brand, never the fake heatmap.
+    var empty = '<div class="holo-shot-empty">'
+      + '<svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="22" r="9" fill="none" stroke="rgba(0,229,255,.4)" stroke-width="2"/>'
+      + '<path d="M14 54 q18 -22 36 0" fill="none" stroke="rgba(0,229,255,.25)" stroke-width="2" stroke-dasharray="3 4"/></svg>'
+      + '<div class="holo-shot-empty-h">NO SHOT DATA ON FILE</div>'
+      + '<div class="holo-shot-empty-s">Per-zone shooting splits are not available for this prospect.</div>'
+      + '</div>';
+    return { hasShotData: false, html: empty };
+  }
+
+  // Percentile → holo fill tint + ink. Red is reserved for genuinely poor
+  // (<25th), matching the editorial chart's semantic-red rule; otherwise the
+  // scale runs cool-cyan → mint → bright-mint as quality climbs.
+  function heat(p) {
+    if (p == null || isNaN(p)) return { tint:'rgba(120,140,165,.14)', ink:'#8FB0C4' };
+    if (p < 25) return { tint:'rgba(255,90,110,.20)',  ink:'#FF6E7E' };
+    if (p < 45) return { tint:'rgba(255,181,71,.18)',  ink:'#FFB547' };
+    if (p < 65) return { tint:'rgba(79,209,232,.20)',  ink:'#5FE0E8' };
+    if (p < 85) return { tint:'rgba(0,229,255,.26)',   ink:'#00E5FF' };
+    return        { tint:'rgba(95,224,168,.34)',  ink:'#7CF2C0' };
+  }
+  function pctileLabel(p) {
+    if (p === undefined || p === null || isNaN(p)) return '\u2014';
+    var n = Math.round(p), t = n % 10, h = n % 100, suf = 'th';
+    if (h < 11 || h > 13) { if (t === 1) suf = 'st'; else if (t === 2) suf = 'nd'; else if (t === 3) suf = 'rd'; }
+    return n + suf;
+  }
+
+  var rimH = heat(d.rc), midH = heat(d.mc), tptH = heat(d.tc), ftH = heat(d.fc);
+
+  // Same court grammar as the editorial chart: 360×230, basket at top.
+  var W = 360, H = 230;
+  var bx = 180, by = 28, r3 = 158;
+  var pX = 123, pW = 114, pH = 132;
+  var arcX1 = Math.round(bx - Math.sqrt(r3*r3 - by*by));
+  var arcX2 = Math.round(bx + Math.sqrt(r3*r3 - by*by));
+  var uid = 'hsc' + (_holoShotChartUid++);
+
+  function plate(x, y, tag, pct, att, pc, ink) {
+    var w = 92, h = 50, px = x - w/2, py = y - h/2;
+    var pL = pctileLabel(pc);
+    return '<g filter="url(#' + uid + '_g)">'
+      + '<rect x="' + px + '" y="' + py + '" width="' + w + '" height="' + h + '" rx="8" '
+      +   'fill="rgba(6,20,38,.82)" stroke="' + ink + '" stroke-opacity="0.55" stroke-width="1"/>'
+      + '</g>'
+      + '<text x="' + x + '" y="' + (py+13) + '" text-anchor="middle" fill="rgba(230,248,255,.62)" '
+      +   'font-family="\'JetBrains Mono\',monospace" font-weight="700" font-size="8" letter-spacing="2">' + tag + '</text>'
+      + '<text x="' + x + '" y="' + (py+31) + '" text-anchor="middle" fill="#fff" '
+      +   'font-family="\'Barlow Condensed\',sans-serif" font-weight="800" font-size="20">' + pct.toFixed(1) + '%</text>'
+      + '<text x="' + x + '" y="' + (py+43) + '" text-anchor="middle" fill="' + ink + '" '
+      +   'font-family="\'JetBrains Mono\',monospace" font-weight="600" font-size="8">'
+      +   att.toFixed(1) + '/100 \u00B7 ' + pL + '</text>';
+  }
+
+  var svg = '<svg class="holo-court" viewBox="0 0 ' + W + ' ' + H + '" xmlns="http://www.w3.org/2000/svg" '
+    + 'shape-rendering="geometricPrecision" text-rendering="optimizeLegibility">'
+    + '<defs>'
+    +   '<clipPath id="' + uid + '_arc"><circle cx="' + bx + '" cy="' + by + '" r="' + r3 + '"/></clipPath>'
+    +   '<filter id="' + uid + '_g" x="-20%" y="-20%" width="140%" height="140%">'
+    +     '<feDropShadow dx="0" dy="1" stdDeviation="2.5" flood-color="#00E5FF" flood-opacity="0.18"/>'
+    +   '</filter>'
+    + '</defs>'
+    // dark holo surface
+    + '<rect width="' + W + '" height="' + H + '" rx="10" fill="rgba(3,11,22,.66)"/>'
+    // zone tints painted far → near (3PT field, mid inside arc, rim paint)
+    + '<rect x="1.5" y="1.5" width="' + (W-3) + '" height="' + (H-3) + '" rx="9" fill="' + tptH.tint + '"/>'
+    + '<rect x="1.5" y="1.5" width="' + (W-3) + '" height="' + (H-3) + '" fill="rgba(3,11,22,.66)" clip-path="url(#' + uid + '_arc)"/>'
+    + '<rect x="1.5" y="1.5" width="' + (W-3) + '" height="' + (H-3) + '" fill="' + midH.tint + '" clip-path="url(#' + uid + '_arc)"/>'
+    + '<rect x="' + pX + '" y="1.5" width="' + pW + '" height="' + pH + '" fill="rgba(3,11,22,.66)"/>'
+    + '<rect x="' + pX + '" y="1.5" width="' + pW + '" height="' + pH + '" fill="' + rimH.tint + '"/>'
+    // court lines — cyan hairlines
+    + '<rect x="1.5" y="1.5" width="' + (W-3) + '" height="' + (H-3) + '" rx="9" fill="none" stroke="rgba(0,229,255,.40)" stroke-width="1.4"/>'
+    + '<rect x="' + pX + '" y="1.5" width="' + pW + '" height="' + pH + '" fill="none" stroke="rgba(0,229,255,.45)" stroke-width="1.3"/>'
+    + '<path d="M ' + pX + ',' + pH + ' A ' + (pW/2) + ',' + (pW/2) + ' 0 0 0 ' + (pX+pW) + ',' + pH + '" fill="none" stroke="rgba(0,229,255,.45)" stroke-width="1.3"/>'
+    + '<path d="M ' + arcX1 + ',2 A ' + r3 + ',' + r3 + ' 0 1 1 ' + arcX2 + ',2" fill="none" stroke="rgba(0,229,255,.7)" stroke-width="1.8"/>'
+    + '<circle cx="' + bx + '" cy="' + by + '" r="28" fill="none" stroke="rgba(0,229,255,.30)" stroke-width="1.1"/>'
+    // basket fixture — the one amber accent, matching the editorial chart
+    + '<line x1="' + (bx-19) + '" y1="' + (by-11) + '" x2="' + (bx+19) + '" y2="' + (by-11) + '" stroke="#FFB547" stroke-width="3" stroke-linecap="round"/>'
+    + '<circle cx="' + bx + '" cy="' + by + '" r="7.5" fill="none" stroke="#FFB547" stroke-width="2.2"/>'
+    // zone plates with REAL FG% + percentile
+    + plate(bx, by + 60, 'RIM', d.rp, d.ra, d.rc, rimH.ink)
+    + plate(72, 122,      'MID', d.mp, d.ma, d.mc, midH.ink)
+    + plate(W-72, 184,    '3PT', d.tp, d.ta, d.tc, tptH.ink)
     + '</svg>';
-  return svg;
+
+  // Stat table — real per-zone splits (FG% / percentile bar / att-100 / unassisted)
+  function row(zone, h, pct, att, pc, ua) {
+    var hasP = (pc != null && !isNaN(pc));
+    var barW = hasP ? Math.max(4, Math.min(100, pc)) : 0;
+    return '<div class="holo-sct-row">'
+      + '<span class="holo-sct-zone"><i style="background:' + h.ink + '"></i>' + zone + '</span>'
+      + '<span class="holo-sct-fg">' + pct.toFixed(1) + '<i>%</i></span>'
+      + '<span class="holo-sct-pctl"><span class="holo-sct-bar"><span style="width:' + barW + '%;background:' + h.ink + '"></span></span>'
+      +   '<span class="holo-sct-pn" style="color:' + h.ink + '">' + pctileLabel(pc) + '</span></span>'
+      + '<span class="holo-sct-vol">' + att.toFixed(1) + '</span>'
+      + '<span class="holo-sct-ua">' + (ua != null && !isNaN(ua) ? Math.round(ua) + '%' : '\u2014') + '</span>'
+      + '</div>';
+  }
+  var table = '<div class="holo-sct-head"><span>Zone</span><span>FG%</span><span>Pctl</span><span>Att</span><span>Unast</span></div>'
+    + row('Rim', rimH, d.rp, d.ra, d.rc, d.ru)
+    + row('Mid', midH, d.mp, d.ma, d.mc, null)
+    + row('3PT', tptH, d.tp, d.ta, d.tc, d.tu)
+    + row('FT',  ftH,  d.fp, d.fa, d.fc, null);
+
+  // Derived verdict (same logic family as the editorial chart) — the chart
+  // concludes rather than just displaying.
+  var verdict = (function() {
+    var uVals = [];
+    if (d.ru != null && !isNaN(d.ru)) uVals.push(d.ru);
+    if (d.tu != null && !isNaN(d.tu)) uVals.push(d.tu);
+    var uAvg = uVals.length ? uVals.reduce(function(a,b){return a+b;},0)/uVals.length : null;
+    var creation = uAvg == null ? '' : (uAvg >= 60 ? 'Self-created ' : uAvg <= 30 ? 'Play-finishing ' : '');
+    var arch;
+    if (d.rc >= 60 && d.mc >= 60 && d.tc >= 60)      arch = 'three-level scorer';
+    else if (d.tc >= 70 && d.ta >= 8)                arch = 'high-volume shooter';
+    else if (d.rc >= 70 && d.ra >= 10)               arch = 'rim-pressure finisher';
+    else if (d.tc >= 70)                             arch = 'efficient spot shooter';
+    else if (d.mc >= 80)                             arch = 'mid-range operator';
+    else if (d.rc < 35 && d.tc < 35)                 arch = 'developing scorer';
+    else if (d.rc >= 55 && d.tc < 45)                arch = 'interior-leaning scorer';
+    else if (d.tc >= 55 && d.rc < 45)                arch = 'perimeter-leaning scorer';
+    else                                             arch = 'balanced scorer';
+    var zones = [
+      {tag:'rim', pc:d.rc, txt:(d.rc>=75?'elite':'strong')+' at the rim'},
+      {tag:'mid', pc:d.mc, txt:(d.mc>=75?'elite':'strong')+' from mid-range'},
+      {tag:'3pt', pc:d.tc, txt:(d.tc>=75?'elite':'strong')+' from three'},
+      {tag:'ft',  pc:d.fc, txt:(d.fc>=75?'elite':'reliable')+' at the line'}
+    ].filter(function(z){return z.pc!=null && !isNaN(z.pc);});
+    zones.sort(function(a,b){return b.pc-a.pc;});
+    var bits = [];
+    if (zones.length && zones[0].pc >= 60) bits.push(zones[0].txt + ' (' + pctileLabel(zones[0].pc) + ')');
+    var worst = zones.length ? zones[zones.length-1] : null;
+    if (worst && worst.pc < 30 && worst !== zones[0]) {
+      var cav = { rim:'rim finishing', mid:'the mid-range', '3pt':'the three ball', ft:'the FT line' }[worst.tag];
+      bits.push(cav + ' lags (' + pctileLabel(worst.pc) + ')');
+    }
+    if (uAvg != null && uAvg >= 60) bits.push(Math.round(uAvg) + '% unassisted');
+    var head = (creation + arch); head = head.charAt(0).toUpperCase() + head.slice(1);
+    return { head: head, detail: bits.join(' \u00B7 ') };
+  })();
+
+  var html = '<div class="holo-shot-verdict">'
+    +   '<span class="holo-shot-verdict-tag">Profile</span>'
+    +   '<span class="holo-shot-verdict-head">' + _holoEsc(verdict.head) + '</span>'
+    +   (verdict.detail ? '<span class="holo-shot-verdict-detail">' + _holoEsc(verdict.detail) + '</span>' : '')
+    + '</div>'
+    + svg
+    + '<div class="holo-sct-table">' + table + '</div>'
+    + '<div class="holo-shot-source">Data: draftballr.com \u00B7 per-100 possessions</div>';
+
+  return { hasShotData: true, html: html };
 }
 
 function holoOpenDossier(rank) {
@@ -18153,6 +19135,12 @@ function holoOpenDossier(rank) {
   var wsDiffStr = wsDiff != null ? (wsDiff >= 0 ? '+' : '') + wsDiff.toFixed(1) + '"' : '—';
 
   // ── Production bars (value + class percentile)
+  //
+  // Each bar's width and color are both driven by the player's percentile in
+  // the 2026 class. This mirrors the helix nodes' percentile hue treatment
+  // (red→orange→cyan→mint) so the same visual language carries across the
+  // dossier — a player who's red on a helix node is also red on the
+  // corresponding bar. No more "green for everything regardless of merit".
   var barKeys = [
     { key:'metric',  label:'METRIC',  fmt:'n1' },
     { key:'ts_pct',  label:'TS%',     fmt:'pct' },
@@ -18161,25 +19149,51 @@ function holoOpenDossier(rank) {
     { key:'stl_bl',  label:'STL+BL',  fmt:'n2' },
     { key:'pa2_usg', label:'P+A/USG', fmt:'n1' },
   ];
+  // Hue maps via the same _holoStatPctileHue used by the helix (10°…128°);
+  // fall back to neutral cyan when there's no range data on file for the key.
+  function _barFillStyle(key, raw) {
+    var hueInfo = (typeof _holoStatPctileHue === 'function')
+      ? _holoStatPctileHue(key, raw) : { hasData: false };
+    if (!hueInfo.hasData || hueInfo.hue == null) {
+      // Neutral cyan ramp — same as the old static bar, used only when the
+      // stat has no range definition (no rug-pull on un-rankable values).
+      return 'background:linear-gradient(90deg,#1c6f8e,#22b3a6,#5fe0a8);'
+        + 'box-shadow:0 0 8px rgba(0,229,255,.4);';
+    }
+    var h = hueInfo.hue;
+    // Three-stop gradient inside one hue keeps the bar legible and on-brand:
+    // dark shoulder → mid → bright crest, all at the same H so it reads as a
+    // single percentile color rather than a rainbow.
+    var c1 = _hslHex(h, 55, 28);
+    var c2 = _hslHex(h, 80, 50);
+    var c3 = _hslHex(h, 90, 65);
+    var glow = _hslHex(h, 90, 55);
+    return 'background:linear-gradient(90deg,' + c1 + ',' + c2 + ',' + c3 + ');'
+      + 'box-shadow:0 0 10px ' + glow + '88;';
+  }
   var barsHtml = barKeys.map(function(b) {
     var raw = player[b.key];
     var pct = _holoPctile(b.key, raw);
     var w = pct != null ? Math.round(pct * 100) : 0;
     var valStr = _holoFmt(raw, b.fmt);
+    var fillStyle = _barFillStyle(b.key, raw);
     return '<div class="holo-bar-row">'
       + '<div class="holo-bar-lbl">' + b.label + '</div>'
-      + '<div class="holo-bar-track"><div class="holo-bar-fill" data-w="' + w + '"></div></div>'
+      + '<div class="holo-bar-track"><div class="holo-bar-fill" data-w="' + w + '" style="' + fillStyle + '"></div></div>'
       + '<div class="holo-bar-val">' + valStr + '</div>'
       + '</div>';
   }).join('');
 
   // ── Scouting report columns
+  // data-empty signals empty columns to the CSS so they visually de-emphasize
+  // instead of competing for attention with populated columns.
   var rep = player.report || {};
   function col(items, cls, head) {
-    var inner = (items && items.length)
+    var empty = !items || !items.length;
+    var inner = !empty
       ? items.map(function(s){ return '<div class="holo-report-item">' + _holoEsc(s) + '</div>'; }).join('')
       : '<div class="holo-report-empty">No notes on file</div>';
-    return '<div class="holo-report-col ' + cls + '">'
+    return '<div class="holo-report-col ' + cls + '" data-empty="' + empty + '">'
       + '<div class="holo-report-col-head">' + head + '</div>'
       + inner + '</div>';
   }
@@ -18193,10 +19207,24 @@ function holoOpenDossier(rank) {
   var ceiling = rep.ceiling || '\u2014';
   var floor = rep.floor || '\u2014';
 
-  // ── Shot-profile summary chips
+  // ── Shot-profile summary chips (real top-line efficiency context)
   var tsStr = _holoFmt(player.ts_pct, 'pct');
   var tparStr = _holoFmt(player.tpar, 'n3');
   var ftarStr = _holoFmt(player.ftar, 'n3');
+  // ── Real per-zone shot chart (mirrors the player-card chart)
+  var shot = _holoRealShotChart(player);
+
+  // Shot-profile summary chips block. Built as a separate string because the
+  // previous inline ternary used leading `+` on each line, which JS parsed as
+  // unary plus → NaN, producing garbage markup. Build it cleanly here.
+  var shotChipsHtml = '';
+  if (shot.hasShotData) {
+    shotChipsHtml = '<div class="holo-shot-chips">'
+      + '<div class="holo-shot-chip"><div class="lbl">TS%</div><div class="val">' + tsStr + '</div></div>'
+      + '<div class="holo-shot-chip"><div class="lbl">3P RATE</div><div class="val">' + tparStr + '</div></div>'
+      + '<div class="holo-shot-chip"><div class="lbl">FT RATE</div><div class="val">' + ftarStr + '</div></div>'
+      + '</div>';
+  }
 
   mount.innerHTML = ''
     + '<div class="holo-dossier-header">'
@@ -18210,18 +19238,12 @@ function holoOpenDossier(rank) {
     + '</div>'
 
     + '<div class="holo-dossier-body">'
-    // Shot-zone panel
+    // Shot-zone panel — REAL per-zone shooting splits (mirrors player card)
     +   '<div class="holo-panel holo-panel-shot">'
-    +     '<div class="holo-panel-title">Shot Profile \u2014 Zone Tendency</div>'
+    +     '<div class="holo-panel-title">Shot Profile' + (shot.hasShotData ? ' \u2014 Zone Splits' : '') + '</div>'
     +     '<div class="holo-court-wrap">'
-    +       _holoCourtSvg(player)
-    +       '<div class="holo-court-legend"><span>Low</span><div class="holo-legend-bar"></div><span>High</span></div>'
-    +       '<div class="holo-shot-chips">'
-    +         '<div class="holo-shot-chip"><div class="lbl">TS%</div><div class="val">' + tsStr + '</div></div>'
-    +         '<div class="holo-shot-chip"><div class="lbl">3P RATE</div><div class="val">' + tparStr + '</div></div>'
-    +         '<div class="holo-shot-chip"><div class="lbl">FT RATE</div><div class="val">' + ftarStr + '</div></div>'
-    +       '</div>'
-    +       '<div class="holo-shot-note">Zone shading reflects shot-selection tendency derived from 3P rate, FT rate &amp; efficiency \u2014 not per-shot accuracy.</div>'
+    +       shot.html
+    +       shotChipsHtml
     +     '</div>'
     +   '</div>'
     // Measurables panel
@@ -18254,6 +19276,13 @@ function holoOpenDossier(rank) {
 
   // Reveal with the morph, then animate production bars to their widths.
   proj.classList.add('dossier-open');
+  // Perf: the projection's pointer-parallax fires on every mousemove against a
+  // now-hidden figure. Detach it while the dossier is up; close re-attaches.
+  // Idempotent: guarded by the bound flag.
+  if (proj._holoTilt && proj._holoTiltBound) {
+    proj.removeEventListener('mousemove', proj._holoTilt);
+    proj._holoTiltBound = false;
+  }
   requestAnimationFrame(function(){
     requestAnimationFrame(function(){
       var fills = mount.querySelectorAll('.holo-bar-fill');
@@ -18271,18 +19300,34 @@ function holoCloseDossier() {
   var proj = document.getElementById('holoProjection');
   if (!proj) return;
   proj.classList.remove('dossier-open');
+  // Re-attach the pointer-parallax handler that open() suspended for perf.
+  // BUT only if the projection itself is still open — otherwise we re-bind a
+  // listener that holoCloseProjection is about to (or just did) tear down,
+  // and any in-flight mousemove fires against a stale figure. Idempotent via
+  // the bound flag, so back-to-back calls are safe.
+  if (proj.classList.contains('is-open')
+      && proj._holoTilt
+      && !proj._holoTiltBound) {
+    proj.addEventListener('mousemove', proj._holoTilt);
+    proj._holoTiltBound = true;
+  }
   // Leave the dossier DOM in place (cheap) so re-opening is instant; it's
   // hidden via opacity/pointer-events when the class is removed.
 }
 
 // Lightweight HTML escaper for any user-facing text injected into the dossier.
+// Escapes the five characters that have special meaning in HTML attribute
+// or text contexts: & < > " '. The apostrophe matters because some attrs in
+// this codebase use single quotes (e.g. background-image:url('...')), and
+// future regressions could place escaped text inside one. Cheap insurance.
 function _holoEsc(s) {
   if (s == null) return '';
   return String(s)
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
 }
 
 
