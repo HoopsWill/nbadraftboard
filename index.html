@@ -2838,6 +2838,7 @@ tr:hover td{background:var(--gray-50)}
 .mock-slbl{font-size:6.5px;color:var(--gray-400);text-transform:uppercase;letter-spacing:.4px;line-height:1.3;font-weight:600}
 .mock-cell-info{display:flex;flex-direction:column;gap:1px}
 
+
   /* Mock Builder — pool becomes slide-up drawer */
   .mdc-wrap{flex-direction:column;height:auto;min-height:0;border:none;box-shadow:none;border-radius:0}
   /* F2: Use dvh so iOS doesn't size against the expanded viewport (address bar hidden).
@@ -7905,68 +7906,27 @@ ap{
 .future-table tr:hover td{background:var(--gray-50)}
 
 /* ── Past Boards card view ──────────────────────────────────────────────
-   Mirrors the future-card surface language (white slab, tier-colored left
-   border, solid rank badge) but the body carries what historical players
-   actually have: the metric stat strip + the draft OUTCOME (team / pick /
-   rank delta) instead of scouting notes/comps. --hc-color carries the tier
-   hue per card, same pattern as --ft-color. */
-.hist-cards-grid{
-  display:grid;gap:12px;
-  grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+   Past Boards renders on the shared .player-card system (same tier bar, rank
+   badge, 70px avatar, metric panel, bio strip, positional stat grid and comp
+   pills as the 2026 / 2027 RANK boards) so all three tabs read as one product.
+   STRUCTURAL: the draft OUTCOME row now sits in the SAME place as the 2026
+   Draft Board card — inside .card-id-main, in a .card-id-meta slab directly
+   below the school line and above the measurables — and reuses 2026's
+   .card-dest-unit.card-drafted styling verbatim. The only Past-Boards-specific
+   addition is the rank-Δ chip (.pc-draft-delta), which trails the team name on
+   that same row, plus the muted "Undrafted" variant. */
+.pc-draft-delta{
+  flex-shrink:0;display:inline-flex;align-items:baseline;gap:3px;
+  font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:var(--text-sm);
+  line-height:1;font-variant-numeric:tabular-nums;
 }
-.hist-card{
-  background:white;border-radius:12px;
-  border-left:3px solid var(--hc-color,var(--gray-300));
-  box-shadow:0 0 0 1px rgba(10,22,40,.08),0 2px 8px rgba(10,22,40,.05);
-  overflow:hidden;cursor:pointer;position:relative;
-  display:flex;flex-direction:column;
-  transition:box-shadow var(--motion-base),transform var(--motion-base);
-  content-visibility:auto;contain-intrinsic-size:0 188px;
-}
-.hist-card:hover{
-  box-shadow:0 0 0 1px rgba(10,22,40,.10),0 6px 20px rgba(10,22,40,.12);
-  transform:translateY(-3px);
-}
-.hist-card::after{
-  content:'\2197';position:absolute;top:8px;right:11px;
-  font-size:var(--text-sm);font-weight:700;color:var(--gray-300);
-  opacity:0;transition:opacity var(--motion-fast);pointer-events:none;
-}
-@media (hover:hover){ .hist-card:hover::after{opacity:1} }
-.hist-card-header{display:flex;align-items:center;gap:11px;padding:13px 14px 9px}
-.hist-rank-badge{
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  flex-shrink:0;width:42px;height:42px;border-radius:9px;
-  background:var(--hc-color,var(--gray-400));
-}
-.hist-rank-badge .rn{font-family:'Barlow Condensed',sans-serif;font-size:var(--text-20);font-weight:900;color:white;line-height:1}
-.hist-rank-badge .rl{font-family:'Barlow Condensed',sans-serif;font-size:7.5px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:rgba(255,255,255,.6)}
-.hist-card .avatar-fallback{background:var(--navy-mid) !important;color:rgba(255,255,255,.85) !important}
-.hist-card-identity{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px;padding-left:2px}
-.hist-card-name{font-family:'Barlow Condensed',sans-serif;font-size:var(--text-16);font-weight:900;color:var(--navy);line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.hist-card-school{display:flex;align-items:center;gap:5px;font-size:var(--text-2xs);color:var(--gray-500);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.hist-card-role{font-size:var(--text-3xs);color:var(--gray-400);text-transform:uppercase;letter-spacing:.6px;font-weight:700}
-/* Stat strip — compact metric cells, gradient-tinted like the table */
-.hist-card-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;padding:2px 14px 0}
-.hist-stat{border-radius:5px;padding:5px 2px;text-align:center;background:var(--gray-50)}
-.hist-stat .hs-v{font-family:'Barlow Condensed',sans-serif;font-size:var(--text-base);font-weight:800;line-height:1;color:var(--navy)}
-.hist-stat .hs-l{font-size:6.5px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--gray-400);margin-top:2px}
-/* Draft outcome footer — pinned to bottom */
-.hist-card-draft{
-  margin-top:auto;display:flex;align-items:center;gap:8px;
-  padding:9px 14px 11px;margin-top:10px;
-  border-top:1px solid var(--gray-100);
-}
-.hist-draft-pick{
-  font-family:'Barlow Condensed',sans-serif;font-weight:900;
-  font-size:var(--text-xs);color:white;background:var(--navy);
-  border-radius:4px;padding:2px 7px;flex-shrink:0;letter-spacing:.3px;
-}
-.hist-draft-team{font-size:var(--text-2xs);color:var(--gray-700);font-weight:600;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.hist-draft-delta{font-size:var(--text-2xs);font-weight:800;flex-shrink:0;font-family:'Barlow Condensed',sans-serif}
-.hist-card-undrafted{
-  margin-top:auto;padding:9px 14px 11px;margin-top:10px;border-top:1px solid var(--gray-100);
-  font-size:var(--text-2xs);color:var(--gray-400);font-weight:600;letter-spacing:.3px;
+.pc-draft-delta .dl{font-size:7px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--gray-400)}
+/* Undrafted: same slab as a drafted row (rule above, padded) but muted, with a
+   gray status dot standing in for the team logo so the row height stays even. */
+.card-undrafted-row .card-dest-name{color:var(--gray-400);font-weight:700;text-transform:uppercase;letter-spacing:.5px;font-size:var(--text-2xs)}
+.card-undrafted-row::before{
+  content:'';width:18px;height:18px;border-radius:50%;flex-shrink:0;
+  background:var(--gray-100);box-shadow:inset 0 0 0 1.5px var(--gray-200);
 }
 
 /* ── M
@@ -7995,7 +7955,154 @@ ock Drafts table CSS ───────────────────�
 .mock-slbl{font-size:6.5px;color:var(--gray-400);text-transform:uppercase;letter-spacing:.4px;line-height:1.3;font-weight:600}
 .mock-cell-info{display:flex;flex-direction:column;gap:1px}
 
-/* ── T
+/* ══ ARCHIVE — CONSENSUS LEDGER ══════════════════════════════════════════════
+   Redesigned mock-archive surface. Each pick is a row-card: pick numeral + tier
+   rail on the left, the consensus (latest) player as the hero in the middle,
+   and a horizontal movement track on the right that shows who held the slot at
+   each snapshot. Connectors light amber where the name flipped, so volatility
+   reads at a glance. Brand amber stays reserved for franchise tier + the "flip"
+   signal; everything else is the neutral navy/gray chrome scale. TOP-LEVEL — must
+   live outside any @media so the grid/flex layout applies on desktop. */
+.arch-wrap{ --arch-flip:#C9971A; --arch-hold:var(--gray-300); }
+
+/* Summary band — class identity + the three framing numbers. */
+.arch-summary{
+  display:flex; align-items:center; gap:24px; flex-wrap:wrap;
+  background:linear-gradient(135deg,var(--navy) 0%,var(--navy-mid) 100%);
+  border-radius:var(--r-lg); padding:18px 24px; margin-bottom:14px;
+  box-shadow:var(--elev-2), var(--ring-hair); position:relative; overflow:hidden;
+}
+.arch-summary::after{
+  content:""; position:absolute; inset:0; pointer-events:none; opacity:.5;
+  background:repeating-linear-gradient(90deg,transparent 0 39px,rgba(255,255,255,.025) 39px 40px);
+}
+.arch-sum-headline{display:flex; flex-direction:column; line-height:1; z-index:1}
+.arch-sum-year{font-family:'Barlow Condensed',sans-serif; font-size:var(--text-2xl); font-weight:900; color:white; letter-spacing:-.5px}
+.arch-sum-cls{font-size:var(--text-2xs); font-weight:700; text-transform:uppercase; letter-spacing:2px; color:var(--amber-light); margin-top:2px}
+.arch-sum-window{
+  display:flex; align-items:center; gap:8px; flex-wrap:wrap;
+  padding:8px 14px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.1);
+  border-radius:var(--r-sm); z-index:1;
+}
+.arch-sum-win-from,.arch-sum-win-to{font-family:'Barlow Condensed',sans-serif; font-size:var(--text-sm); font-weight:700; color:white; white-space:nowrap}
+.arch-sum-win-arrow{color:var(--amber-light); font-weight:700}
+.arch-sum-win-lbl{font-size:var(--text-3xs); text-transform:uppercase; letter-spacing:1px; color:rgba(255,255,255,.4); width:100%}
+.arch-sum-metrics{display:flex; gap:22px; margin-left:auto; z-index:1}
+.arch-sum-metric{display:flex; flex-direction:column; align-items:center; line-height:1}
+.arch-sum-num{font-family:'Barlow Condensed',sans-serif; font-size:var(--text-lg); font-weight:900; color:white}
+.arch-sum-num.arch-sum-stable{color:var(--amber-light)}
+.arch-sum-lbl{font-size:var(--text-3xs); text-transform:uppercase; letter-spacing:.8px; color:rgba(255,255,255,.5); margin-top:3px; text-align:center}
+
+/* Legend strip. */
+.arch-legend{display:flex; align-items:center; gap:18px; flex-wrap:wrap; padding:0 4px 12px; }
+.arch-legend-item{display:inline-flex; align-items:center; gap:6px; font-size:var(--text-2xs); color:var(--gray-500); font-weight:600}
+.arch-leg-dot{width:18px; height:3px; border-radius:2px; flex-shrink:0}
+.arch-leg-hold{background:var(--gray-300)}
+.arch-leg-flip{background:var(--arch-flip,#C9971A)}
+.arch-legend-hint{margin-left:auto; font-style:italic; font-weight:500; color:var(--gray-400)}
+
+/* Ledger column. */
+.arch-ledger{display:flex; flex-direction:column; gap:10px}
+
+/* Row-card. */
+.arch-row{
+  display:grid; grid-template-columns:74px minmax(340px,400px) 1fr; align-items:stretch;
+  background:white; border:1px solid var(--border-light); border-radius:var(--r-md);
+  box-shadow:var(--shadow-sm); overflow:hidden; transition:box-shadow .15s ease, transform .15s ease;
+}
+.arch-row:hover{box-shadow:var(--shadow-md); transform:translateY(-1px)}
+.arch-row--empty{grid-template-columns:74px 1fr; opacity:.55}
+
+/* Tier rail — a 3px left edge in the tier color, set per-row. */
+.arch-row--franchise{box-shadow:inset 3px 0 0 var(--tier-franchise), var(--shadow-sm)}
+.arch-row--lottery  {box-shadow:inset 3px 0 0 var(--tier-lottery),   var(--shadow-sm)}
+.arch-row--late1    {box-shadow:inset 3px 0 0 var(--tier-late1),     var(--shadow-sm)}
+.arch-row--second   {box-shadow:inset 3px 0 0 var(--tier-second),    var(--shadow-sm)}
+.arch-row--franchise:hover{box-shadow:inset 3px 0 0 var(--tier-franchise), var(--shadow-md)}
+.arch-row--lottery:hover  {box-shadow:inset 3px 0 0 var(--tier-lottery),   var(--shadow-md)}
+.arch-row--late1:hover    {box-shadow:inset 3px 0 0 var(--tier-late1),     var(--shadow-md)}
+.arch-row--second:hover   {box-shadow:inset 3px 0 0 var(--tier-second),    var(--shadow-md)}
+
+/* Pick numeral + movement badge stacked. */
+.arch-pick{display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1px; padding:8px 6px; background:var(--gray-50); border-right:1px solid var(--gray-100)}
+.arch-pick-num{font-family:'Barlow Condensed',sans-serif; font-size:30px; font-weight:900; color:var(--rank-ink); line-height:.95}
+.arch-row--franchise .arch-pick-num{color:var(--tier-franchise)}
+.arch-pick-lbl{font-size:var(--text-8); text-transform:uppercase; letter-spacing:1px; color:var(--gray-400); font-weight:700}
+.arch-empty-note{display:flex; align-items:center; padding:14px 18px; font-size:var(--text-xs); color:var(--gray-400); font-style:italic}
+
+/* Consensus hero — two-tier stack so the name gets a full line. */
+.arch-hero{display:flex; flex-direction:column; gap:7px; padding:11px 16px; border-right:1px solid var(--gray-100); min-width:0; justify-content:center}
+.arch-hero-top{display:flex; align-items:center; gap:11px; min-width:0}
+.arch-hero-photo{flex-shrink:0}
+.arch-hero-id{display:flex; flex-direction:column; gap:2px; min-width:0; flex:1}
+.arch-hero-name{
+  font-family:'Barlow Condensed',sans-serif; font-size:var(--text-lg); font-weight:800; color:var(--navy);
+  line-height:1; text-align:left; background:none; border:none; padding:0; cursor:pointer;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis; letter-spacing:-.2px;
+}
+.arch-hero-name:hover{color:var(--blue)}
+.arch-hero-team{display:flex; align-items:center; gap:6px; min-width:0}
+.arch-hero-team-name{font-size:var(--text-2xs); color:var(--gray-600); font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.arch-hero-via{font-size:var(--text-8); color:var(--gray-400); font-weight:500; white-space:nowrap}
+.arch-hero-bottom{display:flex; align-items:center; justify-content:space-between; gap:10px; min-width:0}
+.arch-hero-sub{display:flex; align-items:center; gap:7px; min-width:0; flex:1}
+.arch-hero-school{display:inline-flex; align-items:center; gap:4px; font-size:var(--text-2xs); color:var(--gray-500); font-weight:600; min-width:0; overflow:hidden}
+.arch-hero-school span{white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.arch-hero-role{font-size:var(--text-8); color:var(--gray-500); font-weight:700; text-transform:uppercase; letter-spacing:.5px; white-space:nowrap; padding:2px 6px; background:var(--surface-inset); border-radius:3px; flex-shrink:0}
+
+/* Hero stats — shown once, gradient tints inline. */
+.arch-hero-stats{display:flex; gap:4px; flex-shrink:0}
+.arch-stat{display:flex; flex-direction:column; align-items:center; justify-content:center; min-width:40px; padding:3px 6px; border-radius:var(--r-sm); background:var(--gray-50)}
+.arch-stat-val{font-family:'Barlow Condensed',sans-serif; font-size:var(--text-sm); font-weight:800; line-height:1}
+.arch-stat-lbl{font-size:6.5px; text-transform:uppercase; letter-spacing:.4px; font-weight:700; margin-top:2px; opacity:.85}
+
+/* Movement badge — now lives under the pick number. */
+.arch-move-badge{font-size:7.5px; font-weight:800; text-transform:uppercase; letter-spacing:.4px; padding:2px 5px; border-radius:10px; white-space:nowrap; margin-top:5px; line-height:1.2; text-align:center}
+.arch-move-stable{background:rgba(201,151,26,.14); color:var(--amber); border:1px solid rgba(201,151,26,.32)}
+.arch-move-churn{background:white; color:var(--gray-500); border:1px solid var(--gray-300)}
+
+/* Movement track. */
+.arch-track-wrap{padding:10px 14px; overflow-x:auto; -webkit-overflow-scrolling:touch; display:flex; align-items:center}
+.arch-track{display:flex; align-items:stretch; gap:0; min-width:min-content}
+.arch-conn{align-self:center; width:14px; height:2px; flex-shrink:0; background:var(--arch-hold,var(--gray-300)); border-radius:2px}
+.arch-conn--flip{background:var(--arch-flip,#C9971A); height:3px}
+.arch-node{
+  display:flex; flex-direction:column; align-items:center; gap:2px; flex-shrink:0; width:104px;
+  padding:7px 8px; border:1px solid var(--gray-200); border-radius:var(--r-sm); background:white;
+  cursor:pointer; text-align:center; transition:border-color .12s ease, background .12s ease, transform .12s ease;
+}
+.arch-node:hover{border-color:var(--blue); background:rgba(37,99,235,.04); transform:translateY(-1px)}
+.arch-node--flip{border-color:rgba(201,151,26,.5); background:rgba(201,151,26,.05)}
+.arch-node--now{border-color:var(--navy); border-width:1.5px; box-shadow:0 1px 4px rgba(10,22,40,.12)}
+.arch-node--gap{cursor:default; background:var(--gray-50); border-style:dashed; border-color:var(--gray-200)}
+.arch-node--gap:hover{border-color:var(--gray-200); background:var(--gray-50); transform:none}
+.arch-node-date{font-size:var(--text-8); font-weight:700; color:var(--gray-400); text-transform:uppercase; letter-spacing:.3px; white-space:nowrap}
+.arch-node--now .arch-node-date{color:var(--navy)}
+.arch-node-name{font-family:'Barlow Condensed',sans-serif; font-size:var(--text-2xs); font-weight:800; color:var(--navy); line-height:1.1; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.arch-node--flip .arch-node-name{color:var(--amber)}
+.arch-node-name--gap{color:var(--gray-300); font-weight:600}
+.arch-node-team{font-size:var(--text-8); font-weight:700; color:var(--gray-500); letter-spacing:.3px}
+.arch-node-team--none{color:var(--gray-300)}
+
+/* Tablet/laptop: track moves below the hero so the row stays readable. */
+@media (max-width:1024px){
+  .arch-row{grid-template-columns:64px 1fr}
+  .arch-hero{border-right:none; border-bottom:1px solid var(--gray-100)}
+  .arch-track-wrap{grid-column:1 / -1}
+}
+@media (max-width:560px){
+  .arch-summary{gap:14px; padding:14px 16px}
+  .arch-sum-metrics{margin-left:0; gap:16px; width:100%; justify-content:space-between}
+  .arch-sum-year{font-size:var(--text-xl)}
+  .arch-hero{flex-wrap:wrap}
+  .arch-hero-stats{order:3; width:100%; justify-content:flex-start}
+  .arch-hero-move{order:2; margin-left:auto}
+  .arch-legend-hint{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  .arch-row,.arch-node{transition:none}
+  .arch-row:hover,.arch-node:hover{transform:none}
+}
 /* §§ /BLOCK:MOCK_TBL §§ */
 
 /* ═════════════════════════════════════════════════════════════════════════
@@ -9889,7 +9996,6 @@ ock Drafts table CSS ───────────────────�
         <option value="2023">2023</option>
         <option value="2022">2022</option>
       </select>
-      <span style="font-size:var(--text-xs);color:var(--gray-400);font-style:italic">Click any player name to see their pick trend over time →</span>
       <span class="count-badge" id="mockInfo"></span>
     </div>
     <div id="mocksContent"></div>
@@ -11245,6 +11351,18 @@ function splitName(n) {
   const i = n.indexOf(' - ');
   return i > 0 ? [n.slice(0, i), n.slice(i + 3)] : [n, ''];
 }
+// STRUCTURAL: comp / comp_tool must be a textual archetype list. Some historical
+// classes (e.g. 2024) store a NUMERIC value in `comp` (a leftover score column),
+// which has no .split() and previously threw a TypeError that aborted the entire
+// card render for that year. Returns a usable comp string, or '' when comp is
+// numeric/empty/letterless so callers cleanly skip the comp section.
+function compText(p) {
+  if (!p) return '';
+  var c = (typeof p.comp === 'string' && p.comp) ? p.comp
+        : (typeof p.comp_tool === 'string' && p.comp_tool) ? p.comp_tool
+        : '';
+  return /[a-zA-Z]/.test(c) ? c : '';
+}
 function fmtHt(v) {
   if (!v) return '—';
   let f = Math.floor(v / 12), i = Math.round(v % 12);
@@ -12027,15 +12145,28 @@ function _computePhotoUrl(playerName, cssPx) {
   return null;
 }
 
-function avatarHtml(playerName, position, size='52px', borderRadius='10px', spotlight=false) {
+// STRUCTURAL: prior-year (≤2025) player photos were frequently wrong (ESPN
+// headshot lookups by name collide across classes), so we no longer render
+// photos for those classes anywhere — Past Boards table/cards, the modal opened
+// from a past board, YoY anchor, scatter tooltip card, mock-draft entries. The
+// initials-on-position-color fallback that avatarHtml already produces takes
+// over. Pass `year` (any 4-digit class) to opt into the gate; omitting it keeps
+// the 2026+ photo behavior unchanged.
+function _photoAllowedForYear(year) {
+  if (year == null || year === '') return true;        // unknown → keep photo
+  var n = parseInt(year, 10);
+  return !isNaN(n) ? (n >= 2026) : true;
+}
+function avatarHtml(playerName, position, size='52px', borderRadius='10px', spotlight=false, year=null) {
   const color    = posColor(position);
   const initials = escHtml(getInitials(playerName).toUpperCase());
   // Resolve the CSS box to a concrete pixel size so the photo can be fetched at
   // the right resolution. '100%' (modal) fills the largest container (~96px),
   // so we treat it as 96 for sizing purposes; the img still stretches to 100%.
   const sizePx   = (typeof size === 'string' && size.indexOf('%') >= 0) ? 96 : (parseInt(size, 10) || 52);
-  const url      = getPhotoUrl(playerName, sizePx);
-  const fullUrl  = getPhotoUrl(playerName);   // direct full-res, for error retry
+  const allowPhoto = _photoAllowedForYear(year);
+  const url      = allowPhoto ? getPhotoUrl(playerName, sizePx) : '';
+  const fullUrl  = allowPhoto ? getPhotoUrl(playerName) : '';   // direct full-res, for error retry
   // onload: if ESPN returns a silent placeholder (naturalWidth <= 10) show initials instead
   const loadChk  = "if(this.naturalWidth<=10){this.style.display='none';this.nextElementSibling.style.display='flex';}";
   // onerror: if the resized combiner image fails, retry the direct full-res URL
@@ -12908,8 +13039,8 @@ function buildPlayerCard(p, tierKey, _metricsSorted) {
 
   // ── Comp pills with avatar initials ─────────────────────────────────
   var compHtml = '';
-  if (p.comp || p.comp_tool) {
-    var compStr = p.comp || p.comp_tool;
+  var compStr = compText(p);
+  if (compStr) {
     var compAll = compStr.split(/[\/,·+]/).map(function(s){ return s.trim(); }).filter(Boolean);
     // VISUAL: cap to ONE line — show at most 3 archetypes, and if more exist
     // append a compact "+N" chip rather than wrapping to a second row (which
@@ -13525,7 +13656,7 @@ function openPlayerModal(rank, year) {
     var av = document.getElementById('modalAvatar');
     if (!av) return;
     av.classList.remove('holo-on');              // clean by default
-    var photo = avatarHtml(player.name, player.position, '100%', '12px');
+    var photo = avatarHtml(player.name, player.position, '100%', '12px', false, yr);
     // One-time inline SVG filter for the "projection instability" warp.
     if (!document.getElementById('holoWarpSvg')) {
       var svgNS = 'http://www.w3.org/2000/svg';
@@ -14824,7 +14955,7 @@ function _ceRender() {
       + '</div>';
   }
   if (anchorAvatar) {
-    anchorAvatar.innerHTML = avatarHtml(name, anchor.position || '', '60px', '10px');
+    anchorAvatar.innerHTML = avatarHtml(name, anchor.position || '', '60px', '10px', false, _ceState.anchorYear);
   }
   if (anchor.metric && anchor.metric > 0) {
     if (anchorMetric) anchorMetric.style.display = '';
@@ -15304,29 +15435,39 @@ function getBoardRank(playerName, year) {
 
 let trendChart = null;
 
-// ── MOCK DRAFTS ───────────────────────────────────────────────────────────────
+// ── MOCK DRAFTS — ARCHIVE "Consensus Ledger" ────────────────────────────────
+// REDESIGN: the prior layout was a wide spreadsheet — one column per snapshot,
+// every cell a redundant mini-card (photo + 4 stats repeated for the same player
+// across columns). It answered "who was picked where" but buried the question a
+// GM actually asks of an archive: how did each slot MOVE, and where did the
+// boards disagree? This rebuild reframes each pick as a row-card whose hero is
+// the CONSENSUS pick (the latest snapshot), with a horizontal MOVEMENT TRACK on
+// the right that shows who held the slot at each snapshot and lights up amber
+// only where the name flipped — so volatility is legible at a glance and stats
+// appear once per row instead of N times.
 function renderMocks() {
   const yr       = document.getElementById('mockYear').value;
   const yearData = DATA.mocks[yr] || {};
   const snapshots= Object.keys(yearData);
 
-  // Cache by year + snapshot count — prevents re-render on repeated onchange
   var _mSig = 'mocks|' + yr + '|' + snapshots.length;
   if (_hwCacheValid('mocks', _mSig)) { return; }
   _hwCacheSet('mocks', _mSig);
 
   if (!snapshots.length) {
     document.getElementById('mocksContent').innerHTML =
-      '<div class="empty"><div class="empty-icon">📋</div><p>No mock draft data for this year yet</p></div>';
+      '<div class="empty"><div class="empty-icon">\uD83D\uDCCB</div>'
+      + '<p>No mock drafts archived for this class yet.</p></div>';
     document.getElementById('mockInfo').textContent = '';
     return;
   }
-  document.getElementById('mockInfo').textContent = snapshots.length + ' snapshots';
+  document.getElementById('mockInfo').textContent =
+    snapshots.length + ' snapshot' + (snapshots.length === 1 ? '' : 's');
 
-  // All picks across all snapshots
+  // All picks across all snapshots, ascending.
   const allPicks = new Set();
   snapshots.forEach(s => yearData[s].forEach(p => allPicks.add(p.pick)));
-  const sortedPicks = [...allPicks].sort((a,b) => a-b);
+  const sortedPicks = [...allPicks].sort((a, b) => a - b);
 
   // pickTable[pick][snap] = entry | null
   const pickTable = {};
@@ -15337,88 +15478,183 @@ function renderMocks() {
     });
   });
 
-  // ── Table ────────────────────────────────────────────────────────
-  let h = '<div class="mock-table-wrap"><table class="mock-table"><thead><tr>'
-    + '<th class="pick-th">PICK</th>';
+  // Helper — base player name (school suffix stripped) used for change detection.
+  function baseName(raw) { return raw ? splitName(raw)[0] : ''; }
 
-  snapshots.forEach(s => {
-    h += '<th><div class="mock-th-inner">'
-      + '<span class="mock-th-date">' + s + '</span>'
-      + '<span class="mock-th-label">Snapshot</span>'
-      + '</div></th>';
-  });
-  h += '</tr></thead><tbody>';
-
-  sortedPicks.forEach((pick, ri) => {
-    const isLotto = pick <= 14;
-    const altCls  = ri % 2 === 1 ? ' alt' : '';
-    h += '<tr class="' + altCls + '">';
-    h += '<td class="pick-td"><span class="pick-num' + (isLotto ? ' lotto' : '') + '">'
-      + (pick < 10 ? '0'+pick : pick) + '</span></td>';
-
+  // ── Class-level summary: total slots, how many were wire-to-wire stable,
+  // and the single most-volatile slot. Gives the GM an instant read before
+  // they scan a single row.
+  let stableCount = 0, mostChanges = 0, mostChangesPick = null;
+  const rowMeta = {}; // pick -> { changes, finalName, finalEntry, firstName, firstEntry, riser }
+  sortedPicks.forEach(pick => {
+    let prev = null, changes = 0, firstName = '', firstEntry = null,
+        finalName = '', finalEntry = null;
     snapshots.forEach(snap => {
-      const entry = pickTable[pick][snap];
-      if (entry && entry.player) {
-        const [name] = splitName(entry.player);
-        const norm   = normalizeName(entry.player);
-        const rawTeam= (entry.team || '').trim();
-        // Extract base 3-letter code + via note
-        const baseTeam = normalizeTeamCode(rawTeam);
-        const via      = normalizeTeamCode((rawTeam.match(/\(([^)]+)\)/) || [])[1] || '');
-        const logoId   = NBA_TEAM_IDS[baseTeam];
-        const logoHtml = logoId
-          ? '<img class="mock-team-logo" loading="lazy" src="https://a.espncdn.com/i/teamlogos/nba/500/'
-              + logoId + '.png" onerror="this.style.display=\'none\'" alt="' + baseTeam + '">'
-          : (baseTeam
-              ? '<div class="mock-team-logo-fb">' + baseTeam + '</div>'
-              : '');
-
-        // Look up player stats from the matching board
-        const pStats = mockPlayerStats(entry.player, yr);
-        let statsHtml = '';
-        if (pStats) {
-          const mV = (pStats.metric && pStats.metric>0) ? Number(pStats.metric).toFixed(1) : null;
-          const tV = (pStats.ts_pct && pStats.ts_pct>0) ? (pStats.ts_pct*100).toFixed(1)+'%' : null;
-          const pV = (pStats.pa2_usg && pStats.pa2_usg>0) ? Math.round(pStats.pa2_usg) : null;
-          const sV = (pStats.stl_bl && pStats.stl_bl>0) ? parseFloat(pStats.stl_bl).toFixed(1) : null;
-          if (mV || tV || pV || sV) {
-            const metSty = mV ? bbMetStyle(parseFloat(mV)) : '';
-            var tsStyM = pStats.ts_pct  ? gradStyle(pStats.ts_pct, 'ts_pct')   : '';
-            var paStyM = pStats.pa2_usg ? gradStyle(pStats.pa2_usg,'pa2_usg')  : '';
-            var sbStyM = pStats.stl_bl  ? gradStyle(pStats.stl_bl, 'stl_bl')   : '';
-            statsHtml = '<div class="mock-stats-row">'
-              + (mV ? '<div class="mock-stat-box" style="'+metSty+'"><div class="mock-sval">'+mV+'</div><div class="mock-slbl">Metric</div></div>' : '')
-              + (tV ? '<div class="mock-stat-box" style="'+tsStyM+'"><div class="mock-sval">'+tV+'</div><div class="mock-slbl">TS%</div></div>' : '')
-              + (pV ? '<div class="mock-stat-box" style="'+paStyM+'"><div class="mock-sval">'+String(pV)+'</div><div class="mock-slbl">P+A/USG</div></div>' : '')
-              + (sV ? '<div class="mock-stat-box" style="'+sbStyM+'"><div class="mock-sval">'+sV+'</div><div class="mock-slbl">Stl+Bl</div></div>' : '')
-              + '</div>';
-          }
-        }
-
-        h += '<td><div class="mock-cell">'
-          + '<div class="mock-pick-left">'
-          + avatarHtml(entry.player, '', '28px', '5px')
-          + logoHtml
-          + '<div class="mock-cell-info">'
-            + '<span class="mock-player-link" onclick="openTrendModal(\''
-              + escJs(norm) + '\',\'' + yr + '\',\'' + escJs(entry.player) + '\')">'
-              + name + '</span>'
-            + (rawTeam ? '<div class="mock-team-line">'
-              + '<span class="mock-team-code">' + baseTeam + '</span>'
-              + (via ? '<span class="mock-via">via ' + via + '</span>' : '')
-              + '</div>' : '')
-          + '</div>'
-          + '</div>'
-          + (statsHtml ? '<div class="mock-pick-stats">' + statsHtml + '</div>' : '')
-        + '</div></td>';
-      } else {
-        h += '<td><div class="mock-empty">—</div></td>';
+      const e = pickTable[pick][snap];
+      const nm = e && e.player ? baseName(e.player) : null;
+      if (nm) {
+        if (!firstName) { firstName = nm; firstEntry = e; }
+        finalName = nm; finalEntry = e;
+        if (prev !== null && nm !== prev) changes++;
+        prev = nm;
       }
     });
-    h += '</tr>';
+    if (changes === 0 && finalName) stableCount++;
+    if (changes > mostChanges) { mostChanges = changes; mostChangesPick = pick; }
+    rowMeta[pick] = { changes, firstName, firstEntry, finalName, finalEntry };
   });
 
-  h += '</tbody></table></div>';
+  const firstDate = snapshots[0];
+  const lastDate  = snapshots[snapshots.length - 1];
+
+  // ── Header band: class identity + the three numbers that frame the archive.
+  let h = '<div class="arch-wrap">';
+  h += '<div class="arch-summary">'
+     + '<div class="arch-sum-headline">'
+     +   '<span class="arch-sum-year">' + escHtml(yr) + '</span>'
+     +   '<span class="arch-sum-cls">Draft Class</span>'
+     + '</div>'
+     + '<div class="arch-sum-window">'
+     +   '<span class="arch-sum-win-from">' + escHtml(firstDate) + '</span>'
+     +   '<span class="arch-sum-win-arrow" aria-hidden="true">\u2192</span>'
+     +   '<span class="arch-sum-win-to">' + escHtml(lastDate) + '</span>'
+     +   '<span class="arch-sum-win-lbl">tracking window</span>'
+     + '</div>'
+     + '<div class="arch-sum-metrics">'
+     +   '<div class="arch-sum-metric"><span class="arch-sum-num">' + snapshots.length + '</span><span class="arch-sum-lbl">snapshots</span></div>'
+     +   '<div class="arch-sum-metric"><span class="arch-sum-num">' + sortedPicks.length + '</span><span class="arch-sum-lbl">picks tracked</span></div>'
+     +   '<div class="arch-sum-metric"><span class="arch-sum-num arch-sum-stable">' + stableCount + '</span><span class="arch-sum-lbl">held wire&#8209;to&#8209;wire</span></div>'
+     + '</div>'
+     + '</div>';
+
+  // Legend — explains the movement track encoding in the interface's voice.
+  h += '<div class="arch-legend">'
+     + '<span class="arch-legend-item"><span class="arch-leg-dot arch-leg-hold"></span>Same name held</span>'
+     + '<span class="arch-legend-item"><span class="arch-leg-dot arch-leg-flip"></span>Pick changed here</span>'
+     + '<span class="arch-legend-item arch-legend-hint">Tap a name to chart its full slide \u2192</span>'
+     + '</div>';
+
+  h += '<div class="arch-ledger">';
+
+  sortedPicks.forEach(pick => {
+    const meta = rowMeta[pick];
+    if (!meta.finalEntry) {            // slot empty in every snapshot
+      h += '<div class="arch-row arch-row--empty">'
+         + '<div class="arch-pick"><span class="arch-pick-num">' + (pick<10?'0'+pick:pick) + '</span></div>'
+         + '<div class="arch-empty-note">No pick recorded</div>'
+         + '</div>';
+      return;
+    }
+
+    const tierKey = pick <= 5 ? 'franchise' : pick <= 14 ? 'lottery' : pick <= 30 ? 'late1' : 'second';
+    const consensus = meta.finalEntry;
+    const [cName]   = splitName(consensus.player);
+    const cNorm     = normalizeName(consensus.player);
+    const cSchool   = splitName(consensus.player)[1] || '';
+    const cTeamRaw  = (consensus.team || '').trim();
+    const cTeam     = normalizeTeamCode(cTeamRaw);
+    const cVia      = normalizeTeamCode((cTeamRaw.match(/\(([^)]+)\)/) || [])[1] || '');
+    const cTeamName = NBA_TEAM_NAMES[cTeam] || cTeam || '\u2014';
+    const teamLogo  = cTeamRaw ? nbaTeamLogoHtml(cTeamRaw, '30px', '50%') : '';
+    const schoolLogo= cSchool ? schoolLogoHtml(cSchool, '15px', '3px') : '';
+
+    // Movement classification for the row badge.
+    let moveBadge;
+    if (meta.changes === 0) {
+      moveBadge = '<span class="arch-move-badge arch-move-stable">Wire&#8209;to&#8209;wire</span>';
+    } else {
+      const rose = meta.firstName !== meta.finalName;
+      moveBadge = '<span class="arch-move-badge arch-move-churn">'
+        + meta.changes + ' change' + (meta.changes === 1 ? '' : 's') + '</span>';
+      void rose;
+    }
+
+    // Consensus player stats (shown ONCE, for the latest pick).
+    const pStats = mockPlayerStats(consensus.player, yr);
+    let statChips = '';
+    if (pStats) {
+      const mV = (pStats.metric  && pStats.metric  > 0) ? Number(pStats.metric).toFixed(1) : null;
+      const tV = (pStats.ts_pct  && pStats.ts_pct  > 0) ? (pStats.ts_pct * 100).toFixed(1) : null;
+      const pV = (pStats.pa2_usg && pStats.pa2_usg > 0) ? Math.round(pStats.pa2_usg) : null;
+      const sV = (pStats.stl_bl  && pStats.stl_bl  > 0) ? parseFloat(pStats.stl_bl).toFixed(1) : null;
+      const chip = (val, lbl, sty, suf) => val == null ? ''
+        : '<div class="arch-stat" style="' + sty + '"><span class="arch-stat-val">' + val + (suf||'') + '</span><span class="arch-stat-lbl">' + lbl + '</span></div>';
+      statChips = chip(mV, 'Metric',  mV ? bbMetStyle(parseFloat(mV)) : '')
+                + chip(tV, 'TS%',     pStats.ts_pct  ? gradStyle(pStats.ts_pct,  'ts_pct')  : '', '%')
+                + chip(pV, 'P+A/USG', pStats.pa2_usg ? gradStyle(pStats.pa2_usg, 'pa2_usg') : '')
+                + chip(sV, 'Stl+Bl',  pStats.stl_bl  ? gradStyle(pStats.stl_bl,  'stl_bl')  : '');
+    }
+
+    // ── Movement track — one node per snapshot, connectors light amber at flips.
+    let track = '<div class="arch-track" role="list" aria-label="Pick #' + pick + ' across snapshots">';
+    let prevName = null;
+    snapshots.forEach((snap, si) => {
+      const e  = pickTable[pick][snap];
+      const nm = e && e.player ? baseName(e.player) : null;
+      const flipped = si > 0 && nm && prevName && nm !== prevName;
+      const isLast  = si === snapshots.length - 1;
+
+      // Connector (between previous node and this one) — amber when the name flipped.
+      if (si > 0) {
+        track += '<span class="arch-conn' + (flipped ? ' arch-conn--flip' : '') + '" aria-hidden="true"></span>';
+      }
+
+      if (nm) {
+        const eNorm  = normalizeName(e.player);
+        const eTeam  = normalizeTeamCode((e.team || '').trim());
+        const tip    = escHtml(snap) + ' \u00b7 ' + escHtml(nm) + (eTeam ? ' (' + escHtml(eTeam) + ')' : '');
+        track += '<button class="arch-node' + (flipped ? ' arch-node--flip' : '')
+          + (isLast ? ' arch-node--now' : '') + '" role="listitem"'
+          + ' title="' + tip + '"'
+          + ' onclick="openTrendModal(\'' + escJs(eNorm) + '\',\'' + yr + '\',\'' + escJs(e.player) + '\')">'
+          + '<span class="arch-node-date">' + escHtml(snap) + '</span>'
+          + '<span class="arch-node-name">' + escHtml(nm) + '</span>'
+          + (eTeam ? '<span class="arch-node-team">' + escHtml(eTeam) + '</span>' : '<span class="arch-node-team arch-node-team--none">\u2014</span>')
+          + '</button>';
+        prevName = nm;
+      } else {
+        track += '<div class="arch-node arch-node--gap" role="listitem" title="' + escHtml(snap) + ' \u00b7 not mocked">'
+          + '<span class="arch-node-date">' + escHtml(snap) + '</span>'
+          + '<span class="arch-node-name arch-node-name--gap">\u2014</span>'
+          + '</div>';
+      }
+    });
+    track += '</div>';
+
+    h += '<div class="arch-row arch-row--' + tierKey + '">'
+       // Pick number + tier rail + movement badge
+       + '<div class="arch-pick">'
+       +   '<span class="arch-pick-num">' + (pick<10?'0'+pick:pick) + '</span>'
+       +   '<span class="arch-pick-lbl">pick</span>'
+       +   moveBadge
+       + '</div>'
+       // Consensus hero — two-tier: identity row on top, school/role + stats below
+       + '<div class="arch-hero">'
+       +   '<div class="arch-hero-top">'
+       +     '<div class="arch-hero-photo">' + avatarHtml(consensus.player, pStats ? (pStats.position||'') : '', '46px', '9px', false, yr) + '</div>'
+       +     '<div class="arch-hero-id">'
+       +       '<button class="arch-hero-name" onclick="openTrendModal(\'' + escJs(cNorm) + '\',\'' + yr + '\',\'' + escJs(consensus.player) + '\')">' + escHtml(cName) + '</button>'
+       +       '<div class="arch-hero-team">'
+       +         (teamLogo || '')
+       +         '<span class="arch-hero-team-name">' + escHtml(cTeamName) + '</span>'
+       +         (cVia ? '<span class="arch-hero-via">via ' + escHtml(cVia) + '</span>' : '')
+       +       '</div>'
+       +     '</div>'
+       +   '</div>'
+       +   '<div class="arch-hero-bottom">'
+       +     '<div class="arch-hero-sub">'
+       +       (schoolLogo ? '<span class="arch-hero-school">' + schoolLogo + '<span>' + escHtml(cSchool) + '</span></span>' : '')
+       +       (pStats && pStats.torvik_role ? '<span class="arch-hero-role">' + escHtml(pStats.torvik_role) + '</span>' : '')
+       +     '</div>'
+       +     (statChips ? '<div class="arch-hero-stats">' + statChips + '</div>' : '')
+       +   '</div>'
+       + '</div>'
+       // Movement track
+       + '<div class="arch-track-wrap">' + track + '</div>'
+       + '</div>';
+  });
+
+  h += '</div></div>'; // ledger + wrap
   document.getElementById('mocksContent').innerHTML = h;
 }
 
@@ -15662,7 +15898,7 @@ function renderHistory() {
     const atoV = p.ato     ? parseFloat(p.ato).toFixed(2)     : '—';
     const ftaV = p.ftar    ? parseFloat(p.ftar).toFixed(3)    : '—';
     const tpaV = p.tpar    ? parseFloat(p.tpar).toFixed(3)    : '—';
-    const av   = avatarHtml(p.name, p.position||'', '28px', '5px').replace('class="avatar-fallback"','class="td-mini-fb"');
+    const av   = avatarHtml(p.name, p.position||'', '28px', '5px', false, yr).replace('class="avatar-fallback"','class="td-mini-fb"');
     const hLogo = schoolLogoHtml(rawSchool || '', '16px', '2px');
     const hSchoolSpan = hLogo
       ? '<span class="school" style="display:inline-flex;align-items:center;gap:4px">' + hLogo + '<span>' + (school || '') + '</span></span>'
@@ -15689,77 +15925,259 @@ function renderHistory() {
   document.getElementById('historyContent').innerHTML = html;
 }
 
-// Past Boards — card view. Surface mirrors the 2027 board cards; body shows
-// the metric strip + draft outcome (team / pick / rank Δ). Receives the
-// shared per-year gradient fn so card stat tints match the table exactly.
+// Past Boards — card view. STRUCTURAL: renders on the shared .player-card
+// system (identical to the 2026 Draft Board and 2027 Future Watch cards) so all
+// three RANK/HISTORY tabs are true siblings — same tier bar, rank badge, 70px
+// avatar, metric panel + percentile, bio strip, positional stat grid and comp
+// pills. Past Boards carries the SAME data layer as 2026 (position, class, ht,
+// wt, age, BPM trio, comps) PLUS the historical-only draft outcome, so it
+// degrades the least of the three. Two Past-Boards-specific adaptations vs the
+// 2026 card: (1) all gradients/percentiles are computed against THIS draft
+// class — stat tints via the passed-in hGrad / crossGradStyle(...,yr), and the
+// metric percentile + positional stat tracks against per-year arrays built
+// below — so colors stay honest to the year, never 2026's pool; (2) a draft-
+// outcome footer (team / pick / rank Δ) replaces 2026's NBA-destination block.
 function _renderHistoryCards(players, yr, hasDraft, hGrad) {
-  // Rank-band tiers — same monochromatic ladder as the 2027 board.
-  function tierColor(rank) {
-    if (rank <= 5)  return '#C9971A';
-    if (rank <= 14) return '#2C4569';
-    if (rank <= 30) return '#475569';
-    return '#94A3B8';
-  }
-  function fmt(v, kind) {
-    if (v === null || v === undefined || v === 0 || v === '') return '—';
-    if (kind === 'metric') return Number(v).toFixed(1);
-    if (kind === 'pct')    return pct(v);
-    if (kind === 'round')  return Math.round(v);
-    if (kind === 'f2')     return parseFloat(v).toFixed(2);
-    return v;
-  }
-  var out = '<div class="hist-cards-grid">';
-  players.forEach(function(p) {
-    var [rawName, rawSchool] = splitName(p.name);
-    var name   = escHtml(rawName);
-    var school = escHtml(rawSchool || '');
-    var color  = tierColor(p.rank);
-    var av = avatarHtml(p.name, p.position||'', '42px', '9px');
-    var logo = rawSchool ? schoolLogoHtml(rawSchool, '15px', '2px') : '';
+  // Rank-band tiers mapped onto the shared .player-card tier keys so the tier
+  // bar, glow color and section header all match the 2027 board exactly.
+  var tiers = [
+    { key:'franchise', label:'Top 5',          min:1,  max:5   },
+    { key:'lottery',   label:'Lottery',         min:6,  max:14  },
+    { key:'late1',     label:'First Round',     min:15, max:30  },
+    { key:'second',    label:'Second Round +',  min:31, max:999 },
+  ];
+  var TIER_GLOW = {
+    franchise:'245,158,11', lottery:'139,92,246',
+    late1:'59,130,246', second:'8,145,178'
+  };
+  var TIER_DOT = {
+    franchise:'#C9971A', lottery:'#2C4569', late1:'#475569', second:'#94A3B8'
+  };
 
-    out += '<div class="hist-card" style="--hc-color:'+color+'" onclick="openPlayerModal('+p.rank+',\''+yr+'\')">';
-    out += '<div class="hist-card-header">';
-    out += '<div class="hist-rank-badge"><div class="rn">'+p.rank+'</div><div class="rl">rank</div></div>';
-    out += av;
-    out += '<div class="hist-card-identity">';
-    out += '<div class="hist-card-name">'+name+'</div>';
-    if (school) out += '<div class="hist-card-school">'+(logo||'')+'<span>'+school+'</span></div>';
-    if (p.torvik_role) out += '<div class="hist-card-role">'+escHtml(p.torvik_role)+'</div>';
-    out += '</div></div>'; // identity + header
+  // Per-class metric sort for the headline percentile (scoped to THIS year).
+  var metSorted = players.map(function(p){ return p.metric; })
+    .filter(function(v){ return v !== null && v !== undefined && v !== 0 && v !== ''; })
+    .map(Number).sort(function(a,b){ return a-b; });
 
-    // Stat strip — 4 most-informative metrics, tinted by the shared gradient.
-    var cells = [
-      { v: fmt(p.metric,'metric'), l:'Metric', g: hGrad(p.metric,'metric') },
-      { v: fmt(p.ts_pct,'pct'),    l:'TS%',    g: hGrad(p.ts_pct,'ts_pct') },
-      { v: fmt(p.pa2_usg,'round'), l:'P+A/USG',g: hGrad(p.pa2_usg,'pa2_usg') },
-      { v: fmt(p.stl_bl,'f2'),     l:'Stl+Bl', g: hGrad(p.stl_bl,'stl_bl') },
-    ];
-    out += '<div class="hist-card-stats">';
-    cells.forEach(function(c) {
-      out += '<div class="hist-stat" style="'+(c.g||'')+'"><div class="hs-v"'+(c.g?' style="color:inherit"':'')+'>'+c.v+'</div><div class="hs-l">'+c.l+'</div></div>';
+  // Positional value arrays for the stat-cell percentile tracks, within THIS
+  // year's class (mirrors the 2027 renderer's POS27, but scoped per-year).
+  var POSY = {};
+  var RING = ['ts_pct','pa2_usg','stl_bl','ato','ftar','tpar','obpm','dbpm','bpm'];
+  ['Guard','Forward','Center'].forEach(function(pos){
+    POSY[pos] = {};
+    RING.forEach(function(k){
+      POSY[pos][k] = players.filter(function(p){ return p.position===pos; })
+        .map(function(p){ return p[k]; })
+        .filter(function(v){ return v !== null && v !== undefined && v !== 0 && v !== ''; })
+        .map(Number).sort(function(a,b){ return a-b; });
     });
-    out += '</div>';
+  });
+  function pPctY(value, key, pos) {
+    if (value === null || value === undefined || value === 0 || value === '') return null;
+    var arr = POSY[pos] && POSY[pos][key];
+    if (!arr || arr.length < 3) return null;
+    var v = Number(value), lo = 0, hi = arr.length;
+    while (lo < hi) { var mid=(lo+hi)>>>1; if (arr[mid] < v) lo=mid+1; else hi=mid; }
+    return Math.round((lo/arr.length)*100);
+  }
 
-    // Draft outcome footer.
-    if (hasDraft) {
-      var diff = p.draft_diff;
-      var deltaHtml = '';
-      if (typeof diff === 'number') {
-        var dc = diff>0?'var(--green)':diff<0?'var(--red)':'var(--gray-400)';
-        var dt = diff>0?('+'+diff):(''+diff);
-        deltaHtml = '<span class="hist-draft-delta" style="color:'+dc+'">'+dt+'</span>';
+  function fmtRate(v){ return (v||v===0) && v!=='' && v!==null ? parseFloat(v).toFixed(3).replace(/^0\./,'.') : '\u2014'; }
+  function fmtBpm(v){
+    if (v === null || v === undefined || v === '') return '\u2014';
+    var n = parseFloat(v); if (isNaN(n)) return '\u2014';
+    return (n > 0 ? '+' : '') + n.toFixed(1);
+  }
+  function clsAbbrev(cls){
+    if(!cls) return '';
+    var c=cls.toLowerCase();
+    if(c==='freshman'||c==='fresh') return 'FR';
+    if(c==='sophomore') return 'SO';
+    if(c==='junior') return 'JR';
+    if(c==='senior') return 'SR';
+    return cls.slice(0,3).toUpperCase();
+  }
+
+  // Stat cell — gradient tint via the per-year hGrad (matches the table); the
+  // percentile chip + fill track use the per-year positional arrays above.
+  function statCellY(value, key, disp, label, pos, extraCls) {
+    var pp = pPctY(value, key, pos);
+    var barW = pp != null ? Math.max(4, pp) : null;
+    var track = barW != null
+      ? '<div class="stat-track"><div class="stat-track-fill" style="width:'+barW+'%;color:'+posPctInk(pp)+'"></div></div>' : '';
+    var chip = pp != null
+      ? '<span class="stat-pos-pct" style="color:'+posPctInk(pp)+'">'+pp+'</span>' : '';
+    return '<div class="stat-cell'+(extraCls?' '+extraCls:'')+'" style="'+(hGrad(value,key)||'')+'">'
+      + '<div class="stat-val">'+disp+'</div>'
+      + '<div class="stat-lbl">'+label+'</div>'
+      + chip + track + '</div>';
+  }
+
+  var out = '<div class="future-cards-wrap">';
+  tiers.forEach(function(tier) {
+    var group = players.filter(function(p){ return p.rank >= tier.min && p.rank <= tier.max; });
+    if (!group.length) return;
+    out += '<div class="future-tier-section">';
+    out += '<div class="future-tier-header">'
+         + '<span class="future-tier-dot" style="background:'+TIER_DOT[tier.key]+';color:'+TIER_DOT[tier.key]+'"></span>'
+         + '<span class="future-tier-label">'+tier.label+'</span>'
+         + '<span class="future-tier-count">'+group.length+' prospect'+(group.length===1?'':'s')+'</span></div>';
+    out += '<div class="cards-grid">';
+
+    group.forEach(function(p) {
+      var parts     = splitName(p.name || '');
+      var nameRaw   = parts[0];
+      var schoolRaw = parts[1] || '';
+      var _sp = nameRaw.indexOf(' ');
+      var nameFirst = escHtml(_sp > 0 ? nameRaw.slice(0, _sp) : nameRaw);
+      var nameLast  = escHtml(_sp > 0 ? nameRaw.slice(_sp + 1) : '');
+      var school    = escHtml(schoolRaw);
+      var glow      = TIER_GLOW[tier.key] || '10,22,40';
+
+      // Metric panel — value, elite flag, per-year gradient + class percentile.
+      var mv = (p.metric || p.metric===0) && p.metric!=='' && p.metric!==null ? Number(p.metric).toFixed(1) : '\u2014';
+      var isElite = p.metric > 140;
+      var gm = crossGradStyle(p.metric, 'metric', yr);
+      var gmBg = gm.match(/background:([^;]+)/), gmFg = gm.match(/color:([^;]+)/);
+      var panelStyle = (gmBg?'background:'+gmBg[1]+';':'') + (gmFg?'color:'+gmFg[1]+';':'');
+      var metPctHtml = '';
+      if (p.metric && metSorted.length) {
+        var lo=0, hi=metSorted.length;
+        while(lo<hi){ var mid=(lo+hi)>>>1; if(metSorted[mid]<p.metric) lo=mid+1; else hi=mid; }
+        var mp = Math.round((lo/metSorted.length)*100);
+        metPctHtml = '<div class="card-metric-pct"><span class="card-metric-pct-num">'+mp+'<sup>'+ordSfx(mp)+'</sup></span>'
+                   + '<span class="card-metric-pct-lbl">in class</span></div>';
       }
-      if (p.team || p.draft_no) {
-        out += '<div class="hist-card-draft">';
-        out += '<span class="hist-draft-pick">'+(p.draft_no?('#'+Math.round(p.draft_no)):'UDFA')+'</span>';
-        out += '<span class="hist-draft-team">'+escHtml(p.team||'—')+'</span>';
-        out += deltaHtml;
-        out += '</div>';
-      } else {
-        out += '<div class="hist-card-undrafted">Undrafted</div>';
+
+      // Crown for top 3
+      var crownHtml = (p.rank<=3) ? '<span class="card-rank-crown">'+(p.rank===1?'👑':p.rank===2?'🥈':'🥉')+'</span>' : '';
+
+      // Role line
+      var roleLineHtml = p.torvik_role
+        ? '<div class="card-role-line"><span class="role-name">'+escHtml(p.torvik_role)+'</span></div>' : '';
+
+      // Bio strip
+      var clsAbbr = clsAbbrev(p.cls);
+      var htDisplay = p.ht ? (Math.floor(p.ht/12)+'\''+(p.ht%12)+'"') : '';
+      var bioItems = '';
+      if (clsAbbr) bioItems += '<div class="card-bio-item"><div class="card-bio-val">'+clsAbbr+'</div><div class="card-bio-lbl">Class</div></div>';
+      if (htDisplay) bioItems += '<div class="card-bio-item"><div class="card-bio-val">'+htDisplay+'</div><div class="card-bio-lbl">Height</div></div>';
+      if (p.wt) bioItems += '<div class="card-bio-item"><div class="card-bio-val">'+p.wt+' lb</div><div class="card-bio-lbl">Weight</div></div>';
+      if (p.age) {
+        var _ageN = parseFloat(p.age)||0;
+        bioItems += '<div class="card-bio-item"><div class="card-bio-val" style="'+ageColor(_ageN)+'">'+_ageN.toFixed(1)+'</div><div class="card-bio-lbl">Age</div></div>';
       }
-    }
-    out += '</div>'; // hist-card
+
+      // Stat grid — same six primary cells as 2026, plus the BPM trio when
+      // present (historical rows carry obpm/dbpm/bpm just like 2026).
+      var statsHtml =
+          statCellY(p.ts_pct,  'ts_pct',  (p.ts_pct ? (p.ts_pct*100).toFixed(1)+'%' : '\u2014'), 'TS%', p.position)
+        + statCellY(p.pa2_usg, 'pa2_usg', (p.pa2_usg ? ''+Math.round(p.pa2_usg) : '\u2014'),     'P+A/USG', p.position)
+        + statCellY(p.stl_bl,  'stl_bl',  (p.stl_bl ? parseFloat(p.stl_bl).toFixed(1) : '\u2014'),'Stl+Bl', p.position)
+        + statCellY(p.ftar,    'ftar',    fmtRate(p.ftar), 'FTAr', p.position, 'stat-cell--secondary')
+        + statCellY(p.tpar,    'tpar',    fmtRate(p.tpar), '3PAr', p.position, 'stat-cell--secondary')
+        + statCellY(p.ato,     'ato',     (p.ato ? parseFloat(p.ato).toFixed(2) : '\u2014'),     'A/TO', p.position);
+      if (p.obpm != null || p.dbpm != null || p.bpm != null) {
+        statsHtml +=
+            statCellY(p.obpm, 'obpm', fmtBpm(p.obpm), 'OBPM', p.position, 'stat-cell--bpm')
+          + statCellY(p.dbpm, 'dbpm', fmtBpm(p.dbpm), 'DBPM', p.position, 'stat-cell--bpm')
+          + statCellY(p.bpm,  'bpm',  fmtBpm(p.bpm),  'BPM',  p.position, 'stat-cell--bpm');
+      }
+
+      // Comp pills (comp may be numeric in some classes — see compText)
+      var compHtml = '';
+      var compStr = compText(p);
+      if (compStr) {
+        var compAll = compStr.split(/[\/,·+]/).map(function(s){return s.trim();}).filter(Boolean);
+        var compShown = compAll.slice(0,3), compExtra = compAll.length - compShown.length;
+        var pills = compShown.map(function(n){
+          return '<span class="card-comp-pill"><span class="card-comp-dot"></span><span class="card-comp-name">'+escHtml(n)+'</span></span>';
+        }).join('');
+        if (compExtra>0) pills += '<span class="card-comp-pill card-comp-more">+'+compExtra+'</span>';
+        compHtml = '<div class="card-comp"><span class="card-comp-label">Comp Archetypes</span>'+pills+'</div>';
+      }
+
+      // Draft-outcome row — the defining Past Boards data. STRUCTURAL: this now
+      // lives in the SAME slot as the 2026 Draft Board card (.card-id-meta,
+      // directly under the school line and above measurables) and reuses 2026's
+      // .card-dest-unit.card-drafted styling so the two read identically. Past
+      // Boards adds one element 2026 lacks — the rank Δ (draft slot vs our
+      // board) — folded in as a trailing chip on the same row. Team name is
+      // resolved to its full franchise name (e.g. "Charlotte Hornets") via the
+      // same NBA_TEAM_NAMES path the 2026 card uses; the raw string normalizes
+      // and falls back to a text badge logo when ESPN has no id.
+      var draftMetaHtml = '';
+      if (hasDraft) {
+        if (p.team || p.draft_no) {
+          var _tcode = p.team ? normalizeTeamCode(p.team) : '';
+          var _tname = _tcode ? (NBA_TEAM_NAMES[_tcode] || p.team) : (p.team || '\u2014');
+          var teamLogo = p.team ? nbaTeamLogoHtml(p.team, '34px', '50%') : '';
+          var diff = p.draft_diff, deltaHtml = '';
+          if (typeof diff === 'number') {
+            var dc = diff>0?'var(--green)':diff<0?'var(--red)':'var(--gray-500)';
+            var dt = diff>0?('+'+diff):(''+diff);
+            deltaHtml = '<span class="pc-draft-delta" title="Draft slot vs our rank" style="color:'+dc+'">'
+                      + dt + '<span class="dl">Δ</span></span>';
+          }
+          var _tip = (p.draft_no ? 'Pick ' + Math.round(p.draft_no) + ' — ' : '') + _tname
+                   + (typeof diff === 'number' ? ' (' + (diff>0?'+':'') + diff + ' vs our rank)' : '');
+          draftMetaHtml = '<div class="card-id-meta"><span class="card-dest-unit card-drafted" title="'+escHtml(_tip)+'">'
+            + (teamLogo||'')
+            + '<span class="card-dest-text">'
+            +   '<span class="card-dest-name">'+escHtml(_tname)+'</span>'
+            +   deltaHtml
+            + '</span>'
+            + '<span class="card-dest-sub">'+(p.draft_no?Math.round(p.draft_no):'UDFA')+'</span>'
+            + '</span></div>';
+        } else {
+          draftMetaHtml = '<div class="card-id-meta"><span class="card-dest-unit card-drafted card-undrafted-row">'
+            + '<span class="card-dest-text"><span class="card-dest-name">Undrafted</span></span>'
+            + '</span></div>';
+        }
+      }
+
+      var logoHtml = schoolRaw ? buildSchoolLogoHtml(schoolRaw) : '';
+      var schoolLine = '<div class="card-school-inline">'
+        + (logoHtml?'<div class="card-school-logo">'+logoHtml+'</div>':'')
+        + '<span class="card-dest-name">'+(school||'\u2014')+'</span></div>';
+
+      out += '<div class="player-card '+tier.key+'" role="button" tabindex="0"'
+        + ' aria-label="'+escHtml((p.name||'Prospect').replace(' - ',', '))+', rank '+p.rank+'. Open profile."'
+        + ' onclick="openPlayerModal('+p.rank+',\''+yr+'\')" data-rank="'+p.rank+'" style="--tier-glow:'+glow+';">'
+        + '<div class="pc-tier-bar"></div>'
+        + '<div class="pc-inner">'
+          + '<div class="card-header">'
+            + '<div class="card-header-left">'
+              + '<div class="card-rank-badge">'
+                + '<span class="card-rank-label">Rank</span>'
+                + '<span class="card-rank-num">'+p.rank+'</span>'
+                + crownHtml
+              + '</div>'
+              + '<div class="card-id-main">'
+                + '<div class="card-id-top">'
+                  + avatarHtml(p.name, p.position || '', '70px', '14px', true, yr)
+                  + '<div class="card-name">'
+                    + '<span class="card-name-first"><span class="card-name-first-text">'+nameFirst+'</span></span>'
+                    + (nameLast ? '<span class="card-name-last"><span class="card-name-last-text">'+nameLast+'</span></span>' : '')
+                    + roleLineHtml
+                    + schoolLine
+                  + '</div>'
+                + '</div>'
+                + draftMetaHtml
+              + '</div>'
+            + '</div>'
+            + '<div class="card-metric-panel" style="'+panelStyle+'">'
+              + '<div class="card-metric-label">HW Metric</div>'
+              + '<div class="card-metric'+(isElite?' elite':'')+'">'+mv+'</div>'
+              + metPctHtml
+            + '</div>'
+          + '</div>'
+          + (bioItems ? '<div class="card-measurables">'+bioItems+'</div>' : '')
+          + '<div class="card-stats">'+statsHtml+'</div>'
+          + compHtml
+        + '</div>'
+        + '</div>';
+    });
+    out += '</div></div>'; // grid + tier-section
   });
   out += '</div>';
   return out;
@@ -15932,10 +16350,10 @@ function _renderFuture2027Cards(players) {
         + statCell27(p.tpar,    'tpar',    fmtRate(p.tpar), '3PAr', p.position, 'stat-cell--secondary')
         + statCell27(p.ato,     'ato',     (p.ato ? parseFloat(p.ato).toFixed(2) : '\u2014'),     'A/TO', p.position);
 
-      // Comp pills
+      // Comp pills (comp may be numeric in some classes — see compText)
       var compHtml = '';
-      if (p.comp || p.comp_tool) {
-        var compStr = p.comp || p.comp_tool;
+      var compStr = compText(p);
+      if (compStr) {
         var compAll = compStr.split(/[\/,·+]/).map(function(s){return s.trim();}).filter(Boolean);
         var compShown = compAll.slice(0,3), compExtra = compAll.length - compShown.length;
         var pills = compShown.map(function(n){
@@ -17357,7 +17775,7 @@ function runGlobalSearch(query) {
     var primary = appearances[0]; // most recent
     var school  = primary.name.indexOf(' - ') > 0 ? primary.name.split(' - ')[1] : '';
     var logoHtml = schoolLogoHtml(school, '18px', '3px');
-    var av = avatarHtml(primary.name, primary.position || '', '44px', '8px');
+    var av = avatarHtml(primary.name, primary.position || '', '44px', '8px', false, primary._year);
 
     // Year pills for all appearances
     var yearPills = appearances.map(function(a) {
@@ -21066,7 +21484,7 @@ function renderCompare() {
     out += '<div class="compare-card-id">';
     out += '<div class="compare-card-rank" style="background:'+tierBg+'">'
          + '<div class="rn">'+p.rank+'</div><div class="rl">rank</div></div>';
-    out += avatarHtml(p.name, p.position||'', '36px', '6px');
+    out += avatarHtml(p.name, p.position||'', '36px', '6px', false, yr);
     out += '<div class="compare-card-info">'
          + '<div class="cn">'+baseH+'</div>'
          + '<div class="cs">'+(logo||'')
@@ -21211,7 +21629,7 @@ function renderCompare() {
     g += '<div class="cgh-player'+(isLdr?' is-leader':'')+'" style="--c:'+color+'">'
        + '<div class="cgh-accent"></div>'
        + '<div class="cgh-top">'
-       +   avatarHtml(p.name, p.position||'', '30px', '6px')
+       +   avatarHtml(p.name, p.position||'', '30px', '6px', false, p._year)
        +   '<div class="cgh-id">'
        +     '<span class="cgh-name">'+escHtml(nm)+'</span>'
        +     '<span class="cgh-meta">'+(p._year||'2026')+ageChip+'</span>'
@@ -23733,7 +24151,7 @@ function scShowTip(e, nearby, xM, yM) {
     let name   = pt._p._n || pt._p.name || '';
     let school = pt._p._s || '';
     let photoHtml = (typeof avatarHtml === 'function')
-      ? avatarHtml(name, pt._p.position, '40px', '8px', false)
+      ? avatarHtml(name, pt._p.position, '40px', '8px', false, pt._p._y)
       : '<div style="width:40px;height:40px;border-radius:8px;background:' + dotColor + '"></div>';
 
     // Header: photo (40px) on the left, name + school on the right.
